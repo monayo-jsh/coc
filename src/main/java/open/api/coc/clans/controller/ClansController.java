@@ -1,7 +1,8 @@
 package open.api.coc.clans.controller;
 
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.external.coc.config.ClashOfClanConfig;
+import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("clans")
 public class ClansController {
 
+    private final ClansService clansService;
+
     @GetMapping("{clanTag}")
-    public ResponseEntity<?> findClanByClanTag(@PathVariable String clanTag) {
-        return ResponseEntity.ok(clanTag);
+    public ResponseEntity<?> findClan(@PathVariable String clanTag) {
+        Map<String, Object> clan = clansService.findClanByClanTag(clanTag);
+        return ResponseEntity.ok().body(clan);
     }
+
 }

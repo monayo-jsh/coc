@@ -8,3 +8,6 @@ spring:
 external:
   coc:
     api-key: ${COC_API_KEY}
+    domain: https://api.clashofclans.com
+    end-point:
+      clans-clan-tag: /v1/clans/{clanTag}

@@ -1,6 +1,6 @@
 package open.api.external.coc.config;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +23,14 @@ class ClashOfClanConfigTest {
     @Test
     @DisplayName("configuration check not null")
     void testNotNull() {
-        assertNotNull(clashOfClanConfig.getApiKey());
+
+        assertThat(clashOfClanConfig.getApiKey()).isNotBlank();
+
+        assertThat(clashOfClanConfig.getDomain()).isNotBlank();
+        assertThat(clashOfClanConfig.getDomain()).isEqualTo("https://api.clashofclans.com");
+
+        assertThat(clashOfClanConfig.getClansClanTagUri()).isNotBlank();
+
     }
 
 }

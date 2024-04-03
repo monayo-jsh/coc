@@ -1,0 +1,10 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: coc
+
+external:
+  coc:
+    api-key: ${COC_API_KEY}

@@ -16,10 +16,32 @@ public class ClashOfClanConfig {
     @Getter
     @RequiredArgsConstructor
     private static class EndPoint {
-        private final String clansClanTag;
+
+        private final Clans clans;
+
+
+        @RequiredArgsConstructor
+        private static class Clans {
+            private final String prefix;
+            private final String clanTag;
+            private final String capitalRaidSeasons;
+
+            public String getClanTag() {
+                return prefix + clanTag;
+            }
+
+            public String getCapitalRaidSeasons() {
+                return prefix + capitalRaidSeasons;
+            }
+        }
+
     }
 
     public String getClansClanTagUri() {
-        return getDomain() + getEndPoint().getClansClanTag();
+        return getDomain() + getEndPoint().getClans().getClanTag();
+    }
+
+    public String getClansClanTagCapitalRaidSeasons() {
+        return getDomain() + getEndPoint().getClans().getCapitalRaidSeasons();
     }
 }

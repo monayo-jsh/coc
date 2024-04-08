@@ -22,4 +22,10 @@ public class ClansController {
         return ResponseEntity.ok().body(clan);
     }
 
+    @GetMapping("{clanTag}/capitalraidseasons/attackers")
+    public ResponseEntity<?> findClanCapitalRaidSeasons(@PathVariable String clanTag) {
+        Map<String, Object> clanCapitalRaidSeasons = clansService.findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, 1);
+        return ResponseEntity.ok().body(clanCapitalRaidSeasons);
+    }
+
 }

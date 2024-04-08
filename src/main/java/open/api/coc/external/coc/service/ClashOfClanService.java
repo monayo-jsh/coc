@@ -23,4 +23,16 @@ public class ClashOfClanService implements ClashOfClansApi {
                          .body(Map.class);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
+        String uri = clashOfClanConfig.getClansClanTagCapitalRaidSeasons() + "?limit=" + limit;
+        return RestClient.create()
+                         .get()
+                         .uri(uri, clanTag)
+                         .header("Authorization", "Bearer " + clashOfClanConfig.getApiKey())
+                         .retrieve()
+                         .body(Map.class);
+    }
+
 }

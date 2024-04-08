@@ -23,13 +23,13 @@ class ClashOfClanConfigTest {
     @Test
     @DisplayName("configuration check not null")
     void testNotNull() {
-
         assertThat(clashOfClanConfig.getApiKey()).isNotBlank();
 
         assertThat(clashOfClanConfig.getDomain()).isNotBlank();
         assertThat(clashOfClanConfig.getDomain()).isEqualTo("https://api.clashofclans.com");
 
         assertThat(clashOfClanConfig.getClansClanTagUri()).isNotBlank();
+        assertThat(clashOfClanConfig.getClansClanTagCapitalRaidSeasons()).isNotBlank();
 
     }
 

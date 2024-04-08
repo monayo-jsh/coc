@@ -1,13 +1,16 @@
 package open.api.coc.clans.service;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.external.coc.ClashOfClansApi;
+import open.api.coc.external.coc.domain.ClanAttackerRes;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -23,11 +26,11 @@ public class ClansService {
         return clashOfClansApi.findClanByClanTag(clanTag);
     }
 
-    public Map<String, Object> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
+    public ClanAttackerRes findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
         Map<String, Object> clanCapitalRaidSeasons = clashOfClansApi.findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, limit);
         if (ObjectUtils.isEmpty(clanCapitalRaidSeasons.get("items"))) {
             log.info("not found items.. {}", clanTag);
-            return Collections.emptyMap();
+            return ClanAttackerRes.empty(clanTag);
         }
 
         List<Map<String, Object>> items = (List<Map<String, Object>>) clanCapitalRaidSeasons.get("items");
@@ -35,21 +38,32 @@ public class ClansService {
 
         if (first.isEmpty()) {
             log.info("not found items.. {}", clanTag);
-            return Collections.emptyMap();
+            return ClanAttackerRes.empty(clanTag);
         }
 
         Map<String, Object> itemMap = first.get();
 
         if (ObjectUtils.isEmpty(itemMap.get("members"))) {
             log.info("not found members.. {}", itemMap);
-            return Collections.emptyMap();
+            return ClanAttackerRes.empty(clanTag);
         }
 
         List<Map<String, Object>> members = (List<Map<String, Object>>) itemMap.get("members");
-        return new HashMap<>(){
-            {
-                put(clanTag, members.size());
-            }
-        };
+        return ClanAttackerRes.create(clanTag, members.size());
+    }
+
+    public List<ClanAttackerRes> getCapitalAttackers() throws ExecutionException, InterruptedException {
+        List<String> CLAN_TAGS = ClanAttackerRes.CLAN_TAGS.keySet().stream().toList();
+
+        ForkJoinPool forkJoinPool = new ForkJoinPool(CLAN_TAGS.size());
+        List<ClanAttackerRes> clanAttackers = forkJoinPool.submit(() -> CLAN_TAGS.stream()
+                                                                                 .parallel()
+                                                                                 .map(clanTag -> findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, 1))
+                                                                                 .collect(Collectors.toList()))
+                                                          .get();
+
+        return clanAttackers.stream()
+                            .sorted(Comparator.comparing(ClanAttackerRes::getName))
+                            .collect(Collectors.toList());
     }
 }

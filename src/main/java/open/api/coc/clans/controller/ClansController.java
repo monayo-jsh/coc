@@ -29,19 +29,19 @@ public class ClansController {
     }
 
     @GetMapping("{clanTag}/capitalraidseasons/attack/count")
-    public ResponseEntity<?> findClanCapitalRaidSeasons(@PathVariable String clanTag) {
+    public ResponseEntity<ClanCapitalAttackerRes> findClanCapitalRaidSeasons(@PathVariable String clanTag) {
         ClanCapitalAttackerRes clanCapitalRaidAttacker = clansService.findClanCapitalRaidSeasons(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
 
     @GetMapping("capital/attack/count")
-    public ResponseEntity<?> getCapitalAttackers() throws ExecutionException, InterruptedException {
+    public ResponseEntity<List<ClanCapitalAttackerRes> > getCapitalAttackers() throws ExecutionException, InterruptedException {
         List<ClanCapitalAttackerRes> capitalAttackersMap = clansService.getCapitalAttackers();
         return ResponseEntity.ok().body(capitalAttackersMap);
     }
 
     @GetMapping("capital/under/attacker")
-    public ResponseEntity<?> getCapitalAttackerMissing() throws ExecutionException, InterruptedException {
+    public ResponseEntity<List<ClanCapitalUnderAttackerRes>> getCapitalAttackerMissing() throws ExecutionException, InterruptedException {
         List<ClanCapitalUnderAttackerRes> capitalMissingAttackers = clansService.getCapitalMissingAttackers();
         return ResponseEntity.ok().body(capitalMissingAttackers);
     }

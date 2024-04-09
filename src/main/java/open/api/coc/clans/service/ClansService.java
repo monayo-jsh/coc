@@ -13,6 +13,7 @@ import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
+import open.api.coc.clans.domain.converter.ClanCapitalRaidSeasonMemberResConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasonMember;
@@ -27,6 +28,7 @@ public class ClansService {
 
     private final ClanApiService clanApiService;
 
+    private final ClanCapitalRaidSeasonMemberResConverter clanCapitalRaidSeasonMemberResConverter;
 
     public Map<String, Object> findClanByClanTag(String clanTag) {
         return clanApiService.findClanByClanTag(clanTag);
@@ -54,7 +56,11 @@ public class ClansService {
     public ClanCapitalUnderAttackerRes getClanCapitalUnderAttackers(String clanTag, int limit) {
         List<ClanCapitalRaidSeasonMember> members = getClanCapitalRaidSeasonsMembers(clanTag, limit);
         List<ClanCapitalRaidSeasonMember> underAttackers = findUnderAttackers(members);
-        return ClanCapitalUnderAttackerRes.create(clanTag, underAttackers);
+
+
+        return ClanCapitalUnderAttackerRes.create(clanTag, underAttackers.stream()
+                                                                         .map(clanCapitalRaidSeasonMemberResConverter::convert)
+                                                                         .collect(Collectors.toList()));
     }
 
     private List<ClanCapitalRaidSeasonMember> findUnderAttackers(List<ClanCapitalRaidSeasonMember> members) {

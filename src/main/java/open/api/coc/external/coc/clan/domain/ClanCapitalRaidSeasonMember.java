@@ -20,4 +20,5 @@ public class ClanCapitalRaidSeasonMember {
         final int ATTACK_COUNT = 6;
         return attacks < ATTACK_COUNT;
     }
+
 }

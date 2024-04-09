@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.domain.ClanCapitalAttackerRes;
+import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.service.ClansService;
-import open.api.coc.external.coc.domain.ClanAttackerRes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,13 +30,19 @@ public class ClansController {
 
     @GetMapping("{clanTag}/capitalraidseasons/attack/count")
     public ResponseEntity<?> findClanCapitalRaidSeasons(@PathVariable String clanTag) {
-        ClanAttackerRes clanCapitalRaidAttacker = clansService.findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, 1);
+        ClanCapitalAttackerRes clanCapitalRaidAttacker = clansService.findClanCapitalRaidSeasons(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
 
     @GetMapping("capital/attack/count")
     public ResponseEntity<?> getCapitalAttackers() throws ExecutionException, InterruptedException {
-        List<ClanAttackerRes> capitalAttackersMap = clansService.getCapitalAttackers();
+        List<ClanCapitalAttackerRes> capitalAttackersMap = clansService.getCapitalAttackers();
         return ResponseEntity.ok().body(capitalAttackersMap);
+    }
+
+    @GetMapping("capital/under/attacker")
+    public ResponseEntity<?> getCapitalAttackerMissing() throws ExecutionException, InterruptedException {
+        List<ClanCapitalUnderAttackerRes> capitalMissingAttackers = clansService.getCapitalMissingAttackers();
+        return ResponseEntity.ok().body(capitalMissingAttackers);
     }
 }

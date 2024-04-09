@@ -1,17 +1,19 @@
-package open.api.coc.external.coc.service;
+package open.api.coc.external.coc.clan;
 
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.external.coc.ClashOfClansApi;
+import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 @Service
 @RequiredArgsConstructor
-public class ClashOfClanService implements ClashOfClansApi {
+public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
+
     @Override
     @SuppressWarnings("unchecked")
     public Map<String, Object> findClanByClanTag(String clanTag) {
@@ -24,15 +26,14 @@ public class ClashOfClanService implements ClashOfClansApi {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
+    public Optional<ClanCapitalRaidSeasons> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
         String uri = clashOfClanConfig.getClansClanTagCapitalRaidSeasons() + "?limit=" + limit;
-        return RestClient.create()
-                         .get()
-                         .uri(uri, clanTag)
-                         .header("Authorization", "Bearer " + clashOfClanConfig.getApiKey())
-                         .retrieve()
-                         .body(Map.class);
+        return Optional.ofNullable(RestClient.create()
+                                                    .get()
+                                                    .uri(uri, clanTag)
+                                                    .header("Authorization", "Bearer " + clashOfClanConfig.getApiKey())
+                                                    .retrieve()
+                                                    .body(ClanCapitalRaidSeasons.class));
     }
 
 }

@@ -1,11 +1,11 @@
-package open.api.coc.external.coc.domain;
+package open.api.coc.clans.domain;
 
 import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 
 @Getter
-public class ClanAttackerRes {
+public class ClanCapitalAttackerRes {
     private final String name;
     private final String tag;
     private final Integer attackCount;
@@ -20,18 +20,18 @@ public class ClanAttackerRes {
             put("#2GJGRU920", "아카데미 Academe");
         }
     };
-    private ClanAttackerRes(String clanTag, Integer attackCount) {
+    private ClanCapitalAttackerRes(String clanTag, Integer attackCount) {
         this.name = CLAN_TAGS.get(clanTag);
         this.tag = clanTag;
         this.attackCount = attackCount;
     }
 
-    public static ClanAttackerRes empty(String clanTag) {
-        return new ClanAttackerRes(clanTag, 0);
+    public static ClanCapitalAttackerRes empty(String clanTag) {
+        return new ClanCapitalAttackerRes(clanTag, 0);
     }
 
-    public static ClanAttackerRes create(String clanTag, int attackCount) {
-        return new ClanAttackerRes(clanTag, attackCount);
+    public static ClanCapitalAttackerRes create(String clanTag, int attackCount) {
+        return new ClanCapitalAttackerRes(clanTag, attackCount);
     }
 
     public Integer getRemainAttackCount() {

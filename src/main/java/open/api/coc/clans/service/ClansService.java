@@ -1,7 +1,6 @@
 package open.api.coc.clans.service;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -9,6 +8,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.common.Clan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
@@ -54,13 +54,14 @@ public class ClansService {
     }
 
     public ClanCapitalUnderAttackerRes getClanCapitalUnderAttackers(String clanTag, int limit) {
-        List<ClanCapitalRaidSeasonMember> members = getClanCapitalRaidSeasonsMembers(clanTag, limit);
+        Clan clan = Clan.findByTag(clanTag);
+
+        List<ClanCapitalRaidSeasonMember> members = getClanCapitalRaidSeasonsMembers(clan.getTag(), limit);
         List<ClanCapitalRaidSeasonMember> underAttackers = findUnderAttackers(members);
 
-
-        return ClanCapitalUnderAttackerRes.create(clanTag, underAttackers.stream()
-                                                                         .map(clanCapitalRaidSeasonMemberResConverter::convert)
-                                                                         .collect(Collectors.toList()));
+        return ClanCapitalUnderAttackerRes.create(clan.getName(), underAttackers.stream()
+                                                                                .map(clanCapitalRaidSeasonMemberResConverter::convert)
+                                                                                .collect(Collectors.toList()));
     }
 
     private List<ClanCapitalRaidSeasonMember> findUnderAttackers(List<ClanCapitalRaidSeasonMember> members) {
@@ -72,29 +73,25 @@ public class ClansService {
     }
 
     public List<ClanCapitalAttackerRes> getCapitalAttackers() throws ExecutionException, InterruptedException {
-        List<String> CLAN_TAGS = ClanCapitalAttackerRes.CLAN_TAGS.keySet().stream().toList();
+        List<String> capitalClanTagList = Clan.getCapitalClanTagList();
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool(CLAN_TAGS.size());
-        List<ClanCapitalAttackerRes> clanAttackers = forkJoinPool.submit(() -> CLAN_TAGS.stream()
-                                                                                        .parallel()
-                                                                                        .map(this::findClanCapitalRaidSeasons)
-                                                                                        .collect(Collectors.toList()))
-                                                                 .get();
-
-        return clanAttackers.stream()
-                            .sorted(Comparator.comparing(ClanCapitalAttackerRes::getName))
-                            .collect(Collectors.toList());
+        ForkJoinPool forkJoinPool = new ForkJoinPool(capitalClanTagList.size());
+        return forkJoinPool.submit(() -> capitalClanTagList.stream()
+                                                           .parallel()
+                                                           .map(this::findClanCapitalRaidSeasons)
+                                                           .collect(Collectors.toList()))
+                           .get();
     }
 
     public List<ClanCapitalUnderAttackerRes> getCapitalMissingAttackers() throws ExecutionException, InterruptedException {
-        List<String> CLAN_TAGS = ClanCapitalAttackerRes.CLAN_TAGS.keySet().stream().toList();
+        List<String> capitalClanTagList = Clan.getCapitalClanTagList();
 
-        ForkJoinPool forkJoinPool = new ForkJoinPool(CLAN_TAGS.size());
+        ForkJoinPool forkJoinPool = new ForkJoinPool(capitalClanTagList.size());
 
-        return forkJoinPool.submit(() -> CLAN_TAGS.stream()
-                                                  .parallel()
-                                                  .map(clanTag -> getClanCapitalUnderAttackers(clanTag, 1))
-                                                  .collect(Collectors.toList()))
+        return forkJoinPool.submit(() -> capitalClanTagList.stream()
+                                                           .parallel()
+                                                           .map(clanTag -> getClanCapitalUnderAttackers(clanTag, 1))
+                                                           .collect(Collectors.toList()))
                            .get();
     }
 }

@@ -1,4 +1,4 @@
-package open.api.coc.clans.common.exception;
+package open.api.coc.clans.common.exception.handler;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

@@ -1,15 +1,14 @@
 button.right-double-arrow {
   display: inline-block;
-  border-radius: 4px;
+  border-radius: 3rem;
   background-color: var(--button-background-color);
   border: none;
   color: #ffffff;
   text-align: center;
-  font-size: 17px;
-  padding: 16px;
+  padding: 3rem;
   transition: all 0.5s;
   cursor: pointer;
-  margin: 5px;
+  margin: 3rem;
 }
 
 button.right-double-arrow:hover {
@@ -27,13 +26,13 @@ button.right-double-arrow span:after {
   content: '»';
   position: absolute;
   opacity: 0;
-  top: -1px;
-  right: -15px;
+  top: 0;
+  right: -4rem;
   transition: 0.5s;
 }
 
 button.right-double-arrow:hover span {
-  padding-right: 15px;
+  padding-right: 4rem;
 }
 
 button.right-double-arrow:hover span:after {
@@ -44,39 +43,39 @@ button.right-double-arrow:hover span:after {
 button.right-single-arrow {
   position: relative;
   margin: auto;
-  padding: 12px 18px;
+  padding: 0.1em;
   transition: all 0.2s ease;
   border: none;
   background: none;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button.right-single-arrow:before {
   content: "";
   position: absolute;
-  top: -1px;
+  top: 0;
   left: 0;
   display: block;
-  border-radius: 50px;
+  border-radius: 0.3em;
   background: var(--button-hover-background-color);
-  width: 45px;
-  height: 45px;
+  width: 1em;
+  height: 1.3em;
   transition: all 0.3s ease;
 }
 
 button.right-single-arrow span {
   position: relative;
-  font-family: "Ubuntu", sans-serif;
-  font-size: 18px;
-  font-weight: 700;
+  font-weight: bold;
   letter-spacing: 0.05em;
   color: var(--button-background-color);
 }
 
 button.right-single-arrow svg {
   position: relative;
-  top: -1px;
-  margin-left: 10px;
+  top: 0;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;

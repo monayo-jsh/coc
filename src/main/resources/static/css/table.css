@@ -9,7 +9,7 @@ table {
 }
 
 .table-caption {
-  font-size: 1.5rem;
+  font-size: 5rem;
   font-weight: bold;
   text-align: left;
   margin-bottom: 5px;
@@ -28,9 +28,10 @@ thead {
   background-color: var(--button-background-color);
 }
 
-td, th {
+th, td {
   padding: 1em .5em;
   vertical-align: middle;
+  font-size: 0.8em;
 }
 
 td {

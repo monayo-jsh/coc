@@ -75,6 +75,7 @@ button.right-single-arrow span {
 
 button.right-single-arrow svg {
   position: relative;
+  margin-left: 10px;
   top: 0;
   fill: none;
   stroke-linecap: round;

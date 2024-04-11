@@ -57,13 +57,26 @@
 
       return `
         <button class="right-single-arrow" onclick="renderPage('{LINK}'); return false;">
-          <span>이동하기</span>
-          <svg width="1em" height="1em" viewBox="0 0 13 10">
+          <span>이동</span>
+          <svg width="0.5em" height="0.5em" viewBox="0 0 13 10">
             <path d="M1,5 L11,5"></path>
             <polyline points="8 1 12 5 8 9"></polyline>
           </svg>
         </button>
       `.replace('{LINK}', OPEN_CLAN_PROFILE_LINK);
+    }
+
+    function makeCountWithColor(count) {
+      let color = "yellow";
+      if (count < 10) {
+        color = "red";
+      }
+      if (count > 30) {
+        color = "green"
+      }
+      return `
+        <span style="color: ${color}">${count}</span>
+      `;
     }
 
     function insertRow(row) {
@@ -73,7 +86,7 @@
       const insertRow = tbody.insertRow(tbody.children.length);
 
       insertCell(insertRow, 0, name);
-      insertCell(insertRow, 1, remainAttackCount);
+      insertCell(insertRow, 1, makeCountWithColor(remainAttackCount));
       insertCell(insertRow, 2, makeOpenClanProfileLink(tag));
     }
 
@@ -136,7 +149,7 @@
         <tr>
           <th>클랜명</th>
           <th>남은 공격수</th>
-          <th>이동 링크</th>
+          <th>링크</th>
         </tr>
       </thead>
       <tbody class="contents">

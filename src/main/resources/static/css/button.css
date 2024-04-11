@@ -8,7 +8,7 @@ button.right-double-arrow {
   padding: 3rem;
   transition: all 0.5s;
   cursor: pointer;
-  margin: 3rem;
+  margin: 0.5rem 0;
 }
 
 button.right-double-arrow:hover {

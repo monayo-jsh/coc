@@ -16,4 +16,9 @@ public class ViewController {
         return "capital/Attacks";
     }
 
+    @GetMapping("/clan/war")
+    public String viewClanWar() {
+        return "clan/War";
+    }
+
 }

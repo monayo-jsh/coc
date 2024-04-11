@@ -28,6 +28,10 @@ thead {
   background-color: var(--button-background-color);
 }
 
+tbody.loading {
+  background-color: lightgray;
+}
+
 th, td {
   padding: 1em .5em;
   vertical-align: middle;
@@ -36,7 +40,6 @@ th, td {
 
 td {
   border-bottom: 1px solid rgba(0,0,0,.1);
-  background: #fff;
 }
 
 a {

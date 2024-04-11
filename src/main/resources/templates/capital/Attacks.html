@@ -36,14 +36,14 @@
     }
 
     function getTheadElement() {
-      return document.querySelector('.clan-capital-table thead.header');
+      return document.querySelector('.table-clan-capital thead.header');
     }
 
     function getColumnLength(thead) {
       return thead.firstElementChild.children.length;
     }
     function getTbodyElement() {
-       return document.querySelector('.clan-capital-table tbody.contents');
+       return document.querySelector('.table-clan-capital tbody.contents');
     }
 
     function insertCell(row, cellIndex, data) {
@@ -144,7 +144,7 @@
         </button>
 
     </div>
-    <table class="clan-capital-table">
+    <table class="table-clan-capital">
       <thead class="header">
         <tr>
           <th>클랜명</th>

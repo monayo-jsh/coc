@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/table.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/axios/axios_v1.6.8.js"></script>
+
+  <title>습격전 공격 현황</title>
+
+  <script>
+    function initPage() {
+      guideRow("조회중...");
+      getClanCapitalAttacks();
+    }
+
+  function clearTbody() {
+      const tbody = getTbodyElement();
+      while (tbody.children.length) {
+        tbody.deleteRow(0);
+      }
+    }
+
+    function guideRow(text) {
+      const tbody = getTbodyElement();
+
+      const insertRow = tbody.insertRow(0);
+      const emptyCell = insertRow.insertCell(0);
+
+      emptyCell.innerHTML = text;
+      emptyCell.colSpan = getColumnLength(getTheadElement());
+      emptyCell.classList.add('text-align-center');
+    }
+
+    function getTheadElement() {
+      return document.querySelector('.clan-capital-table thead.header');
+    }
+
+    function getColumnLength(thead) {
+      return thead.firstElementChild.children.length;
+    }
+    function getTbodyElement() {
+       return document.querySelector('.clan-capital-table tbody.contents');
+    }
+
+    function insertCell(row, cellIndex, data) {
+      const insertCell = row.insertCell(cellIndex);
+      insertCell.innerHTML = data
+    }
+
+    function makeOpenClanProfileLink(tag) {
+      if (!tag) return "-"
+      const OPEN_CLAN_PROFILE_LINK = `https://link.clashofclans.com/kr?action=OpenClanProfile&tag=${tag}`
+
+      return `
+        <button class="right-single-arrow" onclick="renderPage('{LINK}'); return false;">
+          <span>이동하기</span>
+          <svg width="15px" height="10px" viewBox="0 0 13 10">
+            <path d="M1,5 L11,5"></path>
+            <polyline points="8 1 12 5 8 9"></polyline>
+          </svg>
+        </button>
+      `.replace('{LINK}', OPEN_CLAN_PROFILE_LINK);
+    }
+
+    function insertRow(row) {
+      const {name, tag, remainAttackCount} = row;
+
+      const tbody = getTbodyElement();
+      const insertRow = tbody.insertRow(tbody.children.length);
+
+      insertCell(insertRow, 0, name);
+      insertCell(insertRow, 1, remainAttackCount);
+      insertCell(insertRow, 2, makeOpenClanProfileLink(tag));
+    }
+
+    function writeContents(rows) {
+      for(const row of rows) {
+        insertRow(row);
+      }
+    }
+
+    function getClanCapitalAttacks() {
+      showLoading();
+      axios.get('/clans/capital/attack/count')
+           .then((response) => {
+             clearTbody();
+             const { data } = response
+             if (!data) {
+               guideRow("조회 결과 없음");
+               return;
+             }
+             writeContents(data);
+           })
+           .catch((error) => {
+             console.error(error);
+             clearTbody();
+             guideRow("조회 실패");
+           })
+           .finally(() => {
+             hideLoading()
+           });
+    }
+  </script>
+</head>
+<body onload="initPage()">
+  <div class="clan-capital" style="width: 320px;">
+    <div class="table-caption">
+        <span>습격전 현황</span>
+        <button class="refresh" onclick="getClanCapitalAttacks(); return false;">
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="currentColor"
+              class="bi bi-arrow-repeat"
+              viewBox="0 0 16 16"
+          >
+            <path
+                d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+            ></path>
+            <path
+                fill-rule="evenodd"
+                d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+            ></path>
+          </svg>
+          Refresh
+        </button>
+
+    </div>
+    <table class="clan-capital-table">
+      <thead class="header">
+        <tr>
+          <th>클랜명</th>
+          <th>남은 공격수</th>
+          <th>이동 링크</th>
+        </tr>
+      </thead>
+      <tbody class="contents">
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

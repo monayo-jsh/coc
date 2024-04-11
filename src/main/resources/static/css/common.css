@@ -1,0 +1,24 @@
+:root {
+  --button-background-color: #73685d;
+  --button-hover-background-color: #b9a796;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  list-style: none;
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text-align-center {
+  text-align: center;
+}

@@ -16,7 +16,9 @@ public enum Clan {
     CLAN_ACADEME_4("#2L209LC8P", "아카데미 4.0", 4),
 //    CLAN_ACADEME_5("#2QV0R0L8R", "아카데미 5.0", 5),
 
-    LEAGUE_ACADEME("#2GJGRU920", "Academe", 6);
+    LEAGUE_ACADEME("#2GJGRU920", "Academe", 6),
+
+    LEAGUE_TEAM_BCADEME("#2GY9YL0J9", "TEAM Bcademe", 7);
 
     private final String tag;
     private final String name;

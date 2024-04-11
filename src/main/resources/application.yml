@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: coc
+  thymeleaf:
+    cache: false
+  mvc:
+    static-path-pattern: /static/**
 
 external:
   coc:

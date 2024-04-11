@@ -45,4 +45,5 @@ public class ClansController {
         List<ClanCapitalUnderAttackerRes> capitalMissingAttackers = clansService.getCapitalMissingAttackers();
         return ResponseEntity.ok().body(capitalMissingAttackers);
     }
+
 }

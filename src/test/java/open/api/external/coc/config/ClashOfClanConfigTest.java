@@ -30,6 +30,7 @@ class ClashOfClanConfigTest {
 
         assertThat(clashOfClanConfig.getClansClanTagUri()).isNotBlank();
         assertThat(clashOfClanConfig.getClansClanTagCapitalRaidSeasons()).isNotBlank();
+        assertThat(clashOfClanConfig.getClansClanTagCurrentWar()).isNotBlank();
 
     }
 

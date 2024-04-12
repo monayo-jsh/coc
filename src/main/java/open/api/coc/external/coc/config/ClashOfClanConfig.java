@@ -25,6 +25,7 @@ public class ClashOfClanConfig {
             private final String prefix;
             private final String clanTag;
             private final String capitalRaidSeasons;
+            private final String currentWar;
 
             public String getClanTag() {
                 return prefix + clanTag;
@@ -32,6 +33,10 @@ public class ClashOfClanConfig {
 
             public String getCapitalRaidSeasons() {
                 return prefix + capitalRaidSeasons;
+            }
+
+            public String getCurrentWar() {
+                return prefix + currentWar;
             }
         }
 
@@ -44,4 +49,9 @@ public class ClashOfClanConfig {
     public String getClansClanTagCapitalRaidSeasons() {
         return getDomain() + getEndPoint().getClans().getCapitalRaidSeasons();
     }
+
+    public String getClansClanTagCurrentWar() {
+        return getDomain() + getEndPoint().getClans().getCurrentWar();
+    }
+
 }

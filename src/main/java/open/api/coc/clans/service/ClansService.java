@@ -13,11 +13,14 @@ import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
+import open.api.coc.clans.domain.ClanCurrentWarRes;
 import open.api.coc.clans.domain.converter.ClanCapitalRaidSeasonMemberResConverter;
+import open.api.coc.clans.domain.converter.ClanCurrentWarResConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
-import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeason;
-import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasonMember;
-import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
+import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasonMember;
+import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -29,6 +32,7 @@ public class ClansService {
     private final ClanApiService clanApiService;
 
     private final ClanCapitalRaidSeasonMemberResConverter clanCapitalRaidSeasonMemberResConverter;
+    private final ClanCurrentWarResConverter clanCurrentWarResConverter;
 
     public Map<String, Object> findClanByClanTag(String clanTag) {
         return clanApiService.findClanByClanTag(clanTag);
@@ -94,4 +98,12 @@ public class ClansService {
                                                            .collect(Collectors.toList()))
                            .get();
     }
+
+    public ClanCurrentWarRes getClanCurrentWar(String clanTag) {
+        ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
+                                               .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
+
+        return clanCurrentWarResConverter.convert(clanCurrentWar);
+    }
+
 }

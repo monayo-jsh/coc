@@ -2,7 +2,8 @@ package open.api.coc.external.coc.clan;
 
 import java.util.Map;
 import java.util.Optional;
-import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,4 +13,5 @@ public interface ClanApiService {
 
     Optional<ClanCapitalRaidSeasons> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit);
 
+    Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag);
 }

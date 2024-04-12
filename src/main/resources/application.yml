@@ -18,3 +18,4 @@ external:
         prefix: /v1/clans
         clan-tag: /{clanTag}
         capital-raid-seasons: /{clanTag}/capitalraidseasons
+        current-war: /{clanTag}/currentwar

@@ -3,7 +3,8 @@ package open.api.coc.external.coc.clan;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.external.coc.clan.domain.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -36,4 +37,13 @@ public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanAp
                                                     .body(ClanCapitalRaidSeasons.class));
     }
 
+    @Override
+    public Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag) {
+        return Optional.ofNullable(RestClient.create()
+                                                    .get()
+                                                    .uri(clashOfClanConfig.getClansClanTagCurrentWar(), clanTag)
+                                                    .header("Authorization", "Bearer " + clashOfClanConfig.getApiKey())
+                                                    .retrieve()
+                                                    .body(ClanWar.class));
+    }
 }

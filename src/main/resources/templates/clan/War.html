@@ -67,12 +67,895 @@
 
   </script>
   <title>클랜전 현황</title>
+  <style>
+    :root {
+      --default-border: 1px solid grey;
+    }
+    .clan-war {
+      width: 680px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .summary {
+      display: flex;
+      align-items: center;
+      font-size: 1.5em;
+      padding: 3px;
+      border: var(--default-border);
+      border-radius: 10px;
+      height: 125px;
+      background: #0000007a;
+
+      .name {
+        padding: 3px;
+        color: #fefe46;
+        font-weight: bolder;
+      }
+      .stars {
+        padding: 3px;
+        color: #fff;
+      }
+
+      .attacks {
+        font-size: .8em;
+        padding: 3px;
+        color: #fff;
+      }
+    }
+
+    .summary .clan {
+      width: 35%;
+    }
+    .summary .war-info {
+      width: 30%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: bolder;
+      color: red;
+
+      .war-remaining-time {
+        background: linear-gradient(to right, #ffffff75, 10%, transparent), linear-gradient(to left, #ffffff75, 10%, transparent);
+        width: 130px;
+        text-align: center;
+        font-size: 0.9em;
+      }
+      .war-state {
+        font-size: 0.8em;
+      }
+    }
+    .summary .clan-icon img {
+      height: 50px;
+    }
+    .summary .opponent {
+      width: 35%;
+
+      .name {
+        display: flex;
+        justify-content: right;
+      }
+      .stars {
+        display: flex;
+        justify-content: right;
+        .count {
+          margin-right: 5px;
+        }
+      }
+
+      .attacks {
+        display: flex;
+        justify-content: right;
+      }
+    }
+
+    .member-attack {
+      margin-top: 10px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: darkgray white;
+
+      .member {
+        margin: 5px 0;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background: linear-gradient(to left, #868686, transparent);
+        border: var(--default-border);
+        border-radius: 10px;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+
+        .layout-left {
+          display: flex;
+          align-items: center;
+          width: 35%;
+
+          .no {
+            padding: 15px;
+            font-size: 1.5em;
+            font-weight: bolder;
+            border-right: var(--default-border);
+          }
+
+          .level {
+            padding: 15px;
+            font-size: 1.5em;
+            font-weight: bolder;
+            border-right: var(--default-border);
+          }
+
+          .user {
+            padding: 15px 3px ;
+
+            .name {
+              font-weight: bolder;
+            }
+
+            .role {
+              font-size: .7em;
+              font-weight: bolder;
+            }
+          }
+        }
+
+        .layout-right {
+          display: flex;
+          align-items: center;
+          padding: 5px 0;
+
+          .no {
+            font-size: .7em;
+            font-weight: bolder;
+          }
+
+          .destruction-percentage {
+            font-weight: bolder;
+          }
+
+          .stars {
+          }
+
+          .duration {
+          }
+
+          .attack-list {
+            display: flex;
+            flex-direction: column;
+            padding: 0 5px;
+            border-left: var(--default-border);
+
+            .attack-info {
+              width: 380px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 5px 0;
+
+              .name {
+                display: flex;
+                justify-content: right;
+                width: 150px;
+                font-weight: bolder;
+              }
+
+              .stars {
+                .fill {
+                  color: #fff;
+                }
+              }
+            }
+
+            .attack-info:nth-child(2) {
+              border-top: var(--default-border);
+            }
+          }
+        }
+
+        .total-stars {
+          display: flex;
+          padding: 15px;
+          color: #fff;
+        }
+      }
+    }
+  </style>
 </head>
-<body onload="getClans()">
+<body>
   <section class="card-wrapper">
     <i class="fa-solid fa-arrow-left button" id="prev"></i>
     <div class="card-container">
-      <div class="carousel"></div>
+      <div class="carousel">
+
+        <div class="card-contents">
+
+          <div class="clan-war">
+            <div class="summary">
+              <div class="clan">
+                <div class="name">아카데미</div>
+                <div class="stars">
+                  <i class="fa-solid fa-star"></i>
+                  <span class="count">120</span>
+                </div>
+                <div class="attacks">64/80</div>
+              </div>
+              <div class="war-info">
+                <div class="clan-icon">
+                  <img src="https://api-assets.clashofclans.com/badges/70/Az2KTu1Fo-2eOl6555nLAbcJvV_x3iW-TjJVM8vqt0s.png" alt="" />
+                  <img src="https://api-assets.clashofclans.com/badges/70/jqROygwkZNHpwqkvj8OD_tY43eIEIQOxCSrUd-JmmDw.png" alt="" />
+                </div>
+                <div class="war-remaining-time">
+                  9시간 56분
+                </div>
+                <div class="war-state">
+                  전투일
+                </div>
+              </div>
+              <div class="opponent">
+                <div class="name">Team WAVE</div>
+                <div class="stars">
+                  <span class="count">100</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="attacks">44/80</div>
+              </div>
+            </div>
+
+            <div class="member-attack">
+
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+                </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+              <div class="member">
+
+                <div class="layout-left">
+                  <div class="no">1.</div>
+                  <div class="level">16</div>
+                  <div class="user">
+                    <div class="name">제우스</div>
+                    <div class="role">장로</div>
+                  </div>
+                </div>
+
+                <div class="layout-right">
+                  <div class="attack-list">
+                    <div class="attack-info">
+                      <div class="no">공격1</div>
+                      <div class="name">1.Nazgul</div>
+                      <div class="destruction-percentage">95%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                    <div class="attack-info">
+                      <div class="no">공격2</div>
+                      <div class="name">7.EDDY</div>
+                      <div class="destruction-percentage">100%</div>
+                      <div class="stars">
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                        <i class="fa-solid fa-star fill"></i>
+                      </div>
+                      <div class="duration">1분 58초</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="total-stars">
+                  <span class="count">6</span>
+                  <i class="fa-solid fa-star"></i>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
       <i class="fa-solid fa-arrow-right button" id="next"></i>
     </div>
   </section>

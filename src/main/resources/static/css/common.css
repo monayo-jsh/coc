@@ -1,5 +1,3 @@
-@import url(./loading.css);
-
 :root {
   --button-background-color: #73685d;
   --button-hover-background-color: #b9a796;
@@ -8,6 +6,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   font-size: 2rem;
   font-weight: 200;
   font-family: "맑은 고딕", sans-serif;

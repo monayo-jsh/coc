@@ -14,6 +14,7 @@ import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.ClanCurrentWarRes;
+import open.api.coc.clans.domain.ClanRes;
 import open.api.coc.clans.domain.converter.ClanCapitalRaidSeasonMemberResConverter;
 import open.api.coc.clans.domain.converter.ClanCurrentWarResConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -106,4 +107,10 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
 
+    public List<ClanRes> getClanList() {
+        return Clan.getClanWarList()
+                   .stream()
+                   .map(ClanRes::create)
+                   .collect(Collectors.toList());
+    }
 }

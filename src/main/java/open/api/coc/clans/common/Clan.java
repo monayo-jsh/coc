@@ -14,7 +14,7 @@ public enum Clan {
     CLAN_ACADEME_2("#2QG0G20RR", "아카데미 2.0", 2),
     CLAN_ACADEME_3("#2LPP8PUCG", "아카데미 3.0", 3),
     CLAN_ACADEME_4("#2L209LC8P", "아카데미 4.0", 4),
-//    CLAN_ACADEME_5("#2QV0R0L8R", "아카데미 5.0", 5),
+    CLAN_ACADEME_5("#2QV0R0L8R", "아카데미 5.0", 5),
 
     LEAGUE_ACADEME("#2GJGRU920", "Academe", 6),
 
@@ -39,10 +39,23 @@ public enum Clan {
     }
 
     public static List<String> getCapitalClanTagList() {
-        return List.of(CLAN_ACADEME.getTag(),
-                       CLAN_ACADEME_2.getTag(),
-                       CLAN_ACADEME_3.getTag(),
-                       CLAN_ACADEME_4.getTag(),
-                       LEAGUE_ACADEME.getTag());
+        return List.of(
+            CLAN_ACADEME.getTag(),
+            CLAN_ACADEME_2.getTag(),
+            CLAN_ACADEME_3.getTag(),
+            CLAN_ACADEME_4.getTag(),
+            LEAGUE_ACADEME.getTag()
+        );
+    }
+
+    public static List<Clan> getClanWarList() {
+        return List.of(
+            CLAN_ACADEME,
+            CLAN_ACADEME_2,
+            CLAN_ACADEME_3,
+            CLAN_ACADEME_4,
+            CLAN_ACADEME_5,
+            LEAGUE_ACADEME
+        );
     }
 }

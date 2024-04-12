@@ -2,27 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/card.css" />
+  <style>
+    body {
+      height: 99vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #343f4f;
+    }
+  </style>
+  <script src="/static/axios/axios_v1.6.8.js"></script>
+
+  <script type="text/javascript">
+    function initCardSlide() {
+      const carousel = document.querySelector(".carousel"),
+          cardContents = document.querySelectorAll(".card-contents"),
+          buttons = document.querySelectorAll(".button");
+
+      let cardIndex = 1;
+
+      const slideCard = () => {
+        cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
+
+        carousel.style.transform = `translate(-${cardIndex * 100}%)`
+      };
+
+      const updateClick = (e) => {
+        cardIndex += e.target.id === "next" ? 1 : -1;
+        slideCard()
+      }
+
+      buttons.forEach(button => button.addEventListener("click", updateClick))
+    }
+
+    function getClans() {
+      axios.get('/clans')
+           .then((response) => {
+             const { data } = response;
+
+             const carousel = document.querySelector(".carousel");
+             for (const clan of data) {
+               const { name, tag } = clan;
+               const createDiv = document.createElement('div');
+               createDiv.classList.add('card-contents');
+
+               const contentsDiv = document.createElement('div');
+               contentsDiv.innerText = `${name} :: ${tag}`
+               contentsDiv.style.height = "100%";
+               contentsDiv.style.width = "500px";
+
+               createDiv.appendChild(contentsDiv);
+
+               carousel.appendChild(createDiv);
+
+               initCardSlide()
+             }
+           })
+           .catch((error) => {
+             console.error(error);
+           });
+    }
+
+  </script>
   <title>클랜전 현황</title>
 </head>
-<body>
-<div class="clan-war">
-  <div class="table-caption">
-    <span>클랜전 현황</span>
-    <span>{전쟁 상태}</span>
-    <span>{전쟁 규모}</span>
-    <span>{전쟁 시작}</span>
-    <span>{전쟁 종료}</span>
-  </div>
-  <table class="table-clan-war">
-    <thead class="header">
-    <tr>
-      <th>이름</th>
-      <th>남은 공격수</th>
-    </tr>
-    </thead>
-    <tbody class="contents">
-    </tbody>
-  </table>
-</div>
+<body onload="getClans()">
+  <section class="card-wrapper">
+    <i class="fa-solid fa-arrow-left button" id="prev"></i>
+    <div class="card-container">
+      <div class="carousel"></div>
+      <i class="fa-solid fa-arrow-right button" id="next"></i>
+    </div>
+  </section>
 </body>
 </html>

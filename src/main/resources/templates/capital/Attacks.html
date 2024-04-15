@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/table.css" />
@@ -11,6 +12,12 @@
 
   <title>습격전 현황</title>
 
+  <style>
+    .clan-capital {
+      width: 100%;
+      padding: 10px;
+    }
+  </style>
   <script>
     function initPage() {
       guideRow("조회중...");
@@ -67,13 +74,11 @@
     }
 
     function makeCountWithColor(count) {
-      let color = "yellow";
+      let color = "green";
       if (count < 10) {
         color = "red";
       }
-      if (count > 30) {
-        color = "green"
-      }
+
       return `
         <span style="color: ${color}">${count}</span>
       `;

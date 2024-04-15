@@ -2,39 +2,200 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <style>
     body {
-      height: 99vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      margin: 0;
       background: #343f4f;
+      display: flex;
+      justify-content: center;
     }
   </style>
-  <script src="/static/axios/axios_v1.6.8.js"></script>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+  </script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/javascript">
     function initCardSlide() {
-      const carousel = document.querySelector(".carousel"),
-          cardContents = document.querySelectorAll(".card-contents"),
+      const cardContents = document.querySelectorAll(".card-contents"),
           buttons = document.querySelectorAll(".button");
 
-      let cardIndex = 1;
+      let cardIndex = 0;
 
-      const slideCard = () => {
+      const showCard = () => {
         cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
 
-        carousel.style.transform = `translate(-${cardIndex * 100}%)`
+        const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
+        const clanWarContent = targetClanWar.querySelector('.clan-war');
+
+        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+        const clanWarContents = templateClanWar.querySelector('.card-contents');
+
+        clanWarContents.classList.add(`clan-${cardIndex}`)
+        clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag);
+
+        settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
+          targetClanWar.innerHTML = clanWarContents.innerHTML;
+
+          cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
+          cardContents[cardIndex].classList.remove('display-none');
+        })
       };
 
       const updateClick = (e) => {
         cardIndex += e.target.id === "next" ? 1 : -1;
-        slideCard()
+        showCard()
       }
 
       buttons.forEach(button => button.addEventListener("click", updateClick))
+    }
+
+    function makeMemberMapByTag(clanMembers) {
+      return clanMembers.reduce((memberMap, member) => {
+        memberMap[member.tag] = member
+        return memberMap
+      }, {});
+    }
+
+    function getSumByStars(attacks) {
+      return attacks.reduce((starsSum, attack) => {
+        starsSum += attack.stars
+        return starsSum
+      }, 0)
+    }
+
+    function appendAttackList(attackListElement, attacks, opponentMemberMap) {
+      if (!attacks.length) {
+        const htmlSpanElement = document.createElement('span');
+        htmlSpanElement.style.color = 'red';
+        htmlSpanElement.style.textAlign = 'center';
+        htmlSpanElement.innerText = '공격 기록 없음';
+        attackListElement.appendChild(htmlSpanElement);
+        return
+      }
+
+      const templateMember = document.getElementById('section-member-attack');
+
+      function formatMinuteSecond(sec) {
+        return dayjs.duration(sec * 1000).format('m분 ss초');
+      }
+
+      for (attack of attacks) {
+
+        const cloneTemplateMemberAttack = document.importNode(templateMember.content, true);
+        const attackInfoElement = cloneTemplateMemberAttack.querySelector('.attack-info');
+
+        const { attackerTag, defenderTag, destructionPercentage, duration, stars} = attack;
+
+        const opponentMember = opponentMemberMap[defenderTag]
+        attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                                                       .replace(/{OPPONENT_NAME}/, opponentMember.name)
+                                                       .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
+                                                       .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
+
+        const starElements = attackInfoElement.querySelectorAll('.fa-star');
+        for (let i=0; i<stars; i++) {
+          starElements[i].classList.add('fill');
+        }
+
+        attackListElement.appendChild(attackInfoElement);
+      }
+    }
+
+    function settingMemberAttack(memberAttackHtml, clanMembers, opponentMembers) {
+      const opponentMemberMap = makeMemberMapByTag(opponentMembers);
+
+      const templateMember = document.getElementById('section-member');
+
+      for(member of clanMembers) {
+
+        const cloneTemplateMember = document.importNode(templateMember.content, true);
+        const memberElement = cloneTemplateMember.querySelector('.member');
+
+        const { name, tag, townHallLevel, attacks } = member;
+        const totalStars = getSumByStars(attacks);
+        memberElement.innerHTML = memberElement.innerHTML
+                                               .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                               .replace(/{USER_NAME}/, name)
+                                               .replace(/{USER_STARS}/, totalStars)
+
+        const attackListElement = cloneTemplateMember.querySelector('.attack-list');
+        appendAttackList(attackListElement, attacks, opponentMemberMap);
+
+        memberAttackHtml.appendChild(memberElement)
+      }
+    }
+
+    function sortByMapPosition(members) {
+      return members.sort(function (a, b) {
+        if (a.mapPosition > b.mapPosition) {
+          return 1;
+        }
+        if (a.mapPosition < b.mapPosition) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+    }
+
+    async function settingClanWar(clanWarContentsElement, clanTag) {
+      const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
+
+      await axios.get(uri)
+                 .then((response) => {
+                   const { data } = response;
+                   const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+
+                   clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                                            .replace(/{CLAN_NAME}/, clan.name)
+                                                                            .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                                                                            .replace(/{CLAN_ATTACK}/, clan.attacks)
+                                                                            .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                                            .replace(/{WAR_STATE}/, convWarState(state))
+                                                                            .replace(/{OPPONENT_NAME}/, opponent.name)
+                                                                            .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                                                                            .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                                                                            .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember);
+
+                   const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+                   clanIcon.src = clan.badge.small
+
+                   const oppentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+                   oppentIcon.src = opponent.badge.small
+
+                   let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members)
+                 })
+                 .catch((error) => {
+                   console.error(error);
+                 });
+
+      function convWarState(state) {
+        switch(state) {
+          case 'inWar': return '전쟁중';
+        }
+        return state;
+      }
+
+      function formatWarRemainHourMinute(endTime) {
+        const now = dayjs();
+        const endDateTime = dayjs(endTime);
+
+        if (now > endDateTime) {
+          return "0시간 0분";
+        }
+
+        return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
+      }
     }
 
     function getClans() {
@@ -43,22 +204,25 @@
              const { data } = response;
 
              const carousel = document.querySelector(".carousel");
-             for (const clan of data) {
-               const { name, tag } = clan;
-               const createDiv = document.createElement('div');
-               createDiv.classList.add('card-contents');
+             for (let index = 0; index<data.length; index++) {
+               const { tag } = data[index];
 
-               const contentsDiv = document.createElement('div');
-               contentsDiv.innerText = `${name} :: ${tag}`
-               contentsDiv.style.height = "100%";
-               contentsDiv.style.width = "500px";
+               const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+               const clanWarContents = templateClanWar.querySelector('.card-contents');
 
-               createDiv.appendChild(contentsDiv);
+               clanWarContents.classList.add(`clan-${index}`, 'display-none');
+               clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, tag);
 
-               carousel.appendChild(createDiv);
+               if (index === 0) {
+                 settingClanWar(clanWarContents, tag);
+                 clanWarContents.classList.remove('display-none');
+               }
 
-               initCardSlide()
+
+               carousel.appendChild(templateClanWar);
              }
+
+             initCardSlide()
            })
            .catch((error) => {
              console.error(error);
@@ -72,8 +236,7 @@
       --default-border: 1px solid grey;
     }
     .clan-war {
-      width: 680px;
-      height: 100%;
+      width: 100%;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -82,17 +245,17 @@
     .summary {
       display: flex;
       align-items: center;
-      font-size: 1.5em;
       padding: 3px;
       border: var(--default-border);
       border-radius: 10px;
-      height: 125px;
       background: #0000007a;
 
       .name {
         padding: 3px;
         color: #fefe46;
+        font-size: 1rem;
         font-weight: bolder;
+        text-align: center;
       }
       .stars {
         padding: 3px;
@@ -117,9 +280,14 @@
       font-weight: bolder;
       color: red;
 
+      .clan-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
       .war-remaining-time {
         background: linear-gradient(to right, #ffffff75, 10%, transparent), linear-gradient(to left, #ffffff75, 10%, transparent);
-        width: 130px;
         text-align: center;
         font-size: 0.9em;
       }
@@ -127,15 +295,12 @@
         font-size: 0.8em;
       }
     }
-    .summary .clan-icon img {
-      height: 50px;
-    }
+
     .summary .opponent {
       width: 35%;
 
       .name {
         display: flex;
-        justify-content: right;
       }
       .stars {
         display: flex;
@@ -152,14 +317,15 @@
     }
 
     .member-attack {
-      margin-top: 10px;
       overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: darkgray white;
+      scrollbar-width: none;
+      min-width: 355px;
+      height: 625px;
 
       .member {
         margin: 5px 0;
         display: flex;
+        flex-direction: column;
         justify-content: space-around;
         align-items: center;
         background: linear-gradient(to left, #868686, transparent);
@@ -167,83 +333,99 @@
         border-radius: 10px;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 
-        .layout-left {
+        .layout-title {
+          width: 95%;
           display: flex;
           align-items: center;
-          width: 35%;
-
-          .no {
-            padding: 15px;
-            font-size: 1.5em;
-            font-weight: bolder;
-            border-right: var(--default-border);
-          }
-
-          .level {
-            padding: 15px;
-            font-size: 1.5em;
-            font-weight: bolder;
-            border-right: var(--default-border);
-          }
+          justify-content: space-between;
+          border-bottom: var(--default-border);
 
           .user {
-            padding: 15px 3px ;
+            display: flex;
+            align-items: center;
 
-            .name {
+            .hall-level {
+              padding: 15px 10px;
               font-weight: bolder;
             }
 
-            .role {
-              font-size: .7em;
-              font-weight: bolder;
+            .title {
+              padding: 5px 10px;
+              border-left: var(--default-border);
+
+              .name {
+                font-weight: bolder;
+              }
+
+              .role {
+                font-size: .7em;
+                font-weight: bolder;
+              }
+
             }
+
           }
+
+          .info {
+
+            .total-stars {
+              display: flex;
+              padding: 15px;
+              color: #fff;
+
+              .count {
+                margin-left: 5px;
+              }
+
+            }
+
+          }
+
         }
 
-        .layout-right {
+        .layout-body {
+          width: 95%;
           display: flex;
           align-items: center;
-          padding: 5px 0;
-
-          .no {
-            font-size: .7em;
-            font-weight: bolder;
-          }
+          padding: 10px 0;
 
           .destruction-percentage {
             font-weight: bolder;
-          }
-
-          .stars {
-          }
-
-          .duration {
           }
 
           .attack-list {
             display: flex;
             flex-direction: column;
             padding: 0 5px;
-            border-left: var(--default-border);
+            width: 100%;
 
             .attack-info {
-              width: 380px;
               display: flex;
               justify-content: space-between;
               align-items: center;
               padding: 5px 0;
 
               .name {
-                display: flex;
-                justify-content: right;
-                width: 150px;
+                width: 40%;
                 font-weight: bolder;
               }
 
+              .destruction-percentage {
+                width: 15%;
+              }
+
               .stars {
+                width: 20%;
+
                 .fill {
                   color: #fff;
                 }
+              }
+
+              .duration {
+                width: 20%;
+                text-align: right;
+                font-size: 12px;
               }
             }
 
@@ -253,711 +435,92 @@
           }
         }
 
-        .total-stars {
-          display: flex;
-          padding: 15px;
-          color: #fff;
-        }
       }
     }
   </style>
 </head>
-<body>
+<body onload="getClans()">
   <section class="card-wrapper">
     <i class="fa-solid fa-arrow-left button" id="prev"></i>
     <div class="card-container">
-      <div class="carousel">
-
-        <div class="card-contents">
-
-          <div class="clan-war">
-            <div class="summary">
-              <div class="clan">
-                <div class="name">아카데미</div>
-                <div class="stars">
-                  <i class="fa-solid fa-star"></i>
-                  <span class="count">120</span>
-                </div>
-                <div class="attacks">64/80</div>
-              </div>
-              <div class="war-info">
-                <div class="clan-icon">
-                  <img src="https://api-assets.clashofclans.com/badges/70/Az2KTu1Fo-2eOl6555nLAbcJvV_x3iW-TjJVM8vqt0s.png" alt="" />
-                  <img src="https://api-assets.clashofclans.com/badges/70/jqROygwkZNHpwqkvj8OD_tY43eIEIQOxCSrUd-JmmDw.png" alt="" />
-                </div>
-                <div class="war-remaining-time">
-                  9시간 56분
-                </div>
-                <div class="war-state">
-                  전투일
-                </div>
-              </div>
-              <div class="opponent">
-                <div class="name">Team WAVE</div>
-                <div class="stars">
-                  <span class="count">100</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-                <div class="attacks">44/80</div>
-              </div>
-            </div>
-
-            <div class="member-attack">
-
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-                </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-              <div class="member">
-
-                <div class="layout-left">
-                  <div class="no">1.</div>
-                  <div class="level">16</div>
-                  <div class="user">
-                    <div class="name">제우스</div>
-                    <div class="role">장로</div>
-                  </div>
-                </div>
-
-                <div class="layout-right">
-                  <div class="attack-list">
-                    <div class="attack-info">
-                      <div class="no">공격1</div>
-                      <div class="name">1.Nazgul</div>
-                      <div class="destruction-percentage">95%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                    <div class="attack-info">
-                      <div class="no">공격2</div>
-                      <div class="name">7.EDDY</div>
-                      <div class="destruction-percentage">100%</div>
-                      <div class="stars">
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                        <i class="fa-solid fa-star fill"></i>
-                      </div>
-                      <div class="duration">1분 58초</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="total-stars">
-                  <span class="count">6</span>
-                  <i class="fa-solid fa-star"></i>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-
-      </div>
+      <div class="carousel"></div>
       <i class="fa-solid fa-arrow-right button" id="next"></i>
     </div>
   </section>
 </body>
+
+<template id="section-clan-war">
+  <div class="card-contents">
+    <div class="clan-war" data-clan-tag="{CLAN_TAG}">
+      <div class="summary">
+        <div class="clan">
+          <div class="name">{CLAN_NAME}</div>
+          <div class="stars">
+            <i class="fa-solid fa-star"></i>
+            <span class="count">{CLAN_STAR_COUNT}</span>
+          </div>
+          <div class="attacks">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</div>
+        </div>
+        <div class="war-info">
+          <div class="clan-icon">
+            <img class="clan" alt="" />
+            <img class="opponent" alt="" />
+          </div>
+          <div class="war-remaining-time">
+            {WAR_REMAIN_HOUR_MINUTE}
+          </div>
+          <div class="war-state">
+            {WAR_STATE}
+          </div>
+        </div>
+        <div class="opponent">
+          <div class="name">{OPPONENT_NAME}</div>
+          <div class="stars">
+            <span class="count">{OPPONENT_STAR_COUNT}</span>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="attacks">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</div>
+        </div>
+      </div>
+
+      <div class="member-attack"></div>
+    </div>
+  </div>
+</template>
+<template id="section-member">
+  <div class="member">
+
+    <div class="layout-title">
+      <div class="user">
+        <div class="hall-level">{USER_HALL_LEVEL}</div>
+        <div class="title">
+          <div class="name">{USER_NAME}</div>
+<!--          <div class="role">{USER_ROLE}</div>-->
+        </div>
+      </div>
+      <div class="info">
+        <div class="total-stars">
+          <i class="fa-solid fa-star"></i>
+          <span class="count">{USER_STARS}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout-body">
+      <div class="attack-list"></div>
+    </div>
+  </div>
+</template>
+<template id="section-member-attack">
+  <div class="attack-info">
+    <div class="name">{OPPONENT_NAME}</div>
+    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
+    <div class="stars">
+      <i class="fa-solid fa-star"></i>
+      <i class="fa-solid fa-star"></i>
+      <i class="fa-solid fa-star"></i>
+    </div>
+    <div class="duration">{DESTRUCTION_DURATION}</div>
+  </div>
+</template>
 </html>

@@ -11,6 +11,7 @@ import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -20,13 +21,18 @@ public class ClanWarMemberResConverter implements Converter<ClanWarMember, ClanW
 
     @Override
     public ClanWarMemberRes convert(ClanWarMember source) {
+        ClanWarAttackRes clanWarAttackRes = null;
+        if (!ObjectUtils.isEmpty(source.getBestOpponentAttack())) {
+            clanWarAttackRes = clanWarAttackResConverter.convert(source.getBestOpponentAttack());
+        }
+
         return ClanWarMemberRes.builder()
                                .name(source.getName())
                                .tag(source.getTag())
                                .townHallLevel(source.getTownhallLevel())
                                .mapPosition(source.getMapPosition())
                                .attacks(makeAttacks(source.getAttacks()))
-                               .bestOpponentAttack(clanWarAttackResConverter.convert(source.getBestOpponentAttack()))
+                               .bestOpponentAttack(clanWarAttackRes)
                                .build();
     }
 

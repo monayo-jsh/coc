@@ -9,13 +9,15 @@ table {
 }
 
 .table-caption {
-  font-size: 5rem;
-  font-weight: bold;
-  text-align: left;
   margin-bottom: 5px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  span {
+    font-size: 21px;
+    font-weight: bold;
+  }
 }
 
 th {
@@ -44,49 +46,4 @@ td {
 
 a {
   color: var(--button-background-color);
-}
-
-@media all and (max-width: 768px) {
-
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
-
-  th {
-    text-align: right;
-  }
-
-  table {
-    position: relative;
-    padding-bottom: 0;
-    border: none;
-    box-shadow: 0 0 10px rgba(0,0,0,.2);
-  }
-
-  thead {
-    float: left;
-    white-space: nowrap;
-  }
-
-  tbody {
-    overflow-x: auto;
-    overflow-y: hidden;
-    position: relative;
-    white-space: nowrap;
-  }
-
-  tr {
-    display: inline-block;
-    vertical-align: top;
-  }
-
-  th {
-    border-bottom: 1px solid #a39485;
-  }
-
-  td {
-    border-bottom: 1px solid #e5e5e5;
-  }
-
-
 }

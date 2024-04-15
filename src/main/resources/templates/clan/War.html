@@ -43,7 +43,9 @@
         const clanWarContents = templateClanWar.querySelector('.card-contents');
 
         clanWarContents.classList.add(`clan-${cardIndex}`)
-        clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag);
+        clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
+                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
 
         settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
           targetClanWar.innerHTML = clanWarContents.innerHTML;
@@ -77,21 +79,14 @@
       }, 0)
     }
 
-    function appendAttackList(attackListElement, attacks, opponentMemberMap) {
+    function appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember) {
+
       if (!attacks.length) {
-        const htmlSpanElement = document.createElement('span');
-        htmlSpanElement.style.color = 'red';
-        htmlSpanElement.style.textAlign = 'center';
-        htmlSpanElement.innerText = '공격 기록 없음';
-        attackListElement.appendChild(htmlSpanElement);
+        appendNotAttackRows(attacksPerMember);
         return
       }
 
       const templateMember = document.getElementById('section-member-attack');
-
-      function formatMinuteSecond(sec) {
-        return dayjs.duration(sec * 1000).format('m분 ss초');
-      }
 
       for (attack of attacks) {
 
@@ -113,9 +108,27 @@
 
         attackListElement.appendChild(attackInfoElement);
       }
+
+      appendNotAttackRows(attacksPerMember - attacks.length)
+
+      function formatMinuteSecond(sec) {
+        return dayjs.duration(sec * 1000).format('m분 ss초');
+      }
+
+      function appendNotAttackRows(rowCount) {
+        const templateMemberNotAttack = document.getElementById('section-member-not-attack');
+        for (let i=0; i<rowCount; i++) {
+          const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
+          const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
+          attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                                                         .replace(/{ATTACK_NO}/, `공격${i+1}`);
+
+          attackListElement.appendChild(attackInfoElement);
+        }
+      }
     }
 
-    function settingMemberAttack(memberAttackHtml, clanMembers, opponentMembers) {
+    function settingMemberAttack(memberAttackHtml, clanMembers, opponentMembers, attacksPerMember) {
       const opponentMemberMap = makeMemberMapByTag(opponentMembers);
 
       const templateMember = document.getElementById('section-member');
@@ -133,7 +146,7 @@
                                                .replace(/{USER_STARS}/, totalStars)
 
         const attackListElement = cloneTemplateMember.querySelector('.attack-list');
-        appendAttackList(attackListElement, attacks, opponentMemberMap);
+        appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember);
 
         memberAttackHtml.appendChild(memberElement)
       }
@@ -161,13 +174,12 @@
                    const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
 
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
-                                                                            .replace(/{CLAN_NAME}/, clan.name)
                                                                             .replace(/{CLAN_STAR_COUNT}/, clan.stars)
                                                                             .replace(/{CLAN_ATTACK}/, clan.attacks)
                                                                             .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
                                                                             .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
                                                                             .replace(/{WAR_STATE}/, convWarState(state))
-                                                                            .replace(/{OPPONENT_NAME}/, opponent.name)
+                                                                            .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
                                                                             .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
                                                                             .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
                                                                             .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember);
@@ -175,11 +187,11 @@
                    const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
                    clanIcon.src = clan.badge.small
 
-                   const oppentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
-                   oppentIcon.src = opponent.badge.small
+                   const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+                   opponentIcon.src = opponent.badge.small
 
                    let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members)
+                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember)
                  })
                  .catch((error) => {
                    console.error(error);
@@ -187,7 +199,10 @@
 
       function convWarState(state) {
         switch(state) {
+          case 'preparation': return '준비일';
           case 'inWar': return '전쟁중';
+          case 'notInWar': return "전쟁중이 아님";
+          case 'warEnded': return '전쟁 종료';
         }
         return state;
       }
@@ -197,7 +212,7 @@
         const endDateTime = dayjs(endTime);
 
         if (now > endDateTime) {
-          return "0시간 0분";
+          return "";
         }
 
         return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
@@ -213,13 +228,15 @@
 
              const carousel = document.querySelector(".carousel");
              for (let index = 0; index<data.length; index++) {
-               const { tag } = data[index];
+               const { tag, name } = data[index];
 
                const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
                const clanWarContents = templateClanWar.querySelector('.card-contents');
 
                clanWarContents.classList.add(`clan-${index}`, 'display-none');
-               clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, tag);
+               clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                          .replace(/{CLAN_TAG}/, tag)
+                                                          .replace(/{CLAN_NAME}/g, name);
 
                if (index === 0) {
                  settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
@@ -443,8 +460,17 @@
               }
             }
 
-            .attack-info:nth-child(2) {
+            .attack-info:nth-child(2),
+            .attack-info.not:nth-child(2) {
               border-top: var(--default-border);
+            }
+
+            .attack-info.not {
+              .message {
+                font-size: .9rem;
+                color: yellow;
+                font-weight: bolder;
+              }
             }
           }
         }
@@ -482,7 +508,7 @@
 
 <template id="section-clan-war">
   <div class="card-contents">
-    <div class="clan-war" data-clan-tag="{CLAN_TAG}">
+    <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
       <div class="summary">
         <div class="clan">
           <div class="name">{CLAN_NAME}</div>
@@ -552,6 +578,13 @@
       <i class="fa-solid fa-star fa-xs"></i>
     </div>
     <div class="duration">{DESTRUCTION_DURATION}</div>
+  </div>
+</template>
+
+<template id="section-member-not-attack">
+  <div class="attack-info not">
+    <div class="name">{ATTACK_NO}</div>
+    <div class="message">사용 안함</div>
   </div>
 </template>
 </html>

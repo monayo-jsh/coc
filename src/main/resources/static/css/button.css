@@ -143,3 +143,19 @@ button.refresh.ing svg {
     transform: rotate(360deg);
   }
 }
+
+.button-grey {
+  position: relative;
+  background: #7a7a7a;
+  color: #fff;
+  padding: .5rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}

@@ -130,10 +130,6 @@ button.refresh:hover svg {
   animation: spin_refresh 0.5s linear;
 }
 
-button.refresh.ing svg {
-  animation: spin_refresh 1s infinite linear;
-}
-
 @keyframes spin_refresh {
   from {
     transform: rotate(0deg);

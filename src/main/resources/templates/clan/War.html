@@ -23,6 +23,7 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/static/js/common.js"></script>
   <script type="text/javascript">
     function initCardSlide() {
       const cardContents = document.querySelectorAll(".card-contents");
@@ -31,7 +32,7 @@
       let cardIndex = 0;
 
       const showCard = () => {
-        showWifiLoading();
+        showWifiLoading('.card-container');
 
         cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
 
@@ -50,7 +51,7 @@
           cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
           cardContents[cardIndex].classList.remove('display-none');
 
-          hideWifiLoading();
+          hideWifiLoading('.card-container');
         })
       };
 
@@ -203,26 +204,8 @@
       }
     }
 
-    function showWifiLoading() {
-      setTimeout(() => {
-        const cardContainer = document.querySelector('.card-container');
-        cardContainer.classList.add('opacity-01');
-        const loader = document.querySelector('#wifi-loader');
-        loader.classList.remove('display-none');
-      }, 100)
-    }
-
-    function hideWifiLoading() {
-      setTimeout(() => {
-        const cardContainer = document.querySelector('.card-container');
-        cardContainer.classList.remove('opacity-01');
-        const loader = document.querySelector('#wifi-loader');
-        loader.classList.add('display-none');
-      }, 100)
-    }
-
     function getClans() {
-      showWifiLoading();
+      showWifiLoading('.card-container');
 
       axios.get('/clans')
            .then((response) => {
@@ -239,7 +222,7 @@
                clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, tag);
 
                if (index === 0) {
-                 settingClanWar(clanWarContents, tag).then(() => hideWifiLoading())
+                 settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
                  clanWarContents.classList.remove('display-none');
                }
 

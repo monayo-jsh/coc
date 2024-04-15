@@ -6,6 +6,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/table.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/axios/axios_v1.6.8.js"></script>
@@ -16,6 +17,11 @@
     .clan-capital {
       width: 100%;
       padding: 10px;
+    }
+    .content-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
     }
   </style>
   <script>
@@ -102,7 +108,7 @@
     }
 
     function getClanCapitalAttacks() {
-      showLoading();
+      showWifiLoading('.contents');
       axios.get('/clans/capital/attack/count')
            .then((response) => {
              clearTbody();
@@ -119,7 +125,7 @@
              guideRow("조회 실패");
            })
            .finally(() => {
-             hideLoading()
+             hideWifiLoading('.contents')
            });
     }
   </script>
@@ -149,17 +155,35 @@
         </button>
 
     </div>
-    <table class="table-clan-capital">
-      <thead class="header">
+    <div class="content-wrapper">
+      <div id="wifi-loader" class="display-none">
+        <svg class="circle-outer" viewBox="0 0 86 86">
+          <circle class="back" cx="43" cy="43" r="40"></circle>
+          <circle class="front" cx="43" cy="43" r="40"></circle>
+          <circle class="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg class="circle-middle" viewBox="0 0 60 60">
+          <circle class="back" cx="30" cy="30" r="27"></circle>
+          <circle class="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg class="circle-inner" viewBox="0 0 34 34">
+          <circle class="back" cx="17" cy="17" r="14"></circle>
+          <circle class="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        <div class="text" data-text="Searching"></div>
+      </div>
+      <table class="table-clan-capital">
+        <thead class="header">
         <tr>
           <th>클랜명</th>
           <th>남은 공격</th>
           <th>링크</th>
         </tr>
-      </thead>
-      <tbody class="contents">
-      </tbody>
-    </table>
+        </thead>
+        <tbody class="contents">
+        </tbody>
+      </table>
+    </div>
   </div>
 </body>
 </html>

@@ -2,32 +2,20 @@ function renderPage(uri) {
   location.href = uri;
 }
 
-function getTbody() {
-  return getButtonRefresh()
-                 .parentElement
-                 .parentElement
-                 .querySelector('table tbody.contents');
+function showWifiLoading(dimElementClassName) {
+  setTimeout(() => {
+    const cardContainer = document.querySelector(dimElementClassName);
+    cardContainer.classList.add('opacity-01');
+    const loader = document.querySelector('#wifi-loader');
+    loader.classList.remove('display-none');
+  }, 100)
 }
 
-function getButtonRefresh() {
-  return document.querySelector('button.refresh');
-}
-
-function showLoading() {
-  const spinIcon = getButtonRefresh();
-  if (spinIcon) {
-    spinIcon.classList.add('ing');
-
-    const tbody = getTbody();
-    tbody.classList.add('loading');
-  }
-}
-function hideLoading() {
-  const spinIcon = getButtonRefresh();
-  if (spinIcon) {
-    spinIcon.classList.remove('ing');
-
-    const tbody = getTbody();
-    tbody.classList.remove('loading');
-  }
+function hideWifiLoading(dimElementClassName) {
+  setTimeout(() => {
+    const cardContainer = document.querySelector(dimElementClassName);
+    cardContainer.classList.remove('opacity-01');
+    const loader = document.querySelector('#wifi-loader');
+    loader.classList.add('display-none');
+  }, 100)
 }

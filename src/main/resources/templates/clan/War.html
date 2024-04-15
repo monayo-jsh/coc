@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
+  <link rel="stylesheet" href="/static/css/loader.css" />
   <style>
     body {
       margin: 0;
@@ -24,12 +25,14 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script type="text/javascript">
     function initCardSlide() {
-      const cardContents = document.querySelectorAll(".card-contents"),
-          buttons = document.querySelectorAll(".button");
+      const cardContents = document.querySelectorAll(".card-contents");
+      const buttons = document.querySelectorAll(".button");
 
       let cardIndex = 0;
 
       const showCard = () => {
+        showWifiLoading();
+
         cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
 
         const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
@@ -46,6 +49,8 @@
 
           cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
           cardContents[cardIndex].classList.remove('display-none');
+
+          hideWifiLoading();
         })
       };
 
@@ -198,7 +203,27 @@
       }
     }
 
+    function showWifiLoading() {
+      setTimeout(() => {
+        const cardContainer = document.querySelector('.card-container');
+        cardContainer.classList.add('opacity-01');
+        const loader = document.querySelector('#wifi-loader');
+        loader.classList.remove('display-none');
+      }, 100)
+    }
+
+    function hideWifiLoading() {
+      setTimeout(() => {
+        const cardContainer = document.querySelector('.card-container');
+        cardContainer.classList.remove('opacity-01');
+        const loader = document.querySelector('#wifi-loader');
+        loader.classList.add('display-none');
+      }, 100)
+    }
+
     function getClans() {
+      showWifiLoading();
+
       axios.get('/clans')
            .then((response) => {
              const { data } = response;
@@ -214,15 +239,14 @@
                clanWarContents.innerHTML = clanWarContents.innerHTML.replace(/{CLAN_TAG}/, tag);
 
                if (index === 0) {
-                 settingClanWar(clanWarContents, tag);
+                 settingClanWar(clanWarContents, tag).then(() => hideWifiLoading())
                  clanWarContents.classList.remove('display-none');
                }
-
 
                carousel.appendChild(templateClanWar);
              }
 
-             initCardSlide()
+             initCardSlide();
            })
            .catch((error) => {
              console.error(error);
@@ -447,12 +471,29 @@
   </style>
 </head>
 <body onload="getClans()">
-  <section class="card-wrapper">
+  <section class="card-wrapper" >
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
+
     <i class="fa-solid fa-arrow-left button" id="prev"></i>
     <div class="card-container">
       <div class="carousel"></div>
-      <i class="fa-solid fa-arrow-right button" id="next"></i>
     </div>
+    <i class="fa-solid fa-arrow-right button" id="next"></i>
   </section>
 </body>
 

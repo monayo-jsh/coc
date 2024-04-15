@@ -253,7 +253,7 @@
       .name {
         padding: 3px;
         color: #fefe46;
-        font-size: 1rem;
+        font-size: 0.9rem;
         font-weight: bolder;
         text-align: center;
       }
@@ -319,7 +319,6 @@
     .member-attack {
       overflow-y: auto;
       scrollbar-width: none;
-      min-width: 355px;
       height: 625px;
 
       .member {
@@ -354,6 +353,7 @@
               border-left: var(--default-border);
 
               .name {
+                font-size: .9rem;
                 font-weight: bolder;
               }
 
@@ -369,14 +369,8 @@
           .info {
 
             .total-stars {
-              display: flex;
               padding: 15px;
               color: #fff;
-
-              .count {
-                margin-left: 5px;
-              }
-
             }
 
           }
@@ -406,16 +400,18 @@
               padding: 5px 0;
 
               .name {
-                width: 40%;
+                font-size: .9rem;
+                width: 35%;
                 font-weight: bolder;
               }
 
               .destruction-percentage {
-                width: 15%;
+                font-size: .9rem;
+                width: 17%;
               }
 
               .stars {
-                width: 20%;
+                width: 21%;
 
                 .fill {
                   color: #fff;
@@ -423,9 +419,9 @@
               }
 
               .duration {
-                width: 20%;
+                width: 22%;
                 text-align: right;
-                font-size: 12px;
+                font-size: 0.8rem;
               }
             }
 
@@ -516,9 +512,9 @@
     <div class="name">{OPPONENT_NAME}</div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
     <div class="stars">
-      <i class="fa-solid fa-star"></i>
-      <i class="fa-solid fa-star"></i>
-      <i class="fa-solid fa-star"></i>
+      <i class="fa-solid fa-star fa-xs"></i>
+      <i class="fa-solid fa-star fa-xs"></i>
+      <i class="fa-solid fa-star fa-xs"></i>
     </div>
     <div class="duration">{DESTRUCTION_DURATION}</div>
   </div>

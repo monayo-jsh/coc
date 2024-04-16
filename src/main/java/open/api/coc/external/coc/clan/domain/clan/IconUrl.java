@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BadgeUrl {
+public class IconUrl {
 
     private String small;
     private String medium;
-    private String large;
+    private String tiny;
 
 }

@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.ClanCurrentWarRes;
+import open.api.coc.clans.domain.ClanMemberListRes;
 import open.api.coc.clans.domain.ClanRes;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
@@ -36,8 +37,14 @@ public class ClansController {
         return ResponseEntity.ok().body(clan);
     }
 
+    @GetMapping("{clanTag}/members")
+    public ResponseEntity<ClanMemberListRes> getClanMembers(@PathVariable String clanTag) {
+        ClanMemberListRes clanMemberList = clansService.findClanMembersByClanTag(clanTag);
+        return ResponseEntity.ok().body(clanMemberList);
+    }
+
     @GetMapping("{clanTag}/current/war")
-    public ResponseEntity<?> getClanCurrentWar(@PathVariable String clanTag) {
+    public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {
         ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);
         return ResponseEntity.ok().body(clanCurrentWar);
     }

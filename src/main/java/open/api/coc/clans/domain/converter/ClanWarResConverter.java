@@ -16,7 +16,7 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
 
-    private final BadgeResConverter badgeResConverter;
+    private final IconUrlResConverter iconUrlResConverter;
     private final ClanWarMemberResConverter clanWarMemberResConverter;
 
     @Override
@@ -24,7 +24,7 @@ public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
         return ClanWarRes.builder()
                          .name(source.getName())
                          .tag(source.getTag())
-                         .badge(badgeResConverter.convert(source.getBadgeUrls()))
+                         .badge(iconUrlResConverter.convert(source.getIconUrls()))
                          .stars(source.getStars())
                          .attacks(source.getAttacks())
                          .destructionPercentage(source.getDestructionPercentage())

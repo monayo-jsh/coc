@@ -19,3 +19,4 @@ external:
         clan-tag: /{clanTag}
         capital-raid-seasons: /{clanTag}/capitalraidseasons
         current-war: /{clanTag}/currentwar
+        members: /{clanTag}/members

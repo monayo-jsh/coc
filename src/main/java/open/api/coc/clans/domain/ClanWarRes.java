@@ -12,7 +12,7 @@ public class ClanWarRes {
 
     private String name;
     private String tag;
-    private BadgeRes badge;
+    private IconUrlRes badge;
 
     private Integer attacks;
     private Integer stars;

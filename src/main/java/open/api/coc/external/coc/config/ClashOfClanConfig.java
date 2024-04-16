@@ -13,6 +13,7 @@ public class ClashOfClanConfig {
     private final String domain;
 
     private final EndPoint endPoint;
+
     @Getter
     @RequiredArgsConstructor
     private static class EndPoint {
@@ -26,18 +27,18 @@ public class ClashOfClanConfig {
             private final String clanTag;
             private final String capitalRaidSeasons;
             private final String currentWar;
+            private final String members;
 
             public String getClanTag() {
                 return prefix + clanTag;
             }
-
             public String getCapitalRaidSeasons() {
                 return prefix + capitalRaidSeasons;
             }
-
             public String getCurrentWar() {
                 return prefix + currentWar;
             }
+            public String getMembers() { return prefix + members; }
         }
 
     }
@@ -52,6 +53,10 @@ public class ClashOfClanConfig {
 
     public String getClansClanTagCurrentWar() {
         return getDomain() + getEndPoint().getClans().getCurrentWar();
+    }
+
+    public String getClansClanMembers() {
+        return getDomain() + getEndPoint().getClans().getMembers();
     }
 
 }

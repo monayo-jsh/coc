@@ -14,13 +14,16 @@ import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.ClanCurrentWarRes;
+import open.api.coc.clans.domain.ClanMemberListRes;
 import open.api.coc.clans.domain.ClanRes;
 import open.api.coc.clans.domain.converter.ClanCapitalRaidSeasonMemberResConverter;
 import open.api.coc.clans.domain.converter.ClanCurrentWarResConverter;
+import open.api.coc.clans.domain.converter.ClanMemberListResConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasonMember;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -34,6 +37,7 @@ public class ClansService {
 
     private final ClanCapitalRaidSeasonMemberResConverter clanCapitalRaidSeasonMemberResConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
+    private final ClanMemberListResConverter clanMemberListResConverter;
 
     public Map<String, Object> findClanByClanTag(String clanTag) {
         return clanApiService.findClanByClanTag(clanTag);
@@ -112,5 +116,12 @@ public class ClansService {
                    .stream()
                    .map(ClanRes::create)
                    .collect(Collectors.toList());
+    }
+
+    public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
+        ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)
+                                                      .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 사용자 조회 실패"));
+
+        return clanMemberListResConverter.convert(clanMemberList);
     }
 }

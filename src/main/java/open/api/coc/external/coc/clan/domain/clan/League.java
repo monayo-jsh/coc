@@ -1,6 +1,5 @@
 package open.api.coc.external.coc.clan.domain.clan;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,16 +7,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class WarClan {
+public class League {
 
+    private Integer id;
     private String name;
-    private String tag;
     private IconUrl iconUrls;
-
-    private Integer attacks;
-    private Integer stars;
-    private Float destructionPercentage;
-
-    private List<ClanWarMember> members;
 
 }

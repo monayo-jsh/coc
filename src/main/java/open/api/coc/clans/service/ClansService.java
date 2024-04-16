@@ -111,7 +111,14 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
 
-    public List<ClanRes> getClanList() {
+    public List<ClanRes> getClanResList() {
+        return Clan.getClanList()
+                   .stream()
+                   .map(ClanRes::create)
+                   .collect(Collectors.toList());
+    }
+
+    public List<ClanRes> getClanWarResList() {
         return Clan.getClanWarList()
                    .stream()
                    .map(ClanRes::create)

@@ -1,0 +1,146 @@
+:root {
+  --default-border: 1px solid #80808033;
+}
+
+.content-wrapper {
+  height: 100%;
+  padding: 10px;
+}
+
+.clan-members {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.member.row:not(:first-child) {
+  margin-top: 5px;
+}
+
+.member.row {
+  width: 100%;
+  min-width: 250px;
+  max-width: 300px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  background: linear-gradient(to left, #c3c3c3, transparent), linear-gradient(to right, #c3c3c3, transparent);
+  border: var(--default-border);
+  border-radius: 0 0 10px 0;
+  box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+  margin: 5px;
+
+  .cell {
+    padding: 5px;
+    font-size: 0.7em;
+    font-weight: bold;
+  }
+
+  .user {
+    font-size: 1em;
+    font-weight: bold;
+    word-break: break-all;
+  }
+
+  .label-clan {
+    font-size: .7em;
+    font-weight: bold;
+    word-break: break-all;
+  }
+
+  .league-icon {
+    padding: 0;
+  }
+
+  .town-hall {
+  }
+
+  .xp {
+    position: relative;
+    padding: 16px;
+    background-image: url("/static/images/etc/xp.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+
+    .level {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-weight: bold;
+      font-size: .9em;
+    }
+  }
+
+  .donations,
+  .donations-received {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .label {
+      font-size: 0.8em;
+      font-weight: bolder;
+      text-align: center;
+    }
+    .count {
+      margin-top: 5px;
+      padding: 3px 0;
+      font-size: 0.8em;
+      font-weight: bold;
+      text-align: center;
+      border: var(--default-border);
+      border-radius: 5px;
+      box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+  }
+
+  .trophies {
+    .count {
+      position: relative;
+      font-weight: bold;
+      font-size: 1.2em;
+      border: var(--default-border);
+      border-radius: 8px;
+      padding: 5px 15px;
+      background-color: #efd466;
+      color: #fff;
+      width: 95px;
+
+      .icon {
+        position: absolute;
+        width: 36px;
+        height: 36px;
+        background-image: url(/static/images/etc/trophies.png);
+        background-repeat: no-repeat;
+        background-size: contain;
+        top: 0;
+        right: 0;
+        transform: translateY(-7px);
+      }
+    }
+  }
+
+}
+
+.layout-badge,
+.layout-title,
+.layout-donations {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 5px;
+}
+
+.layout-title {
+  justify-content: space-between;
+}
+
+.layout-badge {
+  padding: 5px 10px;
+
+  .cell:not(:first-child) {
+    margin-left: 8px;
+  }
+}

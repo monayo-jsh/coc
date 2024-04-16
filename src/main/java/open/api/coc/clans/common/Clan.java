@@ -16,9 +16,17 @@ public enum Clan {
     CLAN_ACADEME_4("#2L209LC8P", "아카데미 4.0", 4),
     CLAN_ACADEME_5("#2QV0R0L8R", "아카데미 5.0", 5),
 
-    LEAGUE_ACADEME("#2GJGRU920", "Academe", 6),
+    ACADEME_ENG("#2GJGRU920", "Academe", 6),
 
-    LEAGUE_TEAM_BCADEME("#2GY9YL0J9", "TEAM Bcademe", 7);
+    LEAGUE_TEAM_ACADEME("#2GPGU92Q2", "TEAM Academe", 7),
+    LEAGUE_TEAM_BCADEME("#2GY9YL0J9", "TEAM Bcademe", 8),
+
+    CLAN_WAR_LEAGUE("#229V992R8", "클랜전리그", 20),
+    CLAN_SIX_DRAGON("#2G9GU9PLU", "육룡이 나르샤", 21),
+    CLAN_BAR_RICE_CAKE_HONEY("#2PLJJLY89", "가래떡에 꿀", 22),
+    CLAN_BAR_RICE_CAKE_SUGAR("#2PUPJ09VP", "가래떡에 설탕", 23),
+
+    CLAN_ACADEME_SHELTER("#2LJ0U02YJ", "아카데미 쉼터", 99);
 
     private final String tag;
     private final String name;
@@ -38,13 +46,21 @@ public enum Clan {
                      .orElseThrow(() -> createNotFoundException("클랜태그 일치하는 클랜 정의 찾지 못함"));
     }
 
-    public static List<String> getCapitalClanTagList() {
+    public static List<Clan> getClanList() {
         return List.of(
-            CLAN_ACADEME.getTag(),
-            CLAN_ACADEME_2.getTag(),
-            CLAN_ACADEME_3.getTag(),
-            CLAN_ACADEME_4.getTag(),
-            LEAGUE_ACADEME.getTag()
+            CLAN_ACADEME,
+            CLAN_ACADEME_2,
+            CLAN_ACADEME_3,
+            CLAN_ACADEME_4,
+            CLAN_ACADEME_5,
+            ACADEME_ENG,
+            LEAGUE_TEAM_ACADEME,
+            LEAGUE_TEAM_BCADEME,
+            CLAN_WAR_LEAGUE,
+            CLAN_SIX_DRAGON,
+            CLAN_BAR_RICE_CAKE_HONEY,
+            CLAN_BAR_RICE_CAKE_SUGAR,
+            CLAN_ACADEME_SHELTER
         );
     }
 
@@ -55,7 +71,17 @@ public enum Clan {
             CLAN_ACADEME_3,
             CLAN_ACADEME_4,
             CLAN_ACADEME_5,
-            LEAGUE_ACADEME
+            ACADEME_ENG
+        );
+    }
+
+    public static List<String> getCapitalClanTagList() {
+        return List.of(
+            CLAN_ACADEME.getTag(),
+            CLAN_ACADEME_2.getTag(),
+            CLAN_ACADEME_3.getTag(),
+            CLAN_ACADEME_4.getTag(),
+            ACADEME_ENG.getTag()
         );
     }
 }

@@ -28,7 +28,13 @@ public class ClansController {
     @GetMapping("")
     public ResponseEntity<List<ClanRes>> getClans() {
         return ResponseEntity.ok()
-                             .body(clansService.getClanList());
+                             .body(clansService.getClanResList());
+    }
+
+    @GetMapping("/war")
+    public ResponseEntity<List<ClanRes>> getClansWar() {
+        return ResponseEntity.ok()
+                             .body(clansService.getClanWarResList());
     }
 
     @GetMapping("{clanTag}")

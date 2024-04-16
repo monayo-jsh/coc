@@ -11,14 +11,19 @@ public class ViewController {
         return "Home";
     }
 
-    @GetMapping("/capital/attacks")
-    public String viewCapitalAttacks() {
-        return "capital/Attacks";
+    @GetMapping("/clan/member")
+    public String viewClanMember() {
+        return "clan/Member";
     }
 
     @GetMapping("/clan/war")
     public String viewClanWar() {
         return "clan/War";
+    }
+
+    @GetMapping("/capital/attacks")
+    public String viewCapitalAttacks() {
+        return "capital/Attacks";
     }
 
 }

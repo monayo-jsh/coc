@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/loader.css" />
+  <link rel="stylesheet" href="/static/css/clan/member.css" />
+  <link rel="stylesheet" href="/static/css/townhall.css" />
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/static/js/common.js"></script>
+
+  <title>클랜원 현황</title>
+
+  <script>
+    async function requestClans() {
+      return axios.get('/clans')
+           .then((response) => {
+             const { data } = response
+             if (!data) {
+               return [];
+             }
+
+             return data;
+           })
+           .catch((error) => {
+             console.error(error);
+             return [];
+           });
+    }
+    function getRequestClanMembersByClan(clan) {
+      const uri = `/clans/${encodeURIComponent(clan.tag)}/members`
+      return axios.get(uri,
+          {
+            params: {
+              clan: JSON.stringify(clan)
+            }
+          });
+    }
+
+    async function fetchClanMembers(clans) {
+      const requests = clans.map(clan => getRequestClanMembersByClan(clan))
+
+      let members = [];
+      await axios.all(requests)
+                 .then((responses) => {
+                   responses.forEach((response) => {
+                     const { config, data } = response
+                     if (data.members) {
+                       // set clan
+                       const clan = JSON.parse(config.params.clan)
+                       data.members.forEach((member) => member.clan = clan)
+
+                       // concat member
+                       members = members.concat(data.members);
+                     }
+                   })
+                 })
+                 .catch((error) => {
+                   console.error(error)
+                 })
+
+      return members;
+    }
+
+    function sortByTrophies(members) {
+      return members.sort(function (a, b) {
+        if (a.trophies < b.trophies) {
+          return 1;
+        }
+        if (a.trophies > b.trophies) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+    }
+
+    async function getClanMembers() {
+      // showWifiLoading('.contents');
+      showWifiLoading('.content-wrapper');
+      const clans = await requestClans();
+      const members = await fetchClanMembers(clans)
+      hideWifiLoading('.content-wrapper');
+
+      const sortedMembers = sortByTrophies(members)
+      renderMembers(sortedMembers)
+    }
+
+    function renderMembers(members) {
+      const clanMembersElement = document.querySelector('.clan-members');
+
+      const memberTemplate = document.querySelector('#member');
+      let no = 1;
+      for(const member of members) {
+        const templateMember = document.importNode(memberTemplate.content, true);
+        const memberHtml = templateMember.querySelector('.member');
+
+        const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = member
+
+        memberHtml.innerHTML = memberHtml.innerHTML
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{CLAN_NAME}/, clan.name)
+                                         .replace(/{TROPHIES}/, trophies)
+                                         .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
+                                         .replace(/{EXP_LEVEL}/, expLevel)
+                                         .replace(/{DONATIONS}/, donations)
+                                         .replace(/{DONATIONS_RECEIVED}/, donationsReceived);
+
+        const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+        const { iconUrls } = league
+        leagueIconImg.src = iconUrls.tiny;
+
+        clanMembersElement.appendChild(memberHtml);
+        no++;
+      }
+    }
+  </script>
+</head>
+<body onload="getClanMembers()">
+  <div class="content-wrapper">
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
+
+
+    <div class="clan-members"></div>
+  </div>
+</body>
+<template id="member">
+  <div class="member row">
+    <div class="layout-title">
+      <div class="cell">
+        <div class="user">{NAME}</div>
+        <div class="label-clan">{CLAN_NAME}</div>
+      </div>
+      <div class="cell trophies">
+        <div class="count">
+          {TROPHIES}
+          <div class="icon"></div>
+        </div>
+      </div>
+    </div>
+    <div class="layout-badge">
+      <img class="cell league-icon" src="" alt="">
+      <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
+      <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
+    </div>
+    <div class="layout-donations">
+      <div class="cell donations">
+        <span class="label">지원한 유닛</span>
+        <span class="count">{DONATIONS}</span>
+      </div>
+      <div class="cell donations-received">
+        <span class="label">지원받은 유닛</span>
+        <span class="count">{DONATIONS_RECEIVED}</span>
+      </div>
+    </div>
+  </div>
+</template>
+</html>

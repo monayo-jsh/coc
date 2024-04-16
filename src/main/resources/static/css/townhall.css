@@ -1,0 +1,55 @@
+.town-hall {
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+.town-hall.th16 {
+  background-image: url(/static/images/townhall/16.png);
+}
+.town-hall.th15 {
+  background-image: url(/static/images/townhall/15.png);
+}
+.town-hall.th14 {
+  background-image: url(/static/images/townhall/14.png);
+}
+.town-hall.th13 {
+  background-image: url(/static/images/townhall/13.png);
+}
+.town-hall.th12 {
+  background-image: url(/static/images/townhall/12.png);
+}
+.town-hall.th11 {
+  background-image: url(/static/images/townhall/11.png);
+}
+.town-hall.th10 {
+  background-image: url(/static/images/townhall/10.png);
+}
+.town-hall.th9 {
+  background-image: url(/static/images/townhall/9.png);
+}
+.town-hall.th8 {
+  background-image: url(/static/images/townhall/8.png);
+}
+.town-hall.th7 {
+  background-image: url(/static/images/townhall/7.png);
+}
+.town-hall.th6 {
+  background-image: url(/static/images/townhall/6.png);
+}
+.town-hall.th5 {
+  background-image: url(/static/images/townhall/5.png);
+}
+.town-hall.th4 {
+  background-image: url(/static/images/townhall/4.png);
+}
+.town-hall.th3 {
+  background-image: url(/static/images/townhall/3.png);
+}
+.town-hall.th2 {
+  background-image: url(/static/images/townhall/2.png);
+}
+.town-hall.th1 {
+  background-image: url(/static/images/townhall/1.png);
+}

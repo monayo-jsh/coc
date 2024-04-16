@@ -69,11 +69,11 @@
 
     function makeOpenClanProfileLink(tag) {
       if (!tag) return "-"
-      const OPEN_CLAN_PROFILE_LINK = `https://link.clashofclans.com/kr?action=OpenClanProfile&tag=${tag}`
+      const OPEN_CLAN_PROFILE_LINK = `clashofclans://action=OpenClanProfile&tag=${tag}`
 
       return `
         <button class="right-single-arrow" onclick="renderPage('{LINK}'); return false;">
-          <span>이동</span>
+          <span>접속</span>
           <svg width="0.5em" height="0.5em" viewBox="0 0 13 10">
             <path d="M1,5 L11,5"></path>
             <polyline points="8 1 12 5 8 9"></polyline>

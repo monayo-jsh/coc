@@ -222,7 +222,7 @@
     function getClans() {
       showWifiLoading('.card-container');
 
-      axios.get('/clans')
+      axios.get('/clans/war')
            .then((response) => {
              const { data } = response;
 

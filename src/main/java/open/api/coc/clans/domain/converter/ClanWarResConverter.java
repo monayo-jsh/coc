@@ -24,7 +24,7 @@ public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
         return ClanWarRes.builder()
                          .name(source.getName())
                          .tag(source.getTag())
-                         .badge(iconUrlResConverter.convert(source.getIconUrls()))
+                         .badge(iconUrlResConverter.convert(source.getBadgeUrls()))
                          .stars(source.getStars())
                          .attacks(source.getAttacks())
                          .destructionPercentage(source.getDestructionPercentage())

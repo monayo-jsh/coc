@@ -12,7 +12,7 @@ public class WarClan {
 
     private String name;
     private String tag;
-    private IconUrl iconUrls;
+    private IconUrl badgeUrls;
 
     private Integer attacks;
     private Integer stars;

@@ -9,8 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class IconUrl {
 
+    private String tiny;
     private String small;
     private String medium;
-    private String tiny;
+    private String large;
 
 }

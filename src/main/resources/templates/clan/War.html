@@ -4,13 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <style>
     body {
+      margin: 0;
+      height: 100%;
       display: flex;
       justify-content: center;
-      margin: 0;
       overflow-y: hidden;
     }
   </style>
@@ -138,11 +141,11 @@
         const cloneTemplateMember = document.importNode(templateMember.content, true);
         const memberElement = cloneTemplateMember.querySelector('.member');
 
-        const { name, tag, townHallLevel, attacks } = member;
+        const { name, tag, townHallLevel, mapPosition, attacks } = member;
         const totalStars = getSumByStars(attacks);
         memberElement.innerHTML = memberElement.innerHTML
                                                .replace(/{USER_HALL_LEVEL}/, townHallLevel)
-                                               .replace(/{USER_NAME}/, name)
+                                               .replace(/{USER_NAME}/, `${mapPosition}. ${name}`)
                                                .replace(/{USER_STARS}/, totalStars)
 
         const attackListElement = cloneTemplateMember.querySelector('.attack-list');
@@ -372,13 +375,10 @@
           .user {
             display: flex;
             align-items: center;
-
-            .hall-level {
-              padding: 15px 10px;
-              font-weight: bolder;
-            }
+            margin-left: 5px;
 
             .title {
+              margin-left: 5px;
               padding: 5px 10px;
               border-left: var(--default-border);
 
@@ -386,11 +386,6 @@
                 font-size: .9rem;
                 font-weight: bolder;
                 word-break: break-all;
-              }
-
-              .role {
-                font-size: .7em;
-                font-weight: bolder;
               }
 
             }
@@ -549,7 +544,7 @@
 
     <div class="layout-title">
       <div class="user">
-        <div class="hall-level">{USER_HALL_LEVEL}</div>
+        <div class="town-hall th{USER_HALL_LEVEL}"></div>
         <div class="title">
           <div class="name">{USER_NAME}</div>
 <!--          <div class="role">{USER_ROLE}</div>-->

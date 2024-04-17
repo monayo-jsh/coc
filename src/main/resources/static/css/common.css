@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 :root {
   --button-background-color: #73685d;
   --button-hover-background-color: #b9a796;
@@ -7,9 +9,8 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 20px;
-  font-weight: 200;
-  font-family: "맑은 고딕", sans-serif;
+  font-size: 1em;
+  font-family: 'Poppins', sans-serif;
 }
 
 li {

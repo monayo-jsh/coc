@@ -29,8 +29,10 @@ class ClashOfClanConfigTest {
         assertThat(clashOfClanConfig.getDomain()).isEqualTo("https://api.clashofclans.com");
 
         assertThat(clashOfClanConfig.getClansClanTagUri()).isNotBlank();
-        assertThat(clashOfClanConfig.getClansClanTagCapitalRaidSeasons()).isNotBlank();
-        assertThat(clashOfClanConfig.getClansClanTagCurrentWar()).isNotBlank();
+        assertThat(clashOfClanConfig.getClansClanTagCapitalRaidSeasonsUri()).isNotBlank();
+        assertThat(clashOfClanConfig.getClansClanTagCurrentWarUri()).isNotBlank();
+
+        assertThat(clashOfClanConfig.getPlayerUri()).isNotBlank();
 
     }
 

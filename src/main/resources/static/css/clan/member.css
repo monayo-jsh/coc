@@ -4,12 +4,15 @@
 
 .content-wrapper {
   height: 100%;
-  padding: 10px;
+  display: flex;
+  justify-content: center;
 }
 
 .clan-members {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
 }
 
 .member.row:not(:first-child) {
@@ -20,16 +23,18 @@
   width: 100%;
   min-width: 250px;
   max-width: 300px;
-  height: 100%;
+  min-height: 160px;
+  max-height: 250px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
   background: linear-gradient(to left, #c3c3c3, transparent), linear-gradient(to right, #c3c3c3, transparent);
   border: var(--default-border);
   border-radius: 0 0 10px 0;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
   margin: 5px;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
 
   .cell {
     padding: 5px;
@@ -74,17 +79,18 @@
 
   .donations,
   .donations-received {
+    padding: 0;
     display: flex;
-    flex-direction: column;
     justify-content: center;
+    align-items: center;
 
     .label {
+      width: 40px;
       font-size: 0.8em;
       font-weight: bolder;
       text-align: center;
     }
     .count {
-      margin-top: 5px;
       padding: 3px 0;
       font-size: 0.8em;
       font-weight: bold;
@@ -93,10 +99,17 @@
       border-radius: 5px;
       box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
       background-color: #fff;
+      width: 70px;
     }
   }
 
+  .donations-received {
+    margin-top: 5px;
+  }
+
   .trophies {
+    padding: 0;
+
     .count {
       position: relative;
       font-weight: bold;
@@ -124,9 +137,14 @@
 
 }
 
+.inner-section {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+
 .layout-badge,
-.layout-title,
-.layout-donations {
+.layout-title {
   width: 100%;
   display: flex;
   align-items: center;
@@ -138,9 +156,35 @@
 }
 
 .layout-badge {
-  padding: 5px 10px;
+  padding: 5px 0;
 
   .cell:not(:first-child) {
     margin-left: 8px;
   }
+}
+
+.layout-donations {
+  flex-direction: column;
+}
+
+.member.row.active {
+  transform: rotateY(180deg);
+
+  .card-front {
+    display: none;
+  }
+
+  .card-back {
+    display: unset;
+  }
+}
+
+.card-front {
+  width: 100%;
+}
+
+.card-back {
+  width: 100%;
+  display: none;
+  transform: rotateY(180deg);
 }

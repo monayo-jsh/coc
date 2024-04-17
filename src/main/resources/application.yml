@@ -20,3 +20,6 @@ external:
         capital-raid-seasons: /{clanTag}/capitalraidseasons
         current-war: /{clanTag}/currentwar
         members: /{clanTag}/members
+      players:
+        prefix: /v1/players
+        player: /{playerTag}

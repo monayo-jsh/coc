@@ -211,9 +211,25 @@
       }
     }
 
-    function renderHeroEquipments(memberHtml, player) {
-      const { equipment } = player
 
+    function renderHeroEquipments(memberHtml, player) {
+      const { heroEquipments } = player
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '영웅 장비');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const heroEquipment of heroEquipments) {
+        renderEquipment(contentsElement, heroEquipment);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back');
+      cardBackElement.appendChild(innerSectionElement);
     }
 
     async function renderPlayerDetail(memberHtml, tag) {
@@ -317,9 +333,13 @@
       </div>
       <div class="inner-section heroes"></div>
     </div>
-    <div class="card-back">
-      <div class="cell">데이터 확인중</div>
-    </div>
+    <div class="card-back"></div>
+  </div>
+</template>
+<template id="inner-section">
+  <div class="inner-section">
+    <div class="label">{LABEL}</div>
+    <div class="contents"></div>
   </div>
 </template>
 <template id="member-hero">

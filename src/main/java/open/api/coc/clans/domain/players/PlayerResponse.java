@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
 
 @Getter
@@ -26,5 +27,6 @@ public class PlayerResponse {
     private Integer warStars;
 
     private List<HeroResponse> heroes;
+    private List<HeroEquipmentResponse> heroEquipments;
 
 }

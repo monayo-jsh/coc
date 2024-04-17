@@ -211,9 +211,15 @@
       }
     }
 
+    function renderHeroEquipments(memberHtml, player) {
+      const { equipment } = player
+
+    }
+
     async function renderPlayerDetail(memberHtml, tag) {
       fetchPlayer(tag).then((player) => {
-        renderHeroes(memberHtml, player)
+        renderHeroes(memberHtml, player);
+        renderHeroEquipments(memberHtml, player);
       })
 
     }
@@ -248,6 +254,8 @@
         setTimeout(() => {
           renderPlayerDetail(memberHtml, tag);
         }, 0)
+
+        if (true) return;
       }
     }
   </script>

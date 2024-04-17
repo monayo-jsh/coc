@@ -4,10 +4,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
+import open.api.coc.clans.domain.common.converter.HeroEquipmentResponseConverter;
 import open.api.coc.clans.domain.common.converter.HeroResponseConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.external.coc.clan.domain.common.Hero;
+import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -18,7 +21,7 @@ import org.springframework.util.CollectionUtils;
 public class PlayerResponseConverter implements Converter<Player, PlayerResponse> {
 
     private final HeroResponseConverter heroResponseConverter;
-
+    private final HeroEquipmentResponseConverter heroEquipmentResponseConverter;
     @Override
     public PlayerResponse convert(Player source) {
         return PlayerResponse.builder()
@@ -32,7 +35,16 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                              .defenseWins(source.getDefenseWins())
                              .warStars(source.getWarStars())
                              .heroes(makeHeroes(source.getHeroes()))
+                             .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
                              .build();
+    }
+
+    private List<HeroEquipmentResponse> makeHeroEquipments(List<HeroEquipment> heroEquipments) {
+        if (CollectionUtils.isEmpty(heroEquipments)) return Collections.emptyList();
+
+        return heroEquipments.stream()
+                             .map(heroEquipmentResponseConverter::convert)
+                             .collect(Collectors.toList());
     }
 
     private List<HeroResponse> makeHeroes(List<Hero> heroes) {

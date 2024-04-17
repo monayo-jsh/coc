@@ -75,6 +75,16 @@ public enum Clan {
         );
     }
 
+    public static List<Clan> getClanCapitalList() {
+        return List.of(
+            CLAN_ACADEME,
+            CLAN_ACADEME_2,
+            CLAN_ACADEME_3,
+            CLAN_ACADEME_4,
+            ACADEME_ENG
+        );
+    }
+
     public static List<String> getCapitalClanTagList() {
         return List.of(
             CLAN_ACADEME.getTag(),

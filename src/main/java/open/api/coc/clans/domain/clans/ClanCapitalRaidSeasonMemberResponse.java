@@ -7,12 +7,13 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ClanCapitalRaidSeasonMemberRes {
+public class ClanCapitalRaidSeasonMemberResponse {
 
     private String tag;
     private String name;
     private Integer attacks;
     private Integer attackLimit;
     private Integer bonusAttackLimit;
+    private Integer capitalResourcesLooted;
 
 }

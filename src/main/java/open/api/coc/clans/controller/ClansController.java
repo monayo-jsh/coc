@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanCapitalAttackerRes;
+import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
@@ -35,6 +36,12 @@ public class ClansController {
                              .body(clansService.getClanWarResList());
     }
 
+    @GetMapping("/capital")
+    public ResponseEntity<List<ClanRes>> getClansCapital() {
+        return ResponseEntity.ok()
+                             .body(clansService.getClanCaptialList());
+    }
+
     @GetMapping("{clanTag}")
     public ResponseEntity<?> findClan(@PathVariable String clanTag) {
         Map<String, Object> clan = clansService.findClanByClanTag(clanTag);
@@ -53,9 +60,9 @@ public class ClansController {
         return ResponseEntity.ok().body(clanCurrentWar);
     }
 
-    @GetMapping("{clanTag}/capitalraidseasons/attack/count")
-    public ResponseEntity<ClanCapitalAttackerRes> findClanCapitalRaidSeasons(@PathVariable String clanTag) {
-        ClanCapitalAttackerRes clanCapitalRaidAttacker = clansService.findClanCapitalRaidSeasons(clanTag);
+    @GetMapping("{clanTag}/capital/raid/seasons")
+    public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {
+        ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
 

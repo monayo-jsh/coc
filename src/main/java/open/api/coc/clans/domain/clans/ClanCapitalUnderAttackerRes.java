@@ -7,14 +7,14 @@ import lombok.Getter;
 public class ClanCapitalUnderAttackerRes {
 
     private final String name;
-    private final List<ClanCapitalRaidSeasonMemberRes> attackers;
+    private final List<ClanCapitalRaidSeasonMemberResponse> attackers;
 
-    private ClanCapitalUnderAttackerRes(String clanName, List<ClanCapitalRaidSeasonMemberRes> attackers) {
+    private ClanCapitalUnderAttackerRes(String clanName, List<ClanCapitalRaidSeasonMemberResponse> attackers) {
         this.name = clanName;
         this.attackers = attackers;
     }
 
-    public static ClanCapitalUnderAttackerRes create(String clanName, List<ClanCapitalRaidSeasonMemberRes> attackers) {
+    public static ClanCapitalUnderAttackerRes create(String clanName, List<ClanCapitalRaidSeasonMemberResponse> attackers) {
         return new ClanCapitalUnderAttackerRes(clanName, attackers);
     }
 

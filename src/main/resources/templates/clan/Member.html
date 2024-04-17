@@ -14,7 +14,18 @@
   <title>클랜원 현황</title>
 
   <script>
-    async function requestClans() {
+    function eventClick(e) {
+      const classList = e.classList;
+
+      const activeClassName = 'active';
+      if (classList.contains(activeClassName)) {
+        classList.remove(activeClassName);
+      } else {
+        classList.add(activeClassName);
+      }
+    }
+
+  async function requestClans() {
       return axios.get('/clans')
            .then((response) => {
              const { data } = response
@@ -42,8 +53,10 @@
     async function fetchClanMembers(clans) {
       const requests = clans.map(clan => getRequestClanMembersByClan(clan))
 
+      const test = [requests[0]]
+
       let members = [];
-      await axios.all(requests)
+      await axios.all(test)
                  .then((responses) => {
                    responses.forEach((response) => {
                      const { config, data } = response
@@ -78,6 +91,8 @@
     }
 
     async function getClanMembers() {
+      if (true) return;
+
       // showWifiLoading('.contents');
       showWifiLoading('.content-wrapper');
       const clans = await requestClans();
@@ -138,37 +153,111 @@
     </div>
 
 
-    <div class="clan-members"></div>
-  </div>
-</body>
-<template id="member">
-  <div class="member row">
-    <div class="layout-title">
-      <div class="cell">
-        <div class="user">{NAME}</div>
-        <div class="label-clan">{CLAN_NAME}</div>
+    <div class="clan-members">
+      <div class="member row" onclick="eventClick(this); return false;">
+        <div class="card-front">
+          <div class="layout-title">
+            <div class="cell">
+              <div class="user">제우스</div>
+              <div class="label-clan">아카메디</div>
+            </div>
+            <div class="cell trophies">
+              <div class="count">
+                9999
+                <div class="icon"></div>
+              </div>
+            </div>
+          </div>
+          <div class="layout-badge">
+            <img class="cell league-icon" src="" alt="">
+            <div class="cell town-hall th16"></div>
+            <div class="cell xp"><span class="level">255</span></div>
+          </div>
+          <div class="layout-donations">
+            <div class="cell donations">
+              <span class="label">지원한 유닛</span>
+              <span class="count">1000</span>
+            </div>
+            <div class="cell donations-received">
+              <span class="label">지원받은 유닛</span>
+              <span class="count">2000</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-back">
+          <div class="cell">데이터 확인중</div>
+        </div>
       </div>
-      <div class="cell trophies">
-        <div class="count">
-          {TROPHIES}
-          <div class="icon"></div>
+      <div class="member row" onclick="eventClick(this); return false;">
+        <div class="card-front">
+          <div class="layout-title">
+            <div class="cell">
+              <div class="user">제우스</div>
+              <div class="label-clan">아카메디</div>
+            </div>
+            <div class="cell trophies">
+              <div class="count">
+                9999
+                <div class="icon"></div>
+              </div>
+            </div>
+          </div>
+          <div class="layout-badge">
+            <img class="cell league-icon" src="" alt="">
+            <div class="cell town-hall th16"></div>
+            <div class="cell xp"><span class="level">255</span></div>
+          </div>
+          <div class="layout-donations">
+            <div class="cell donations">
+              <span class="label">지원한 유닛</span>
+              <span class="count">1000</span>
+            </div>
+            <div class="cell donations-received">
+              <span class="label">지원받은 유닛</span>
+              <span class="count">2000</span>
+            </div>
+          </div>
+        </div>
+        <div class="card-back">
+          <div class="cell">데이터 확인중</div>
         </div>
       </div>
     </div>
-    <div class="layout-badge">
-      <img class="cell league-icon" src="" alt="">
-      <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
-      <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
+  </div>
+</body>
+<template id="member">
+  <div class="member row" onclick="eventClick(this); return false;">
+    <div class="card-front">
+      <div class="layout-title">
+        <div class="cell">
+          <div class="user">{NAME}</div>
+          <div class="label-clan">{CLAN_NAME}</div>
+        </div>
+        <div class="cell trophies">
+          <div class="count">
+            {TROPHIES}
+            <div class="icon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="layout-badge">
+        <img class="cell league-icon" src="" alt="">
+        <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
+        <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
+      </div>
+      <div class="layout-donations">
+        <div class="cell donations">
+          <span class="label">지원한 유닛</span>
+          <span class="count">{DONATIONS}</span>
+        </div>
+        <div class="cell donations-received">
+          <span class="label">지원받은 유닛</span>
+          <span class="count">{DONATIONS_RECEIVED}</span>
+        </div>
+      </div>
     </div>
-    <div class="layout-donations">
-      <div class="cell donations">
-        <span class="label">지원한 유닛</span>
-        <span class="count">{DONATIONS}</span>
-      </div>
-      <div class="cell donations-received">
-        <span class="label">지원받은 유닛</span>
-        <span class="count">{DONATIONS_RECEIVED}</span>
-      </div>
+    <div class="card-back">
+      <div class="cell">데이터 확인중</div>
     </div>
   </div>
 </template>

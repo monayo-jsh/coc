@@ -183,10 +183,38 @@
   width: 100%;
 }
 
+.card-back:not(:first-child) {
+  margin-top: 0;
+}
+
 .card-back {
-  width: 100%;
+  margin: 5px;
   display: none;
   transform: rotateY(180deg);
+  overflow-y: scroll;
+  scrollbar-width: none;
+
+  .inner-section {
+    margin: 5px 0;
+    flex-direction: column;
+    background-color: #e2e2e2;
+    border-radius: 5px;
+
+    .label {
+      font-size: 0.5em;
+      font-weight: bold;
+    }
+
+    .contents {
+      margin-top: 5px;
+      display: flex;
+      flex-wrap: wrap;
+
+      .equipment {
+        margin: 0 3px;
+      }
+    }
+  }
 }
 
 .hero.active .equipment-wrapper {

@@ -1,0 +1,45 @@
+.hero {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.hero.barbarian_king {
+  background-image: url(/static/images/hero/Barbarian_King.png);
+}
+.hero.archer_queen {
+  background-image: url(/static/images/hero/Archer_Queen.png);
+}
+.hero.grand_warden {
+  background-image: url(/static/images/hero/Grand_Warden.png);
+}
+.hero.royal_champion {
+  background-image: url(/static/images/hero/Royal_Champion.png);
+}
+
+.level-icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 15px;
+  height: 15px;
+  font-weight: bold;
+  font-size: 11px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url(/static/images/etc/max_level.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  color: black;
+  filter: drop-shadow(0 0 0 red) invert(95%);
+}
+
+.level-icon.is-max {
+  color: #fff;
+  filter: unset;
+}

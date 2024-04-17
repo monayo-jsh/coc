@@ -30,3 +30,37 @@ body {
 .text-align-center {
   text-align: center;
 }
+
+
+body::after {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+
+  /* load images */
+  content:
+      url(/static/images/hero/Barbarian_King.png)
+      url(/static/images/hero/Archer_Queen.png)
+      url(/static/images/hero/Grand_Warden.png)
+      url(/static/images/hero/Royal_Champion.png)
+      url(/static/images/etc/max_level.png)
+      url("/static/images/etc/xp.png")
+      url(/static/images/townhall/16.png)
+      url(/static/images/townhall/15.png)
+      url(/static/images/townhall/14.png)
+      url(/static/images/townhall/13.png)
+      url(/static/images/townhall/12.png)
+      url(/static/images/townhall/11.png)
+      url(/static/images/townhall/10.png)
+      url(/static/images/townhall/9.png)
+      url(/static/images/townhall/8.png)
+      url(/static/images/townhall/7.png)
+      url(/static/images/townhall/6.png)
+      url(/static/images/townhall/5.png)
+      url(/static/images/townhall/4.png)
+      url(/static/images/townhall/3.png)
+      url(/static/images/townhall/2.png)
+      url(/static/images/townhall/1.png);
+}

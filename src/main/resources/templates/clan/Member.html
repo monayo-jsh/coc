@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/common.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
+  <link rel="stylesheet" href="/static/css/hero.css" />
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
@@ -91,8 +93,6 @@
     }
 
     async function getClanMembers() {
-      if (true) return;
-
       // showWifiLoading('.contents');
       showWifiLoading('.content-wrapper');
       const clans = await requestClans();
@@ -101,6 +101,62 @@
 
       const sortedMembers = sortByTrophies(members)
       renderMembers(sortedMembers)
+    }
+
+    function fetchPlayer(tag) {
+      const uri = `/players/${encodeURIComponent(tag)}`;
+
+      return axios.get(uri)
+                  .then((response) => {
+                    const { data } = response
+                    if (!data) {
+                      return {};
+                    }
+
+                    return data;
+                  })
+                  .catch((error) => {
+                    console.error(error);
+                    return {};
+                  });
+    }
+
+    function renderHero(memberHtml, hero) {
+      const { name, level, maxLevel, village } = hero;
+
+      // 본 마을 영웅만 표기
+      if (village !== 'home') return;
+
+      const heroesElement = memberHtml.querySelector('.inner-section.heroes');
+      const memberHeroTemplate = document.querySelector('#member-hero');
+      const memberHero = document.importNode(memberHeroTemplate.content, true);
+      const heroElement = memberHero.querySelector('.hero');
+
+
+      let heroIconClassName = name.toLowerCase().replace(/\s/g, "_")
+      heroElement.classList.add(heroIconClassName);
+
+      heroElement.innerHTML = heroElement.innerHTML
+                                         .replace(/{LEVEL}/, level)
+                                         .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      heroesElement.appendChild(heroElement);
+    }
+
+    function renderHeroes(memberHtml, player) {
+      const { heroes } = player
+      for (const hero of heroes) {
+        setTimeout(() => {
+          renderHero(memberHtml, hero);
+        }, 0)
+      }
+    }
+
+    async function renderPlayerDetail(memberHtml, tag) {
+      fetchPlayer(tag).then((player) => {
+        renderHeroes(memberHtml, player)
+      })
+
     }
 
     function renderMembers(members) {
@@ -120,8 +176,8 @@
                                          .replace(/{TROPHIES}/, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
                                          .replace(/{EXP_LEVEL}/, expLevel)
-                                         .replace(/{DONATIONS}/, donations)
-                                         .replace(/{DONATIONS_RECEIVED}/, donationsReceived);
+                                         .replace(/{DONATIONS}/, Number(donations).toLocaleString())
+                                         .replace(/{DONATIONS_RECEIVED}/, Number(donationsReceived).toLocaleString());
 
         const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
         const { iconUrls } = league
@@ -129,6 +185,10 @@
 
         clanMembersElement.appendChild(memberHtml);
         no++;
+
+        setTimeout(() => {
+          renderPlayerDetail(memberHtml, tag);
+        }, 0)
       }
     }
   </script>
@@ -153,76 +213,7 @@
     </div>
 
 
-    <div class="clan-members">
-      <div class="member row" onclick="eventClick(this); return false;">
-        <div class="card-front">
-          <div class="layout-title">
-            <div class="cell">
-              <div class="user">제우스</div>
-              <div class="label-clan">아카메디</div>
-            </div>
-            <div class="cell trophies">
-              <div class="count">
-                9999
-                <div class="icon"></div>
-              </div>
-            </div>
-          </div>
-          <div class="layout-badge">
-            <img class="cell league-icon" src="" alt="">
-            <div class="cell town-hall th16"></div>
-            <div class="cell xp"><span class="level">255</span></div>
-          </div>
-          <div class="layout-donations">
-            <div class="cell donations">
-              <span class="label">지원한 유닛</span>
-              <span class="count">1000</span>
-            </div>
-            <div class="cell donations-received">
-              <span class="label">지원받은 유닛</span>
-              <span class="count">2000</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-back">
-          <div class="cell">데이터 확인중</div>
-        </div>
-      </div>
-      <div class="member row" onclick="eventClick(this); return false;">
-        <div class="card-front">
-          <div class="layout-title">
-            <div class="cell">
-              <div class="user">제우스</div>
-              <div class="label-clan">아카메디</div>
-            </div>
-            <div class="cell trophies">
-              <div class="count">
-                9999
-                <div class="icon"></div>
-              </div>
-            </div>
-          </div>
-          <div class="layout-badge">
-            <img class="cell league-icon" src="" alt="">
-            <div class="cell town-hall th16"></div>
-            <div class="cell xp"><span class="level">255</span></div>
-          </div>
-          <div class="layout-donations">
-            <div class="cell donations">
-              <span class="label">지원한 유닛</span>
-              <span class="count">1000</span>
-            </div>
-            <div class="cell donations-received">
-              <span class="label">지원받은 유닛</span>
-              <span class="count">2000</span>
-            </div>
-          </div>
-        </div>
-        <div class="card-back">
-          <div class="cell">데이터 확인중</div>
-        </div>
-      </div>
-    </div>
+    <div class="clan-members"></div>
   </div>
 </body>
 <template id="member">
@@ -240,25 +231,33 @@
           </div>
         </div>
       </div>
-      <div class="layout-badge">
-        <img class="cell league-icon" src="" alt="">
-        <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
-        <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
-      </div>
-      <div class="layout-donations">
-        <div class="cell donations">
-          <span class="label">지원한 유닛</span>
-          <span class="count">{DONATIONS}</span>
+      <div class="inner-section">
+        <div class="layout-badge">
+          <img class="cell league-icon" src="" alt="">
+          <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
+          <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
         </div>
-        <div class="cell donations-received">
-          <span class="label">지원받은 유닛</span>
-          <span class="count">{DONATIONS_RECEIVED}</span>
+        <div class="layout-donations">
+          <div class="cell donations">
+            <span class="label">지원</span>
+            <span class="count">{DONATIONS}</span>
+          </div>
+          <div class="cell donations-received">
+            <span class="label">받음</span>
+            <span class="count">{DONATIONS_RECEIVED}</span>
+          </div>
         </div>
       </div>
+      <div class="inner-section heroes"></div>
     </div>
     <div class="card-back">
       <div class="cell">데이터 확인중</div>
     </div>
+  </div>
+</template>
+<template id="member-hero">
+  <div class="hero">
+    <div class="level-icon {IS_MAX}">{LEVEL}</div>
   </div>
 </template>
 </html>

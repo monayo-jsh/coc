@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" href="/static/css/common.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/hero.css" />
+  <link rel="stylesheet" href="/static/css/heroEquipment.css" />
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
@@ -16,10 +16,40 @@
   <title>클랜원 현황</title>
 
   <script>
-    function eventClick(e) {
+    function cardClick(e, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const classList = e.closest('.member.row').classList;
+
+      const activeClassName = 'active';
+      if (classList.contains(activeClassName)) {
+        classList.remove(activeClassName);
+      } else {
+        classList.add(activeClassName);
+      }
+
+      // 장비 보기 켜져 있으면 닫기
+      e.querySelectorAll('.hero.active')
+       .forEach((ele) => ele.classList.remove(activeClassName));
+    }
+    function heroClick(e, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
       const classList = e.classList;
 
       const activeClassName = 'active';
+
+      e.closest('.heroes')
+       .querySelectorAll('.hero.active')
+       .forEach((ele) => {
+         if (ele !== e) {
+           //다른 장비가 켜져있으면 닫기
+           ele.classList.remove(activeClassName);
+         }
+       });
+
       if (classList.contains(activeClassName)) {
         classList.remove(activeClassName);
       } else {
@@ -93,7 +123,6 @@
     }
 
     async function getClanMembers() {
-      // showWifiLoading('.contents');
       showWifiLoading('.content-wrapper');
       const clans = await requestClans();
       const members = await fetchClanMembers(clans)
@@ -121,8 +150,36 @@
                   });
     }
 
+    function renderEquipment(equipmentWrapperElement, equipment) {
+      const { name, level, maxLevel, village } = equipment;
+
+      // 본 마을 영웅 장비만 표기
+      if (village !== 'home') return;
+
+      const heroEquipmentTemplate = document.querySelector('#member-hero-equipment');
+      const heroEquipment = document.importNode(heroEquipmentTemplate.content, true);
+      const equipmentElement = heroEquipment.querySelector('.equipment');
+
+      let equipmentIconClassName = name.toLowerCase().replace(/\s/g, "_")
+      equipmentElement.classList.add(equipmentIconClassName);
+
+      equipmentElement.innerHTML = equipmentElement.innerHTML
+                                                   .replace(/{LEVEL}/, level)
+                                                   .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      equipmentWrapperElement.appendChild(equipmentElement);
+    }
+
+    function renderEquipments(heroElement, equipments) {
+      const equipmentWrapperElement = heroElement.querySelector('.equipment-wrapper');
+
+      for(const equipment of equipments) {
+        renderEquipment(equipmentWrapperElement, equipment);
+      }
+    }
+
     function renderHero(memberHtml, hero) {
-      const { name, level, maxLevel, village } = hero;
+      const { name, level, maxLevel, village, equipments } = hero;
 
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
@@ -141,6 +198,8 @@
                                          .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
 
       heroesElement.appendChild(heroElement);
+
+      renderEquipments(heroElement, equipments)
     }
 
     function renderHeroes(memberHtml, player) {
@@ -217,7 +276,7 @@
   </div>
 </body>
 <template id="member">
-  <div class="member row" onclick="eventClick(this); return false;">
+  <div class="member row" onclick="cardClick(this, event); return false;">
     <div class="card-front">
       <div class="layout-title">
         <div class="cell">
@@ -256,7 +315,13 @@
   </div>
 </template>
 <template id="member-hero">
-  <div class="hero">
+  <div class="hero" onclick="heroClick(this, event); return false;">
+    <div class="level-icon {IS_MAX}">{LEVEL}</div>
+    <div class="equipment-wrapper"></div>
+  </div>
+</template>
+<template id="member-hero-equipment">
+  <div class="equipment">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
   </div>
 </template>

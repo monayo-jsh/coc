@@ -1,0 +1,72 @@
+.equipment {
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  width: 35px;
+  height: 35px;
+}
+
+.equipment.barbarian_puppet {
+  background-image: url("/static/images/hero/equipment/Barbarian_Puppet.png");
+}
+.equipment.earthquake_boots {
+  background-image: url("/static/images/hero/equipment/Earthquake_Boots.png");
+}
+.equipment.giant_gauntlet {
+  background-image: url("/static/images/hero/equipment/Giant_Gauntlet.png");
+}
+.equipment.rage_vial {
+  background-image: url("/static/images/hero/equipment/Rage_Vial.png");
+}
+.equipment.vampstache {
+  background-image: url("/static/images/hero/equipment/Vampstache.png");
+}
+
+
+.equipment.archer_puppet {
+  background-image: url("/static/images/hero/equipment/Archer_Puppet.png");
+}
+.equipment.giant_arrow {
+  background-image: url("/static/images/hero/equipment/Giant_Arrow.png");
+}
+.equipment.frozen_arrow {
+  background-image: url("/static/images/hero/equipment/Frozen_Arrow.png");
+}
+.equipment.invisibility_vial {
+  background-image: url("/static/images/hero/equipment/Invisibility_Vial.png");
+}
+.equipment.healer_puppet {
+  background-image: url("/static/images/hero/equipment/Healer_Puppet.png");
+}
+
+
+.equipment.life_gem {
+  background-image: url("/static/images/hero/equipment/Life_Gem.png");
+}
+.equipment.rage_gem {
+  background-image: url("/static/images/hero/equipment/Rage_Gem.png");
+}
+.equipment.healing_tome {
+  background-image: url("/static/images/hero/equipment/Healing_Tome.png");
+}
+.equipment.eternal_tome {
+  background-image: url("/static/images/hero/equipment/Eternal_Tome.png");
+}
+.equipment.fireball {
+  background-image: url("/static/images/hero/equipment/Fireball.png");
+}
+
+
+.equipment.royal_gem {
+  background-image: url("/static/images/hero/equipment/Royal_Gem.png");
+}
+.equipment.haste_vial {
+  background-image: url("/static/images/hero/equipment/Haste_Vial.png");
+}
+.equipment.seeking_shield {
+  background-image: url("/static/images/hero/equipment/Seeking_Shield.png");
+}
+.equipment.hog_rider_puppet {
+  background-image: url("/static/images/hero/equipment/Hog_Rider_Puppet.png");
+}

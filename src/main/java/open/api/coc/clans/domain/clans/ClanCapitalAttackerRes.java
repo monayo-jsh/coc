@@ -1,4 +1,4 @@
-package open.api.coc.clans.domain;
+package open.api.coc.clans.domain.clans;
 
 import lombok.Getter;
 import open.api.coc.clans.common.Clan;

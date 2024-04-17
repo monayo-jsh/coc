@@ -1,11 +1,11 @@
-package open.api.coc.clans.domain.converter;
+package open.api.coc.clans.domain.clans.converter;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.ClanWarAttackRes;
-import open.api.coc.clans.domain.ClanWarMemberRes;
+import open.api.coc.clans.domain.clans.ClanWarAttackRes;
+import open.api.coc.clans.domain.clans.ClanWarMemberRes;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.core.convert.converter.Converter;

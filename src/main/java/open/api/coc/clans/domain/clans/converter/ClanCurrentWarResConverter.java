@@ -1,9 +1,9 @@
-package open.api.coc.clans.domain.converter;
+package open.api.coc.clans.domain.clans.converter;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

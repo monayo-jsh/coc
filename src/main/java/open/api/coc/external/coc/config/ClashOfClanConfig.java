@@ -19,6 +19,7 @@ public class ClashOfClanConfig {
     private static class EndPoint {
 
         private final Clans clans;
+        private final Players players;
 
 
         @RequiredArgsConstructor
@@ -41,22 +42,35 @@ public class ClashOfClanConfig {
             public String getMembers() { return prefix + members; }
         }
 
+        @RequiredArgsConstructor
+        private static class Players {
+            private final String prefix;
+            private final String player;
+
+            public String getPlayer() {
+                return prefix + player;
+            }
+        }
     }
 
     public String getClansClanTagUri() {
         return getDomain() + getEndPoint().getClans().getClanTag();
     }
 
-    public String getClansClanTagCapitalRaidSeasons() {
+    public String getClansClanTagCapitalRaidSeasonsUri() {
         return getDomain() + getEndPoint().getClans().getCapitalRaidSeasons();
     }
 
-    public String getClansClanTagCurrentWar() {
+    public String getClansClanTagCurrentWarUri() {
         return getDomain() + getEndPoint().getClans().getCurrentWar();
     }
 
-    public String getClansClanMembers() {
+    public String getClansClanMembersUri() {
         return getDomain() + getEndPoint().getClans().getMembers();
+    }
+
+    public String getPlayerUri() {
+        return getDomain() + getEndPoint().getPlayers().getPlayer();
     }
 
 }

@@ -1,7 +1,7 @@
-package open.api.coc.clans.domain.converter;
+package open.api.coc.clans.domain.clans.converter;
 
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.LeagueRes;
+import open.api.coc.clans.domain.clans.LeagueRes;
 import open.api.coc.external.coc.clan.domain.clan.League;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

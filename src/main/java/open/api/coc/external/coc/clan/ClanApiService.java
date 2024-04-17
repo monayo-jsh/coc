@@ -5,6 +5,7 @@ import java.util.Optional;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -17,5 +18,7 @@ public interface ClanApiService {
     Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag);
 
     Optional<ClanMemberList> findClanMembersByClanTag(String clanTag);
+
+    Optional<Player> findPlayerBy(String playerTag);
 
 }

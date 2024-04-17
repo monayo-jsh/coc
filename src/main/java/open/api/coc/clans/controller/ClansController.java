@@ -4,12 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.domain.ClanCapitalAttackerRes;
-import open.api.coc.clans.domain.ClanCapitalUnderAttackerRes;
-import open.api.coc.clans.domain.ClanCurrentWarRes;
-import open.api.coc.clans.domain.ClanMemberListRes;
-import open.api.coc.clans.domain.ClanRes;
+import open.api.coc.clans.domain.clans.ClanCapitalAttackerRes;
+import open.api.coc.clans.domain.clans.ClanCapitalUnderAttackerRes;
+import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanMemberListRes;
+import open.api.coc.clans.domain.clans.ClanRes;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("clans")

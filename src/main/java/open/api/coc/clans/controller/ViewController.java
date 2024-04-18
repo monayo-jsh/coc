@@ -26,9 +26,4 @@ public class ViewController {
         return "capital/Raid";
     }
 
-    @GetMapping("/capital/attacks")
-    public String viewCapitalAttacks() {
-        return "capital/Attacks";
-    }
-
 }

@@ -12,8 +12,10 @@ public class ClanCapitalRaidSeasonResponse {
 
     private String state;
 
-    private long startTime;
-    private long endTime;
+    private final Integer totalAttackLimit = 50;
+
+    private Long startTime;
+    private Long endTime;
 
     private List<ClanCapitalRaidSeasonMemberResponse> members;
 

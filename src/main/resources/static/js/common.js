@@ -2,6 +2,9 @@ function renderPage(uri) {
   location.href = uri;
 }
 
+function addClassDim(element) {
+  element.classList.add('dim')
+}
 function showWifiLoading(dimElementClassName) {
   setTimeout(() => {
     const cardContainer = document.querySelector(dimElementClassName);

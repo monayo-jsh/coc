@@ -5,121 +5,212 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/axios/axios_v1.6.8.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>습격전 현황</title>
 
   <script>
+    function callApp(element) {
+      if (element.classList.contains("dim")) {
+        // 종료된 경우
+        return;
+      }
+
+      if (!confirm("게임을 실행하시겠습니까?")) {
+        return;
+      }
+
+      const { dataset } = element;
+      const { clanTag } = dataset;
+      const OPEN_CLAN_PROFILE_LINK = `clashofclans://action=OpenClanProfile&tag=${clanTag}`;
+
+      renderPage(OPEN_CLAN_PROFILE_LINK);
+    }
+
+  // 시즌 설정 변수
+    let capitalRaidSeason;
+
+    async function fetchCapitalClans() {
+      return await axios.get("/clans/capital")
+          .then((response) => {
+            const { data } = response
+            return data;
+          })
+          .catch((error) => {
+            console.error(error)
+            return [];
+          });
+    }
+
+    async function fetchClan(capitalClan) {
+      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}`
+      return await axios.get(uri)
+                        .then((response) => {
+                          const { data } = response
+                          return data;
+                        })
+                        .catch((error) => {
+                          console.error(error)
+                          return {};
+                        });
+    }
+
+    async function renderCapital(capitalCardElement, capitalClan) {
+      const clan = await fetchClan(capitalClan);
+
+      const { capitalLeague, clanCapital } = clan;
+
+      const { name } = capitalLeague;
+      const { capitalHallLevel } = clanCapital;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{CAPITAL_LEAGUE}/, name)
+                                                       .replace(/{CAPITAL_HALL_LEVEL}/, capitalHallLevel);
+
+    }
+
+    async function fetchCapitalRaidSeason(capitalClan) {
+      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}/capital/raid/seasons`
+      return await axios.get(uri)
+                        .then((response) => {
+                          const { data } = response
+                          const { startTime, endTime } = data;
+
+                          if (!capitalRaidSeason) {
+                            //시즌 기간 설정
+                            capitalRaidSeason = {
+                              startTime: startTime,
+                              endTime: endTime
+                            }
+
+                            settingSeasonPeriod()
+                          }
+
+                          return data;
+                        })
+                        .catch((error) => {
+                          console.error(error)
+                          return {};
+                        });
+    }
+
+    async function renderCapitalSeason(capitalCardElement, capitalClan) {
+      const capitalRaidSeason = await fetchCapitalRaidSeason(capitalClan);
+
+      const { state, totalAttackLimit, members } = capitalRaidSeason;
+
+      const remainAttacks = totalAttackLimit - members.length;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{ATTACK_LIMIT}/, totalAttackLimit)
+                                                       .replace(/{COLOR}/, convColor(remainAttacks))
+                                                       .replace(/{REMAIN_ATTACKS}/, remainAttacks);
+
+      if ( state === 'ended' || remainAttacks === 0) {
+        addClassDim(capitalCardElement);
+      }
+
+      function convColor(remainAttacks) {
+        if (remainAttacks > 20) return "green";
+        if (remainAttacks < 10) return "red";
+        return "yellow";
+      }
+    }
+
+    function formatDate(time) {
+      return dayjs(time).format("M월 D일");
+    }
+
+    function formatPeriod(startTime, endTime) {
+      const formattedStartTime = formatDate(startTime);
+      const formattedEndTime = formatDate(endTime);
+      return `${formattedStartTime} ~ ${formattedEndTime}`;
+    }
+
+    function settingSeasonPeriod() {
+      const captionCardSubTitleElement = document.querySelector('.card.caption .sub-title');
+      const { startTime, endTime } = capitalRaidSeason;
+      captionCardSubTitleElement.innerHTML = captionCardSubTitleElement.innerHTML
+                                                                       .replace(/{PERIOD}/, formatPeriod(startTime, endTime));
+
+      captionCardSubTitleElement.classList.remove('display-none');
+    }
+
+    async function renderCapitalCard(capitalRaidElement, capitalClan) {
+      const capitalCardTemplate = document.querySelector('#capital-card');
+      const capitalCard = document.importNode(capitalCardTemplate.content, true);
+      const capitalCardElement = capitalCard.querySelector('.card');
+
+      capitalCardElement.dataset.clanTag = capitalClan.tag;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{CLAN_NAME}/, capitalClan.name);
+
+      capitalRaidElement.appendChild(capitalCard);
+
+      await renderCapital(capitalCardElement, capitalClan);
+      await renderCapitalSeason(capitalCardElement, capitalClan);
+
+      capitalCardElement.querySelector('.row.loader').classList.add('display-none');
+      capitalCardElement.querySelector('.row.content').classList.remove('display-none');
+    }
+
+    async function writeCapitalClans() {
+      const capitalClans = await fetchCapitalClans();
+
+      const capitalRaidElement = document.querySelector('.capital-raid');
+      for (const capitalClan of capitalClans) {
+        renderCapitalCard(capitalRaidElement, capitalClan);
+      }
+    }
+
     function initPage() {
-      guideRow("조회중...");
-      getClanCapitalAttacks();
-    }
-
-  function clearTbody() {
-      const tbody = getTbodyElement();
-      while (tbody.children.length) {
-        tbody.deleteRow(0);
-      }
-    }
-
-    function guideRow(text) {
-      const tbody = getTbodyElement();
-
-      const insertRow = tbody.insertRow(0);
-      const emptyCell = insertRow.insertCell(0);
-
-      emptyCell.innerHTML = text;
-      emptyCell.colSpan = getColumnLength(getTheadElement());
-      emptyCell.classList.add('text-align-center');
-    }
-
-    function getTheadElement() {
-      return document.querySelector('.table-clan-capital thead.header');
-    }
-
-    function getColumnLength(thead) {
-      return thead.firstElementChild.children.length;
-    }
-    function getTbodyElement() {
-       return document.querySelector('.table-clan-capital tbody.contents');
-    }
-
-    function insertCell(row, cellIndex, data) {
-      const insertCell = row.insertCell(cellIndex);
-      insertCell.innerHTML = data
-    }
-
-    function makeOpenClanProfileLink(tag) {
-      if (!tag) return "-"
-      const OPEN_CLAN_PROFILE_LINK = `clashofclans://action=OpenClanProfile&tag=${tag}`
-
-      return `
-        <button class="right-single-arrow" onclick="renderPage('{LINK}'); return false;">
-          <span>접속</span>
-          <svg width="0.5em" height="0.5em" viewBox="0 0 13 10">
-            <path d="M1,5 L11,5"></path>
-            <polyline points="8 1 12 5 8 9"></polyline>
-          </svg>
-        </button>
-      `.replace('{LINK}', OPEN_CLAN_PROFILE_LINK);
-    }
-
-    function makeCountWithColor(count) {
-      let color = "green";
-      if (count < 10) {
-        color = "red";
-      }
-
-      return `
-        <span style="color: ${color}">${count}</span>
-      `;
-    }
-
-    function insertRow(row) {
-      const {name, tag, remainAttackCount} = row;
-
-      const tbody = getTbodyElement();
-      const insertRow = tbody.insertRow(tbody.children.length);
-
-      insertCell(insertRow, 0, name);
-      insertCell(insertRow, 1, makeCountWithColor(remainAttackCount));
-      insertCell(insertRow, 2, makeOpenClanProfileLink(tag));
-    }
-
-    function writeContents(rows) {
-      for(const row of rows) {
-        insertRow(row);
-      }
-    }
-
-    function getClanCapitalAttacks() {
-      showWifiLoading('.contents');
-      axios.get('/clans/capital/attack/count')
-           .then((response) => {
-             clearTbody();
-             const { data } = response
-             if (!data) {
-               guideRow("조회 결과 없음");
-               return;
-             }
-             writeContents(data);
-           })
-           .catch((error) => {
-             console.error(error);
-             clearTbody();
-             guideRow("조회 실패");
-           })
-           .finally(() => {
-             hideWifiLoading('.contents')
-           });
+      writeCapitalClans();
     }
   </script>
 </head>
-<body>
+<body onload="initPage()">
   <div class="capital-raid">
-
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">습격전 시즌</span>
+        <span class="sub-title display-none">{PERIOD}</span>
+      </div>
+    </div>
   </div>
 </body>
+<template id="capital-card">
+  <div class="card" onclick="callApp(this); return false;">
+    <div class="bottom-section">
+      <span class="title">{CLAN_NAME}</span>
+      <div class="row loader">
+        <div class="dots-loader">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+      <div class="row content display-none">
+        <div class="item">
+          <span class="big-text">{CAPITAL_HALL_LEVEL}</span>
+          <span class="regular-text">캐피탈 홀</span>
+        </div>
+        <div class="item">
+          <span class="big-text color">{ATTACK_LIMIT}</span>
+          <span class="regular-text">공격 가능</span>
+        </div>
+        <div class="item">
+          <span class="big-text color-{COLOR}">{REMAIN_ATTACKS}</span>
+          <span class="regular-text">남은 공격</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 </html>

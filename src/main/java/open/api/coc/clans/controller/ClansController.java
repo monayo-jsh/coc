@@ -2,11 +2,8 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanCapitalAttackerRes;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
-import open.api.coc.clans.domain.clans.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRes;
@@ -64,17 +61,5 @@ public class ClansController {
     public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {
         ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
-    }
-
-    @GetMapping("capital/attack/count")
-    public ResponseEntity<List<ClanCapitalAttackerRes> > getCapitalAttackers() throws ExecutionException, InterruptedException {
-        List<ClanCapitalAttackerRes> capitalAttackersMap = clansService.getCapitalAttackers();
-        return ResponseEntity.ok().body(capitalAttackersMap);
-    }
-
-    @GetMapping("capital/under/attacker")
-    public ResponseEntity<List<ClanCapitalUnderAttackerRes>> getCapitalAttackerMissing() throws ExecutionException, InterruptedException {
-        List<ClanCapitalUnderAttackerRes> capitalMissingAttackers = clansService.getCapitalMissingAttackers();
-        return ResponseEntity.ok().body(capitalMissingAttackers);
     }
 }

@@ -1,4 +1,4 @@
-.equipment {
+.img-icon {
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -7,66 +7,66 @@
   height: 35px;
 }
 
-.equipment.barbarian_puppet {
+.img-icon.barbarian_puppet {
   background-image: url("/static/images/hero/equipment/Barbarian_Puppet.png");
 }
-.equipment.earthquake_boots {
+.img-icon.earthquake_boots {
   background-image: url("/static/images/hero/equipment/Earthquake_Boots.png");
 }
-.equipment.giant_gauntlet {
+.img-icon.giant_gauntlet {
   background-image: url("/static/images/hero/equipment/Giant_Gauntlet.png");
 }
-.equipment.rage_vial {
+.img-icon.rage_vial {
   background-image: url("/static/images/hero/equipment/Rage_Vial.png");
 }
-.equipment.vampstache {
+.img-icon.vampstache {
   background-image: url("/static/images/hero/equipment/Vampstache.png");
 }
 
 
-.equipment.archer_puppet {
+.img-icon.archer_puppet {
   background-image: url("/static/images/hero/equipment/Archer_Puppet.png");
 }
-.equipment.giant_arrow {
+.img-icon.giant_arrow {
   background-image: url("/static/images/hero/equipment/Giant_Arrow.png");
 }
-.equipment.frozen_arrow {
+.img-icon.frozen_arrow {
   background-image: url("/static/images/hero/equipment/Frozen_Arrow.png");
 }
-.equipment.invisibility_vial {
+.img-icon.invisibility_vial {
   background-image: url("/static/images/hero/equipment/Invisibility_Vial.png");
 }
-.equipment.healer_puppet {
+.img-icon.healer_puppet {
   background-image: url("/static/images/hero/equipment/Healer_Puppet.png");
 }
 
 
-.equipment.life_gem {
+.img-icon.life_gem {
   background-image: url("/static/images/hero/equipment/Life_Gem.png");
 }
-.equipment.rage_gem {
+.img-icon.rage_gem {
   background-image: url("/static/images/hero/equipment/Rage_Gem.png");
 }
-.equipment.healing_tome {
+.img-icon.healing_tome {
   background-image: url("/static/images/hero/equipment/Healing_Tome.png");
 }
-.equipment.eternal_tome {
+.img-icon.eternal_tome {
   background-image: url("/static/images/hero/equipment/Eternal_Tome.png");
 }
-.equipment.fireball {
+.img-icon.fireball {
   background-image: url("/static/images/hero/equipment/Fireball.png");
 }
 
 
-.equipment.royal_gem {
+.img-icon.royal_gem {
   background-image: url("/static/images/hero/equipment/Royal_Gem.png");
 }
-.equipment.haste_vial {
+.img-icon.haste_vial {
   background-image: url("/static/images/hero/equipment/Haste_Vial.png");
 }
-.equipment.seeking_shield {
+.img-icon.seeking_shield {
   background-image: url("/static/images/hero/equipment/Seeking_Shield.png");
 }
-.equipment.hog_rider_puppet {
+.img-icon.hog_rider_puppet {
   background-image: url("/static/images/hero/equipment/Hog_Rider_Puppet.png");
 }

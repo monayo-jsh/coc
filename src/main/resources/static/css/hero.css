@@ -2,8 +2,6 @@
   position: relative;
   width: 36px;
   height: 36px;
-  border: var(--default-border);
-  border-radius: 10px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;

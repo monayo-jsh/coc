@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/hero.css" />
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
+  <link rel="stylesheet" href="/static/css/pet.css" />
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
@@ -152,31 +153,11 @@
                   });
     }
 
-    function renderEquipment(equipmentWrapperElement, equipment) {
-      const { name, level, maxLevel, village } = equipment;
-
-      // 본 마을 영웅 장비만 표기
-      if (village !== 'home') return;
-
-      const heroEquipmentTemplate = document.querySelector('#member-hero-equipment');
-      const heroEquipment = document.importNode(heroEquipmentTemplate.content, true);
-      const equipmentElement = heroEquipment.querySelector('.equipment');
-
-      let equipmentIconClassName = name.toLowerCase().replace(/\s/g, "_")
-      equipmentElement.classList.add(equipmentIconClassName);
-
-      equipmentElement.innerHTML = equipmentElement.innerHTML
-                                                   .replace(/{LEVEL}/, level)
-                                                   .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
-
-      equipmentWrapperElement.appendChild(equipmentElement);
-    }
-
     function renderEquipments(heroElement, equipments) {
       const equipmentWrapperElement = heroElement.querySelector('.equipment-wrapper');
 
       for(const equipment of equipments) {
-        renderEquipment(equipmentWrapperElement, equipment);
+        renderImgIcon(equipmentWrapperElement, equipment);
       }
     }
 
@@ -230,7 +211,51 @@
 
       const contentsElement = innerSectionElement.querySelector('.contents');
       for (const heroEquipment of heroEquipments) {
-        renderEquipment(contentsElement, heroEquipment);
+        renderImgIcon(contentsElement, heroEquipment);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back');
+      cardBackElement.appendChild(innerSectionElement);
+    }
+
+    function renderImgIcon(contentsElement, icon) {
+      const { name, level, maxLevel, village } = icon;
+
+      // 본 마을 영웅 장비만 표기
+      if (village !== 'home') return;
+
+      const iconsTemplate = document.querySelector('#icons');
+      const icons = document.importNode(iconsTemplate.content, true);
+      const imgIconElement = icons.querySelector('.img-icon');
+
+      let equipmentIconClassName = name.toLowerCase()
+                                       .replace(/\s/g, "_")
+                                       .replace(/\./g, "");
+
+      imgIconElement.classList.add(equipmentIconClassName);
+
+      imgIconElement.innerHTML = imgIconElement.innerHTML
+                                               .replace(/{LEVEL}/, level)
+                                               .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      contentsElement.appendChild(imgIconElement);
+    }
+
+    function renderPets(memberHtml, player) {
+      const { pets } = player
+      if (!pets) return;
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '펫');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const pet of pets) {
+        renderImgIcon(contentsElement, pet);
       }
 
       const cardBackElement = memberHtml.querySelector('.card-back');
@@ -241,6 +266,7 @@
       fetchPlayer(tag).then((player) => {
         renderHeroes(memberHtml, player);
         renderHeroEquipments(memberHtml, player);
+        renderPets(memberHtml, player);
       })
 
     }
@@ -351,8 +377,8 @@
     <div class="equipment-wrapper"></div>
   </div>
 </template>
-<template id="member-hero-equipment">
-  <div class="equipment">
+<template id="icons">
+  <div class="img-icon">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
   </div>
 </template>

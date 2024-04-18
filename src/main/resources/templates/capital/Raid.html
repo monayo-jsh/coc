@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/axios/axios_v1.6.8.js"></script>
+
+  <title>습격전 현황</title>
+
+  <script>
+    function initPage() {
+      guideRow("조회중...");
+      getClanCapitalAttacks();
+    }
+
+  function clearTbody() {
+      const tbody = getTbodyElement();
+      while (tbody.children.length) {
+        tbody.deleteRow(0);
+      }
+    }
+
+    function guideRow(text) {
+      const tbody = getTbodyElement();
+
+      const insertRow = tbody.insertRow(0);
+      const emptyCell = insertRow.insertCell(0);
+
+      emptyCell.innerHTML = text;
+      emptyCell.colSpan = getColumnLength(getTheadElement());
+      emptyCell.classList.add('text-align-center');
+    }
+
+    function getTheadElement() {
+      return document.querySelector('.table-clan-capital thead.header');
+    }
+
+    function getColumnLength(thead) {
+      return thead.firstElementChild.children.length;
+    }
+    function getTbodyElement() {
+       return document.querySelector('.table-clan-capital tbody.contents');
+    }
+
+    function insertCell(row, cellIndex, data) {
+      const insertCell = row.insertCell(cellIndex);
+      insertCell.innerHTML = data
+    }
+
+    function makeOpenClanProfileLink(tag) {
+      if (!tag) return "-"
+      const OPEN_CLAN_PROFILE_LINK = `clashofclans://action=OpenClanProfile&tag=${tag}`
+
+      return `
+        <button class="right-single-arrow" onclick="renderPage('{LINK}'); return false;">
+          <span>접속</span>
+          <svg width="0.5em" height="0.5em" viewBox="0 0 13 10">
+            <path d="M1,5 L11,5"></path>
+            <polyline points="8 1 12 5 8 9"></polyline>
+          </svg>
+        </button>
+      `.replace('{LINK}', OPEN_CLAN_PROFILE_LINK);
+    }
+
+    function makeCountWithColor(count) {
+      let color = "green";
+      if (count < 10) {
+        color = "red";
+      }
+
+      return `
+        <span style="color: ${color}">${count}</span>
+      `;
+    }
+
+    function insertRow(row) {
+      const {name, tag, remainAttackCount} = row;
+
+      const tbody = getTbodyElement();
+      const insertRow = tbody.insertRow(tbody.children.length);
+
+      insertCell(insertRow, 0, name);
+      insertCell(insertRow, 1, makeCountWithColor(remainAttackCount));
+      insertCell(insertRow, 2, makeOpenClanProfileLink(tag));
+    }
+
+    function writeContents(rows) {
+      for(const row of rows) {
+        insertRow(row);
+      }
+    }
+
+    function getClanCapitalAttacks() {
+      showWifiLoading('.contents');
+      axios.get('/clans/capital/attack/count')
+           .then((response) => {
+             clearTbody();
+             const { data } = response
+             if (!data) {
+               guideRow("조회 결과 없음");
+               return;
+             }
+             writeContents(data);
+           })
+           .catch((error) => {
+             console.error(error);
+             clearTbody();
+             guideRow("조회 실패");
+           })
+           .finally(() => {
+             hideWifiLoading('.contents')
+           });
+    }
+  </script>
+</head>
+<body>
+  <div class="capital-raid">
+
+  </div>
+</body>
+</html>

@@ -6,11 +6,15 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
+import open.api.coc.clans.domain.common.TroopsResponse;
 import open.api.coc.clans.domain.common.converter.HeroEquipmentResponseConverter;
 import open.api.coc.clans.domain.common.converter.HeroResponseConverter;
+import open.api.coc.clans.domain.common.converter.TroopseResponseConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
+import open.api.coc.external.coc.clan.domain.common.Pet;
+import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -22,6 +26,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
     private final HeroResponseConverter heroResponseConverter;
     private final HeroEquipmentResponseConverter heroEquipmentResponseConverter;
+    private final TroopseResponseConverter troopseResponseConverter;
     @Override
     public PlayerResponse convert(Player source) {
         return PlayerResponse.builder()
@@ -36,7 +41,17 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                              .warStars(source.getWarStars())
                              .heroes(makeHeroes(source.getHeroes()))
                              .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
+                             .pets(makePets(source.getTroops()))
                              .build();
+    }
+
+    private List<TroopsResponse> makePets(List<Troops> troops) {
+        if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
+
+        return troops.stream()
+                     .filter(troop -> Pet.isPets(troop.getName()))
+                     .map(troopseResponseConverter::convert)
+                     .collect(Collectors.toList());
     }
 
     private List<HeroEquipmentResponse> makeHeroEquipments(List<HeroEquipment> heroEquipments) {

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
+import open.api.coc.external.coc.clan.domain.common.Troops;
 
 @Getter
 @NoArgsConstructor
@@ -28,5 +29,7 @@ public class Player {
 
     private List<Hero> heroes;
     private List<HeroEquipment> heroEquipment;
+
+    private List<Troops> troops;
 
 }

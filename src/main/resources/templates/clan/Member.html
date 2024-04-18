@@ -129,7 +129,9 @@
       hideWifiLoading('.content-wrapper');
 
       const sortedMembers = sortByTrophies(members)
-      renderMembers(sortedMembers)
+
+      const test = [sortedMembers[0]]
+      renderMembers(test)
     }
 
     function fetchPlayer(tag) {
@@ -204,6 +206,8 @@
 
     function renderHeroes(memberHtml, player) {
       const { heroes } = player
+      if (!heroes) return;
+
       for (const hero of heroes) {
         setTimeout(() => {
           renderHero(memberHtml, hero);
@@ -214,6 +218,7 @@
 
     function renderHeroEquipments(memberHtml, player) {
       const { heroEquipments } = player
+      if (!heroEquipments) return;
 
       const innerSectionTemplate = document.querySelector('#inner-section');
 

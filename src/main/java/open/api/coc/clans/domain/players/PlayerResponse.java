@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
+import open.api.coc.clans.domain.common.TroopsResponse;
 
 @Getter
 @Builder
@@ -28,5 +29,7 @@ public class PlayerResponse {
 
     private List<HeroResponse> heroes;
     private List<HeroEquipmentResponse> heroEquipments;
+
+    private List<TroopsResponse> pets;
 
 }

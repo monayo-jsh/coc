@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
@@ -14,7 +15,19 @@
   <title>습격전 현황</title>
 
   <script>
-    function callApp(element) {
+    // 시즌 설정 변수
+    let capitalRaidSeason;
+
+    function onToggleRecord(element) {
+      const footerSectionElement = element.closest('.footer-section');
+      if (footerSectionElement.classList.contains('expand')) {
+        footerSectionElement.classList.remove('expand');
+      } else {
+        footerSectionElement.classList.add('expand');
+      }
+    }
+
+  function callApp(element) {
       if (element.classList.contains("dim")) {
         // 종료된 경우
         return;
@@ -30,9 +43,6 @@
 
       renderPage(OPEN_CLAN_PROFILE_LINK);
     }
-
-  // 시즌 설정 변수
-    let capitalRaidSeason;
 
     async function fetchCapitalClans() {
       return await axios.get("/clans/capital")
@@ -59,8 +69,23 @@
                         });
     }
 
+    function renderFailed(capitalCardElement) {
+      const errorContentTemplate = document.querySelector("#error-content");
+      const errorContent = document.importNode(errorContentTemplate.content, true);
+
+      const errorContentElement = errorContent.querySelector('.item');
+      const rowContentElement = capitalCardElement.querySelector('.row.content');
+
+      rowContentElement.replaceWith(errorContentElement);
+    }
+
     async function renderCapital(capitalCardElement, capitalClan) {
-      const clan = await fetchClan(capitalClan);
+      let clan = await fetchClan(capitalClan);
+
+      if (!Object.keys(clan).length) {
+        renderFailed(capitalCardElement);
+        return;
+      }
 
       const { capitalLeague, clanCapital } = clan;
 
@@ -98,8 +123,50 @@
                         });
     }
 
+    function renderCapitalMemberRecord(capitalCardElement, members) {
+      const membersElement = capitalCardElement.querySelector('.footer-section .members');
+
+      const memberRecordTemplate = document.querySelector('#member-record');
+      for(const member of members) {
+        const { name, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
+        const memberRecord = document.importNode(memberRecordTemplate.content, true);
+        const memberRecordElement = memberRecord.querySelector('.record');
+
+        if (attacks < attackLimit + bonusAttackLimit) {
+          // 미공 판단
+          memberRecordElement.classList.add('under');
+        }
+
+        memberRecordElement.innerHTML = memberRecordElement.innerHTML
+                                                           .replace(/{NAME}/, name)
+                                                           .replace(/{ATTACKS}/, attacks)
+                                                           .replace(/{RESOURCES_LOOTED}/, Number(capitalResourcesLooted).toLocaleString());
+
+        membersElement.appendChild(memberRecord);
+      }
+    }
+
+    function sortByCapitalResourcesLooted(members) {
+      return members.sort(function (a, b) {
+        if (a.capitalResourcesLooted < b.capitalResourcesLooted) {
+          return 1;
+        }
+        if (a.capitalResourcesLooted > b.capitalResourcesLooted) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+    }
+
     async function renderCapitalSeason(capitalCardElement, capitalClan) {
       const capitalRaidSeason = await fetchCapitalRaidSeason(capitalClan);
+
+      if (!Object.keys(capitalRaidSeason).length) {
+        renderFailed(capitalCardElement);
+        capitalCardElement.querySelector('.footer-section').classList.add('display-none');
+        return;
+      }
 
       const { state, totalAttackLimit, members } = capitalRaidSeason;
 
@@ -110,9 +177,11 @@
                                                        .replace(/{COLOR}/, convColor(remainAttacks))
                                                        .replace(/{REMAIN_ATTACKS}/, remainAttacks);
 
-      if ( state === 'ended' || remainAttacks === 0) {
+      if ( state === 'ended' || remainAttacks === 0 ) {
         addClassDim(capitalCardElement);
       }
+
+      renderCapitalMemberRecord(capitalCardElement, sortByCapitalResourcesLooted(members));
 
       function convColor(remainAttacks) {
         if (remainAttacks > 20) return "green";
@@ -157,6 +226,7 @@
 
       capitalCardElement.querySelector('.row.loader').classList.add('display-none');
       capitalCardElement.querySelector('.row.content').classList.remove('display-none');
+      capitalCardElement.querySelector('.footer-section').classList.remove('display-none');
     }
 
     async function writeCapitalClans() {
@@ -185,6 +255,7 @@
 </body>
 <template id="capital-card">
   <div class="card" onclick="callApp(this); return false;">
+
     <div class="bottom-section">
       <span class="title">{CLAN_NAME}</span>
       <div class="row loader">
@@ -211,6 +282,40 @@
         </div>
       </div>
     </div>
+
+    <div class="footer-section display-none">
+      <span class="sub-title cursor-pointer" onclick="onToggleRecord(this);">
+        기록 보기
+        <i class="fa-solid fa-caret-up"></i>
+      </span>
+      <div class="row content">
+        <div class="item members"></div>
+      </div>
+
+    </div>
+
+  </div>
+</template>
+<template id="error-content">
+  <div class="item">
+    <span class="sub-title color-red">조회 실패</span>
+  </div>
+</template>
+<template id="member-record">
+  <div class="record">
+
+    <div class="item">
+      <span class="regular-text">{NAME}</span>
+    </div>
+
+    <div class="item">
+      <span class="regular-text">{ATTACKS}</span>
+    </div>
+
+    <div class="item">
+      <span class="regular-text">{RESOURCES_LOOTED}</span>
+    </div>
+
   </div>
 </template>
 </html>

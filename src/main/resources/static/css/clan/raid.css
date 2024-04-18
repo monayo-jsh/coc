@@ -4,7 +4,7 @@
 }
 
 .card:not(:first-child) {
-  margin-top: 10px;
+  margin-top: 5px;
 }
 
 .card {
@@ -17,7 +17,7 @@
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.card .bottom-section {
+.card .bottom-section,.footer-section {
   margin-top: 5px;
   padding: 5px 0;
 
@@ -82,4 +82,54 @@
     transform: scale(1.05);
     color: #fff;
   }
+}
+
+.footer-section {
+  margin-top: 0;
+  padding: 0;
+
+  .members {
+    display: none;
+    padding: 0;
+    height: 100px;
+    overflow-y: auto;
+    scrollbar-width: none;
+
+    .record {
+      display: flex;
+      align-items: center;
+    }
+
+    .record:not(:first-child) {
+      margin-top: 3px;
+    }
+
+    .record.under {
+
+      .regular-text {
+        color: red;
+      }
+
+    }
+  }
+
+}
+
+.footer-section.expand {
+
+  .members {
+    display: flex;
+    flex-direction: column;
+    padding: 0 !important;
+  }
+
+}
+
+i {
+  transition: 0.3s;
+}
+
+.expand i {
+  transition: 0.3s;
+  transform: rotate(180deg);
 }

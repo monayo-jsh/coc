@@ -12,11 +12,13 @@ import open.api.coc.clans.common.Clan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.clans.ClanCapitalAttackerRes;
+import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalUnderAttackerRes;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRes;
-import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonMemberResConverter;
+import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonMemberResponseConverter;
+import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -35,7 +37,8 @@ public class ClansService {
 
     private final ClanApiService clanApiService;
 
-    private final ClanCapitalRaidSeasonMemberResConverter clanCapitalRaidSeasonMemberResConverter;
+    private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
+    private final ClanCapitalRaidSeasonMemberResponseConverter clanCapitalRaidSeasonMemberResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
@@ -69,7 +72,7 @@ public class ClansService {
         List<ClanCapitalRaidSeasonMember> underAttackers = findUnderAttackers(members);
 
         return ClanCapitalUnderAttackerRes.create(clan.getName(), underAttackers.stream()
-                                                                                .map(clanCapitalRaidSeasonMemberResConverter::convert)
+                                                                                .map(clanCapitalRaidSeasonMemberResponseConverter::convert)
                                                                                 .collect(Collectors.toList()));
     }
 
@@ -125,10 +128,31 @@ public class ClansService {
                    .collect(Collectors.toList());
     }
 
+    public List<ClanRes> getClanCaptialList() {
+        return Clan.getClanCapitalList()
+                   .stream()
+                   .map(ClanRes::create)
+                   .collect(Collectors.toList());
+    }
+
     public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
         ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)
                                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 사용자 조회 실패"));
 
         return clanMemberListResConverter.convert(clanMemberList);
+    }
+
+    public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {
+        final int SEARCH_LIMIT = 1;
+        ClanCapitalRaidSeasons clanCapitalRaidSeasons = clanApiService.findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, SEARCH_LIMIT)
+                                                                      .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜캐피탈 조회 실패"));
+
+        if (clanCapitalRaidSeasons.isEmpty()) {
+            throw CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜캐피탈 조회 실패");
+        }
+
+        ClanCapitalRaidSeason clanCapitalRaidSeason = clanCapitalRaidSeasons.getItemWithMembers();
+
+        return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 }

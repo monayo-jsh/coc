@@ -11,6 +11,7 @@
   box-sizing: border-box;
   font-size: 1em;
   font-family: 'Poppins', sans-serif;
+  word-break: break-all;
 }
 
 li {
@@ -54,6 +55,32 @@ body {
 .level-icon.is-max {
   color: #fff;
   filter: unset;
+}
+
+.display-none {
+  display: none !important;
+}
+
+.opacity-01 {
+  opacity: 0.1;
+}
+
+.dim {
+  opacity: 0.8;
+}
+
+.color-yellow {
+  color: yellow !important;
+}
+.color-green {
+  color: green !important;
+}
+.color-red {
+  color: red !important;
+}
+
+.cursor-pointer {
+  cursor: pointer !important;
 }
 
 body::after {

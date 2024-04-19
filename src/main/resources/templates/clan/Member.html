@@ -86,10 +86,8 @@
     async function fetchClanMembers(clans) {
       const requests = clans.map(clan => getRequestClanMembersByClan(clan))
 
-      const test = [requests[0]]
-
       let members = [];
-      await axios.all(test)
+      await axios.all(requests)
                  .then((responses) => {
                    responses.forEach((response) => {
                      const { config, data } = response
@@ -130,9 +128,7 @@
       hideWifiLoading('.content-wrapper');
 
       const sortedMembers = sortByTrophies(members)
-
-      const test = [sortedMembers[0]]
-      renderMembers(test)
+      renderMembers(sortedMembers)
     }
 
     function fetchPlayer(tag) {
@@ -199,7 +195,7 @@
 
     function renderHeroEquipments(memberHtml, player) {
       const { heroEquipments } = player
-      if (!heroEquipments) return;
+      if (!heroEquipments || !heroEquipments.length) return;
 
       const innerSectionTemplate = document.querySelector('#inner-section');
 
@@ -243,7 +239,7 @@
 
     function renderPets(memberHtml, player) {
       const { pets } = player
-      if (!pets) return;
+      if (!pets || !pets.length) return;
 
       const innerSectionTemplate = document.querySelector('#inner-section');
 
@@ -283,7 +279,7 @@
         const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = member
 
         memberHtml.innerHTML = memberHtml.innerHTML
-                                         .replace(/{NAME}/, name)
+                                         .replace(/{NAME}/, `${no}. ${name}`)
                                          .replace(/{CLAN_NAME}/, clan.name)
                                          .replace(/{TROPHIES}/, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)

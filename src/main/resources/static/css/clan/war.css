@@ -36,11 +36,13 @@ body {
   .stars {
     padding: 3px;
     color: #fff;
+    .count {
+      font-size: .8em;
+    }
   }
 
   .attacks {
     display: flex;
-    font-size: .8em;
     padding: 3px;
     color: #fff;
 
@@ -50,6 +52,7 @@ body {
     }
     .count {
       margin-left: 3px;
+      font-size: .8em;
     }
   }
 }

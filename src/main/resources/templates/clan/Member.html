@@ -123,9 +123,11 @@
 
     async function getClanMembers() {
       showWifiLoading('.content-wrapper');
-      const clans = await requestClans();
-      const members = await fetchClanMembers(clans)
+      let clans = await requestClans();
+      clans = clans.slice(0, 1)
+      let members = await fetchClanMembers(clans)
       hideWifiLoading('.content-wrapper');
+      members = members.slice(0, 10)
 
       const sortedMembers = sortByTrophies(members)
       renderMembers(sortedMembers)
@@ -212,6 +214,9 @@
 
       const cardBackElement = memberHtml.querySelector('.card-back');
       cardBackElement.appendChild(innerSectionElement);
+
+      // 로딩바 제거
+      cardBackElement.querySelector('.loader-circle').remove();
     }
 
     function renderImgIcon(contentsElement, icon) {
@@ -362,7 +367,22 @@
       </div>
       <div class="inner-section heroes"></div>
     </div>
-    <div class="card-back"></div>
+    <div class="card-back">
+      <div class="loader-circle">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+      </div>
+    </div>
   </div>
 </template>
 <template id="inner-section">

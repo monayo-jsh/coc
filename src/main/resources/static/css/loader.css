@@ -255,3 +255,96 @@
     box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
   }
 }
+
+.loader-circle {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  border-radius: 10px;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+
+.loader-circle div {
+  width: 8%;
+  height: 24%;
+  background: rgb(128, 128, 128);
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  opacity: 0;
+  border-radius: 50px;
+  box-shadow: 0 0 3px rgba(0,0,0,0.2);
+  animation: fade458 1s linear infinite;
+}
+
+@keyframes fade458 {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.25;
+  }
+}
+
+.loader-circle .bar1 {
+  transform: rotate(0deg) translate(0, -130%);
+  animation-delay: 0s;
+}
+
+.loader-circle .bar2 {
+  transform: rotate(30deg) translate(0, -130%);
+  animation-delay: -1.1s;
+}
+
+.loader-circle .bar3 {
+  transform: rotate(60deg) translate(0, -130%);
+  animation-delay: -1s;
+}
+
+.loader-circle .bar4 {
+  transform: rotate(90deg) translate(0, -130%);
+  animation-delay: -0.9s;
+}
+
+.loader-circle .bar5 {
+  transform: rotate(120deg) translate(0, -130%);
+  animation-delay: -0.8s;
+}
+
+.loader-circle .bar6 {
+  transform: rotate(150deg) translate(0, -130%);
+  animation-delay: -0.7s;
+}
+
+.loader-circle .bar7 {
+  transform: rotate(180deg) translate(0, -130%);
+  animation-delay: -0.6s;
+}
+
+.loader-circle .bar8 {
+  transform: rotate(210deg) translate(0, -130%);
+  animation-delay: -0.5s;
+}
+
+.loader-circle .bar9 {
+  transform: rotate(240deg) translate(0, -130%);
+  animation-delay: -0.4s;
+}
+
+.loader-circle .bar10 {
+  transform: rotate(270deg) translate(0, -130%);
+  animation-delay: -0.3s;
+}
+
+.loader-circle .bar11 {
+  transform: rotate(300deg) translate(0, -130%);
+  animation-delay: -0.2s;
+}
+
+.loader-circle .bar12 {
+  transform: rotate(330deg) translate(0, -130%);
+  animation-delay: -0.1s;
+}

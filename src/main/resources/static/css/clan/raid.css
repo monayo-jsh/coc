@@ -7,9 +7,14 @@
   margin-top: 5px;
 }
 
+.card.caption {
+  min-height: unset;
+}
+
 .card {
-  width: 230px;
-  border-radius: 20px;
+  width: 270px;
+  min-height: 130px;
+  border-radius: 15px;
   background: #1b233d;
   padding: 5px;
   overflow: hidden;
@@ -40,7 +45,12 @@
   }
 
   .row.loader {
-    margin-top: 15px;
+    margin-top: 35px;
+  }
+
+  .row.error {
+    margin-top: 25px;
+    justify-content: center;
   }
 
   .row {

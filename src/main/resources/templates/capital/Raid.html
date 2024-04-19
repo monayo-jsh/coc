@@ -73,7 +73,7 @@
       const errorContentTemplate = document.querySelector("#error-content");
       const errorContent = document.importNode(errorContentTemplate.content, true);
 
-      const errorContentElement = errorContent.querySelector('.item');
+      const errorContentElement = errorContent.querySelector('.row');
       const rowContentElement = capitalCardElement.querySelector('.row.content');
 
       rowContentElement.replaceWith(errorContentElement);
@@ -164,7 +164,7 @@
 
       if (!Object.keys(capitalRaidSeason).length) {
         renderFailed(capitalCardElement);
-        capitalCardElement.querySelector('.footer-section').classList.add('display-none');
+        capitalCardElement.querySelector('.footer-section').remove();
         return;
       }
 
@@ -226,7 +226,8 @@
 
       capitalCardElement.querySelector('.row.loader').classList.add('display-none');
       capitalCardElement.querySelector('.row.content').classList.remove('display-none');
-      capitalCardElement.querySelector('.footer-section').classList.remove('display-none');
+      const footerSection = capitalCardElement.querySelector('.footer-section');
+      if (footerSection) footerSection.classList.remove('display-none');
     }
 
     async function writeCapitalClans() {
@@ -297,7 +298,7 @@
   </div>
 </template>
 <template id="error-content">
-  <div class="item">
+  <div class="row error">
     <span class="sub-title color-red">조회 실패</span>
   </div>
 </template>

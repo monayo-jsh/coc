@@ -124,10 +124,8 @@
     async function getClanMembers() {
       showWifiLoading('.content-wrapper');
       let clans = await requestClans();
-      clans = clans.slice(0, 1)
       let members = await fetchClanMembers(clans)
       hideWifiLoading('.content-wrapper');
-      members = members.slice(0, 10)
 
       const sortedMembers = sortByTrophies(members)
       renderMembers(sortedMembers)

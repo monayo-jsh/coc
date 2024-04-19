@@ -282,14 +282,19 @@
   <div class="card-contents">
     <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
       <div class="summary">
+
         <div class="clan">
           <div class="name">{CLAN_NAME}</div>
           <div class="stars">
             <i class="fa-solid fa-star"></i>
             <span class="count">{CLAN_STAR_COUNT}</span>
           </div>
-          <div class="attacks">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</div>
+          <div class="attacks">
+            <div class="icon-sword"></div>
+            <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+          </div>
         </div>
+
         <div class="war-info">
           <div class="clan-icon">
             <img class="clan" alt="" />
@@ -302,14 +307,23 @@
             {WAR_STATE}
           </div>
         </div>
+
         <div class="opponent">
+
           <div class="name">{OPPONENT_NAME}</div>
           <div class="stars">
+
             <span class="count">{OPPONENT_STAR_COUNT}</span>
             <i class="fa-solid fa-star"></i>
+
           </div>
-          <div class="attacks">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</div>
+          <div class="attacks">
+            <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
+            <div class="icon-sword"></div>
+          </div>
+
         </div>
+
       </div>
 
       <div class="member-attack"></div>

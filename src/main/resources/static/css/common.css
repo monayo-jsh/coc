@@ -83,6 +83,15 @@ body {
   cursor: pointer !important;
 }
 
+.icon-sword {
+  width: 36px;
+  height: 36px;
+  background-image: url("/static/images/etc/sword.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 body::after {
   position: absolute;
   width: 0;

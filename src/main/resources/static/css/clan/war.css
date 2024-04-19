@@ -39,9 +39,18 @@ body {
   }
 
   .attacks {
+    display: flex;
     font-size: .8em;
     padding: 3px;
     color: #fff;
+
+    .icon-sword {
+      width: 18px;
+      height: 16px;
+    }
+    .count {
+      margin-left: 3px;
+    }
   }
 }
 

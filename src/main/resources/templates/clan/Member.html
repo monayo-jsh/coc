@@ -325,7 +325,8 @@
               .addEventListener("scroll", (event) => {
                 const scrollHeight = event.currentTarget.scrollHeight;
                 const scrollPosition = event.currentTarget.scrollTop + event.currentTarget.clientHeight;
-                if (scrollPosition >= scrollHeight) {
+
+                if (scrollPosition + 5 >= scrollHeight) {
                   if (!drawMembers.length) {
                     // 모두 표시된 경우
                     const loaderElement = document.querySelector('.clan-members .loader-circle.list');

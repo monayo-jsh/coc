@@ -96,6 +96,15 @@ body::before {
       url(/static/images/townhall/1.png);
 }
 
+.logo {
+  width: 230px;
+  height: 230px;
+  background-image: url("/static/images/logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .text-align-center {
   text-align: center;
 }

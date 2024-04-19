@@ -91,8 +91,12 @@
         const { attackerTag, defenderTag, destructionPercentage, duration, stars} = attack;
 
         const opponentMember = opponentMemberMap[defenderTag]
+
+        const { name, townHallLevel, mapPosition } = opponentMember
+
         attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                                                       .replace(/{OPPONENT_NAME}/, opponentMember.name)
+                                                       .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                                       .replace(/{OPPONENT_NAME}/, `${mapPosition}. ${name}`)
                                                        .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
                                                        .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
 
@@ -168,7 +172,10 @@
                    const { data } = response;
                    const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
 
+                   const totalStarCount = teamSize * 3;
+
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                                            .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
                                                                             .replace(/{CLAN_STAR_COUNT}/, clan.stars)
                                                                             .replace(/{CLAN_ATTACK}/, clan.attacks)
                                                                             .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
@@ -287,7 +294,7 @@
           <div class="name">{CLAN_NAME}</div>
           <div class="stars">
             <i class="fa-solid fa-star"></i>
-            <span class="count">{CLAN_STAR_COUNT}</span>
+            <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
           </div>
           <div class="attacks">
             <div class="icon-sword"></div>
@@ -313,7 +320,7 @@
           <div class="name">{OPPONENT_NAME}</div>
           <div class="stars">
 
-            <span class="count">{OPPONENT_STAR_COUNT}</span>
+            <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
             <i class="fa-solid fa-star"></i>
 
           </div>
@@ -356,14 +363,19 @@
 </template>
 <template id="section-member-attack">
   <div class="attack-info">
-    <div class="name">{OPPONENT_NAME}</div>
-    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
-    <div class="stars">
-      <i class="fa-solid fa-star fa-xs"></i>
-      <i class="fa-solid fa-star fa-xs"></i>
-      <i class="fa-solid fa-star fa-xs"></i>
+    <div class="user">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+      <div class="name">{OPPONENT_NAME}</div>
     </div>
-    <div class="duration">{DESTRUCTION_DURATION}</div>
+    <div class="result">
+      <div class="stars">
+        <i class="fa-solid fa-star fa-xs"></i>
+        <i class="fa-solid fa-star fa-xs"></i>
+        <i class="fa-solid fa-star fa-xs"></i>
+      </div>
+      <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
+      <div class="duration">{DESTRUCTION_DURATION}</div>
+    </div>
   </div>
 </template>
 

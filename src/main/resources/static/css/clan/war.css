@@ -165,10 +165,6 @@ body {
       align-items: center;
       padding: 10px 0;
 
-      .destruction-percentage {
-        font-weight: bolder;
-      }
-
       .attack-list {
         display: flex;
         flex-direction: column;
@@ -182,30 +178,44 @@ body {
           padding: 10px 0;
           margin: 0 5px;
 
-          .name {
-            font-size: .9rem;
-            width: 35%;
-            font-weight: bolder;
-            word-break: break-all;
-          }
+          .user {
+            display: flex;
+            align-items: center;
 
-          .destruction-percentage {
-            font-size: .9rem;
-            width: 17%;
-          }
+            .town-hall {
+              width: 26px;
+              height: 26px;
+            }
 
-          .stars {
-            width: 21%;
-
-            .fill {
-              color: #fff;
+            .name {
+              margin-left: 5px;
+              padding: 5px 10px;
+              border-left: var(--default-border);
+              font-size: .8em;
+              font-weight: bolder;
+              word-break: break-all;
             }
           }
 
-          .duration {
-            width: 22%;
-            text-align: right;
-            font-size: 0.8rem;
+          .result {
+            display: flex;
+            flex-direction: column;
+
+            .stars {
+              .fill {
+                color: #fff;
+              }
+            }
+
+            .destruction-percentage {
+              font-size: 0.8em;
+              font-weight: bold;
+            }
+
+            .duration {
+              font-size: 0.8em;
+              font-weight: bold;
+            }
           }
         }
 
@@ -217,8 +227,14 @@ body {
         .attack-info.not {
           margin: 0 5px;
 
+          .name {
+            font-size: .8em;
+            font-weight: bolder;
+            word-break: break-all;
+          }
+
           .message {
-            font-size: .9rem;
+            font-size: .8em;
             color: yellow;
             font-weight: bolder;
           }

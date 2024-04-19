@@ -92,7 +92,7 @@ body {
   background-position: center;
 }
 
-body::after {
+body::before {
   position: absolute;
   width: 0;
   height: 0;
@@ -129,7 +129,7 @@ body::after {
       url(/static/images/etc/max_level.png)
       url(/static/images/etc/xp.png)
 
-      url(/static/images/pets/L.A.S.S.I.png);
+      url(/static/images/pets/Lassi.png)
       url(/static/images/pets/Mighty_Yak.png)
       url(/static/images/pets/Electro_Owl.png)
       url(/static/images/pets/Phoenix.png)

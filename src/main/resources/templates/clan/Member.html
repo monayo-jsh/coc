@@ -299,9 +299,13 @@
         }, 0)
       }
     }
+
+    window.onload = () => {
+      getClanMembers()
+    }
   </script>
 </head>
-<body onload="getClanMembers()">
+<body>
   <div class="content-wrapper">
     <div id="wifi-loader" class="display-none">
       <svg class="circle-outer" viewBox="0 0 86 86">

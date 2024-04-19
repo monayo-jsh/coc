@@ -109,28 +109,40 @@
     }
 
     function sortByTrophies(members) {
-      return members.sort(function (a, b) {
-        if (a.trophies < b.trophies) {
-          return 1;
-        }
-        if (a.trophies > b.trophies) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
+      return members.map(member => member)
+                    .sort(function (a, b) {
+                      if (a.trophies < b.trophies) {
+                        return 1;
+                      }
+                      if (a.trophies > b.trophies) {
+                        return -1;
+                      }
+                      // a must be equal to b
+                      return 0;
+                    });
+    }
+
+    // 화면에서 페이징 구성 처리
+    const members = []
+    let drawMembers;
+
+    function drawPagingMembers(members) {
+      const PER_PAGE = 10;
+      const writeMembers = members.splice(0, PER_PAGE);
+      renderMembers(writeMembers)
+
     }
 
     async function getClanMembers() {
       showWifiLoading('.content-wrapper');
       let clans = await requestClans();
-      let members = await fetchClanMembers(clans)
+
+      members.push(... await fetchClanMembers(clans));
       hideWifiLoading('.content-wrapper');
 
-      members = members.slice(0, 10);
+      drawMembers = sortByTrophies(members)
 
-      const sortedMembers = sortByTrophies(members)
-      renderMembers(sortedMembers)
+      drawPagingMembers(drawMembers);
     }
 
     function fetchPlayer(tag) {
@@ -276,7 +288,7 @@
       const clanMembersElement = document.querySelector('.clan-members');
 
       const memberTemplate = document.querySelector('#member');
-      let no = 1;
+      let no = clanMembersElement.children.length + 1;
       for(const member of members) {
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
@@ -312,9 +324,13 @@
               .addEventListener("scroll", (event) => {
                 const scrollHeight = event.currentTarget.scrollHeight;
                 const scrollPosition = event.currentTarget.scrollTop + event.currentTarget.clientHeight;
-                console.log ("scrollHeight", scrollHeight, "scrollPosition", scrollPosition);
                 if (scrollPosition >= scrollHeight) {
-                  console.log ("end reached");
+                  if (!drawMembers.length) {
+                    // 모두 표시된 경우
+                    return;
+                  }
+
+                  drawPagingMembers(drawMembers);
                 }
               })
     }

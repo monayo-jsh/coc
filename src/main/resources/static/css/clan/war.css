@@ -195,6 +195,15 @@ body {
               font-weight: bolder;
               word-break: break-all;
             }
+
+            @media (max-width: 320px) {
+              .name {
+                width: 165px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+            }
           }
 
           .result {

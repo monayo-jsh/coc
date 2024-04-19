@@ -9,6 +9,10 @@
 }
 
 .clan-members {
+  width: 270px;
+  height: 100vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

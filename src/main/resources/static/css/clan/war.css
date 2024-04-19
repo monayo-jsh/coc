@@ -175,7 +175,7 @@ body {
       width: 100%;
       display: flex;
       align-items: center;
-      padding: 10px 0;
+      padding: 5px 0;
 
       .attack-list {
         display: flex;
@@ -242,6 +242,7 @@ body {
 
         .attack-info:nth-child(2),
         .attack-info.not:nth-child(2) {
+          margin-top: 5px;
           border-top: var(--default-border);
         }
 

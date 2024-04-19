@@ -18,7 +18,10 @@
     // 시즌 설정 변수
     let capitalRaidSeason;
 
-    function onToggleRecord(element) {
+    function onToggleRecord(element, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
       const footerSectionElement = element.closest('.footer-section');
       if (footerSectionElement.classList.contains('expand')) {
         footerSectionElement.classList.remove('expand');
@@ -39,9 +42,8 @@
 
       const { dataset } = element;
       const { clanTag } = dataset;
-      const OPEN_CLAN_PROFILE_LINK = `clashofclans://action=OpenClanProfile&tag=${clanTag}`;
 
-      renderPage(OPEN_CLAN_PROFILE_LINK);
+      location.href = `clashofclans://action=OpenClanProfile&tag=${clanTag}`;
     }
 
     async function fetchCapitalClans() {
@@ -255,10 +257,10 @@
   </div>
 </body>
 <template id="capital-card">
-  <div class="card" onclick="callApp(this); return false;">
+  <div class="card">
 
     <div class="bottom-section">
-      <span class="title">{CLAN_NAME}</span>
+      <span class="title cursor-pointer" onclick="callApp(this); return false;">{CLAN_NAME}</span>
       <div class="row loader">
         <div class="loader-circle">
           <div class="bar1"></div>
@@ -292,8 +294,8 @@
     </div>
 
     <div class="footer-section display-none">
-      <span class="sub-title cursor-pointer" onclick="onToggleRecord(this);">
-        기록 보기
+      <span class="sub-title">
+        <span class="cursor-pointer" onclick="onToggleRecord(this, event); return false;">기록 보기</span>
         <i class="fa-solid fa-caret-up"></i>
       </span>
       <div class="row content">

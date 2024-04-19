@@ -16,6 +16,11 @@
   background-color: #22c55e;
 }
 
+.cards .violet {
+  background-color: #b13bf6;
+}
+
+
 .cards .card {
   display: flex;
   align-items: center;

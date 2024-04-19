@@ -127,6 +127,8 @@
       let members = await fetchClanMembers(clans)
       hideWifiLoading('.content-wrapper');
 
+      members = members.slice(0, 10);
+
       const sortedMembers = sortByTrophies(members)
       renderMembers(sortedMembers)
     }
@@ -305,6 +307,16 @@
 
     window.onload = () => {
       getClanMembers()
+
+      document.querySelector('.clan-members')
+              .addEventListener("scroll", (event) => {
+                const scrollHeight = event.currentTarget.scrollHeight;
+                const scrollPosition = event.currentTarget.scrollTop + event.currentTarget.clientHeight;
+                console.log ("scrollHeight", scrollHeight, "scrollPosition", scrollPosition);
+                if (scrollPosition >= scrollHeight) {
+                  console.log ("end reached");
+                }
+              })
     }
   </script>
 </head>

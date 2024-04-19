@@ -1,5 +1,5 @@
 function renderPage(uri) {
-  location.href = '/clan/academe' + uri;
+  location.href = uri;
 }
 
 function addClassDim(element) {

@@ -286,9 +286,10 @@
 
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
+      const loaderElement = document.querySelector('.clan-members .loader-circle.list');
 
       const memberTemplate = document.querySelector('#member');
-      let no = clanMembersElement.children.length + 1;
+      let no = clanMembersElement.children.length;
       for(const member of members) {
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
@@ -308,7 +309,7 @@
         const { iconUrls } = league
         leagueIconImg.src = iconUrls.tiny;
 
-        clanMembersElement.appendChild(memberHtml);
+        clanMembersElement.insertBefore(memberHtml, loaderElement);
         no++;
 
         setTimeout(() => {
@@ -327,10 +328,14 @@
                 if (scrollPosition >= scrollHeight) {
                   if (!drawMembers.length) {
                     // 모두 표시된 경우
+                    const loaderElement = document.querySelector('.clan-members .loader-circle.list');
+                    loaderElement.classList.add('display-none');
                     return;
                   }
 
-                  drawPagingMembers(drawMembers);
+                  setTimeout(() => {
+                    drawPagingMembers(drawMembers);
+                  }, 500)
                 }
               })
     }
@@ -356,7 +361,22 @@
     </div>
 
 
-    <div class="clan-members"></div>
+    <div class="clan-members">
+      <div class="loader-circle list">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+      </div>
+    </div>
   </div>
 </body>
 <template id="member">

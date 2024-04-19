@@ -17,6 +17,11 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: flex-start;
+
+  .loader-circle.list {
+    position: unset;
+    transform: translate(0, 0);
+  }
 }
 
 .member.row:not(:first-child) {

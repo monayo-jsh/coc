@@ -31,8 +31,17 @@ body {
     font-size: 0.9rem;
     font-weight: bolder;
     text-align: center;
-    word-break: break-all;
   }
+
+  @media (max-width: 320px) {
+    .name {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      width: 85px;
+      overflow: hidden;
+    }
+  }
+
   .stars {
     padding: 3px;
     color: #fff;
@@ -178,8 +187,8 @@ body {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 10px 0;
           margin: 0 5px;
+          min-height: 60px;
 
           .user {
             display: flex;

@@ -75,15 +75,8 @@
     }
 
     function appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember) {
-
-      if (!attacks.length) {
-        appendNotAttackRows(attacksPerMember);
-        return
-      }
-
       const templateMember = document.getElementById('section-member-attack');
-
-      for (attack of attacks) {
+      for (const attack of attacks) {
 
         const cloneTemplateMemberAttack = document.importNode(templateMember.content, true);
         const attackInfoElement = cloneTemplateMemberAttack.querySelector('.attack-info');
@@ -108,22 +101,35 @@
         attackListElement.appendChild(attackInfoElement);
       }
 
-      appendNotAttackRows(attacksPerMember - attacks.length)
+      appendNotAttackRows(attackListElement, attacksPerMember, attacks.length)
+    }
 
-      function formatMinuteSecond(sec) {
-        return dayjs.duration(sec * 1000).format('m분 ss초');
+    function formatMinuteSecond(sec) {
+      return dayjs.duration(sec * 1000).format('m분 ss초');
+    }
+
+    function appendNotAttackRows(attackListElement, attacksPerMember, attackLength) {
+      let no = getStartNo();
+
+      const templateMemberNotAttack = document.getElementById('section-member-not-attack');
+
+      const rowCount = getDrawRowCount();
+      for (let i=0; i<rowCount; i++) {
+        const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
+        const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
+        attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                                                       .replace(/{ATTACK_NO}/, `공격${no++}`);
+
+        attackListElement.appendChild(attackInfoElement);
       }
 
-      function appendNotAttackRows(rowCount) {
-        const templateMemberNotAttack = document.getElementById('section-member-not-attack');
-        for (let i=0; i<rowCount; i++) {
-          const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
-          const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
-          attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                                                         .replace(/{ATTACK_NO}/, `공격${i+1}`);
+      function getStartNo() {
+        if (attackLength === 0) return 1;
+        return getDrawRowCount() + 1;
+      }
 
-          attackListElement.appendChild(attackInfoElement);
-        }
+      function getDrawRowCount() {
+        return attacksPerMember - attackLength;
       }
     }
 
@@ -132,7 +138,7 @@
 
       const templateMember = document.getElementById('section-member');
 
-      for(member of clanMembers) {
+      for(const member of clanMembers) {
 
         const cloneTemplateMember = document.importNode(templateMember.content, true);
         const memberElement = cloneTemplateMember.querySelector('.member');

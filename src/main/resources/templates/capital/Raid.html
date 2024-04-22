@@ -134,7 +134,9 @@
         const memberRecord = document.importNode(memberRecordTemplate.content, true);
         const memberRecordElement = memberRecord.querySelector('.record');
 
-        if (attacks < attackLimit + bonusAttackLimit) {
+        // const mustUsedAttacks = attackLimit + bonusAttackLimit;
+        const mustUsedAttacks = 6; // 추가 공권 미획득 시 판단할 수 없어 하드코딩으로 처리
+        if (attacks < mustUsedAttacks) {
           // 미공 판단
           memberRecordElement.classList.add('under');
         }

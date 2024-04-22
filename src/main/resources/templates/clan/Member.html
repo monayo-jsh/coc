@@ -17,7 +17,7 @@
   <title>클랜원 현황</title>
 
   <script>
-    function cardClick(e, event) {
+  function cardClick(e, event) {
       event.preventDefault();
       event.stopPropagation();
 
@@ -100,32 +100,63 @@
     }
 
     function sortByTrophies(members) {
+      // 트로피 순 > 이름 순
       return members.map(member => member)
-                    .sort((a, b) => b.trophies - a.trophies);
+                    .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
     }
+
+  function sortByHeroLevelSum(members) {
+    // 웅합 순 > 트로피 순
+    return members.map(member => member)
+                  .sort((a, b) => b.heroLevelSum - a.heroLevelSum || b.trophies - a.trophies);
+  }
 
     // 사용자 목록
     const members = []
 
+  function clearClanMembers() {
+    const clanMembers = document.querySelector('.clan-members');
+    clanMembers.innerHTML = '';
+  }
+
+  function drawMember(members) {
+    showWifiLoading('.clan-members');
+    setTimeout(() => {
+      clearClanMembers();
+      renderMembers(members);
+      hideWifiLoading('.clan-members');
+    }, 500);
+  }
+
+  function renderMemberSortByTrophies() {
+    const sortedMembers = sortByTrophies(members);
+    drawMember(sortedMembers);
+  }
+
+  function rederMemberSortByHeroLevelSum() {
+    const sortedMembers = sortByHeroLevelSum(members);
+    drawMember(sortedMembers)
+  }
     async function getClanMembers() {
-      showWifiLoading('.content-wrapper');
+      showWifiLoading('.clan-members');
       let clans = await requestClans();
 
       const clanMembers = await fetchClanMembers(clans);
       members.push(...clanMembers);
 
       await fetchPlayerDetail(members);
-      hideWifiLoading('.content-wrapper');
+      hideWifiLoading('.clan-members');
 
-      renderMembers(sortByTrophies(members));
+      renderMemberSortByTrophies();
     }
 
     function calcHeroLevelSum(heroes) {
       if (!heroes) return 0;
-      return heroes.reduce((levelSum, hero) => {
-        levelSum += hero.level
-        return levelSum
-      }, 0)
+      return heroes.filter(hero => hero.village === 'home')
+                   .reduce((levelSum, hero) => {
+                     levelSum += hero.level
+                     return levelSum
+                   }, 0)
     }
 
     function overridePlayer(memberMap, member) {
@@ -182,7 +213,7 @@
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
 
-      const heroesElement = memberHtml.querySelector('.inner-section.heroes');
+      const heroesElement = memberHtml.querySelector('.inner-section .heroes');
       const memberHeroTemplate = document.querySelector('#member-hero');
       const memberHero = document.importNode(memberHeroTemplate.content, true);
       const heroElement = memberHero.querySelector('.hero');
@@ -284,7 +315,7 @@
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = player
+        const { name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/, `${no}. ${name}`)
@@ -292,6 +323,8 @@
                                          .replace(/{TROPHIES}/, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
                                          .replace(/{EXP_LEVEL}/, expLevel)
+                                         .replace(/{HERO_LEVEL}/, heroLevelSum)
+                                         .replace(/{IS_HERO_MAX_LEVEL}/, heroLevelSum === 305 ? 'is-max' : '')
                                          .replace(/{DONATIONS}/, Number(donations).toLocaleString())
                                          .replace(/{DONATIONS_RECEIVED}/, Number(donationsReceived).toLocaleString());
 
@@ -332,7 +365,28 @@
       <div class="text" data-text="Searching"></div>
     </div>
 
+    <div class="support-area">
+      <div class="container">
+        <div class="radio-tile-group">
+          <div class="input-container">
+            <input id="trophies" class="radio-button" type="radio" name="radio" checked onchange="renderMemberSortByTrophies();">
+            <div class="radio-tile">
+              <div class="icon trophies"></div>
+              <label for="trophies" class="radio-tile-label">트로피순</label>
+            </div>
+          </div>
 
+          <div class="input-container">
+            <input id="hero-level-sum" class="radio-button" type="radio" name="radio" onchange="rederMemberSortByHeroLevelSum();">
+            <div class="radio-tile">
+              <div class="icon hero barbarian_king"></div>
+              <label for="hero-level-sum" class="radio-tile-label">웅합순</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
     <div class="clan-members"></div>
   </div>
 </body>
@@ -368,7 +422,12 @@
           </div>
         </div>
       </div>
-      <div class="inner-section heroes"></div>
+      <div class="inner-section hero-wrapper">
+        <div class="label">
+          <div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div>
+        </div>
+        <div class="heroes"></div>
+      </div>
     </div>
     <div class="card-back"></div>
   </div>

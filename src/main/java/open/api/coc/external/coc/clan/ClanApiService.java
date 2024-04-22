@@ -21,4 +21,6 @@ public interface ClanApiService {
 
     Optional<Player> findPlayerBy(String playerTag);
 
+    Optional<Player> fetchPlayerBy(String playerTag);
+
 }

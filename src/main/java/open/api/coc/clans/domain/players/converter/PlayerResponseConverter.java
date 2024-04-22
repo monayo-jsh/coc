@@ -10,7 +10,9 @@ import open.api.coc.clans.domain.common.TroopsResponse;
 import open.api.coc.clans.domain.common.converter.HeroEquipmentResponseConverter;
 import open.api.coc.clans.domain.common.converter.HeroResponseConverter;
 import open.api.coc.clans.domain.common.converter.TroopseResponseConverter;
+import open.api.coc.clans.domain.players.ClanResponse;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.external.coc.clan.domain.common.Clan;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.clan.domain.common.Pet;
@@ -19,11 +21,13 @@ import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
 @Component
 @RequiredArgsConstructor
 public class PlayerResponseConverter implements Converter<Player, PlayerResponse> {
 
+    private final ClanResponseConverter clanResponseConverter;
     private final HeroResponseConverter heroResponseConverter;
     private final HeroEquipmentResponseConverter heroEquipmentResponseConverter;
     private final TroopseResponseConverter troopseResponseConverter;
@@ -39,10 +43,16 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                              .attackWins(source.getAttackWins())
                              .defenseWins(source.getDefenseWins())
                              .warStars(source.getWarStars())
+                             .clan(makeClan(source.getClan()))
                              .heroes(makeHeroes(source.getHeroes()))
                              .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
                              .pets(makePets(source.getTroops()))
                              .build();
+    }
+
+    private ClanResponse makeClan(Clan clan) {
+        if (ObjectUtils.isEmpty(clan)) return null;
+        return clanResponseConverter.convert(clan);
     }
 
     private List<TroopsResponse> makePets(List<Troops> troops) {

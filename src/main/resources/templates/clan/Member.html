@@ -75,12 +75,7 @@
     }
     function getRequestClanMembersByClan(clan) {
       const uri = `/clans/${encodeURIComponent(clan.tag)}/members`
-      return axios.get(uri,
-          {
-            params: {
-              clan: JSON.stringify(clan)
-            }
-          });
+      return axios.get(uri);
     }
 
     async function fetchClanMembers(clans) {
@@ -92,10 +87,6 @@
                    responses.forEach((response) => {
                      const { config, data } = response
                      if (data.members) {
-                       // set clan
-                       const clan = JSON.parse(config.params.clan)
-                       data.members.forEach((member) => member.clan = clan)
-
                        // concat member
                        members = members.concat(data.members);
                      }
@@ -110,57 +101,71 @@
 
     function sortByTrophies(members) {
       return members.map(member => member)
-                    .sort(function (a, b) {
-                      if (a.trophies < b.trophies) {
-                        return 1;
-                      }
-                      if (a.trophies > b.trophies) {
-                        return -1;
-                      }
-                      // a must be equal to b
-                      return 0;
-                    });
+                    .sort((a, b) => b.trophies - a.trophies);
     }
 
-    // 화면에서 페이징 구성 처리
+    // 사용자 목록
     const members = []
-    let drawMembers;
-
-    function drawPagingMembers(members) {
-      const PER_PAGE = 10;
-      const writeMembers = members.splice(0, PER_PAGE);
-      renderMembers(writeMembers)
-
-    }
 
     async function getClanMembers() {
       showWifiLoading('.content-wrapper');
       let clans = await requestClans();
 
-      members.push(... await fetchClanMembers(clans));
+      const clanMembers = await fetchClanMembers(clans);
+      members.push(...clanMembers);
+
+      await fetchPlayerDetail(members);
       hideWifiLoading('.content-wrapper');
 
-      drawMembers = sortByTrophies(members)
-
-      drawPagingMembers(drawMembers);
+      renderMembers(sortByTrophies(members));
     }
 
-    function fetchPlayer(tag) {
-      const uri = `/players/${encodeURIComponent(tag)}`;
+    function calcHeroLevelSum(heroes) {
+      if (!heroes) return 0;
+      return heroes.reduce((levelSum, hero) => {
+        levelSum += hero.level
+        return levelSum
+      }, 0)
+    }
 
-      return axios.get(uri)
+    function overridePlayer(memberMap, member) {
+      let fetchMember = memberMap[member.tag]
+      if (fetchMember) {
+        fetchMember = Object.assign(fetchMember, member)
+
+        fetchMember.heroLevelSum = calcHeroLevelSum(fetchMember.heroes);
+
+        Object.assign(member, fetchMember); //member override
+      }
+
+    }
+
+    async function fetchPlayerDetail(members) {
+      const uri = `/players?playerTags=${encodeURIComponent(members.map(member => member.tag))}`;
+      return await axios.get(uri)
                   .then((response) => {
                     const { data } = response
                     if (!data) {
-                      return {};
+                      return;
                     }
 
-                    return data;
+                    const memberMap = makeMemberMapByTag(data);
+
+                    for (let member of members) {
+                      overridePlayer(memberMap, member);
+                    }
                   })
                   .catch((error) => {
                     console.error(error);
                     return {};
                   });
+    }
+
+    function makeMemberMapByTag(clanMembers) {
+      return clanMembers.reduce((memberMap, member) => {
+        memberMap[member.tag] = member
+        return memberMap
+      }, {});
     }
 
     function renderEquipments(heroElement, equipments) {
@@ -200,9 +205,7 @@
       if (!heroes) return;
 
       for (const hero of heroes) {
-        setTimeout(() => {
-          renderHero(memberHtml, hero);
-        }, 0)
+        renderHero(memberHtml, hero);
       }
     }
 
@@ -226,9 +229,6 @@
 
       const cardBackElement = memberHtml.querySelector('.card-back');
       cardBackElement.appendChild(innerSectionElement);
-
-      // 로딩바 제거
-      cardBackElement.querySelector('.loader-circle').remove();
     }
 
     function renderImgIcon(contentsElement, icon) {
@@ -275,26 +275,16 @@
       cardBackElement.appendChild(innerSectionElement);
     }
 
-    async function renderPlayerDetail(memberHtml, tag) {
-      fetchPlayer(tag).then((player) => {
-        renderHeroes(memberHtml, player);
-        renderHeroEquipments(memberHtml, player);
-        renderPets(memberHtml, player);
-      })
-
-    }
-
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
-      const loaderElement = document.querySelector('.clan-members .loader-circle.list');
 
       const memberTemplate = document.querySelector('#member');
-      let no = clanMembersElement.children.length;
-      for(const member of members) {
+      let no = clanMembersElement.children.length + 1;
+      for(const player of members) {
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = member
+        const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/, `${no}. ${name}`)
@@ -309,36 +299,17 @@
         const { iconUrls } = league
         leagueIconImg.src = iconUrls.tiny;
 
-        clanMembersElement.insertBefore(memberHtml, loaderElement);
+        clanMembersElement.appendChild(memberHtml);
         no++;
 
-        setTimeout(() => {
-          renderPlayerDetail(memberHtml, tag);
-        }, 0)
+        renderHeroes(memberHtml, player);
+        renderHeroEquipments(memberHtml, player);
+        renderPets(memberHtml, player);
       }
     }
 
     window.onload = () => {
-      getClanMembers()
-
-      document.querySelector('.clan-members')
-              .addEventListener("scroll", (event) => {
-                const scrollHeight = event.currentTarget.scrollHeight;
-                const scrollPosition = event.currentTarget.scrollTop + event.currentTarget.clientHeight;
-
-                if (scrollPosition + 5 >= scrollHeight) {
-                  if (!drawMembers.length) {
-                    // 모두 표시된 경우
-                    const loaderElement = document.querySelector('.clan-members .loader-circle.list');
-                    loaderElement.classList.add('display-none');
-                    return;
-                  }
-
-                  setTimeout(() => {
-                    drawPagingMembers(drawMembers);
-                  }, 500)
-                }
-              })
+      getClanMembers();
     }
   </script>
 </head>
@@ -362,22 +333,7 @@
     </div>
 
 
-    <div class="clan-members">
-      <div class="loader-circle list">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-        <div class="bar4"></div>
-        <div class="bar5"></div>
-        <div class="bar6"></div>
-        <div class="bar7"></div>
-        <div class="bar8"></div>
-        <div class="bar9"></div>
-        <div class="bar10"></div>
-        <div class="bar11"></div>
-        <div class="bar12"></div>
-      </div>
-    </div>
+    <div class="clan-members"></div>
   </div>
 </body>
 <template id="member">
@@ -414,22 +370,7 @@
       </div>
       <div class="inner-section heroes"></div>
     </div>
-    <div class="card-back">
-      <div class="loader-circle">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-        <div class="bar4"></div>
-        <div class="bar5"></div>
-        <div class="bar6"></div>
-        <div class="bar7"></div>
-        <div class="bar8"></div>
-        <div class="bar9"></div>
-        <div class="bar10"></div>
-        <div class="bar11"></div>
-        <div class="bar12"></div>
-      </div>
-    </div>
+    <div class="card-back"></div>
   </div>
 </template>
 <template id="inner-section">

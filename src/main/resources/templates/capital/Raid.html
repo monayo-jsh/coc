@@ -31,16 +31,17 @@
     }
 
   function callApp(element) {
-      if (element.classList.contains("dim")) {
-        // 종료된 경우
-        return;
-      }
+      const card = element.closest('div.card');
+      // if (card.classList.contains("dim")) {
+      //   // 종료된 경우
+      //   return;
+      // }
 
       if (!confirm("게임을 실행하시겠습니까?")) {
         return;
       }
 
-      const { dataset } = element;
+      const { dataset } = card;
       const { clanTag } = dataset;
 
       location.href = `clashofclans://action=OpenClanProfile&tag=${clanTag}`;

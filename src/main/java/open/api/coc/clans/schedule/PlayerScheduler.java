@@ -1,6 +1,5 @@
 package open.api.coc.clans.schedule;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +39,7 @@ public class PlayerScheduler {
         for (Clan clan : clans) {
             try {
                 fetchedClanMembers(clan);
-                log.info("{} is cache completed", clan.getName());
+                log.debug("{} is cache completed", clan.getName());
             } catch (Exception e) {
                 log.info("{} is clan search failed.. ", clan.getName());
             }

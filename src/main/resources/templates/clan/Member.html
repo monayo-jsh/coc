@@ -122,6 +122,10 @@
   function drawMember(members) {
     showWifiLoading('.clan-members');
     setTimeout(() => {
+      //스크롤 상단 이동
+      document.querySelector('.clan-members').scrollTo({
+        top: 0
+      })
       clearClanMembers();
       renderMembers(members);
       hideWifiLoading('.clan-members');

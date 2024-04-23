@@ -1,7 +1,6 @@
-package open.api.coc.external.coc.clan.config;
+package open.api.coc.external.coc.config;
 
 import lombok.RequiredArgsConstructor;
-import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/css/common.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
@@ -11,13 +12,66 @@
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
   <link rel="stylesheet" href="/static/css/pet.css" />
 
-  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
+  <script>
+    dayjs.locale('ko')
+  </script>
   <title>클랜원 현황</title>
 
   <script>
-    function cardClick(e, event) {
+    function filterVillage(array, village = 'home') {
+      return array.filter(data => data.village === village);
+    }
+
+    function convertArrayToMap(array) {
+      return filterVillage(array).reduce((map, row) => {
+        map[row.name] = row.level
+        return map
+      }, {});
+    }
+
+    function formattedPlayers(players) {
+      return players.map(player => {
+        const heroMap = convertArrayToMap(player.heroes);
+        const heroEquipmentMap = convertArrayToMap(player.heroEquipments);
+        const petMap = convertArrayToMap(player.pets);
+        return {
+          '클랜': player.clan.name,
+          '이름': player.name,
+          '태그': player.tag,
+          '타운홀': player.townHallLevel,
+          '경험치레벨': player.expLevel,
+          '현재 트로피': player.trophies,
+          '최고 트로피': player.bestTrophies,
+          '전쟁획득별': player.warStars,
+          '지원수': player.donations,
+          '지원받은수': player.donationsReceived,
+          '시즌 공격수': player.attackWins,
+          '시즌 방어수': player.defenseWins,
+          '영웅합': player.heroLevelSum,
+          ...heroMap,
+          ...heroEquipmentMap,
+          ...petMap,
+        };
+      })
+    }
+
+    function exportExcel() {
+      const players = formattedPlayers(members);
+
+      const workbook = XLSX.utils.book_new();
+      const worksheet = XLSX.utils.json_to_sheet(players);
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
+      const fileName = `클랜원_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    }
+
+  function cardClick(e, event) {
       event.preventDefault();
       event.stopPropagation();
 
@@ -73,94 +127,155 @@
              return [];
            });
     }
-    function getRequestClanMembersByClan(clan) {
-      const uri = `/clans/${encodeURIComponent(clan.tag)}/members`
-      return axios.get(uri,
-          {
-            params: {
-              clan: JSON.stringify(clan)
-            }
-          });
-    }
 
-    async function fetchClanMembers(clans) {
-      const requests = clans.map(clan => getRequestClanMembersByClan(clan))
+  function deviceArray(array, size) {
+      const result = [];
+      for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
+      }
+      return result;
+  }
 
-      let members = [];
+  function makeClanMemberRequest(clans) {
+    const uri = `/clans/members?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
+    return axios.get(uri);
+  }
+
+  async function fetchClanMembers(clans) {
+      const requests = deviceArray(clans, clans.length/2).map(makeClanMemberRequest);
+
+      let allClanMembers = [];
       await axios.all(requests)
                  .then((responses) => {
                    responses.forEach((response) => {
-                     const { config, data } = response
-                     if (data.members) {
-                       // set clan
-                       const clan = JSON.parse(config.params.clan)
-                       data.members.forEach((member) => member.clan = clan)
 
-                       // concat member
-                       members = members.concat(data.members);
-                     }
-                   })
+                     const { data } = response;
+                     data.forEach((response) => {
+                       const { clanTag, members } = response
+                       if (members) {
+                         // concat member
+                         allClanMembers = allClanMembers.concat(members);
+                       }
+                     })
+
+                   });
                  })
                  .catch((error) => {
                    console.error(error)
                  })
 
-      return members;
+      return allClanMembers;
     }
 
     function sortByTrophies(members) {
+      // 트로피 순 > 이름 순
       return members.map(member => member)
-                    .sort(function (a, b) {
-                      if (a.trophies < b.trophies) {
-                        return 1;
-                      }
-                      if (a.trophies > b.trophies) {
-                        return -1;
-                      }
-                      // a must be equal to b
-                      return 0;
-                    });
+                    .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
     }
 
-    // 화면에서 페이징 구성 처리
+  function sortByHeroLevelSum(members) {
+    // 웅합 순 > 트로피 순
+    return members.map(member => member)
+                  .sort((a, b) => b.heroLevelSum - a.heroLevelSum || b.trophies - a.trophies);
+  }
+
+    // 사용자 목록
     const members = []
-    let drawMembers;
 
-    function drawPagingMembers(members) {
-      const PER_PAGE = 10;
-      const writeMembers = members.splice(0, PER_PAGE);
-      renderMembers(writeMembers)
+  function clearClanMembers() {
+    const clanMembers = document.querySelector('.clan-members');
+    clanMembers.innerHTML = '';
+  }
 
-    }
+  function drawMember(members) {
+    showWifiLoading('.clan-members');
+    setTimeout(() => {
+      //스크롤 상단 이동
+      document.querySelector('.clan-members').scrollTo({
+        top: 0
+      })
+      clearClanMembers();
+      renderMembers(members);
+      hideWifiLoading('.clan-members');
+    }, 500);
+  }
 
+  function renderMemberSortByTrophies() {
+    const sortedMembers = sortByTrophies(members);
+    drawMember(sortedMembers);
+  }
+
+  function rederMemberSortByHeroLevelSum() {
+    const sortedMembers = sortByHeroLevelSum(members);
+    drawMember(sortedMembers)
+  }
     async function getClanMembers() {
-      showWifiLoading('.content-wrapper');
+      showWifiLoading('.clan-members');
       let clans = await requestClans();
 
-      members.push(... await fetchClanMembers(clans));
-      hideWifiLoading('.content-wrapper');
+      const clanMembers = await fetchClanMembers(clans);
+      members.push(...clanMembers);
 
-      drawMembers = sortByTrophies(members)
+      await fetchPlayerDetail(members);
+      hideWifiLoading('.clan-members');
 
-      drawPagingMembers(drawMembers);
+      renderMemberSortByTrophies();
     }
 
-    function fetchPlayer(tag) {
-      const uri = `/players/${encodeURIComponent(tag)}`;
+    function calcHeroLevelSum(heroes) {
+      if (!heroes) return 0;
+      return heroes.filter(hero => hero.village === 'home')
+                   .reduce((levelSum, hero) => {
+                     levelSum += hero.level
+                     return levelSum
+                   }, 0)
+    }
 
-      return axios.get(uri)
-                  .then((response) => {
-                    const { data } = response
-                    if (!data) {
-                      return {};
-                    }
+    function overridePlayer(memberMap, member) {
+      let fetchMember = memberMap[member.tag]
+      if (fetchMember) {
+        fetchMember = Object.assign(fetchMember, member)
 
-                    return data;
+        fetchMember.heroLevelSum = calcHeroLevelSum(fetchMember.heroes);
+
+        Object.assign(member, fetchMember); //member override
+      }
+
+    }
+
+  function makePlayerRequest(players) {
+    const uri = `/players?playerTags=${encodeURIComponent(players.map(player => player.tag))}`
+    return axios.get(uri);
+  }
+
+  async function fetchPlayerDetail(members) {
+      const requests = deviceArray(members, members.length/3).map(makePlayerRequest);
+      return await axios.all(requests)
+                  .then((responses) => {
+                    responses.forEach((response) => {
+                      const { data } = response
+                      if (!data) {
+                        return;
+                      }
+
+                      const memberMap = makeMemberMapByTag(data);
+
+                      for (let member of members) {
+                        overridePlayer(memberMap, member);
+                      }
+                    })
                   })
                   .catch((error) => {
                     console.error(error);
                     return {};
                   });
+    }
+
+    function makeMemberMapByTag(clanMembers) {
+      return clanMembers.reduce((memberMap, member) => {
+        memberMap[member.tag] = member
+        return memberMap
+      }, {});
     }
 
     function renderEquipments(heroElement, equipments) {
@@ -177,7 +292,7 @@
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
 
-      const heroesElement = memberHtml.querySelector('.inner-section.heroes');
+      const heroesElement = memberHtml.querySelector('.inner-section .heroes');
       const memberHeroTemplate = document.querySelector('#member-hero');
       const memberHero = document.importNode(memberHeroTemplate.content, true);
       const heroElement = memberHero.querySelector('.hero');
@@ -200,9 +315,7 @@
       if (!heroes) return;
 
       for (const hero of heroes) {
-        setTimeout(() => {
-          renderHero(memberHtml, hero);
-        }, 0)
+        renderHero(memberHtml, hero);
       }
     }
 
@@ -226,9 +339,6 @@
 
       const cardBackElement = memberHtml.querySelector('.card-back');
       cardBackElement.appendChild(innerSectionElement);
-
-      // 로딩바 제거
-      cardBackElement.querySelector('.loader-circle').remove();
     }
 
     function renderImgIcon(contentsElement, icon) {
@@ -275,26 +385,16 @@
       cardBackElement.appendChild(innerSectionElement);
     }
 
-    async function renderPlayerDetail(memberHtml, tag) {
-      fetchPlayer(tag).then((player) => {
-        renderHeroes(memberHtml, player);
-        renderHeroEquipments(memberHtml, player);
-        renderPets(memberHtml, player);
-      })
-
-    }
-
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
-      const loaderElement = document.querySelector('.clan-members .loader-circle.list');
 
       const memberTemplate = document.querySelector('#member');
-      let no = clanMembersElement.children.length;
-      for(const member of members) {
+      let no = clanMembersElement.children.length + 1;
+      for(const player of members) {
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { name, tag, clan, townHallLevel, expLevel, league, trophies, donations, donationsReceived } = member
+        const { name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/, `${no}. ${name}`)
@@ -302,6 +402,8 @@
                                          .replace(/{TROPHIES}/, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
                                          .replace(/{EXP_LEVEL}/, expLevel)
+                                         .replace(/{HERO_LEVEL}/, heroLevelSum)
+                                         .replace(/{IS_HERO_MAX_LEVEL}/, heroLevelSum === 305 ? 'is-max' : '')
                                          .replace(/{DONATIONS}/, Number(donations).toLocaleString())
                                          .replace(/{DONATIONS_RECEIVED}/, Number(donationsReceived).toLocaleString());
 
@@ -309,36 +411,17 @@
         const { iconUrls } = league
         leagueIconImg.src = iconUrls.tiny;
 
-        clanMembersElement.insertBefore(memberHtml, loaderElement);
+        clanMembersElement.appendChild(memberHtml);
         no++;
 
-        setTimeout(() => {
-          renderPlayerDetail(memberHtml, tag);
-        }, 0)
+        renderHeroes(memberHtml, player);
+        renderHeroEquipments(memberHtml, player);
+        renderPets(memberHtml, player);
       }
     }
 
     window.onload = () => {
-      getClanMembers()
-
-      document.querySelector('.clan-members')
-              .addEventListener("scroll", (event) => {
-                const scrollHeight = event.currentTarget.scrollHeight;
-                const scrollPosition = event.currentTarget.scrollTop + event.currentTarget.clientHeight;
-
-                if (scrollPosition + 5 >= scrollHeight) {
-                  if (!drawMembers.length) {
-                    // 모두 표시된 경우
-                    const loaderElement = document.querySelector('.clan-members .loader-circle.list');
-                    loaderElement.classList.add('display-none');
-                    return;
-                  }
-
-                  setTimeout(() => {
-                    drawPagingMembers(drawMembers);
-                  }, 500)
-                }
-              })
+      getClanMembers();
     }
   </script>
 </head>
@@ -361,23 +444,29 @@
       <div class="text" data-text="Searching"></div>
     </div>
 
+    <div class="support-area">
+      <div class="container">
+        <div class="radio-tile-group">
+          <div class="input-container">
+            <input id="trophies" class="radio-button" type="radio" name="radio" checked onchange="renderMemberSortByTrophies();">
+            <div class="radio-tile">
+              <div class="icon trophies"></div>
+              <label for="trophies" class="radio-tile-label">트로피순</label>
+            </div>
+          </div>
 
-    <div class="clan-members">
-      <div class="loader-circle list">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-        <div class="bar4"></div>
-        <div class="bar5"></div>
-        <div class="bar6"></div>
-        <div class="bar7"></div>
-        <div class="bar8"></div>
-        <div class="bar9"></div>
-        <div class="bar10"></div>
-        <div class="bar11"></div>
-        <div class="bar12"></div>
+          <div class="input-container">
+            <input id="hero-level-sum" class="radio-button" type="radio" name="radio" onchange="rederMemberSortByHeroLevelSum();">
+            <div class="radio-tile">
+              <div class="icon hero barbarian_king"></div>
+              <label for="hero-level-sum" class="radio-tile-label">웅합순</label>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
+    <div class="clan-members"></div>
   </div>
 </body>
 <template id="member">
@@ -412,24 +501,14 @@
           </div>
         </div>
       </div>
-      <div class="inner-section heroes"></div>
-    </div>
-    <div class="card-back">
-      <div class="loader-circle">
-        <div class="bar1"></div>
-        <div class="bar2"></div>
-        <div class="bar3"></div>
-        <div class="bar4"></div>
-        <div class="bar5"></div>
-        <div class="bar6"></div>
-        <div class="bar7"></div>
-        <div class="bar8"></div>
-        <div class="bar9"></div>
-        <div class="bar10"></div>
-        <div class="bar11"></div>
-        <div class="bar12"></div>
+      <div class="inner-section hero-wrapper">
+        <div class="label">
+          <div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div>
+        </div>
+        <div class="heroes"></div>
       </div>
     </div>
+    <div class="card-back"></div>
   </div>
 </template>
 <template id="inner-section">

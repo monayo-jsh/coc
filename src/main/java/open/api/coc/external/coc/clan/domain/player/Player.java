@@ -4,10 +4,13 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import open.api.coc.external.coc.clan.domain.common.Clan;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 
+@ToString
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,6 +29,8 @@ public class Player {
     private Integer defenseWins;
 
     private Integer warStars;
+
+    private Clan clan;
 
     private List<Hero> heroes;
     private List<HeroEquipment> heroEquipment;

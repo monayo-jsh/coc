@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/css/common.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
@@ -74,20 +75,37 @@
            });
     }
 
-    async function fetchClanMembers(clans) {
-      const uri = `/clans/members?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
+  function deviceArray(array, size) {
+      const result = [];
+      for (let i = 0; i < array.length; i += size) {
+        result.push(array.slice(i, i + size));
+      }
+      return result;
+  }
+
+  function makeClanMemberRequest(clans) {
+    const uri = `/clans/members?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
+    return axios.get(uri);
+  }
+
+  async function fetchClanMembers(clans) {
+      const requests = deviceArray(clans, clans.length/2).map(makeClanMemberRequest);
 
       let allClanMembers = [];
-      await axios.get(uri)
-                 .then((response) => {
-                   const { data } = response;
-                   data.forEach((response) => {
-                     const { clanTag, members } = response
-                     if (members) {
-                       // concat member
-                       allClanMembers = allClanMembers.concat(members);
-                     }
-                   })
+      await axios.all(requests)
+                 .then((responses) => {
+                   responses.forEach((response) => {
+
+                     const { data } = response;
+                     data.forEach((response) => {
+                       const { clanTag, members } = response
+                       if (members) {
+                         // concat member
+                         allClanMembers = allClanMembers.concat(members);
+                       }
+                     })
+
+                   });
                  })
                  .catch((error) => {
                    console.error(error)
@@ -172,20 +190,27 @@
 
     }
 
-    async function fetchPlayerDetail(members) {
-      const uri = `/players?playerTags=${encodeURIComponent(members.map(member => member.tag))}`;
-      return await axios.get(uri)
-                  .then((response) => {
-                    const { data } = response
-                    if (!data) {
-                      return;
-                    }
+  function makePlayerRequest(players) {
+    const uri = `/players?playerTags=${encodeURIComponent(players.map(player => player.tag))}`
+    return axios.get(uri);
+  }
 
-                    const memberMap = makeMemberMapByTag(data);
+  async function fetchPlayerDetail(members) {
+      const requests = deviceArray(members, members.length/3).map(makePlayerRequest);
+      return await axios.all(requests)
+                  .then((responses) => {
+                    responses.forEach((response) => {
+                      const { data } = response
+                      if (!data) {
+                        return;
+                      }
 
-                    for (let member of members) {
-                      overridePlayer(memberMap, member);
-                    }
+                      const memberMap = makeMemberMapByTag(data);
+
+                      for (let member of members) {
+                        overridePlayer(memberMap, member);
+                      }
+                    })
                   })
                   .catch((error) => {
                     console.error(error);

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("players")
+@RequestMapping("/players")
 public class PlayersController {
 
     private final PlayersService playersService;
@@ -24,7 +24,7 @@ public class PlayersController {
                              .body(playersService.findPlayerBy(playerTags));
     }
 
-    @GetMapping("{playerTag}")
+    @GetMapping("/{playerTag}")
     public ResponseEntity<PlayerResponse> getPlayer(@PathVariable String playerTag) {
         return ResponseEntity.ok()
                              .body(playersService.findPlayerBy(playerTag));

@@ -73,22 +73,19 @@
              return [];
            });
     }
-    function getRequestClanMembersByClan(clan) {
-      const uri = `/clans/${encodeURIComponent(clan.tag)}/members`
-      return axios.get(uri);
-    }
 
     async function fetchClanMembers(clans) {
-      const requests = clans.map(clan => getRequestClanMembersByClan(clan))
+      const uri = `/clans/members?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
 
-      let members = [];
-      await axios.all(requests)
-                 .then((responses) => {
-                   responses.forEach((response) => {
-                     const { config, data } = response
-                     if (data.members) {
+      let allClanMembers = [];
+      await axios.get(uri)
+                 .then((response) => {
+                   const { data } = response;
+                   data.forEach((response) => {
+                     const { clanTag, members } = response
+                     if (members) {
                        // concat member
-                       members = members.concat(data.members);
+                       allClanMembers = allClanMembers.concat(members);
                      }
                    })
                  })
@@ -96,7 +93,7 @@
                    console.error(error)
                  })
 
-      return members;
+      return allClanMembers;
     }
 
     function sortByTrophies(members) {

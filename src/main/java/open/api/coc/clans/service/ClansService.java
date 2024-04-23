@@ -69,7 +69,9 @@ public class ClansService {
         ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)
                                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 사용자 조회 실패"));
 
-        return clanMemberListResConverter.convert(clanMemberList);
+        ClanMemberListRes clanMemberListRes = clanMemberListResConverter.convert(clanMemberList);
+        clanMemberListRes.setClanTag(clanTag);
+        return clanMemberListRes;
     }
 
     public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {
@@ -84,5 +86,12 @@ public class ClansService {
         ClanCapitalRaidSeason clanCapitalRaidSeason = clanCapitalRaidSeasons.getItemWithMembers();
 
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
+    }
+
+    public List<ClanMemberListRes> findClanMembersByClanTags(List<String> clanTags) {
+        return clanTags.stream()
+                       .parallel()
+                       .map(this::findClanMembersByClanTag)
+                       .collect(Collectors.toList());
     }
 }

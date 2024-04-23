@@ -12,11 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("clans")
+@RequestMapping("/clans")
 public class ClansController {
 
     private final ClansService clansService;
@@ -39,25 +40,31 @@ public class ClansController {
                              .body(clansService.getClanCaptialList());
     }
 
-    @GetMapping("{clanTag}")
+    @GetMapping("/members")
+    public ResponseEntity<List<ClanMemberListRes>> getClanMembersByClanTags(@RequestParam List<String> clanTags) {
+        List<ClanMemberListRes> clanMemberLists = clansService.findClanMembersByClanTags(clanTags);
+        return ResponseEntity.ok().body(clanMemberLists);
+    }
+
+    @GetMapping("/{clanTag}")
     public ResponseEntity<?> findClan(@PathVariable String clanTag) {
         Map<String, Object> clan = clansService.findClanByClanTag(clanTag);
         return ResponseEntity.ok().body(clan);
     }
 
-    @GetMapping("{clanTag}/members")
+    @GetMapping("/{clanTag}/members")
     public ResponseEntity<ClanMemberListRes> getClanMembers(@PathVariable String clanTag) {
         ClanMemberListRes clanMemberList = clansService.findClanMembersByClanTag(clanTag);
         return ResponseEntity.ok().body(clanMemberList);
     }
 
-    @GetMapping("{clanTag}/current/war")
+    @GetMapping("/{clanTag}/current/war")
     public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {
         ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);
         return ResponseEntity.ok().body(clanCurrentWar);
     }
 
-    @GetMapping("{clanTag}/capital/raid/seasons")
+    @GetMapping("/{clanTag}/capital/raid/seasons")
     public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {
         ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);

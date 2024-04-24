@@ -3,6 +3,7 @@ package open.api.coc.external.coc.clan.domain.clan;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.external.coc.clan.domain.common.Label;
 
 @Getter
 @NoArgsConstructor
@@ -15,7 +16,7 @@ public class ClanMember {
     private Integer townHallLevel;
     private Integer expLevel;
 
-    private League league;
+    private Label league;
     private Integer trophies;
     private Integer clanRank;
     private Integer previousClanRank;

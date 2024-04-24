@@ -7,10 +7,10 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class LeagueRes {
+public class LabelResponse {
 
     private Integer id;
     private String name;
-    private IconUrlRes iconUrls;
+    private IconUrlResponse iconUrls;
 
 }

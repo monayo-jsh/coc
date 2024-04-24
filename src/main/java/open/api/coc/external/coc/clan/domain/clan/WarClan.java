@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.external.coc.clan.domain.common.IconUrl;
 
 @Getter
 @NoArgsConstructor

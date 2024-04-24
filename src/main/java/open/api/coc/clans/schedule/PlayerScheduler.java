@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,10 @@ public class PlayerScheduler {
         for (Clan clan : clans) {
             try {
                 fetchedClanMembers(clan);
-                log.debug("{} is cache completed", clan.getName());
+                log.info("{} is cache completed", clan.getName());
+
+                // clash of clan API endpoint Too Many Requests Limit 대응
+                Thread.sleep(TimeUnit.SECONDS.toMillis(1));
             } catch (Exception e) {
                 log.info("{} is clan search failed.. ", clan.getName());
             }

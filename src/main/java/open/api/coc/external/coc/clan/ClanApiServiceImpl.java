@@ -1,10 +1,10 @@
 package open.api.coc.external.coc.clan;
 
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.player.Player;
@@ -22,11 +22,11 @@ public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanAp
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
     @Override
-    @SuppressWarnings("unchecked")
-    public Map<String, Object> findClanByClanTag(String clanTag) {
-        return restClient.get().uri(clashOfClanConfig.getClansClanTagUri(), clanTag)
-                         .retrieve()
-                         .body(Map.class);
+    public Optional<Clan> findClanByClanTag(String clanTag) {
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getClansClanTagUri(), clanTag)
+                                             .retrieve()
+                                             .body(Clan.class));
     }
 
     @Override

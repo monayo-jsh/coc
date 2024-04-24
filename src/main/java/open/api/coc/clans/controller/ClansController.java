@@ -1,12 +1,11 @@
 package open.api.coc.clans.controller;
 
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanRes;
+import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,19 +22,19 @@ public class ClansController {
     private final ClansService clansService;
 
     @GetMapping("")
-    public ResponseEntity<List<ClanRes>> getClans() {
+    public ResponseEntity<List<ClanResponse>> getClans() {
         return ResponseEntity.ok()
                              .body(clansService.getClanResList());
     }
 
     @GetMapping("/war")
-    public ResponseEntity<List<ClanRes>> getClansWar() {
+    public ResponseEntity<List<ClanResponse>> getClansWar() {
         return ResponseEntity.ok()
                              .body(clansService.getClanWarResList());
     }
 
     @GetMapping("/capital")
-    public ResponseEntity<List<ClanRes>> getClansCapital() {
+    public ResponseEntity<List<ClanResponse>> getClansCapital() {
         return ResponseEntity.ok()
                              .body(clansService.getClanCaptialList());
     }
@@ -47,8 +46,8 @@ public class ClansController {
     }
 
     @GetMapping("/{clanTag}")
-    public ResponseEntity<?> findClan(@PathVariable String clanTag) {
-        Map<String, Object> clan = clansService.findClanByClanTag(clanTag);
+    public ResponseEntity<ClanResponse> findClan(@PathVariable String clanTag) {
+        ClanResponse clan = clansService.findClanByClanTag(clanTag);
         return ResponseEntity.ok().body(clan);
     }
 

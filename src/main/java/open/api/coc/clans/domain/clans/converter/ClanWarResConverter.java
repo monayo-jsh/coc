@@ -16,8 +16,8 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
 
-    private final IconUrlResConverter iconUrlResConverter;
-    private final ClanWarMemberResConverter clanWarMemberResConverter;
+    private final IconUrlResponseConverter iconUrlResConverter;
+    private final ClanWarMemberResponseConverter clanWarMemberResponseConverter;
 
     @Override
     public ClanWarRes convert(WarClan source) {
@@ -35,7 +35,7 @@ public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
     private List<ClanWarMemberRes> makeMembers(List<ClanWarMember> members) {
         if (CollectionUtils.isEmpty(members)) return Collections.emptyList();
         return members.stream()
-                      .map(clanWarMemberResConverter::convert)
+                      .map(clanWarMemberResponseConverter::convert)
                       .collect(Collectors.toList());
     }
 

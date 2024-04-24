@@ -27,7 +27,7 @@ public class PlayerResponse {
 
     private Integer warStars;
 
-    private ClanResponse clan;
+    private PlayerClanResponse clan;
 
     private List<HeroResponse> heroes;
     private List<HeroEquipmentResponse> heroEquipments;

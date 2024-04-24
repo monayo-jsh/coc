@@ -12,7 +12,7 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class ClanMemberListResConverter implements Converter<ClanMemberList, ClanMemberListRes> {
 
-    private final ClanMemberResConverter clanMemberResConverter;
+    private final ClanMemberResponseConverter clanMemberResponseConverter;
 
     @Override
     public ClanMemberListRes convert(ClanMemberList source) {
@@ -22,7 +22,7 @@ public class ClanMemberListResConverter implements Converter<ClanMemberList, Cla
 
         return ClanMemberListRes.create(source.getItems()
                                               .stream()
-                                              .map(clanMemberResConverter::convert)
+                                              .map(clanMemberResponseConverter::convert)
                                               .collect(Collectors.toList()));
 
     }

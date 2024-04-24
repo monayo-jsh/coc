@@ -8,7 +8,7 @@ import java.util.Objects;
 import lombok.Getter;
 
 @Getter
-public enum Clan {
+public enum AcademeClan {
 
     CLAN_ACADEME("#2QJUL08V9", "아카데미", 1),
     CLAN_ACADEME_2("#2QG0G20RR", "아카데미 2.0", 2),
@@ -32,21 +32,21 @@ public enum Clan {
     private final String name;
     private final int order;
 
-    Clan(String tag, String name, int order) {
+    AcademeClan(String tag, String name, int order) {
         this.tag = tag;
         this.name = name;
         this.order = order;
 
     }
 
-    public static Clan findByTag(String findTag) {
+    public static AcademeClan findByTag(String findTag) {
         return Arrays.stream(values())
                      .filter(clan -> Objects.equals(clan.getTag(), findTag))
                      .findFirst()
                      .orElseThrow(() -> createNotFoundException("클랜태그 일치하는 클랜 정의 찾지 못함"));
     }
 
-    public static List<Clan> getClanList() {
+    public static List<AcademeClan> getClanList() {
         return List.of(
             CLAN_ACADEME,
             CLAN_ACADEME_2,
@@ -64,7 +64,7 @@ public enum Clan {
         );
     }
 
-    public static List<Clan> getClanWarList() {
+    public static List<AcademeClan> getClanWarList() {
         return List.of(
             CLAN_ACADEME,
             CLAN_ACADEME_2,
@@ -75,7 +75,7 @@ public enum Clan {
         );
     }
 
-    public static List<Clan> getClanCapitalList() {
+    public static List<AcademeClan> getClanCapitalList() {
         return List.of(
             CLAN_ACADEME,
             CLAN_ACADEME_2,
@@ -85,13 +85,4 @@ public enum Clan {
         );
     }
 
-    public static List<String> getCapitalClanTagList() {
-        return List.of(
-            CLAN_ACADEME.getTag(),
-            CLAN_ACADEME_2.getTag(),
-            CLAN_ACADEME_3.getTag(),
-            CLAN_ACADEME_4.getTag(),
-            ACADEME_ENG.getTag()
-        );
-    }
 }

@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ClanMemberRes {
+public class ClanMemberResponse {
 
     private String name;
     private String tag;
@@ -15,7 +15,7 @@ public class ClanMemberRes {
     private Integer townHallLevel;
     private Integer expLevel;
 
-    private LeagueRes league;
+    private LabelResponse league;
     private Integer trophies;
     private Integer clanRank;
     private Integer previousClanRank;

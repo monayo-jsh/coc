@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.common.Clan;
+import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanMember;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
@@ -35,9 +35,9 @@ public class PlayerScheduler {
 
     private void processCachingPlayers() {
 
-        List<Clan> clans = Clan.getClanList();
+        List<AcademeClan> clans = AcademeClan.getClanList();
 
-        for (Clan clan : clans) {
+        for (AcademeClan clan : clans) {
             try {
                 fetchedClanMembers(clan);
                 log.info("{} is cache completed", clan.getName());
@@ -51,7 +51,7 @@ public class PlayerScheduler {
 
     }
 
-    private List<Player> fetchedClanMembers(Clan clan)
+    private List<Player> fetchedClanMembers(AcademeClan clan)
         throws ExecutionException, InterruptedException {
         Optional<ClanMemberList> clanMembers = clanApiService.findClanMembersByClanTag(clan.getTag());
 

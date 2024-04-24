@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class League {
+public class ClanCapital {
 
-    private Integer id;
-    private String name;
-    private IconUrl iconUrls;
+    private Integer capitalHallLevel;
 
 }

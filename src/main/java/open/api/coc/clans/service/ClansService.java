@@ -1,23 +1,24 @@
 package open.api.coc.clans.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.common.Clan;
+import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanRes;
+import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
+import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Service;
@@ -29,12 +30,16 @@ public class ClansService {
 
     private final ClanApiService clanApiService;
 
+    private final ClanResponseConverter clanResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
-    public Map<String, Object> findClanByClanTag(String clanTag) {
-        return clanApiService.findClanByClanTag(clanTag);
+    public ClanResponse findClanByClanTag(String clanTag) {
+        Clan clan = clanApiService.findClanByClanTag(clanTag)
+                                  .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 조회 실패"));
+
+        return clanResponseConverter.convert(clan);
     }
 
     public ClanCurrentWarRes getClanCurrentWar(String clanTag) {
@@ -44,25 +49,25 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
 
-    public List<ClanRes> getClanResList() {
-        return Clan.getClanList()
-                   .stream()
-                   .map(ClanRes::create)
-                   .collect(Collectors.toList());
+    public List<ClanResponse> getClanResList() {
+        return AcademeClan.getClanList()
+                          .stream()
+                          .map(ClanResponse::create)
+                          .collect(Collectors.toList());
     }
 
-    public List<ClanRes> getClanWarResList() {
-        return Clan.getClanWarList()
-                   .stream()
-                   .map(ClanRes::create)
-                   .collect(Collectors.toList());
+    public List<ClanResponse> getClanWarResList() {
+        return AcademeClan.getClanWarList()
+                          .stream()
+                          .map(ClanResponse::create)
+                          .collect(Collectors.toList());
     }
 
-    public List<ClanRes> getClanCaptialList() {
-        return Clan.getClanCapitalList()
-                   .stream()
-                   .map(ClanRes::create)
-                   .collect(Collectors.toList());
+    public List<ClanResponse> getClanCaptialList() {
+        return AcademeClan.getClanCapitalList()
+                          .stream()
+                          .map(ClanResponse::create)
+                          .collect(Collectors.toList());
     }
 
     public ClanMemberListRes findClanMembersByClanTag(String clanTag) {

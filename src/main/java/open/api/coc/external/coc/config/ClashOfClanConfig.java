@@ -54,23 +54,23 @@ public class ClashOfClanConfig {
     }
 
     public String getClansClanTagUri() {
-        return getDomain() + getEndPoint().getClans().getClanTag();
+        return getEndPoint().getClans().getClanTag();
     }
 
     public String getClansClanTagCapitalRaidSeasonsUri() {
-        return getDomain() + getEndPoint().getClans().getCapitalRaidSeasons();
+        return getEndPoint().getClans().getCapitalRaidSeasons();
     }
 
     public String getClansClanTagCurrentWarUri() {
-        return getDomain() + getEndPoint().getClans().getCurrentWar();
+        return getEndPoint().getClans().getCurrentWar();
     }
 
     public String getClansClanMembersUri() {
-        return getDomain() + getEndPoint().getClans().getMembers();
+        return getEndPoint().getClans().getMembers();
     }
 
     public String getPlayerUri() {
-        return getDomain() + getEndPoint().getPlayers().getPlayer();
+        return getEndPoint().getPlayers().getPlayer();
     }
 
 }

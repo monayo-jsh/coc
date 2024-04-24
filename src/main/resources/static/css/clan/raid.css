@@ -58,6 +58,24 @@
     justify-content: center;
   }
 
+  .row.header {
+    align-items: center;
+    justify-content: center;
+
+    .league-icon {
+      height: 35px;
+    }
+
+    .clan-icon {
+      height: 35px;
+      display: flex;
+    }
+
+    .title {
+      margin-left: 5px;
+    }
+  }
+
   .row {
     margin-top: 5px;
     display: flex;
@@ -70,6 +88,10 @@
       padding: 5px;
       color: rgba(170, 222, 243, 0.721);
 
+      .league-icon {
+        height: 40px;
+      }
+
       .big-text {
         font-size: 14px;
         display: block;
@@ -77,6 +99,10 @@
 
       .regular-text {
         font-size: 12px;
+      }
+
+      .small-text {
+        font-size: 10px;
       }
     }
 

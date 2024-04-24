@@ -5,6 +5,7 @@ import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Component;
 
@@ -23,4 +24,5 @@ public interface ClanApiService {
 
     Optional<Player> fetchPlayerBy(String playerTag);
 
+    Optional<LabelList> findLeagues();
 }

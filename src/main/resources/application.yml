@@ -23,3 +23,6 @@ external:
       players:
         prefix: /v1/players
         player: /{playerTag}
+      leagues:
+        prefix: /v1
+        leagues: /leagues

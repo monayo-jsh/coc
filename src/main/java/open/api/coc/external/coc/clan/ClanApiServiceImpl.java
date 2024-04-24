@@ -7,6 +7,7 @@ import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.springframework.cache.annotation.CachePut;
@@ -17,10 +18,11 @@ import org.springframework.web.client.RestClient;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanApiService {
+public class ClanApiServiceImpl implements ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
+
     @Override
     public Optional<Clan> findClanByClanTag(String clanTag) {
         return Optional.ofNullable(restClient.get()
@@ -73,5 +75,13 @@ public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanAp
                                              .uri(clashOfClanConfig.getPlayerUri(), playTag)
                                              .retrieve()
                                              .body(Player.class));
+    }
+
+    @Override
+    public Optional<LabelList> findLeagues() {
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getLeaguesUri())
+                                             .retrieve()
+                                             .body(LabelList.class));
     }
 }

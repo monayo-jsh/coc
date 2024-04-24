@@ -20,7 +20,7 @@ public class ClashOfClanConfig {
 
         private final Clans clans;
         private final Players players;
-
+        private final Leagues leagues;
 
         @RequiredArgsConstructor
         private static class Clans {
@@ -51,6 +51,16 @@ public class ClashOfClanConfig {
                 return prefix + player;
             }
         }
+
+        @RequiredArgsConstructor
+        private static class Leagues {
+            private final String prefix;
+            private final String leagues;
+
+            public String getLeagues() {
+                return prefix + leagues;
+            }
+        }
     }
 
     public String getClansClanTagUri() {
@@ -71,6 +81,10 @@ public class ClashOfClanConfig {
 
     public String getPlayerUri() {
         return getEndPoint().getPlayers().getPlayer();
+    }
+
+    public String getLeaguesUri() {
+        return getEndPoint().getLeagues().getLeagues();
     }
 
 }

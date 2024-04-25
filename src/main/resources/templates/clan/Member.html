@@ -14,6 +14,7 @@
 
   <script src="/static/js/common.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
@@ -187,28 +188,48 @@
     clanMembers.innerHTML = '';
   }
 
-  function drawMember(members) {
-    showWifiLoading('.clan-members');
-    setTimeout(() => {
+    function scrollTop() {
       //스크롤 상단 이동
       document.querySelector('.clan-members').scrollTo({
         top: 0
       })
-      clearClanMembers();
-      renderMembers(members);
-      hideWifiLoading('.clan-members');
-    }, 500);
+    }
+
+    function drawMember(members) {
+    scrollTop();
+    clearClanMembers();
+    renderMembers(members);
   }
 
-  function renderMemberSortByTrophies() {
-    const sortedMembers = sortByTrophies(members);
-    drawMember(sortedMembers);
-  }
+    function getSearchKeyword() {
+      return document.querySelector('.search-input');
+    }
 
-  function rederMemberSortByHeroLevelSum() {
-    const sortedMembers = sortByHeroLevelSum(members);
-    drawMember(sortedMembers)
-  }
+    function initDisplayName(drawMembers) {
+      drawMembers.forEach((member) => member.displayName = member.name);
+    }
+
+    function renderMemberSortByTrophies(drawMembers = members) {
+      initDisplayName(drawMembers);
+      const searchKeyword = getSearchKeyword();
+      if (searchKeyword.value) {
+        drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
+      }
+
+      const sortedMembers = sortByTrophies(drawMembers);
+      drawMember(sortedMembers);
+    }
+
+    function rederMemberSortByHeroLevelSum(drawMembers = members) {
+      initDisplayName(drawMembers);
+      const searchKeyword = getSearchKeyword();
+      if (searchKeyword.value) {
+        drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
+      }
+      const sortedMembers = sortByHeroLevelSum(drawMembers);
+      drawMember(sortedMembers)
+    }
+
     async function getClanMembers() {
       showWifiLoading('.clan-members');
       let clans = await requestClans();
@@ -394,10 +415,10 @@
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
+        const { displayName, name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
-                                         .replace(/{NAME}/, `${no}. ${name}`)
+                                         .replace(/{NAME}/, `${no}. ${displayName || name}`)
                                          .replace(/{CLAN_NAME}/, clan.name)
                                          .replace(/{TROPHIES}/, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
@@ -420,8 +441,95 @@
       }
     }
 
-    window.onload = () => {
-      getClanMembers();
+    function ch2pattern(ch) {
+      const offset = 44032; /* '가'의 코드 */
+      // 한국어 음절
+      if (/[가-힣]/.test(ch)) {
+        const chCode = ch.charCodeAt(0) - offset;
+        // 종성이 있으면 문자 그대로를 찾는다.
+        if (chCode % 28 > 0) {
+          return ch;
+        }
+        const begin = Math.floor(chCode / 28) * 28 + offset;
+        const end = begin + 27;
+        return `[\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
+      }
+      // 한글 자음
+      if (/[ㄱ-ㅎ]/.test(ch)) {
+        const con2syl = {
+          'ㄱ': '가'.charCodeAt(0),
+          'ㄲ': '까'.charCodeAt(0),
+          'ㄴ': '나'.charCodeAt(0),
+          'ㄷ': '다'.charCodeAt(0),
+          'ㄸ': '따'.charCodeAt(0),
+          'ㄹ': '라'.charCodeAt(0),
+          'ㅁ': '마'.charCodeAt(0),
+          'ㅂ': '바'.charCodeAt(0),
+          'ㅃ': '빠'.charCodeAt(0),
+          'ㅅ': '사'.charCodeAt(0),
+        };
+        const begin = con2syl[ch] || ( ( ch.charCodeAt(0) - 12613 /* 'ㅅ'의 코드 */ ) * 588 + con2syl['ㅅ'] );
+        const end = begin + 587;
+        return `[${ch}\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
+      }
+      // 그 외엔 그대로 내보냄
+      // escapeRegExp는 lodash에서 가져옴
+      return _.escapeRegExp(ch);
+    }
+
+    function createFuzzyMatcher(input) {
+      const pattern = input.split('')
+                           .map(ch2pattern)
+                           .map(pattern => `(${pattern})`)
+                           .join('.*?');
+
+      return new RegExp(pattern);
+    }
+
+    function filterKeywordMatchedMembers(searchKeyword, members) {
+      const regexp = createFuzzyMatcher(searchKeyword);
+      return members.filter((member) => {
+                      return regexp.test(member.name);
+                    }).map((member) => {
+                      const displayName = member.name;
+                      member.displayName = displayName.replace(regexp, (match, ...groups) => {
+                        const letters = groups.slice(0, match.length);
+                        let lastIndex = 0;
+                        let highlighted = [];
+                        for(let i=0,l=letters.length; i < l; i++) {
+                          const idx = match.indexOf(letters[i], lastIndex);
+                          highlighted.push(match.substring(lastIndex, idx));
+                          highlighted.push(`<mark>${letters[i]}</mark>`);
+                          lastIndex = idx + 1;
+                        }
+                        return highlighted.join('');
+                      })
+                      return member;
+                    })
+    }
+
+    function refreshRenderingMembers() {
+      const sortElement = document.querySelector('input[class=radio-button]:checked');
+      switch (sortElement.id) {
+        case 'hero-level-sum':
+          rederMemberSortByHeroLevelSum();
+          return;
+        default:
+          renderMemberSortByTrophies();
+          return;
+      }
+    }
+
+    function initSearchKeyword() {
+      // search event 등록
+      const searchKeyword = getSearchKeyword();
+      searchKeyword.addEventListener('keyup', refreshRenderingMembers);
+      searchKeyword.addEventListener('search', refreshRenderingMembers);
+    }
+
+    window.onload = async () => {
+      await getClanMembers();
+      initSearchKeyword();
     }
   </script>
 </head>
@@ -445,6 +553,7 @@
     </div>
 
     <div class="support-area">
+
       <div class="container">
         <div class="radio-tile-group">
           <div class="input-container">
@@ -462,6 +571,15 @@
               <label for="hero-level-sum" class="radio-tile-label">웅합순</label>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="group">
+          <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+          <label>
+            <input placeholder="Search ..." type="search" class="search-input">
+          </label>
         </div>
       </div>
 

@@ -6,6 +6,7 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
 
   <style>
     .home-wrapper {
@@ -16,10 +17,71 @@
   </style>
 
   <script src="/static/js/common.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    async function checkClashOfClanServer() {
+      axios.get("/leagues")
+           .then((response) => {})
+           .catch((error) => {
+             const { response } = error;
+             const { status, data } = response;
+
+             let msg = 'Clash of Clan API Server\n'
+             const { reason, message } = data;
+             if (reason) {
+               msg += `\nreason: ${reason}`;
+             }
+             if (message) {
+               msg += `\nmessage: ${message}`;
+             }
+
+             msg += `\n\n위와 같은 사유로 편의기능을 제공 불가`;
+
+             const codeContainerElement = document.querySelector('#code');
+             codeContainerElement.value = msg;
+
+             const homeWrapperElement = document.querySelector('.home-wrapper');
+             homeWrapperElement.classList.add('display-none');
+
+             const errorElement = document.querySelector('.error');
+             errorElement.classList.remove('display-none');
+           })
+    }
+
+    window.onload = async () => {
+      await checkClashOfClanServer()
+    }
+  </script>
 
   <title>아카데미 클랜 편의기능</title>
 </head>
 <body>
+  <div class="error display-none">
+    <div class="card">
+      <div class="header">
+        <div class="top">
+          <div class="circle">
+            <span class="red circle2"></span>
+          </div>
+          <div class="circle">
+            <span class="yellow circle2"></span>
+          </div>
+          <div class="circle">
+            <span class="green circle2"></span>
+          </div>
+          <div class="title">
+            <p id="title2">서버 점검</p>
+          </div>
+        </div>
+      </div>
+      <div class="code-container">
+        <label for="code">
+          <textarea readonly="" name="code" id="code" class="area"></textarea>
+        </label>
+      </div>
+    </div>
+
+  </div>
   <div class="home-wrapper">
     <div class="logo"></div>
     <div class="cards">

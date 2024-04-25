@@ -10,7 +10,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
 
   <script src="/static/js/common.js"></script>
-  <script src="/static/axios/axios_v1.6.8.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>습격전 현황</title>
@@ -68,8 +68,13 @@
                           return data;
                         })
                         .catch((error) => {
-                          console.error(error)
-                          return {};
+                          console.error(error);
+                          const { response } = error;
+                          const { status } = response
+                          // 서버 이용 불가로 메인 화면 이동
+                          if (status >= 500) {
+                            location.href = "/";
+                          }
                         });
     }
 
@@ -136,8 +141,13 @@
                           return data;
                         })
                         .catch((error) => {
-                          console.error(error)
-                          return {};
+                          console.error(error);
+                          const { response } = error;
+                          const { status } = response
+                          // 서버 이용 불가로 메인 화면 이동
+                          if (status >= 500) {
+                            location.href = "/";
+                          }
                         });
     }
 
@@ -266,8 +276,13 @@
                           return data;
                         })
                         .catch((error) => {
-                          console.error(error)
-                          return [];
+                          console.error(error);
+                          const { response } = error;
+                          const { status } = response
+                          // 서버 이용 불가로 메인 화면 이동
+                          if (status >= 500) {
+                            location.href = "/";
+                          }
                         });
     }
 

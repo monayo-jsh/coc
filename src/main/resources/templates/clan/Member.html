@@ -429,15 +429,16 @@
         const { displayName, name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
-                                         .replace(/{NAME}/, `${no}. ${displayName || name}`)
-                                         .replace(/{CLAN_NAME}/, clan.name)
-                                         .replace(/{TROPHIES}/, trophies)
-                                         .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
-                                         .replace(/{EXP_LEVEL}/, expLevel)
-                                         .replace(/{HERO_LEVEL}/, heroLevelSum)
-                                         .replace(/{IS_HERO_MAX_LEVEL}/, heroLevelSum === 305 ? 'is-max' : '')
-                                         .replace(/{DONATIONS}/, Number(donations).toLocaleString())
-                                         .replace(/{DONATIONS_RECEIVED}/, Number(donationsReceived).toLocaleString());
+                                         .replace(/{NAME}/g, `${no}. ${displayName || name}`)
+                                         .replace(/{TAG}/g, tag)
+                                         .replace(/{CLAN_NAME}/g, clan.name)
+                                         .replace(/{TROPHIES}/g, trophies)
+                                         .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
+                                         .replace(/{EXP_LEVEL}/g, expLevel)
+                                         .replace(/{HERO_LEVEL}/g, heroLevelSum)
+                                         .replace(/{IS_HERO_MAX_LEVEL}/g, heroLevelSum === 305 ? 'is-max' : '')
+                                         .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
+                                         .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
 
         const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
         const { iconUrls } = league
@@ -601,10 +602,14 @@
 <template id="member">
   <div class="member row" onclick="cardClick(this, event); return false;">
     <div class="card-front">
+
       <div class="layout-title">
         <div class="cell">
           <div class="user">{NAME}</div>
-          <div class="label-clan">{CLAN_NAME}</div>
+          <div class="labels">
+            <span class="chip">{CLAN_NAME}</span>
+            <span class="chip">{TAG}</span>
+          </div>
         </div>
         <div class="cell trophies">
           <div class="count">
@@ -613,6 +618,7 @@
           </div>
         </div>
       </div>
+
       <div class="inner-section">
         <div class="layout-badge">
           <img class="cell league-icon" src="" alt="">
@@ -637,7 +643,20 @@
         <div class="heroes"></div>
       </div>
     </div>
-    <div class="card-back"></div>
+
+    <div class="card-back">
+
+      <div class="layout-title">
+        <div class="cell">
+          <div class="user">{NAME}</div>
+          <div class="labels">
+            <span class="chip">{CLAN_NAME}</span>
+            <span class="chip">{TAG}</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </template>
 <template id="inner-section">

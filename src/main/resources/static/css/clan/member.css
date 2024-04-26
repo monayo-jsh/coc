@@ -144,6 +144,16 @@
   margin-top: 5px;
 }
 
+.chip {
+  font-size: 0.5rem;
+  font-weight: bold;
+  word-break: break-all;
+  border: var(--default-border);
+  padding: 3px;
+  border-radius: 15px;
+  background: antiquewhite;
+}
+
 .member.row {
   width: 100%;
   min-width: 250px;
@@ -169,12 +179,6 @@
 
   .user {
     font-size: 1em;
-    font-weight: bold;
-    word-break: break-all;
-  }
-
-  .label-clan {
-    font-size: .7em;
     font-weight: bold;
     word-break: break-all;
   }
@@ -346,8 +350,16 @@
   overflow-y: scroll;
   scrollbar-width: none;
 
+  .layout-title {
+    .cell {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
+
   .inner-section {
-    margin: 5px 0;
+    margin-bottom: 5px;
     flex-direction: column;
     background-color: #e2e2e2;
     border-radius: 5px;

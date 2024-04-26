@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/button.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
@@ -202,10 +203,11 @@
     }
 
     function drawMember(members) {
-    scrollTop();
-    clearClanMembers();
-    renderMembers(members);
-  }
+      scrollTop();
+      clearClanMembers();
+      renderMembers(members);
+      switchCard(); //카드 앞/뒤 설정
+    }
 
     function getSearchKeyword() {
       return document.querySelector('.search-input');
@@ -369,7 +371,7 @@
         renderImgIcon(contentsElement, heroEquipment);
       }
 
-      const cardBackElement = memberHtml.querySelector('.card-back');
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
       cardBackElement.appendChild(innerSectionElement);
     }
 
@@ -413,7 +415,7 @@
         renderImgIcon(contentsElement, pet);
       }
 
-      const cardBackElement = memberHtml.querySelector('.card-back');
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
       cardBackElement.appendChild(innerSectionElement);
     }
 
@@ -426,12 +428,13 @@
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { displayName, name, tag, clan, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
+        const { displayName, name, tag, clan, role, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/g, `${no}. ${displayName || name}`)
                                          .replace(/{TAG}/g, tag)
                                          .replace(/{CLAN_NAME}/g, clan.name)
+                                         .replace(/{CLAN_ROLE}/g, convName(role))
                                          .replace(/{TROPHIES}/g, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
                                          .replace(/{EXP_LEVEL}/g, expLevel)
@@ -539,9 +542,35 @@
       searchKeyword.addEventListener('search', refreshRenderingMembers);
     }
 
+    function getSwitchCardElement() {
+      return document.querySelector('.switch-card');
+    }
+
+    function switchCard() {
+      const swatchCardElement = getSwitchCardElement();
+      const activeClassName = 'active';
+
+      const memberCardElements = document.querySelectorAll('.member.row');
+      if (swatchCardElement.checked) {
+        memberCardElements.forEach((element) => element.classList.add(activeClassName));
+
+        // 장비 보기 켜져 있으면 닫기
+        document.querySelectorAll('.hero.active')
+                .forEach((ele) => ele.classList.remove(activeClassName));
+      } else {
+        memberCardElements.forEach((element) => element.classList.remove(activeClassName));
+      }
+    }
+
+    function initSwitchCard() {
+      const switchCardElement = getSwitchCardElement();
+      switchCardElement.addEventListener('change', switchCard);
+    }
+
     window.onload = async () => {
       await getClanMembers();
       initSearchKeyword();
+      initSwitchCard();
     }
   </script>
 </head>
@@ -593,8 +622,14 @@
             <input placeholder="Search ..." type="search" class="search-input">
           </label>
         </div>
+        <div class="toggle-button-cover">
+          <div class="toggle-button">
+            <input type="checkbox" class="checkbox switch-card">
+            <div class="knobs" data-toggle-on="앞면" data-toggle-off="뒷면"></div>
+            <div class="layer"></div>
+          </div>
+        </div>
       </div>
-
     </div>
     <div class="clan-members"></div>
   </div>
@@ -607,8 +642,9 @@
         <div class="cell">
           <div class="user">{NAME}</div>
           <div class="labels">
-            <span class="chip">{CLAN_NAME}</span>
             <span class="chip">{TAG}</span>
+            <span class="chip">{CLAN_NAME}</span>
+            <span class="chip">{CLAN_ROLE}</span>
           </div>
         </div>
         <div class="cell trophies">
@@ -624,6 +660,7 @@
           <img class="cell league-icon" src="" alt="">
           <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
           <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
+          <div class="cell hero-level"><div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div></div>
         </div>
         <div class="layout-donations">
           <div class="cell donations">
@@ -637,9 +674,6 @@
         </div>
       </div>
       <div class="inner-section hero-wrapper">
-        <div class="label">
-          <div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div>
-        </div>
         <div class="heroes"></div>
       </div>
     </div>
@@ -650,12 +684,16 @@
         <div class="cell">
           <div class="user">{NAME}</div>
           <div class="labels">
-            <span class="chip">{CLAN_NAME}</span>
             <span class="chip">{TAG}</span>
+            <span class="chip">{CLAN_NAME}</span>
+            <span class="chip">{CLAN_ROLE}</span>
           </div>
         </div>
       </div>
 
+      <div class="inner-content">
+
+      </div>
     </div>
   </div>
 </template>

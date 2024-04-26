@@ -22,3 +22,14 @@ function hideWifiLoading(dimElementClassName) {
     loader.classList.add('display-none');
   }, 100)
 }
+
+function convName(role) {
+  if (!role) return role;
+  switch (role.toUpperCase()) {
+    case 'LEADER': return '대표';
+    case 'COLEADER': return '공동대표'
+    case 'ADMIN': return '장로';
+    case 'MEMBER': return '일반';
+    default: return role;
+  }
+}

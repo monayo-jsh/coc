@@ -12,10 +12,18 @@
 .support-area {
   padding: 5px;
 
+  .container:not(:first-child) {
+    margin-top: 7px;
+  }
+
   .container {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    .toggle-button-cover {
+      margin-left: 5px;
+    }
   }
 
   .radio-tile-group {
@@ -89,7 +97,6 @@
   align-items: center;
   position: relative;
   max-width: 270px;
-  margin-top: 7px;
 
   .search-input {
     width: 100%;
@@ -131,6 +138,7 @@
 }
 
 .clan-members {
+  width: 100%;
   height: 100vh;
   overflow-y: scroll;
   scrollbar-width: none;
@@ -158,8 +166,6 @@
   width: 100%;
   min-width: 250px;
   max-width: 300px;
-  min-height: 160px;
-  max-height: 250px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -205,6 +211,16 @@
       font-size: .9em;
       word-break: keep-all;
     }
+  }
+
+  .hero-level {
+
+    .level-icon {
+      position: unset;
+      width: 30px;
+      height: 30px;
+    }
+
   }
 
   .donations,
@@ -277,21 +293,11 @@
   justify-content: unset;
   align-items: center;
 
-  .label {
-
-    .level-icon {
-      position: unset;
-      width: 30px;
-      height: 30px;
-    }
-  }
-
   .heroes {
     width: 100%;
     display: flex;
-    margin-left: 5px;
 
-    .hero {
+    .hero:not(:first-child) {
       margin-left: 10px;
     }
   }
@@ -347,8 +353,12 @@
   margin: 5px;
   display: none;
   transform: rotateY(180deg);
-  overflow-y: scroll;
-  scrollbar-width: none;
+
+  .inner-content {
+    height: 160px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
 
   .layout-title {
     .cell {

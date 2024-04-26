@@ -64,6 +64,23 @@ body {
       font-size: .8em;
     }
   }
+
+  .destruction-percentage {
+    display: flex;
+    justify-content: left;
+    padding: 3px;
+    color: #fff;
+
+    .icon-damage {
+      width: 18px;
+      height: 16px;
+    }
+
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
 }
 
 .summary .clan {
@@ -114,7 +131,32 @@ body {
   .attacks {
     display: flex;
     justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
   }
+
+  .destruction-percentage {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+}
+
+.sub-summary {
+  display: flex;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #0000007a;
 }
 
 .member-attack {

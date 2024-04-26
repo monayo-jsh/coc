@@ -167,3 +167,12 @@ body::before {
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.icon-damage {
+  width: 36px;
+  height: 36px;
+  background-image: url("/static/images/etc/damage.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}

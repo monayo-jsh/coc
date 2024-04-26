@@ -186,12 +186,15 @@
                                                                             .replace(/{CLAN_STAR_COUNT}/, clan.stars)
                                                                             .replace(/{CLAN_ATTACK}/, clan.attacks)
                                                                             .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                            .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
                                                                             .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
                                                                             .replace(/{WAR_STATE}/, convWarState(state))
                                                                             .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
                                                                             .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
                                                                             .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                                                                            .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember);
+                                                                            .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                            .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                                                                            .replace(/{TEAM_SIZE}/, teamSize);
 
                    const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
                    clanIcon.src = clan.badge.small
@@ -301,6 +304,7 @@
 <template id="section-clan-war">
   <div class="card-contents">
     <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
       <div class="summary">
 
         <div class="clan">
@@ -312,6 +316,10 @@
           <div class="attacks">
             <div class="icon-sword"></div>
             <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+          </div>
+          <div class="destruction-percentage">
+            <div class="icon-damage"></div>
+            <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
           </div>
         </div>
 
@@ -342,9 +350,15 @@
             <div class="icon-sword"></div>
           </div>
 
+          <div class="destruction-percentage">
+            <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+            <div class="icon-damage"></div>
+          </div>
         </div>
 
       </div>
+
+      <div class="sub-summary">{TEAM_SIZE}인전</div>
 
       <div class="member-attack"></div>
     </div>

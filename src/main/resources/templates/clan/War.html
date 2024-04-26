@@ -6,6 +6,7 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/button.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
@@ -171,6 +172,8 @@
       });
     }
 
+    const clanWar = {}
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
@@ -203,7 +206,8 @@
                    opponentIcon.src = opponent.badge.small
 
                    let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember)
+                   memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
+                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
                  })
                  .catch((error) => {
                    console.error(error);
@@ -271,10 +275,30 @@
            });
     }
 
+    function switchAttacks(element) {
+      const memberAttackElements = element.closest('.clan-war').querySelector('.member-attack');
+
+      const { dataset } = memberAttackElements;
+      const { attacksPerMember } = dataset;
+
+      for (const memberAttack of memberAttackElements.children) {
+        if (element.checked) {
+          if (memberAttack.querySelectorAll('.attack-info:not(.not)').length === Number(attacksPerMember)) {
+            memberAttack.classList.add('display-none');
+          }
+        } else {
+          memberAttack.classList.remove('display-none');
+        }
+      }
+    }
+
+    window.onload = async () => {
+      await getClans();
+    }
   </script>
   <title>클랜전 현황</title>
 </head>
-<body onload="getClans()">
+<body>
   <section class="card-wrapper" >
     <div id="wifi-loader" class="display-none">
       <svg class="circle-outer" viewBox="0 0 86 86">
@@ -358,7 +382,20 @@
 
       </div>
 
-      <div class="sub-summary">{TEAM_SIZE}인전</div>
+      <div class="sub-summary">
+        <div class="team-size">
+          {TEAM_SIZE}인전
+        </div>
+        <div class="support-area">
+          <div class="toggle-button-cover">
+            <div class="toggle-button">
+              <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
+              <div class="knobs" data-toggle-on="전체 공격" data-toggle-off="남은 공격"></div>
+              <div class="layer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="member-attack"></div>
     </div>

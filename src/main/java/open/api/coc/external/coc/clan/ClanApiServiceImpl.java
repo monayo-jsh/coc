@@ -9,7 +9,6 @@ import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
-import open.api.coc.external.coc.clan.domain.clan.LeagueWar;
 import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
@@ -87,11 +86,11 @@ public class ClanApiServiceImpl implements ClanApiService {
     }
 
     @Override
-    public Optional<LeagueWar> findLeagueWarByRoundTag(String roundTag) {
+    public Optional<ClanWar> findLeagueWarByRoundTag(String roundTag) {
         return Optional.ofNullable(restClient.get()
                 .uri(clashOfClanConfig.getClanWarLeagueUri(), roundTag)
                 .retrieve()
-                .body(LeagueWar.class));
+                .body(ClanWar.class));
     }
 
     private Optional<Player> findPlayer(String playTag) {

@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.external.coc.clan.ClanApiService;
-import open.api.coc.external.coc.clan.domain.clan.LeagueWar;
-import open.api.coc.external.coc.clan.domain.clan.LeagueWarClan;
+import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import open.api.coc.external.coc.clan.domain.clan.WarClan;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ import java.util.*;
 public class ClanWarLeagueScheduler {
     private final ClanApiService clanApiService;
     private final ObjectMapper objectMapper;
-    private static final String RESOURCE_ROOT =  "/clanwarleague";
+    private static final String RESOURCE_ROOT =  "./src/main/resources/static/clanwarleague";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
     @Scheduled(cron = "0 30 23 1-8 * *")
@@ -41,8 +41,13 @@ public class ClanWarLeagueScheduler {
             List<String> newTags = new ArrayList<>();
             for(LinkedHashMap<String, List<String>> round : rounds) {
                 for(String roundTag : round.get("warTags")) {
+                    boolean founded = false;
                     if(!roundTag.equals("#0") && isAcademyRound(clanTag, roundTag)) {
+                        founded = true;
                         newTags.add(roundTag);
+                    }
+                    if(founded) {
+                        break;
                     }
                 }
             }
@@ -75,10 +80,10 @@ public class ClanWarLeagueScheduler {
     }
 
     private boolean isAcademyRound(String clanTag, String roundTag) {
-        Optional<LeagueWar> leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag);
+        Optional<ClanWar> leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag);
         if (leagueWar.isPresent()) {
-            LeagueWarClan clan = leagueWar.get().getClan();
-            LeagueWarClan opponent = leagueWar.get().getOpponent();
+            WarClan clan = leagueWar.get().getClan();
+            WarClan opponent = leagueWar.get().getOpponent();
             return clan.getTag().equals(clanTag) || opponent.getTag().equals(clanTag);
         }
         return false;

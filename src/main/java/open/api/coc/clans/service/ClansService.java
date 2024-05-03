@@ -49,6 +49,13 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
 
+    public ClanCurrentWarRes getLeagueWar(String clanTag, String roundTag) {
+        ClanWar leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag)
+                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "리그전 조회 실패"));
+
+        return clanCurrentWarResConverter.convert(leagueWar);
+    }
+
     public List<ClanResponse> getClanResList() {
         return AcademeClan.getClanList()
                           .stream()

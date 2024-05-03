@@ -28,9 +28,14 @@ public class ClansController {
     }
 
     @GetMapping("/war")
-    public ResponseEntity<List<ClanResponse>> getClansWar() {
+    public ResponseEntity<List<ClanResponse>> getClansWar(@RequestParam(defaultValue = "normal") String view) {
+
+        List<ClanResponse> clanWarList = clansService.getClanWarResList();
+        if ("parallel".equals(view)) {
+            clanWarList = clansService.getClanWarParallelResList();
+        }
         return ResponseEntity.ok()
-                             .body(clansService.getClanWarResList());
+                             .body(clanWarList);
     }
 
     @GetMapping("/capital")

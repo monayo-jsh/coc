@@ -20,6 +20,7 @@ public enum AcademeClan {
 
     LEAGUE_TEAM_ACADEME("#2GPGU92Q2", "TEAM Academe", 7),
     LEAGUE_TEAM_BCADEME("#2GY9YL0J9", "TEAM Bcademe", 8),
+    LEAGUE_TEAM_CCADEME("#2QJLPVPQU", "TEAM Ccademe", 9),
 
     CLAN_WAR_LEAGUE("#229V992R8", "클랜전리그", 20),
     CLAN_SIX_DRAGON("#2G9GU9PLU", "육룡이 나르샤", 21),
@@ -72,6 +73,14 @@ public enum AcademeClan {
             CLAN_ACADEME_4,
             CLAN_ACADEME_5,
             ACADEME_ENG
+        );
+    }
+
+    public static List<AcademeClan> getClanWarParallelList() {
+        return List.of(
+            LEAGUE_TEAM_BCADEME,
+            LEAGUE_TEAM_CCADEME,
+            CLAN_ACADEME_SHELTER
         );
     }
 

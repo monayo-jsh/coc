@@ -87,15 +87,19 @@
     <div class="cards">
       <div class="card red" onclick="renderPage('/clan/member'); return false;">
         <p class="tip">전체 클랜원</p>
-        <p class="second-text"></p>
-      </div>
-      <div class="card blue" onclick="renderPage('/clan/war'); return false;">
-        <p class="tip">클랜전 현황</p>
-        <p class="second-text"></p>
+        <p class="second-text">(아카데미)</p>
       </div>
       <div class="card green" onclick="renderPage('/capital/raid'); return false;">
         <p class="tip">습격전 현황</p>
         <p class="second-text">(매주 금요일 진행)</p>
+      </div>
+      <div class="card blue" onclick="renderPage('/clan/war?type=normal'); return false;">
+        <p class="tip">클랜전 현황</p>
+        <p class="second-text">(토,월,수 매칭)</p>
+      </div>
+      <div class="card coral" onclick="renderPage('/clan/war?type=parallel'); return false;">
+        <p class="tip">병행클랜전 현황</p>
+        <p class="second-text">(월초 리그전 진행)</p>
       </div>
       <div class="card violet" onclick="alert('구현 예정'); return false;">
         <p class="tip">클랜 목록</p>

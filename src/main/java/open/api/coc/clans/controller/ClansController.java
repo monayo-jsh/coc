@@ -2,6 +2,8 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
@@ -32,6 +34,12 @@ public class ClansController {
     public ResponseEntity<List<ClanRes>> getClansWar() {
         return ResponseEntity.ok()
                              .body(clansService.getClanWarResList());
+    }
+
+    @GetMapping("/league")
+    public ResponseEntity<List<ClanRes>> getClansWarLeague() {
+        return ResponseEntity.ok()
+                .body(clansService.getClanWarLeagueResList());
     }
 
     @GetMapping("/capital")
@@ -69,4 +77,5 @@ public class ClansController {
         ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
+
 }

@@ -1,5 +1,6 @@
 package open.api.coc.external.coc.clan;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.web.client.RestClient;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanApiService {
+public class ClanApiServiceImpl implements ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
@@ -68,10 +69,15 @@ public class ClanApiServiceImpl implements open.api.coc.external.coc.clan.ClanAp
         return findPlayer(playTag);
     }
 
+    @Override
+    public List<String> findClanWarLeagueRoundsTag(String clanTag) {
+        return null;
+    }
+
     private Optional<Player> findPlayer(String playTag) {
         return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
-                                             .retrieve()
-                                             .body(Player.class));
+                .uri(clashOfClanConfig.getPlayerUri(), playTag)
+                .retrieve()
+                .body(Player.class));
     }
 }

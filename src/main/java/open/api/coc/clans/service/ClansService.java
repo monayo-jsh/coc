@@ -65,6 +65,13 @@ public class ClansService {
                    .collect(Collectors.toList());
     }
 
+    public List<ClanRes> getClanWarLeagueResList() {
+        return Clan.getClanWarLeague()
+                .stream()
+                .map(ClanRes::create)
+                .toList();
+    }
+
     public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
         ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)
                                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 사용자 조회 실패"));

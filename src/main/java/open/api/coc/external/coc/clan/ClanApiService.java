@@ -1,5 +1,6 @@
 package open.api.coc.external.coc.clan;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
@@ -22,5 +23,7 @@ public interface ClanApiService {
     Optional<Player> findPlayerBy(String playerTag);
 
     Optional<Player> fetchPlayerBy(String playerTag);
+
+    List<String> findClanWarLeagueRoundsTag(String clanTag);
 
 }

@@ -21,6 +21,12 @@ public class ViewController {
         return "clan/War";
     }
 
+
+    @GetMapping("/clan/league")
+    public String viewAdmin() {
+        return "clan/League";
+    }
+
     @GetMapping("/capital/raid")
     public String viewCapitalRaid() {
         return "capital/Raid";

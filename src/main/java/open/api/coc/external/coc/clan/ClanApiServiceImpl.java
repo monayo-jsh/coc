@@ -70,11 +70,16 @@ public class ClanApiServiceImpl implements ClanApiService {
         return findPlayer(playTag);
     }
 
+    @Override
+    public List<String> findClanWarLeagueRoundsTag(String clanTag) {
+        return null;
+    }
+
     private Optional<Player> findPlayer(String playTag) {
         return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
-                                             .retrieve()
-                                             .body(Player.class));
+                .uri(clashOfClanConfig.getPlayerUri(), playTag)
+                .retrieve()
+                .body(Player.class));
     }
 
     @Override

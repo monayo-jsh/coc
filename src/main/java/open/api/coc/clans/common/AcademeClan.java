@@ -85,4 +85,32 @@ public enum AcademeClan {
         );
     }
 
+<<<<<<< HEAD:src/main/java/open/api/coc/clans/common/AcademeClan.java
+=======
+    public static List<String> getCapitalClanTagList() {
+        return List.of(
+            CLAN_ACADEME.getTag(),
+            CLAN_ACADEME_2.getTag(),
+            CLAN_ACADEME_3.getTag(),
+            CLAN_ACADEME_4.getTag(),
+            ACADEME_ENG.getTag()
+        );
+    }
+
+    public static List<Clan> getClanWarLeague() {
+        return List.of(
+                CLAN_ACADEME,
+                CLAN_ACADEME_2,
+                CLAN_ACADEME_3,
+                CLAN_ACADEME_4,
+                CLAN_ACADEME_5,
+                ACADEME_ENG,
+                LEAGUE_TEAM_ACADEME,
+                CLAN_WAR_LEAGUE,
+                CLAN_SIX_DRAGON,
+                CLAN_BAR_RICE_CAKE_HONEY,
+                CLAN_BAR_RICE_CAKE_SUGAR
+        );
+    }
+>>>>>>> refactor/restclient:src/main/java/open/api/coc/clans/common/Clan.java
 }

@@ -25,8 +25,8 @@ public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCap
     public ClanCapitalRaidSeasonResponse convert(ClanCapitalRaidSeason source) {
         return ClanCapitalRaidSeasonResponse.builder()
                                             .state(source.getState())
-                                            .startTime(toEpochMilliSecond(source.getStartTime()))
-                                            .endTime(toEpochMilliSecond(source.getEndTime()))
+                                            .startTime(ConverterUtils.toEpochMilliSecond(source.getStartTime()))
+                                            .endTime(ConverterUtils.toEpochMilliSecond(source.getEndTime()))
                                             .members(makeMembers(source.getMembers()))
                                             .build();
     }
@@ -39,12 +39,4 @@ public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCap
                       .collect(Collectors.toList());
     }
 
-    private long toEpochMilliSecond(String time) {
-        if (StringUtils.isEmpty(time)) return 0;
-
-        final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-        return ZonedDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_PATTERN))
-                            .toInstant()
-                            .toEpochMilli();
-    }
 }

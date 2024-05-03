@@ -21,20 +21,10 @@ public class ClanCurrentWarResConverter implements Converter<ClanWar, ClanCurren
                                 .state(source.getState())
                                 .teamSize(source.getTeamSize())
                                 .attacksPerMember(source.getAttacksPerMember())
-                                .startTime(toEpochMilliSecond(source.getStartTime()))
-                                .endTime(toEpochMilliSecond(source.getEndTime()))
+                                .startTime(ConverterUtils.toEpochMilliSecond(source.getStartTime()))
+                                .endTime(ConverterUtils.toEpochMilliSecond(source.getEndTime()))
                                 .clan(clanWarResConverter.convert(source.getClan()))
                                 .opponent(clanWarResConverter.convert(source.getOpponent()))
                                 .build();
     }
-
-    private long toEpochMilliSecond(String time) {
-        if (StringUtils.isEmpty(time)) return 0;
-
-        final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-        return ZonedDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_PATTERN))
-                            .toInstant()
-                            .toEpochMilli();
-    }
-
 }

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import lombok.Getter;
+import open.api.coc.external.coc.clan.domain.clan.Clan;
 
 @Getter
 public enum AcademeClan {
@@ -85,8 +86,7 @@ public enum AcademeClan {
         );
     }
 
-<<<<<<< HEAD:src/main/java/open/api/coc/clans/common/AcademeClan.java
-=======
+
     public static List<String> getCapitalClanTagList() {
         return List.of(
             CLAN_ACADEME.getTag(),
@@ -97,20 +97,19 @@ public enum AcademeClan {
         );
     }
 
-    public static List<Clan> getClanWarLeague() {
+    public static List<String> getClanWarLeagueTagList() {
         return List.of(
-                CLAN_ACADEME,
-                CLAN_ACADEME_2,
-                CLAN_ACADEME_3,
-                CLAN_ACADEME_4,
-                CLAN_ACADEME_5,
-                ACADEME_ENG,
-                LEAGUE_TEAM_ACADEME,
-                CLAN_WAR_LEAGUE,
-                CLAN_SIX_DRAGON,
-                CLAN_BAR_RICE_CAKE_HONEY,
-                CLAN_BAR_RICE_CAKE_SUGAR
+                CLAN_ACADEME.getTag(),
+                CLAN_ACADEME_2.getTag(),
+                CLAN_ACADEME_3.getTag(),
+                CLAN_ACADEME_4.getTag(),
+                CLAN_ACADEME_5.getTag(),
+                ACADEME_ENG.getTag(),
+                LEAGUE_TEAM_ACADEME.getTag(),
+                CLAN_WAR_LEAGUE.getTag(),
+                CLAN_SIX_DRAGON.getTag(),
+                CLAN_BAR_RICE_CAKE_HONEY.getTag(),
+                CLAN_BAR_RICE_CAKE_SUGAR.getTag()
         );
     }
->>>>>>> refactor/restclient:src/main/java/open/api/coc/clans/common/Clan.java
 }

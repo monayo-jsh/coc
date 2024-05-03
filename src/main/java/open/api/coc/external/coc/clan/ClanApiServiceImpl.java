@@ -1,12 +1,15 @@
 package open.api.coc.external.coc.clan;
 
-import java.util.Optional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import open.api.coc.external.coc.clan.domain.clan.LeagueWar;
 import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
@@ -15,6 +18,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +29,7 @@ public class ClanApiServiceImpl implements ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     @Override
     public Optional<Clan> findClanByClanTag(String clanTag) {
@@ -71,8 +79,19 @@ public class ClanApiServiceImpl implements ClanApiService {
     }
 
     @Override
-    public List<String> findClanWarLeagueRoundsTag(String clanTag) {
-        return null;
+    public List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException {
+        JsonNode rootNode = objectMapper.readTree(
+                restClient.get().uri(clashOfClanConfig.getClansClanTagCurrentLeagueGroupUri(), clanTag)
+                .retrieve().body(String.class));
+        return objectMapper.convertValue(rootNode.get("rounds"), List.class);
+    }
+
+    @Override
+    public Optional<LeagueWar> findLeagueWarByRoundTag(String roundTag) {
+        return Optional.ofNullable(restClient.get()
+                .uri(clashOfClanConfig.getClanWarLeagueUri(), roundTag)
+                .retrieve()
+                .body(LeagueWar.class));
     }
 
     private Optional<Player> findPlayer(String playTag) {

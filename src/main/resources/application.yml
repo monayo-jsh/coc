@@ -19,6 +19,7 @@ external:
         clan-tag: /{clanTag}
         capital-raid-seasons: /{clanTag}/capitalraidseasons
         current-war: /{clanTag}/currentwar
+        league-group: /{clanTag}/currentwar/leaguegroup
         members: /{clanTag}/members
       players:
         prefix: /v1/players
@@ -26,3 +27,6 @@ external:
       leagues:
         prefix: /v1
         leagues: /leagues
+      clanwarleagues:
+        prefix: /v1/clanwarleagues/wars
+        round-tag: /{roundTag}

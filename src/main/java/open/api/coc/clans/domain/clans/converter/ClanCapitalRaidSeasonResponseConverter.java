@@ -20,13 +20,14 @@ import org.thymeleaf.util.StringUtils;
 public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCapitalRaidSeason, ClanCapitalRaidSeasonResponse> {
 
     private final ClanCapitalRaidSeasonMemberResponseConverter clanCapitalRaidSeasonMemberResponseConverter;
+    private final TimeConverter timeConverter;
 
     @Override
     public ClanCapitalRaidSeasonResponse convert(ClanCapitalRaidSeason source) {
         return ClanCapitalRaidSeasonResponse.builder()
                                             .state(source.getState())
-                                            .startTime(ConverterUtils.toEpochMilliSecond(source.getStartTime()))
-                                            .endTime(ConverterUtils.toEpochMilliSecond(source.getEndTime()))
+                                            .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))
+                                            .endTime(timeConverter.toEpochMilliSecond(source.getEndTime()))
                                             .members(makeMembers(source.getMembers()))
                                             .build();
     }

@@ -205,6 +205,11 @@
                    const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
                    opponentIcon.src = opponent.badge.small
 
+                   if (teamSize) {
+                     const subSummary = clanWarContentsElement.querySelector('.sub-summary');
+                     subSummary.classList.remove('display-none');
+                   }
+
                    let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
                    memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
@@ -241,10 +246,17 @@
       }
     }
 
+    function getUriForClanWarViewType() {
+      const urlSearchParams = new URLSearchParams(location.search);
+      const viewType = urlSearchParams.get('type');
+      return `/clans/war?view=${viewType}`;
+    }
+
     function getClans() {
       showWifiLoading('.card-container');
 
-      axios.get('/clans/war')
+      const uri = getUriForClanWarViewType();
+      axios.get(uri)
            .then((response) => {
              const { data } = response;
 
@@ -382,7 +394,7 @@
 
       </div>
 
-      <div class="sub-summary">
+      <div class="sub-summary display-none">
         <div class="team-size">
           {TEAM_SIZE}인전
         </div>

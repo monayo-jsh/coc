@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
 
   <script src="/static/js/common.js"></script>
@@ -24,10 +25,13 @@
       event.stopPropagation();
 
       const footerSectionElement = element.closest('.footer-section');
+      const filterCheckbox = footerSectionElement.querySelector('.filter');
       if (footerSectionElement.classList.contains('expand')) {
         footerSectionElement.classList.remove('expand');
+        filterCheckbox.classList.add('display-none');
       } else {
         footerSectionElement.classList.add('expand');
+        filterCheckbox.classList.remove('display-none');
       }
     }
 
@@ -69,6 +73,12 @@
                         })
                         .catch((error) => {
                           console.error(error);
+
+                          const { code } = error;
+                          if (code === 'ERR_NETWORK') {
+                            return {};
+                          }
+
                           const { response } = error;
                           const { status } = response
                           // 서버 이용 불가로 메인 화면 이동
@@ -142,6 +152,12 @@
                         })
                         .catch((error) => {
                           console.error(error);
+
+                          const { code } = error;
+                          if (code === 'ERR_NETWORK') {
+                            return {};
+                          }
+
                           const { response } = error;
                           const { status } = response
                           // 서버 이용 불가로 메인 화면 이동
@@ -164,7 +180,7 @@
         const mustUsedAttacks = 6; // 추가 공권 미획득 시 판단할 수 없어 하드코딩으로 처리
         if (attacks < mustUsedAttacks) {
           // 미공 판단
-          memberRecordElement.classList.add('under');
+          memberRecordElement.classList.add('UnAttacked');
         }
 
         memberRecordElement.innerHTML = memberRecordElement.innerHTML
@@ -177,16 +193,7 @@
     }
 
     function sortByCapitalResourcesLooted(members) {
-      return members.sort(function (a, b) {
-        if (a.capitalResourcesLooted < b.capitalResourcesLooted) {
-          return 1;
-        }
-        if (a.capitalResourcesLooted > b.capitalResourcesLooted) {
-          return -1;
-        }
-        // a must be equal to b
-        return 0;
-      });
+      return members.sort((a, b) => b.capitalResourcesLooted - a.capitalResourcesLooted);
     }
 
     async function renderCapitalSeason(capitalCardElement, capitalClan) {
@@ -277,6 +284,12 @@
                         })
                         .catch((error) => {
                           console.error(error);
+
+                          const { code } = error;
+                          if (code === 'ERR_NETWORK') {
+                            return {};
+                          }
+
                           const { response } = error;
                           const { status } = response
                           // 서버 이용 불가로 메인 화면 이동
@@ -284,6 +297,37 @@
                             location.href = "/";
                           }
                         });
+    }
+
+    function switchAttacks(element) {
+      const footerSectionElement = element.closest('.footer-section');
+      const memberAttackElements = footerSectionElement.querySelector('.members:not(.empty-un-attacked)');
+
+      // 미공 필터링
+      for (const memberAttack of memberAttackElements.children) {
+        if (element.checked) {
+          if (!memberAttack.classList.contains('UnAttacked')) {
+            memberAttack.classList.add('display-none');
+          }
+          continue;
+        }
+
+        memberAttack.classList.remove('display-none');
+      }
+
+      // 미공 없음 표기
+      const membersElement = footerSectionElement.querySelector('.members');
+      const unAttackers = membersElement.querySelectorAll('.UnAttacked');
+      const emptyUnAttackedElement = footerSectionElement.querySelector('.empty-un-attacked');
+      if (element.checked) {
+        if (unAttackers.length === 0) {
+          emptyUnAttackedElement.classList.remove('display-none');
+          membersElement.classList.add('justify-content-center');
+        }
+      } else {
+        emptyUnAttackedElement.classList.add('display-none');
+        membersElement.classList.remove('justify-content-center');
+      }
     }
 
     let leagueMap = {}
@@ -354,12 +398,24 @@
     </div>
 
     <div class="footer-section display-none">
-      <span class="sub-title">
+      <div class="sub-title">
         <span class="cursor-pointer" onclick="onToggleRecord(this, event); return false;">기록 보기</span>
         <i class="fa-solid fa-caret-up"></i>
-      </span>
+      </div>
+      <div class="row support-area">
+        <div class="toggle-button-simple filter display-none">
+          <div class="toggle-button-simple-cover">
+            <input type="checkbox" class="tgl tgl-skewed" onchange="switchAttacks(this); return false;">
+            <label data-tg-on="미공" data-tg-off="전체" class="tgl-btn"></label>
+          </div>
+        </div>
+      </div>
       <div class="row content">
-        <div class="item members"></div>
+        <div class="item members">
+          <div class="record empty-un-attacked display-none">
+            <span class="regular-text">미공 없음</span>
+          </div>
+        </div>
       </div>
 
     </div>

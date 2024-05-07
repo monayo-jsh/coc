@@ -49,6 +49,24 @@
     letter-spacing: 2px;
   }
 
+  .row.support-area {
+    display: flex;
+    justify-content: right;
+
+    .toggle-button {
+      width: 70px;
+      height: 35px;
+
+      .knobs::before {
+        width: 25px;
+      }
+
+      .checkbox:checked + .knobs:before {
+        left: 32px;
+      }
+    }
+  }
+
   .row.loader {
     margin-top: 35px;
   }
@@ -134,6 +152,8 @@
     height: 100px;
     overflow-y: auto;
     scrollbar-width: none;
+    border: 1px solid;
+    border-radius: 5px;
 
     .record {
       display: flex;
@@ -144,12 +164,17 @@
       margin-top: 3px;
     }
 
-    .record.under {
+    .record.UnAttacked {
 
       .regular-text {
         color: red;
       }
 
+    }
+
+    .record.empty-un-attacked {
+      display: flex;
+      justify-content: center;
     }
   }
 

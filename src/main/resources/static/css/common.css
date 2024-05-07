@@ -159,6 +159,10 @@ body::before {
   cursor: pointer !important;
 }
 
+.justify-content-center {
+  justify-content: center !important;
+}
+
 .icon-sword {
   width: 36px;
   height: 36px;

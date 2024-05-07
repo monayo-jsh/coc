@@ -5,10 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
-import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.clans.*;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -43,6 +40,10 @@ public class ClansController {
         }
         return ResponseEntity.ok()
                              .body(clanWarList);
+    }
+    @GetMapping("/league/{clanTag}")
+    public ResponseEntity<LeagueClanRes> getClansLeagueWar(@PathVariable String clanTag) throws IOException {
+        return ResponseEntity.ok(clansService.getLeagueClan(clanTag));
     }
 
     @GetMapping("/capital")
@@ -81,10 +82,15 @@ public class ClansController {
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
 
-    @GetMapping("/test/{clanTag}")
-    public ResponseEntity<String> test(@PathVariable String clanTag) throws IOException {
+
+    @GetMapping("/league-war")
+    public ResponseEntity<ClanCurrentWarRes> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
+        return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));
+    }
+
+    @GetMapping("/league-data-scheduling")
+    public void leagueDataScheduling() throws IOException {
         scheduler.createWarRoundFile();
-        return ResponseEntity.ok(clanApiService.findClanWarLeagueRoundTags(clanTag).toString());
     }
 
 }

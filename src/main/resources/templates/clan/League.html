@@ -24,7 +24,6 @@
         dayjs.extend(dayjs_plugin_duration)
     </script>
     <script type="text/javascript">
-
         $(document).ready(function() {
             $('.nav-link').click(function() {
                 // 모든 nav-link 요소에서 active 클래스 제거
@@ -33,6 +32,9 @@
                 $(this).addClass('active');
             });
         });
+        const clanTagArr = ["#2QJUL08V9", "#2QG0G20RR","#2LPP8PUCG", "#2L209LC8P","#2QV0R0L8R","#2GJGRU920","#2GPGU92Q2"
+        ,"#229V992R8","#2G9GU9PLU","#2PLJJLY89","#2PUPJ09VP"];
+
         function initCardSlide() {
             const cardContents = document.querySelectorAll(".card-contents");
             const buttons = document.querySelectorAll(".button");
@@ -44,8 +46,8 @@
 
                 cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
 
-                const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
-                const clanWarContent = targetClanWar.querySelector('.clan-war');
+                const nextRound = document.querySelector(`.clan-${cardIndex}`);
+                const clanWarContent = nextRound.querySelector('.clan-war');
 
                 const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
                 const clanWarContents = templateClanWar.querySelector('.card-contents');
@@ -55,8 +57,8 @@
                     .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
                     .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
 
-                settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
-                    targetClanWar.innerHTML = clanWarContents.innerHTML;
+                settingLeagueWar(clanWarContents, clanWarContent.dataset.clanTag, nextRound.dataset.roundTag).then(() => {
+                    nextRound.innerHTML = clanWarContents.innerHTML;
 
                     cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
                     cardContents[cardIndex].classList.remove('display-none');
@@ -183,13 +185,17 @@
             });
         }
 
-        async function settingClanWar(clanWarContentsElement, clanTag) {
-            const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
+        async function settingLeagueWar(clanWarContentsElement, clanTag, roundTag) {
+            const uri = `/clans/league-war`;
+            const params = {
+                clanTag: clanTag,
+                roundTag: roundTag
+            };
 
-            await axios.get(uri)
+            await axios.get(uri, { params })
                 .then((response) => {
                     const { data } = response;
-                    const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+                    const { clan, opponent, startTime, endTime, state, teamSize } = data
 
                     const totalStarCount = teamSize * 3;
 
@@ -197,13 +203,16 @@
                         .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
                         .replace(/{CLAN_STAR_COUNT}/, clan.stars)
                         .replace(/{CLAN_ATTACK}/, clan.attacks)
-                        .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                        .replace(/{CLAN_TOTAL_ATTACK}/, teamSize)
+                        .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, clan.destructionPercentage.toFixed(2))
                         .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
                         .replace(/{WAR_STATE}/, convWarState(state))
                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
                         .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
                         .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                        .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember);
+                        .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize)
+                        .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, opponent.destructionPercentage.toFixed(2))
+                        .replace(/{TEAM_SIZE}/, teamSize);
 
                     const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
                     clanIcon.src = clan.badge.small
@@ -211,11 +220,22 @@
                     const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
                     opponentIcon.src = opponent.badge.small
 
+                    if (teamSize) {
+                        const subSummary = clanWarContentsElement.querySelector('.sub-summary');
+                        subSummary.classList.remove('display-none');
+                    }
+
                     let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember)
+                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members);
                 })
                 .catch((error) => {
                     console.error(error);
+                    const { response } = error;
+                    const { status } = response
+                    // 서버 이용 불가로 메인 화면 이동
+                    if (status >= 500) {
+                        location.href = "/";
+                    }
                 });
 
             function convWarState(state) {
@@ -240,32 +260,42 @@
             }
         }
 
-        function getLeagueClans() {
+
+        function getLeagueClan(clanTag) {
             showWifiLoading('.card-container');
 
-            axios.get('/clans/league')
+            axios.get(`/clans/league/${encodeURIComponent(clanTag)}`)
                 .then((response) => {
                     const { data } = response;
+                    const { tag, name, warTags } = data;
 
-                    const carousel = document.querySelector(".carousel");
-                    for (let index = 0; index<data.length; index++) {
-                        const { tag, name } = data[index];
+                    // 새로운 화면을 생성할 컨테이너 요소
+                    const newScreen = document.createElement('div');
+                    newScreen.classList.add('carousel'); // 원래와 동일한 클래스 부여 (선택 사항)
 
+                    for (let index = 0; index < warTags.length; index++) {
+                        const roundTag = warTags[index];
                         const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
                         const clanWarContents = templateClanWar.querySelector('.card-contents');
-
+                        clanWarContents.dataset.roundTag = roundTag;
                         clanWarContents.classList.add(`clan-${index}`, 'display-none');
                         clanWarContents.innerHTML = clanWarContents.innerHTML
                             .replace(/{CLAN_TAG}/, tag)
                             .replace(/{CLAN_NAME}/g, name);
 
                         if (index === 0) {
-                            settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
+                            settingLeagueWar(clanWarContents, tag, roundTag).then(() => hideWifiLoading('.card-container'))
                             clanWarContents.classList.remove('display-none');
                         }
 
-                        carousel.appendChild(templateClanWar);
+                        // 새로운 화면에 카드를 추가
+                        newScreen.appendChild(templateClanWar);
                     }
+
+                    // 이전 카드 컨테이너 요소를 대체하고, 새로운 화면을 보여줍니다.
+                    const cardContainer = document.querySelector('.card-container');
+                    cardContainer.innerHTML = ''; // 이전 카드를 삭제합니다.
+                    cardContainer.appendChild(newScreen); // 새로운 화면을 추가합니다.
 
                     initCardSlide();
                 })
@@ -274,6 +304,10 @@
                 });
         }
 
+
+        window.onload = async () => {
+            await getLeagueClan(clanTagArr[0]);
+        }
     </script>
 
     <style>
@@ -283,15 +317,6 @@
             display: flex;
             align-items: center;
         }
-        .modal-btn-box button{
-            display:inline-block;
-            width:150px;
-            height:50px;
-            background-color:#ffffff;
-            border:1px solid #e1e1e1;
-            cursor:pointer;
-            padding-top:8px;
-        }
         .home-wrapper {
             max-width: 1500px;
             width:100%;
@@ -300,7 +325,9 @@
             align-items: center;
         }
         .nav-item {
-            align-content: center/* 네비게이션 바의 높이를 적절히 조절합니다. */
+            align-content: center;/* 네비게이션 바의 높이를 적절히 조절합니다. */
+            flex-grow: 1; /* 각 항목을 동일한 너비로 설정 */
+            text-align: center; /* 항목 내의 텍스트를 가운데 정렬 */
         }
 
         .container {
@@ -330,7 +357,9 @@
 
     <title>리그전 현황</title>
 </head>
-<body onload="getLeagueClans()">
+
+
+<body>
 
 <div class="home-wrapper">
     <div class="logo"></div>
@@ -342,37 +371,37 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" href="#" onclick="navigate('')">아카데미</a>
+                        <a class="nav-link active" href="#" onclick="getLeagueClan(clanTagArr[0])">아카데미</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/war')">아카데미 2.0</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[1])">아카데미 2.0</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">아카데미 3.0</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[2])">아카데미 3.0</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">아카데미 4.0</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[3])">아카데미 4.0</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">아카데미 5.0</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[4])">아카데미 5.0</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">Academe</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[5])">Academe</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">Team Academe</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[6])">Team Academe</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">클랜전리그</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[7])">클랜전리그</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">육룡이 나르샤</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[8])">육룡이 나르샤</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">가래떡에 꿀</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[9])">가래떡에 꿀</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="navigate('/clan/league')">가래떡에 설탕</a>
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[10])">가래떡에 설탕</a>
                     </li>
                 </ul>
             </div>
@@ -404,28 +433,12 @@
         </section>
     </div>
 </div>
-
 </body>
 
-<script>
-
-    // 네비게이션 바 클릭 시 서버로 요청을 보내고 데이터를 받아와서 렌더링하는 함수
-    function navigate(url) {
-        fetch(url)
-            .then(response => response.json())
-            .then(data => renderClanInfo(data))
-            .catch(error => console.error('Error fetching data:', error));
-    }
-
-    // 받은 클랜 정보를 화면에 렌더링하는 함수
-    function renderClanInfo(data) {
-        // 예를 들어, 받은 데이터를 이용하여 클랜 정보를 표시하는 로직을 작성합니다.
-        document.getElementById("clanInfo").innerHTML = JSON.stringify(data);
-    }
-</script>
 <template id="section-clan-war">
     <div class="card-contents">
         <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
             <div class="summary">
 
                 <div class="clan">
@@ -437,6 +450,10 @@
                     <div class="attacks">
                         <div class="icon-sword"></div>
                         <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+                    </div>
+                    <div class="destruction-percentage">
+                        <div class="icon-damage"></div>
+                        <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
                     </div>
                 </div>
 
@@ -467,8 +484,18 @@
                         <div class="icon-sword"></div>
                     </div>
 
+                    <div class="destruction-percentage">
+                        <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+                        <div class="icon-damage"></div>
+                    </div>
                 </div>
 
+            </div>
+
+            <div class="sub-summary display-none">
+                <div class="team-size">
+                    {TEAM_SIZE}인전
+                </div>
             </div>
 
             <div class="member-attack"></div>

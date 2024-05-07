@@ -9,25 +9,32 @@ import lombok.Getter;
 @Getter
 public enum HeroEquipmentConfig {
 
-    GIANT_GAUNTLET(1, "Giant Gauntlet"),
-    FROZEN_ARROW(2, "Frozen Arrow"),
-    FIREBALL(3, "Fireball"),
-    BARBARIAN_PUPPET(4, "Barbarian Puppet"),
-    RAGE_VIAL(5, "Rage Vial"),
-    ARCHER_PUPPET(6, "Archer Puppet"),
-    INVISIBILITY_VIAL(7, "Invisibility Vial"),
-    ETERNAL_TOME(8, "Eternal Tome"),
-    LIFE_GEM(9, "Life Gem"),
-    SEEKING_SHIELD(10, "Seeking Shield"),
-    ROYAL_GEM(11, "Royal Gem"),
-    EARTHQUAKE_BOOTS(12, "Earthquake Boots"),
-    HOG_RIDER_PUPPET(13, "Hog Rider Puppet"),
-    VAMPSTACHE(14, "Vampstache"),
-    HASTE_VIAL(15, "Haste Vial"),
-    GIANT_ARROW(16, "Giant Arrow"),
-    HEALER_PUPPET(17, "Healer Puppet"),
-    RAGE_GEM(18, "Rage Gem"),
-    HEALING_TOME(19, "Healing Tome");
+    // 바바리안 킹
+    BARBARIAN_PUPPET(100, "Barbarian Puppet"),
+    EARTHQUAKE_BOOTS(101, "Earthquake Boots"),
+    GIANT_GAUNTLET(102, "Giant Gauntlet"),
+    RAGE_VIAL(103, "Rage Vial"),
+    VAMPSTACHE(104, "Vampstache"),
+
+    // 아처 퀸
+    ARCHER_PUPPET(200, "Archer Puppet"),
+    GIANT_ARROW(201, "Giant Arrow"),
+    FROZEN_ARROW(202, "Frozen Arrow"),
+    INVISIBILITY_VIAL(203, "Invisibility Vial"),
+    HEALER_PUPPET(204, "Healer Puppet"),
+
+    // 그랜드 워든
+    LIFE_GEM(300, "Life Gem"),
+    RAGE_GEM(301, "Rage Gem"),
+    FIREBALL(302, "Fireball"),
+    ETERNAL_TOME(303, "Eternal Tome"),
+    HEALING_TOME(304, "Healing Tome"),
+
+    // 로얄 챔피언
+    ROYAL_GEM(400, "Royal Gem"),
+    HASTE_VIAL(401, "Haste Vial"),
+    SEEKING_SHIELD(402, "Seeking Shield"),
+    HOG_RIDER_PUPPET(403, "Hog Rider Puppet");
 
     private final int code;
     private final String name;

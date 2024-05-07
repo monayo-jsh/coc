@@ -25,7 +25,7 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
             HeroEquipmentConfig heroEquipment = HeroEquipmentConfig.findByName(name);
             return heroEquipment.getCode();
         } catch (Exception ignored) {
-            return -1;
+            return Integer.MAX_VALUE;
         }
     }
 }

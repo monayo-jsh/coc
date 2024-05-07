@@ -1,7 +1,9 @@
 package open.api.coc.clans.domain.players.converter;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
@@ -69,6 +71,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return heroEquipments.stream()
                              .map(heroEquipmentResponseConverter::convert)
+                             .sorted(Comparator.comparingInt(heroEquipment -> Objects.requireNonNull(heroEquipment).getCode()))
                              .collect(Collectors.toList());
     }
 
@@ -77,6 +80,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return heroes.stream()
                      .map(heroResponseConverter::convert)
+                     .sorted(Comparator.comparingInt(hero -> Objects.requireNonNull(hero).getCode()))
                      .collect(Collectors.toList());
     }
 

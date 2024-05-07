@@ -45,7 +45,7 @@ public class HeroResponseConverter implements Converter<Hero, HeroResponse> {
             HeroConfig hero = HeroConfig.findByName(name);
             return hero.getCode();
         } catch (Exception ignored) {
-            return -1;
+            return Integer.MAX_VALUE;
         }
     }
 

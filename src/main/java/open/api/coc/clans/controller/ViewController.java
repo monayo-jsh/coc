@@ -1,12 +1,12 @@
 package open.api.coc.clans.controller;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class ViewController {
 
+    /** 편의 기능 페이지 */
     @GetMapping("")
     public String viewHome() {
         return "Home";
@@ -33,4 +33,9 @@ public class ViewController {
         return "capital/Raid";
     }
 
+    /** 운영 기능 페이지 */
+    @GetMapping("/clan/cms")
+    public String viewAdminHome() {
+        return "cms/Admin";
+    }
 }

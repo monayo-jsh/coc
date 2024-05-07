@@ -14,11 +14,13 @@
   <link rel="stylesheet" href="/static/css/pet.css" />
 
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
   <script>
     dayjs.locale('ko')
@@ -26,53 +28,6 @@
   <title>클랜원 현황</title>
 
   <script>
-    function filterVillage(array, village = 'home') {
-      return array.filter(data => data.village === village);
-    }
-
-    function convertArrayToMap(array) {
-      return filterVillage(array).reduce((map, row) => {
-        map[row.name] = row.level
-        return map
-      }, {});
-    }
-
-    function formattedPlayers(players) {
-      return players.map(player => {
-        const heroMap = convertArrayToMap(player.heroes);
-        const heroEquipmentMap = convertArrayToMap(player.heroEquipments);
-        const petMap = convertArrayToMap(player.pets);
-        return {
-          '클랜': player.clan.name,
-          '이름': player.name,
-          '태그': player.tag,
-          '타운홀': player.townHallLevel,
-          '경험치레벨': player.expLevel,
-          '현재 트로피': player.trophies,
-          '최고 트로피': player.bestTrophies,
-          '전쟁획득별': player.warStars,
-          '지원수': player.donations,
-          '지원받은수': player.donationsReceived,
-          '시즌 공격수': player.attackWins,
-          '시즌 방어수': player.defenseWins,
-          '영웅합': player.heroLevelSum,
-          ...heroMap,
-          ...heroEquipmentMap,
-          ...petMap,
-        };
-      })
-    }
-
-    function exportExcel() {
-      const players = formattedPlayers(members);
-
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(players);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
-      const fileName = `클랜원_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`;
-      XLSX.writeFile(workbook, fileName);
-    }
-
   function cardClick(e, event) {
       event.preventDefault();
       event.stopPropagation();
@@ -112,67 +67,6 @@
       } else {
         classList.add(activeClassName);
       }
-    }
-
-  async function requestClans() {
-      return axios.get('/clans')
-           .then((response) => {
-             const { data } = response
-             if (!data) {
-               return [];
-             }
-
-             return data;
-           })
-           .catch((error) => {
-             console.error(error);
-             return [];
-           });
-    }
-
-  function deviceArray(array, size) {
-      const result = [];
-      for (let i = 0; i < array.length; i += size) {
-        result.push(array.slice(i, i + size));
-      }
-      return result;
-  }
-
-  function makeClanMemberRequest(clans) {
-    const uri = `/clans/members?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
-    return axios.get(uri);
-  }
-
-  async function fetchClanMembers(clans) {
-      const requests = deviceArray(clans, clans.length/2).map(makeClanMemberRequest);
-
-      let allClanMembers = [];
-      await axios.all(requests)
-                 .then((responses) => {
-                   responses.forEach((response) => {
-
-                     const { data } = response;
-                     data.forEach((response) => {
-                       const { clanTag, members } = response
-                       if (members) {
-                         // concat member
-                         allClanMembers = allClanMembers.concat(members);
-                       }
-                     })
-
-                   });
-                 })
-                 .catch((error) => {
-                   console.error(error);
-                   const { response } = error;
-                   const { status } = response
-                   // 서버 이용 불가로 메인 화면 이동
-                   if (status >= 500) {
-                     location.href = "/";
-                   }
-                 })
-
-      return allClanMembers;
     }
 
     function sortByTrophies(members) {
@@ -240,7 +134,7 @@
 
     async function getClanMembers() {
       showWifiLoading('.clan-members');
-      let clans = await requestClans();
+      let clans = await fetchClans();
 
       const clanMembers = await fetchClanMembers(clans);
       members.push(...clanMembers);
@@ -249,67 +143,6 @@
       hideWifiLoading('.clan-members');
 
       renderMemberSortByTrophies();
-    }
-
-    function calcHeroLevelSum(heroes) {
-      if (!heroes) return 0;
-      return heroes.filter(hero => hero.village === 'home')
-                   .reduce((levelSum, hero) => {
-                     levelSum += hero.level
-                     return levelSum
-                   }, 0)
-    }
-
-    function overridePlayer(memberMap, member) {
-      let fetchMember = memberMap[member.tag]
-      if (fetchMember) {
-        fetchMember = Object.assign(fetchMember, member)
-
-        fetchMember.heroLevelSum = calcHeroLevelSum(fetchMember.heroes);
-
-        Object.assign(member, fetchMember); //member override
-      }
-
-    }
-
-  function makePlayerRequest(players) {
-    const uri = `/players?playerTags=${encodeURIComponent(players.map(player => player.tag))}`
-    return axios.get(uri);
-  }
-
-  async function fetchPlayerDetail(members) {
-      const requests = deviceArray(members, members.length/3).map(makePlayerRequest);
-      return await axios.all(requests)
-                  .then((responses) => {
-                    responses.forEach((response) => {
-                      const { data } = response
-                      if (!data) {
-                        return;
-                      }
-
-                      const memberMap = makeMemberMapByTag(data);
-
-                      for (let member of members) {
-                        overridePlayer(memberMap, member);
-                      }
-                    })
-                  })
-                  .catch((error) => {
-                    console.error(error);
-                    const { response } = error;
-                    const { status } = response
-                    // 서버 이용 불가로 메인 화면 이동
-                    if (status >= 500) {
-                      location.href = "/";
-                    }
-                  });
-    }
-
-    function makeMemberMapByTag(clanMembers) {
-      return clanMembers.reduce((memberMap, member) => {
-        memberMap[member.tag] = member
-        return memberMap
-      }, {});
     }
 
     function renderEquipments(heroElement, equipments) {

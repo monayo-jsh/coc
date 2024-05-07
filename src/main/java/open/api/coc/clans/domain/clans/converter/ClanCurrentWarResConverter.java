@@ -14,6 +14,7 @@ import org.thymeleaf.util.StringUtils;
 public class ClanCurrentWarResConverter implements Converter<ClanWar, ClanCurrentWarRes> {
 
     private final ClanWarResConverter clanWarResConverter;
+    private final TimeConverter timeConverter;
 
     @Override
     public ClanCurrentWarRes convert(ClanWar source) {
@@ -21,20 +22,10 @@ public class ClanCurrentWarResConverter implements Converter<ClanWar, ClanCurren
                                 .state(source.getState())
                                 .teamSize(source.getTeamSize())
                                 .attacksPerMember(source.getAttacksPerMember())
-                                .startTime(toEpochMilliSecond(source.getStartTime()))
-                                .endTime(toEpochMilliSecond(source.getEndTime()))
+                                .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))
+                                .endTime(timeConverter.toEpochMilliSecond(source.getEndTime()))
                                 .clan(clanWarResConverter.convert(source.getClan()))
                                 .opponent(clanWarResConverter.convert(source.getOpponent()))
                                 .build();
     }
-
-    private long toEpochMilliSecond(String time) {
-        if (StringUtils.isEmpty(time)) return 0;
-
-        final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-        return ZonedDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_PATTERN))
-                            .toInstant()
-                            .toEpochMilli();
-    }
-
 }

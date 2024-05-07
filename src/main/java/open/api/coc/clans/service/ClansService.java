@@ -1,5 +1,6 @@
 package open.api.coc.clans.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
-import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.clans.*;
 import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
@@ -49,6 +47,14 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
 
+
+    public ClanCurrentWarRes getLeagueWar(String clanTag, String roundTag) {
+        ClanWar leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag)
+                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "리그전 조회 실패"));
+        leagueWar.swapWarClan(clanTag);
+        return clanCurrentWarResConverter.convert(leagueWar);
+    }
+
     public List<ClanResponse> getClanResList() {
         //@TODO 추 후 동적으로 관리하도록 수정하기
         return AcademeClan.getClanList()
@@ -81,6 +87,12 @@ public class ClansService {
                           .map(ClanResponse::create)
                           .collect(Collectors.toList());
     }
+
+    public LeagueClanRes getLeagueClan(String clanTag) throws IOException {
+        AcademeClan clan = AcademeClan.findByTag(clanTag);
+        return LeagueClanRes.create(clan);
+    }
+
 
     public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
         ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)

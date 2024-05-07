@@ -1,12 +1,5 @@
 package open.api.coc.clans.schedule;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
@@ -16,6 +9,14 @@ import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -28,11 +29,12 @@ public class PlayerScheduler {
     public void cachingPlayers() {
 
         log.info("start caching service [players]");
+        long before = System.nanoTime();
         processCachingPlayers();
         log.info("ended caching service [players]");
-
+        long after = System.nanoTime();
+        log.info("경과 시간 : {}", (double) (after - before) / 1_000_000_000);
     }
-
     private void processCachingPlayers() {
 
         List<AcademeClan> clans = AcademeClan.getClanList();
@@ -40,9 +42,9 @@ public class PlayerScheduler {
         for (AcademeClan clan : clans) {
             try {
                 fetchedClanMembers(clan);
-                log.info("{} is cache completed", clan.getName());
-
                 // clash of clan API endpoint Too Many Requests Limit 대응
+                log.debug("{} is cache completed", clan.getName());
+
                 Thread.sleep(TimeUnit.SECONDS.toMillis(1));
             } catch (Exception e) {
                 log.info("{} is clan search failed.. ", clan.getName());

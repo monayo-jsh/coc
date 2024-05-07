@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="/static/css/common.css" />
+    <link rel="stylesheet" href="/static/css/townhall.css" />
+    <link rel="stylesheet" href="/static/css/card.css" />
+    <link rel="stylesheet" href="/static/css/loader.css" />
+    <link rel="stylesheet" href="/static/css/clan/war.css" />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 부트스트랩 자바스크립트 CDN 추가 (jQuery 포함) -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        //dayjs duration 확장
+        dayjs.extend(dayjs_plugin_duration)
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.nav-link').click(function() {
+                // 모든 nav-link 요소에서 active 클래스 제거
+                $('.nav-link').removeClass('active');
+                // 클릭한 링크에 active 클래스 추가
+                $(this).addClass('active');
+            });
+        });
+        const clanTagArr = ["#2QJUL08V9", "#2QG0G20RR","#2LPP8PUCG", "#2L209LC8P","#2QV0R0L8R","#2GJGRU920","#2GPGU92Q2"
+        ,"#229V992R8","#2G9GU9PLU","#2PLJJLY89","#2PUPJ09VP"];
+
+        function initCardSlide() {
+            const cardContents = document.querySelectorAll(".card-contents");
+            const buttons = document.querySelectorAll(".button");
+
+            let cardIndex = 0;
+
+            const showCard = () => {
+                showWifiLoading('.card-container');
+
+                cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
+
+                const nextRound = document.querySelector(`.clan-${cardIndex}`);
+                const clanWarContent = nextRound.querySelector('.clan-war');
+
+                const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+                const clanWarContents = templateClanWar.querySelector('.card-contents');
+
+                clanWarContents.classList.add(`clan-${cardIndex}`)
+                clanWarContents.innerHTML = clanWarContents.innerHTML
+                    .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
+                    .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+
+                settingLeagueWar(clanWarContents, clanWarContent.dataset.clanTag, nextRound.dataset.roundTag).then(() => {
+                    nextRound.innerHTML = clanWarContents.innerHTML;
+
+                    cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
+                    cardContents[cardIndex].classList.remove('display-none');
+
+                    hideWifiLoading('.card-container');
+                })
+            };
+
+            const updateClick = (e) => {
+                cardIndex += e.target.id === "next" ? 1 : -1;
+                showCard()
+            }
+
+            buttons.forEach(button => button.addEventListener("click", updateClick))
+        }
+
+        function makeMemberMapByTag(clanMembers) {
+            return clanMembers.reduce((memberMap, member) => {
+                memberMap[member.tag] = member
+                return memberMap
+            }, {});
+        }
+
+        function getSumByStars(attacks) {
+            return attacks.reduce((starsSum, attack) => {
+                starsSum += attack.stars
+                return starsSum
+            }, 0)
+        }
+
+        function appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember) {
+            const templateMember = document.getElementById('section-member-attack');
+            for (const attack of attacks) {
+
+                const cloneTemplateMemberAttack = document.importNode(templateMember.content, true);
+                const attackInfoElement = cloneTemplateMemberAttack.querySelector('.attack-info');
+
+                const { attackerTag, defenderTag, destructionPercentage, duration, stars} = attack;
+
+                const opponentMember = opponentMemberMap[defenderTag]
+
+                const { name, townHallLevel, mapPosition } = opponentMember
+
+                attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                    .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                    .replace(/{OPPONENT_NAME}/, `${mapPosition}. ${name}`)
+                    .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
+                    .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
+
+                const starElements = attackInfoElement.querySelectorAll('.fa-star');
+                for (let i=0; i<stars; i++) {
+                    starElements[i].classList.add('fill');
+                }
+
+                attackListElement.appendChild(attackInfoElement);
+            }
+
+            appendNotAttackRows(attackListElement, attacksPerMember, attacks.length)
+        }
+
+        function formatMinuteSecond(sec) {
+            return dayjs.duration(sec * 1000).format('m분 ss초');
+        }
+
+        function appendNotAttackRows(attackListElement, attacksPerMember, attackLength) {
+            let no = getStartNo();
+
+            const templateMemberNotAttack = document.getElementById('section-member-not-attack');
+
+            const rowCount = getDrawRowCount();
+            for (let i=0; i<rowCount; i++) {
+                const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
+                const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
+                attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                    .replace(/{ATTACK_NO}/, `공격${no++}`);
+
+                attackListElement.appendChild(attackInfoElement);
+            }
+
+            function getStartNo() {
+                if (attackLength === 0) return 1;
+                return getDrawRowCount() + 1;
+            }
+
+            function getDrawRowCount() {
+                return attacksPerMember - attackLength;
+            }
+        }
+
+        function settingMemberAttack(memberAttackHtml, clanMembers, opponentMembers, attacksPerMember) {
+            const opponentMemberMap = makeMemberMapByTag(opponentMembers);
+
+            const templateMember = document.getElementById('section-member');
+
+            for(const member of clanMembers) {
+
+                const cloneTemplateMember = document.importNode(templateMember.content, true);
+                const memberElement = cloneTemplateMember.querySelector('.member');
+
+                const { name, tag, townHallLevel, mapPosition, attacks } = member;
+                const totalStars = getSumByStars(attacks);
+                memberElement.innerHTML = memberElement.innerHTML
+                    .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                    .replace(/{USER_NAME}/, `${mapPosition}. ${name}`)
+                    .replace(/{USER_STARS}/, totalStars)
+
+                const attackListElement = cloneTemplateMember.querySelector('.attack-list');
+                appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember);
+
+                memberAttackHtml.appendChild(memberElement)
+            }
+        }
+
+        function sortByMapPosition(members) {
+            return members.sort(function (a, b) {
+                if (a.mapPosition > b.mapPosition) {
+                    return 1;
+                }
+                if (a.mapPosition < b.mapPosition) {
+                    return -1;
+                }
+                // a must be equal to b
+                return 0;
+            });
+        }
+
+        async function settingLeagueWar(clanWarContentsElement, clanTag, roundTag) {
+            const uri = `/clans/league-war`;
+            const params = {
+                clanTag: clanTag,
+                roundTag: roundTag
+            };
+
+            await axios.get(uri, { params })
+                .then((response) => {
+                    const { data } = response;
+                    const { clan, opponent, startTime, endTime, state, teamSize } = data
+
+                    const totalStarCount = teamSize * 3;
+
+                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                        .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                        .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                        .replace(/{CLAN_ATTACK}/, clan.attacks)
+                        .replace(/{CLAN_TOTAL_ATTACK}/, teamSize)
+                        .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, clan.destructionPercentage.toFixed(2))
+                        .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                        .replace(/{WAR_STATE}/, convWarState(state))
+                        .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
+                        .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                        .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                        .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize)
+                        .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, opponent.destructionPercentage.toFixed(2))
+                        .replace(/{TEAM_SIZE}/, teamSize);
+
+                    const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+                    clanIcon.src = clan.badge.small
+
+                    const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+                    opponentIcon.src = opponent.badge.small
+
+                    if (teamSize) {
+                        const subSummary = clanWarContentsElement.querySelector('.sub-summary');
+                        subSummary.classList.remove('display-none');
+                    }
+
+                    let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members);
+                })
+                .catch((error) => {
+                    console.error(error);
+                    const { response } = error;
+                    const { status } = response
+                    // 서버 이용 불가로 메인 화면 이동
+                    if (status >= 500) {
+                        location.href = "/";
+                    }
+                });
+
+            function convWarState(state) {
+                switch(state) {
+                    case 'preparation': return '준비일';
+                    case 'inWar': return '전쟁중';
+                    case 'notInWar': return "전쟁중이 아님";
+                    case 'warEnded': return '전쟁 종료';
+                }
+                return state;
+            }
+
+            function formatWarRemainHourMinute(endTime) {
+                const now = dayjs();
+                const endDateTime = dayjs(endTime);
+
+                if (now > endDateTime) {
+                    return "";
+                }
+
+                return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
+            }
+        }
+
+
+        function getLeagueClan(clanTag) {
+            showWifiLoading('.card-container');
+
+            axios.get(`/clans/league/${encodeURIComponent(clanTag)}`)
+                .then((response) => {
+                    const { data } = response;
+                    const { tag, name, warTags } = data;
+
+                    // 새로운 화면을 생성할 컨테이너 요소
+                    const newScreen = document.createElement('div');
+                    newScreen.classList.add('carousel'); // 원래와 동일한 클래스 부여 (선택 사항)
+
+                    for (let index = 0; index < warTags.length; index++) {
+                        const roundTag = warTags[index];
+                        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+                        const clanWarContents = templateClanWar.querySelector('.card-contents');
+                        clanWarContents.dataset.roundTag = roundTag;
+                        clanWarContents.classList.add(`clan-${index}`, 'display-none');
+                        clanWarContents.innerHTML = clanWarContents.innerHTML
+                            .replace(/{CLAN_TAG}/, tag)
+                            .replace(/{CLAN_NAME}/g, name);
+
+                        if (index === 0) {
+                            settingLeagueWar(clanWarContents, tag, roundTag).then(() => hideWifiLoading('.card-container'))
+                            clanWarContents.classList.remove('display-none');
+                        }
+
+                        // 새로운 화면에 카드를 추가
+                        newScreen.appendChild(templateClanWar);
+                    }
+
+                    // 이전 카드 컨테이너 요소를 대체하고, 새로운 화면을 보여줍니다.
+                    const cardContainer = document.querySelector('.card-container');
+                    cardContainer.innerHTML = ''; // 이전 카드를 삭제합니다.
+                    cardContainer.appendChild(newScreen); // 새로운 화면을 추가합니다.
+
+                    initCardSlide();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        }
+
+
+        window.onload = async () => {
+            await getLeagueClan(clanTagArr[0]);
+        }
+    </script>
+
+    <style>
+        body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        .home-wrapper {
+            max-width: 1500px;
+            width:100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-item {
+            align-content: center;/* 네비게이션 바의 높이를 적절히 조절합니다. */
+            flex-grow: 1; /* 각 항목을 동일한 너비로 설정 */
+            text-align: center; /* 항목 내의 텍스트를 가운데 정렬 */
+        }
+
+        .container {
+            max-width: 1240px;
+            width:100%;
+        }
+        .container .card-wrapper {
+            max-width: 1240px;
+            width:100%;
+        }
+        .card-container .carousel {
+            width: 100%;
+            max-width: 1240px;
+            display: flex;
+            justify-content: center;
+            transition: all 0.4s ease;
+        }
+
+        .navbar-toggler {
+            flex-grow: 1;
+        }
+
+
+    </style>
+
+    <script src="/static/js/common.js"></script>
+
+    <title>리그전 현황</title>
+</head>
+
+
+<body>
+
+<div class="home-wrapper">
+    <div class="logo"></div>
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-text">클랜 목록</span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" onclick="getLeagueClan(clanTagArr[0])">아카데미</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[1])">아카데미 2.0</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[2])">아카데미 3.0</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[3])">아카데미 4.0</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[4])">아카데미 5.0</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[5])">Academe</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[6])">Team Academe</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[7])">클랜전리그</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[8])">육룡이 나르샤</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[9])">가래떡에 꿀</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="getLeagueClan(clanTagArr[10])">가래떡에 설탕</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <section class="card-wrapper" >
+            <div id="wifi-loader" class="display-none">
+                <svg class="circle-outer" viewBox="0 0 86 86">
+                    <circle class="back" cx="43" cy="43" r="40"></circle>
+                    <circle class="front" cx="43" cy="43" r="40"></circle>
+                    <circle class="new" cx="43" cy="43" r="40"></circle>
+                </svg>
+                <svg class="circle-middle" viewBox="0 0 60 60">
+                    <circle class="back" cx="30" cy="30" r="27"></circle>
+                    <circle class="front" cx="30" cy="30" r="27"></circle>
+                </svg>
+                <svg class="circle-inner" viewBox="0 0 34 34">
+                    <circle class="back" cx="17" cy="17" r="14"></circle>
+                    <circle class="front" cx="17" cy="17" r="14"></circle>
+                </svg>
+                <div class="text" data-text="Searching"></div>
+            </div>
+
+            <i class="fa-solid fa-arrow-left button" id="prev"></i>
+            <div class="card-container">
+                <div class="carousel"></div>
+            </div>
+            <i class="fa-solid fa-arrow-right button" id="next"></i>
+        </section>
+    </div>
+</div>
+</body>
+
+<template id="section-clan-war">
+    <div class="card-contents">
+        <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
+            <div class="summary">
+
+                <div class="clan">
+                    <div class="name">{CLAN_NAME}</div>
+                    <div class="stars">
+                        <i class="fa-solid fa-star"></i>
+                        <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+                    </div>
+                    <div class="attacks">
+                        <div class="icon-sword"></div>
+                        <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+                    </div>
+                    <div class="destruction-percentage">
+                        <div class="icon-damage"></div>
+                        <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
+                    </div>
+                </div>
+
+                <div class="war-info">
+                    <div class="clan-icon">
+                        <img class="clan" alt="" />
+                        <img class="opponent" alt="" />
+                    </div>
+                    <div class="war-remaining-time">
+                        {WAR_REMAIN_HOUR_MINUTE}
+                    </div>
+                    <div class="war-state">
+                        {WAR_STATE}
+                    </div>
+                </div>
+
+                <div class="opponent">
+
+                    <div class="name">{OPPONENT_NAME}</div>
+                    <div class="stars">
+
+                        <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+                        <i class="fa-solid fa-star"></i>
+
+                    </div>
+                    <div class="attacks">
+                        <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
+                        <div class="icon-sword"></div>
+                    </div>
+
+                    <div class="destruction-percentage">
+                        <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+                        <div class="icon-damage"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="sub-summary display-none">
+                <div class="team-size">
+                    {TEAM_SIZE}인전
+                </div>
+            </div>
+
+            <div class="member-attack"></div>
+        </div>
+    </div>
+</template>
+<template id="section-member">
+    <div class="member">
+
+        <div class="layout-title">
+            <div class="user">
+                <div class="town-hall th{USER_HALL_LEVEL}"></div>
+                <div class="title">
+                    <div class="name">{USER_NAME}</div>
+                    <!--          <div class="role">{USER_ROLE}</div>-->
+                </div>
+            </div>
+            <div class="info">
+                <div class="total-stars">
+                    <i class="fa-solid fa-star"></i>
+                    <span class="count">{USER_STARS}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="layout-body">
+            <div class="attack-list"></div>
+        </div>
+    </div>
+</template>
+<template id="section-member-attack">
+    <div class="attack-info">
+        <div class="user">
+            <div class="town-hall th{USER_HALL_LEVEL}"></div>
+            <div class="name">{OPPONENT_NAME}</div>
+        </div>
+        <div class="result">
+            <div class="stars">
+                <i class="fa-solid fa-star fa-xs"></i>
+                <i class="fa-solid fa-star fa-xs"></i>
+                <i class="fa-solid fa-star fa-xs"></i>
+            </div>
+            <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
+            <div class="duration">{DESTRUCTION_DURATION}</div>
+        </div>
+    </div>
+</template>
+
+<template id="section-member-not-attack">
+    <div class="attack-info not">
+        <div class="name">{ATTACK_NO}</div>
+        <div class="message">사용 안함</div>
+    </div>
+</template>
+</html>

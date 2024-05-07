@@ -16,8 +16,14 @@
   background-color: #22c55e;
 }
 
+
+.cards .black {
+  background-color: black;
+}
+
 .cards .coral {
   background-color: #ff7f50;
+
 }
 
 .cards .violet {

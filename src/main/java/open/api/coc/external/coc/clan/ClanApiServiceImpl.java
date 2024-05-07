@@ -1,6 +1,8 @@
 package open.api.coc.external.coc.clan;
 
-import java.util.Optional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
@@ -15,6 +17,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,6 +28,7 @@ public class ClanApiServiceImpl implements ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     @Override
     public Optional<Clan> findClanByClanTag(String clanTag) {
@@ -70,11 +77,27 @@ public class ClanApiServiceImpl implements ClanApiService {
         return findPlayer(playTag);
     }
 
+    @Override
+    public List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException {
+        JsonNode rootNode = objectMapper.readTree(
+                restClient.get().uri(clashOfClanConfig.getClansClanTagCurrentLeagueGroupUri(), clanTag)
+                .retrieve().body(String.class));
+        return objectMapper.convertValue(rootNode.get("rounds"), List.class);
+    }
+
+    @Override
+    public Optional<ClanWar> findLeagueWarByRoundTag(String roundTag) {
+        return Optional.ofNullable(restClient.get()
+                .uri(clashOfClanConfig.getClanWarLeagueUri(), roundTag)
+                .retrieve()
+                .body(ClanWar.class));
+    }
+
     private Optional<Player> findPlayer(String playTag) {
         return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
-                                             .retrieve()
-                                             .body(Player.class));
+                .uri(clashOfClanConfig.getPlayerUri(), playTag)
+                .retrieve()
+                .body(Player.class));
     }
 
     @Override

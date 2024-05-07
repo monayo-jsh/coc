@@ -1,12 +1,14 @@
 package open.api.coc.clans.controller;
 
+import java.io.IOException;
 import java.util.List;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
-import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.clans.*;
+import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
+import open.api.coc.external.coc.clan.ClanApiService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClansController {
 
     private final ClansService clansService;
+    private final ClanApiService clanApiService;
+    private final ClanWarLeagueScheduler scheduler;
 
     @GetMapping("")
     public ResponseEntity<List<ClanResponse>> getClans() {
@@ -36,6 +40,10 @@ public class ClansController {
         }
         return ResponseEntity.ok()
                              .body(clanWarList);
+    }
+    @GetMapping("/league/{clanTag}")
+    public ResponseEntity<LeagueClanRes> getClansLeagueWar(@PathVariable String clanTag) throws IOException {
+        return ResponseEntity.ok(clansService.getLeagueClan(clanTag));
     }
 
     @GetMapping("/capital")
@@ -73,4 +81,16 @@ public class ClansController {
         ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
         return ResponseEntity.ok().body(clanCapitalRaidAttacker);
     }
+
+
+    @GetMapping("/league-war")
+    public ResponseEntity<ClanCurrentWarRes> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
+        return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));
+    }
+
+    @GetMapping("/league-data-scheduling")
+    public void leagueDataScheduling() throws IOException {
+        scheduler.createWarRoundFile();
+    }
+
 }

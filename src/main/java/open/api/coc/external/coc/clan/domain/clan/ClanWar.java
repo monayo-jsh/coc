@@ -19,4 +19,12 @@ public class ClanWar {
     private WarClan clan;
     private WarClan opponent;
 
+    public void swapWarClan(String clanTag) {
+        if(!clan.getTag().equals(clanTag)) {
+            WarClan temp = opponent;
+            opponent = clan;
+            clan = temp;
+        }
+    }
+
 }

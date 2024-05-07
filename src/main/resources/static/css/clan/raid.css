@@ -106,9 +106,8 @@
       }
     }
 
-    .item:nth-child(2) {
+    .item:not(:first-child) {
       border-left: 1px solid rgba(255, 255, 255, 0.126);
-      border-right: 1px solid rgba(255, 255, 255, 0.126);
     }
   }
 

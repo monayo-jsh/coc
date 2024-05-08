@@ -30,7 +30,7 @@
   justify-content: space-evenly;
   align-items: center;
   background-color: #d7d7d7;
-  height: 75px;
+  height: 50px;
   width: 100%;
   border-radius: .5rem;
   transition: .3s ease;
@@ -57,7 +57,7 @@
 }
 
 .card-info {
-  padding-top: 10%;
+  padding-top: 10px;
 }
 
 .card-footer {
@@ -77,6 +77,8 @@
 }
 
 .text-body {
+  display: flex;
+  margin-top: 5px;
   font-size: .9em;
   padding-bottom: 10px;
 
@@ -87,25 +89,18 @@
 
 /*Button*/
 .card-button {
-  border: 1px solid #252525;
   display: flex;
   padding: .3em;
   cursor: pointer;
-  border-radius: 50px;
   transition: .3s ease-in-out;
 }
 
 .chip {
+  margin: 3px;
   font-size: 12px;
+  font-weight: unset;
 }
 
-/*!*Hover*!
-.card-img:hover {
-  transform: translateY(-25%);
-  box-shadow: rgba(226, 196, 63, 0.25) 0px 13px 47px -5px, rgba(180, 71, 71, 0.3) 0px 8px 16px -8px;
+.fa-square-minus:before {
+  font-size: 30px;
 }
-
-.card-button:hover {
-  border: 1px solid #ffcaa6;
-  background-color: #ffcaa6;
-}*/

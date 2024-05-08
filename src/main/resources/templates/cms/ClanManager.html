@@ -83,6 +83,10 @@
       }
     }
 
+    function findLeader(memberList) {
+      return memberList.filter(member => member.role === 'leader');
+    }
+
     function renderClan(clan) {
 
       const clansListElement = document.querySelector('.clan-list');
@@ -91,12 +95,13 @@
       const clanCard = document.importNode(clanCardTemplate.content, true);
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, description, badgeUrls, warLeague, capitalLeague } = clan;
+      const { name, tag, badgeUrls, warLeague, capitalLeague, memberList } = clan;
+      const [leader] = findLeader(memberList);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
-                           .replace(/{CLAN_DESCRIPTION}/, description)
-                           .replace(/{CLAN_TAG}/, tag);
+                           .replace(/{CLAN_TAG}/, tag)
+                           .replace(/{CLAN_LEADER}/, leader.name);
 
       renderClanBadge(badgeUrls, card);
       renderWarLeagueBadge(warLeague, card);
@@ -159,17 +164,26 @@
       <img class="capital-league-badge icon">
     </div>
     <div class="card-info">
-      <p class="text-title">
+      <div class="text-title">
         <span>{CLAN_NAME}</span>
-        <span class="chip">{CLAN_TAG}</span>
-      </p>
-      <p class="text-body">
-        <span class="description">{CLAN_DESCRIPTION}</span>
-      </p>
+      </div>
+      <div class="text-body">
+        <div class="chip">{CLAN_TAG}</div>
+        <div class="chip bg-blue">{CLAN_LEADER}</div>
+      </div>
     </div>
     <div class="card-footer">
       <div class="card-button">
-        <i class="fa-solid fa-trash" onclick="alert('삭제 예정');"></i>
+        <i class="icon-clan-war"></i>
+      </div>
+      <div class="card-button">
+        <i class="icon-clan-war-league"></i>
+      </div>
+      <div class="card-button">
+        <i class="icon-clan-capital"></i>
+      </div>
+      <div class="card-button" onclick="alert('삭제 예정');">
+        <i class="fa-regular fa-square-minus"></i>
       </div>
     </div>
   </div>

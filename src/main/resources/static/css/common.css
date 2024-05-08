@@ -146,6 +146,10 @@ body::before {
   opacity: 0.8;
 }
 
+.disabled {
+  opacity: 0.5;
+}
+
 .color-yellow {
   color: yellow !important;
 }
@@ -163,6 +167,23 @@ body::before {
 .justify-content-center {
   justify-content: center !important;
 }
+
+.chip {
+  width: fit-content;
+  font-size: 0.5rem;
+  font-weight: bold;
+  word-break: break-all;
+  border: var(--default-border);
+  padding: 3px 5px;
+  border-radius: 15px;
+  background: antiquewhite;
+}
+
+.bg-blue {
+  background-color: #4687f0;
+  color: white;
+}
+
 
 .icon-sword {
   width: 36px;
@@ -182,12 +203,29 @@ body::before {
   background-position: center;
 }
 
-.chip {
-  font-size: 0.5rem;
-  font-weight: bold;
-  word-break: break-all;
-  border: var(--default-border);
-  padding: 3px 5px;
-  border-radius: 15px;
-  background: antiquewhite;
+.icon-clan-war {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/ClanWars.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-clan-war-league {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/WarLeagues.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-clan-capital {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/CapitalGold.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }

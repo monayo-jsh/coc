@@ -87,6 +87,10 @@ function formattedPlayers(players) {
   })
 }
 
+/**
+ * 엑셀 다운로드 기능
+ * @param members
+ */
 function exportExcel(members) {
   const players = formattedPlayers(members);
 
@@ -95,4 +99,20 @@ function exportExcel(members) {
   XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
   const fileName = `클랜원_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`;
   XLSX.writeFile(workbook, fileName);
+}
+
+/**
+ * 클랜 권한 한글명 반환
+ * @param role
+ * @returns {*|string}
+ */
+function convName(role) {
+  if (!role) return role;
+  switch (role.toUpperCase()) {
+    case 'LEADER': return '대표';
+    case 'COLEADER': return '공동대표'
+    case 'ADMIN': return '장로';
+    case 'MEMBER': return '일반';
+    default: return role;
+  }
 }

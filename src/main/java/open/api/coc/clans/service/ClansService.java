@@ -1,14 +1,22 @@
 package open.api.coc.clans.service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
-import open.api.coc.clans.domain.clans.*;
+import open.api.coc.clans.database.entity.ClanEntity;
+import open.api.coc.clans.database.repository.ClanRepository;
+import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanMemberListRes;
+import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
@@ -27,6 +35,8 @@ import org.springframework.stereotype.Service;
 public class ClansService {
 
     private final ClanApiService clanApiService;
+
+    private final ClanRepository clanRepository;
 
     private final ClanResponseConverter clanResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
@@ -55,12 +65,13 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(leagueWar);
     }
 
-    public List<ClanResponse> getClanResList() {
-        //@TODO 추 후 동적으로 관리하도록 수정하기
-        return AcademeClan.getClanList()
-                          .stream()
-                          .map(ClanResponse::create)
-                          .collect(Collectors.toList());
+    public List<ClanResponse> getClanList() {
+        List<ClanEntity> clans = clanRepository.findAll();
+
+        return clans.stream()
+                    .map(ClanResponse::create)
+                    .sorted(Comparator.comparing(ClanResponse::getOrder))
+                    .collect(Collectors.toList());
     }
 
     public List<ClanResponse> getClanWarResList() {
@@ -124,4 +135,12 @@ public class ClansService {
                        .collect(Collectors.toList());
     }
 
+    public List<ClanResponse> findClanByClanTags(List<String> clanTags) {
+        return clanTags.stream()
+                       .parallel()
+                       .map(clanApiService::findClanByClanTag)
+                       .filter(Optional::isPresent)
+                       .map(clan -> clanResponseConverter.convert(clan.get()))
+                       .collect(Collectors.toList());
+    }
 }

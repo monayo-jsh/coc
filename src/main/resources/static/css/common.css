@@ -62,6 +62,7 @@ body::before {
       url(/static/images/hero/equipment/Royal_Gem.png)
       url(/static/images/hero/equipment/Seeking_Shield.png)
       url(/static/images/hero/equipment/Vampstache.png)
+      url(/static/images/hero/equipment/Spiky_Ball.png)
 
       url(/static/images/etc/trophies.png)
       url(/static/images/etc/max_level.png)
@@ -179,4 +180,14 @@ body::before {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.chip {
+  font-size: 0.5rem;
+  font-weight: bold;
+  word-break: break-all;
+  border: var(--default-border);
+  padding: 3px 5px;
+  border-radius: 15px;
+  background: antiquewhite;
 }

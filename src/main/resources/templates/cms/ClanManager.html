@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/warLeague.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/manager.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <title>클랜 관리</title>
+
+
+  <script>
+    let leagueMap = {}
+    async function loadLeagues() {
+      // 리그 목록 조회
+      const leagues = await fetchLeagues();
+      leagues.map(league => {
+        leagueMap[league.name] = league;
+      });
+    }
+
+    function makeClanMapByTag(clans) {
+      return clans.reduce((map, clan) => {
+        map[clan.tag] = clan
+        return map
+      }, {});
+    }
+
+    function renderClanBadge(badgeUrls, card) {
+      if (!badgeUrls) return;
+
+      const { small } = badgeUrls;
+      if (small) {
+        const clanBadge = card.querySelector('.clan-badge');
+        clanBadge.src = small;
+      }
+    }
+
+    function renderWarLeagueBadge(warLeague, card) {
+      if (!warLeague) return;
+
+      const { name } = warLeague;
+      let warLeagueIconClassName = name.replace(/\s/g, "");
+
+      const warLeagueElement = card.querySelector('.clan-war-league-badge');
+
+      if (warLeagueIconClassName !== 'Unranked') {
+        warLeagueElement.classList.add(warLeagueIconClassName);
+        return;
+      }
+
+      const leagueLabel = leagueMap[name];
+      if (leagueLabel) {
+        const {iconUrls} = leagueLabel;
+        const {small} = iconUrls;
+        const imgElement = document.createElement('img');
+        imgElement.src = small;
+        imgElement.classList.add('clan-war-league-badge', 'icon');
+        warLeagueElement.replaceWith(imgElement);
+      }
+    }
+
+    function renderCapitalLeagueBadge(capitalLeague, card) {
+      if (!capitalLeague) return;
+
+      const { name } = capitalLeague;
+      const leagueLabel = leagueMap[name];
+      if (leagueLabel) {
+        const { iconUrls } = leagueLabel;
+        const { small } = iconUrls;
+        const leagueBadge = card.querySelector('.capital-league-badge');
+        leagueBadge.src = small;
+      }
+    }
+
+    function renderClan(clan) {
+
+      const clansListElement = document.querySelector('.clan-list');
+
+      const clanCardTemplate = document.querySelector("#clan-card");
+      const clanCard = document.importNode(clanCardTemplate.content, true);
+      const card = clanCard.querySelector('.card');
+
+      const { name, tag, description, badgeUrls, warLeague, capitalLeague } = clan;
+
+      card.innerHTML = card.innerHTML
+                           .replace(/{CLAN_NAME}/, name)
+                           .replace(/{CLAN_DESCRIPTION}/, description)
+                           .replace(/{CLAN_TAG}/, tag);
+
+      renderClanBadge(badgeUrls, card);
+      renderWarLeagueBadge(warLeague, card);
+      renderCapitalLeagueBadge(capitalLeague, card);
+
+      clansListElement.appendChild(card);
+    }
+
+    function renderClans(clans) {
+      clans.forEach(renderClan)
+    }
+
+    async function getClans() {
+      showWifiLoading('.clan-manager');
+      let clans = await fetchClans();
+      let clanDetailMap = makeClanMapByTag(await fetchClansFromExternal(clans));
+
+      let resultClans = [];
+      clans.forEach(clan => resultClans.push(clanDetailMap[clan.tag]));
+
+      renderClans(resultClans)
+
+      hideWifiLoading('.clan-manager');
+    }
+
+    window.onload = async () => {
+      await loadLeagues();
+      await getClans();
+    }
+  </script>
+
+</head>
+<body>
+  <div class="clan-manager">
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
+
+    <div class="clan-list"></div>
+  </div>
+</body>
+<template id="clan-card">
+  <div class="card">
+    <div class="card-img">
+      <img class="clan-badge icon">
+      <div class="clan-war-league-badge img-icon icon"></div>
+      <img class="capital-league-badge icon">
+    </div>
+    <div class="card-info">
+      <p class="text-title">
+        <span>{CLAN_NAME}</span>
+        <span class="chip">{CLAN_TAG}</span>
+      </p>
+      <p class="text-body">
+        <span class="description">{CLAN_DESCRIPTION}</span>
+      </p>
+    </div>
+    <div class="card-footer">
+      <div class="card-button">
+        <i class="fa-solid fa-trash" onclick="alert('삭제 예정');"></i>
+      </div>
+    </div>
+  </div>
+</template>
+</html>

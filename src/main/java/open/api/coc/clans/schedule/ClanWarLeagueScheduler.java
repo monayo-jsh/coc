@@ -29,7 +29,7 @@ public class ClanWarLeagueScheduler {
     private static final String RESOURCE_ROOT =  "./src/main/resources/static/clanwarleague";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
-    @Scheduled(cron = "0 30 23 1-8 * *")
+    @Scheduled(cron = "0 0 0/6 1-8 * *")
     public void createWarRoundFile() throws IOException {
         createFile();
     }

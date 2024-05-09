@@ -195,6 +195,7 @@ public class ClansService {
         clanContentRepository.deleteById(clanTag);
     }
 
+    @Transactional
     public ClanResponse registerClan(ClanRequest clanRequest) {
         clanRequest.validate();
 

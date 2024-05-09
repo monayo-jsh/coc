@@ -4,7 +4,6 @@
 
 body {
   margin: 0;
-  height: 100%;
   display: flex;
   justify-content: center;
   overflow-y: hidden;
@@ -191,6 +190,12 @@ body {
         background-color: #9fa1a2;
       }
     }
+  }
+}
+
+@media (max-width: 320px) {
+  .member-attack {
+    height: 600px !important;
   }
 }
 

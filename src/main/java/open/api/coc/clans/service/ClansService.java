@@ -3,6 +3,7 @@ package open.api.coc.clans.service;
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.ClanContentEntity;
 import open.api.coc.clans.database.entity.ClanEntity;
@@ -20,6 +22,7 @@ import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
+import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
@@ -190,5 +193,44 @@ public class ClansService {
 
         clanRepository.deleteById(clanTag);
         clanContentRepository.deleteById(clanTag);
+    }
+
+    public ClanResponse registerClan(ClanRequest clanRequest) {
+        clanRequest.validate();
+
+        Optional<ClanEntity> clanEntity = clanRepository.findById(clanRequest.getTag());
+        if (clanEntity.isPresent()) {
+            throw BadRequestException.create(ExceptionCode.ALREADY_DATA, "%s(%s)".formatted(clanRequest.getName(), clanRequest.getTag()));
+        }
+
+        Integer clanMaxOrders = clanRepository.selectMaxOrders();
+
+        ClanContentEntity createClanContent = createClanContentEntity(clanRequest.getTag());
+        ClanEntity createClan = createClanEntity(clanRequest, clanMaxOrders);
+        createClan.changeClanContent(createClanContent);
+
+        clanRepository.save(createClan);
+
+        return clanResponseConverter.convert(createClan);
+    }
+
+    private ClanContentEntity createClanContentEntity(String tag) {
+        final String defaultStatusYN = "N";
+        return ClanContentEntity.builder()
+                                .tag(tag)
+                                .clanWarYn(defaultStatusYN)
+                                .warLeagueYn(defaultStatusYN)
+                                .clanCapitalYn(defaultStatusYN)
+                                .clanWarParallelYn(defaultStatusYN)
+                                .build();
+    }
+
+    private ClanEntity createClanEntity(ClanRequest clanRequest, Integer clanMaxOrders) {
+        return ClanEntity.builder()
+                         .tag(clanRequest.getTag())
+                         .name(clanRequest.getName())
+                         .order(clanMaxOrders + 1)
+                         .regDate(LocalDateTime.now())
+                         .build();
     }
 }

@@ -1,4 +1,6 @@
 const URI_CLANS = '/clans'; //전체 클랜 목록 조회
+const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
+
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
 
@@ -12,11 +14,49 @@ function deviceArray(array, size) {
   return result;
 }
 
+async function registerClan(requestBody) {
+  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(requestBody.tag));
+
+  return await axios.post(uri, requestBody)
+                    .then((response) => {
+                      alert('등록 되었습니다.');
+
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return null;
+                    });
+}
+
+async function findClan(clanTag) {
+  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+
+  return await axios.get(uri)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return null;
+                    })
+}
+
 async function deleteClan(clanTag) {
   const uri = `${URI_CLANS}/${encodeURIComponent(clanTag)}`
   return await axios.delete(uri)
                     .then((response) => {
-                      alert('처리되었습니다.');
+                      alert('삭제 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -30,13 +70,13 @@ async function deleteClan(clanTag) {
 
                       console.error(error);
                       return false;
-                    })
+                    });
 }
 
 async function updateClanContent(requestBody) {
   return await axios.put(URI_CLAN_CONTENT, requestBody)
                     .then((response) => {
-                      alert('처리되었습니다.');
+                      alert('처리 되었습니다.');
                       return true;
                     })
                     .catch((error) => {

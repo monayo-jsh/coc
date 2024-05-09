@@ -13,4 +13,7 @@ public interface ClanRepository extends JpaRepository<ClanEntity, String> {
     @Query("select c from tb_clan c join fetch c.clanContent")
     List<ClanEntity> findAll();
 
+    @Query("select max(c.order) from tb_clan c")
+    Integer selectMaxOrders();
+
 }

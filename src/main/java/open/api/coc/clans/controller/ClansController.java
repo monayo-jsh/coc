@@ -8,6 +8,7 @@ import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
+import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,11 +38,16 @@ public class ClansController {
                              .body(clansService.getClanList());
     }
 
+    @PostMapping("{clanTag}")
+    public ResponseEntity<ClanResponse> registerClan(@RequestBody ClanRequest clanRequest) {
+        ClanResponse clan = clansService.registerClan(clanRequest);
+        return ResponseEntity.ok()
+                             .body(clan);
+    }
+
     @DeleteMapping("{clanTag}")
     public ResponseEntity<?> deleteClan(@PathVariable String clanTag) {
-
         clansService.deleteClan(clanTag);
-
         return ResponseEntity.ok().build();
     }
 

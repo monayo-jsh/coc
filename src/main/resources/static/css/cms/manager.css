@@ -1,6 +1,19 @@
+.search {
+  margin-bottom: 10px;
+}
+.search-result {
+  .card {
+    margin: 0;
+  }
+}
+
 .clan-manager {
   position: relative;
+  padding: 10px;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (max-width: 320px) {
@@ -99,6 +112,10 @@
   margin: 3px;
   font-size: 12px;
   font-weight: unset;
+}
+
+.fa-square-plus:before {
+  font-size: 30px;
 }
 
 .fa-square-minus:before {

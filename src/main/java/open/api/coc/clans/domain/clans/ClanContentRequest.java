@@ -22,4 +22,5 @@ public class ClanContentRequest {
 
     @JsonProperty("clan_war_parallel_yn")
     private final String clanWarParallelYn;
+
 }

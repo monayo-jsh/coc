@@ -1,5 +1,6 @@
 package open.api.coc.clans.database.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -33,8 +34,11 @@ public class ClanEntity {
     @Column(name = "reg_date", nullable = false)
     private LocalDateTime regDate;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "tag")
     private ClanContentEntity clanContent;
 
+    public void changeClanContent(ClanContentEntity clanContent) {
+        this.clanContent = clanContent;
+    }
 }

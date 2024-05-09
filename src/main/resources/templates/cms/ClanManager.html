@@ -22,6 +22,15 @@
 
 
   <script>
+    function clearSearchResult() {
+      const searchResultElement = document.querySelector('.search-result');
+
+      const searchedClanCard = searchResultElement.querySelector('.card');
+      if (searchedClanCard) {
+        searchResultElement.removeChild(searchedClanCard);
+      }
+    }
+
     async function addClan(element) {
       const cardElement = element.closest('.card');
       const { dataset } = cardElement;
@@ -46,6 +55,8 @@
       clanDetail.clanContent = registeredClan.clanContent;
       const clansListElement = document.querySelector('.clan-list');
       renderClan(clanDetail, clansListElement);
+
+      clearSearchResult();
     }
 
   function replaceFooter(searchResultElement) {
@@ -67,15 +78,21 @@
 
         findClan(searchInput.value)
         .then((clan) => {
+          clearSearchResult();
+
           const searchResultElement = document.querySelector('.search-result');
-
-          const searchedClanCard = searchResultElement.querySelector('.card');
-          if (searchedClanCard) {
-            searchResultElement.removeChild(searchedClanCard);
-          }
-
           renderClan(clan, searchResultElement);
           replaceFooter(searchResultElement);
+        })
+        .catch((error) => {
+          clearSearchResult();
+
+          const clanCardNotFoundTemplate = document.querySelector("#clan-card-not-found");
+          const clanCard = document.importNode(clanCardNotFoundTemplate.content, true);
+          const emptyCard = clanCard.querySelector('.card');
+
+          const searchResultElement = document.querySelector('.search-result');
+          searchResultElement.appendChild(emptyCard);
         })
     }
 
@@ -312,9 +329,7 @@
       </div>
     </div>
 
-    <div class="search-result">
-
-    </div>
+    <div class="search-result"></div>
   </div>
 
   <div class="clan-list"></div>
@@ -351,6 +366,15 @@
       </div>
       <div class="card-button color-red" onclick="removeClan(this); return false;">
         <i class="fa-regular fa-square-minus"></i>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="clan-card-not-found">
+  <div class="card empty">
+    <div class="card-info">
+      <div class="text-title">
+        <span>클랜 정보 없음</span>
       </div>
     </div>
   </div>

@@ -5,6 +5,13 @@
   .card {
     margin: 0;
   }
+
+  .card.empty {
+
+    .text-title {
+      text-align: center;
+    }
+  }
 }
 
 .clan-manager {

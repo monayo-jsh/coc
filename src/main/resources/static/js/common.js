@@ -2,6 +2,14 @@ function renderPage(uri) {
   location.href = uri;
 }
 
+function launchAppWithOpenClanProfile(tag) {
+  if (!confirm("게임을 실행하시겠습니까?")) {
+    return;
+  }
+
+  location.href = `clashofclans://action=OpenClanProfile&tag=${tag}`;
+}
+
 function addClassDim(element) {
   element.classList.add('dim')
 }

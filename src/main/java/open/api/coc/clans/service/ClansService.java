@@ -72,7 +72,8 @@ public class ClansService {
 
     public ClanCurrentWarRes getLeagueWar(String clanTag, String roundTag) {
         ClanWar leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag)
-                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "리그전 조회 실패"));
+                                          .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "리그전 조회 실패"));
+
         leagueWar.swapWarClan(clanTag);
         return clanCurrentWarResConverter.convert(leagueWar);
     }
@@ -87,28 +88,27 @@ public class ClansService {
     }
 
     public List<ClanResponse> getClanWarResList() {
-        //@TODO 추 후 동적으로 관리하도록 수정하기
-        return AcademeClan.getClanWarList()
-                          .stream()
-                          .map(ClanResponse::create)
+        List<ClanEntity> clanWarList = clanRepository.findClanWarList();
+
+        return clanWarList.stream()
+                          .map(clanResponseConverter::convert)
                           .collect(Collectors.toList());
     }
 
     public List<ClanResponse> getClanWarParallelResList() {
-        // 병행클전 대상 클랜 목록
-        //@TODO 추 후 동적으로 관리하도록 수정하기
-        return AcademeClan.getClanWarParallelList()
-                          .stream()
-                          .map(ClanResponse::create)
-                          .collect(Collectors.toList());
+        List<ClanEntity> clanWarParallelList = clanRepository.findClanWarParallelList();
+
+        return clanWarParallelList.stream()
+                                  .map(clanResponseConverter::convert)
+                                  .collect(Collectors.toList());
     }
 
     public List<ClanResponse> getClanCaptialList() {
-        //@TODO 추 후 동적으로 관리하도록 수정하기
-        return AcademeClan.getClanCapitalList()
-                          .stream()
-                          .map(ClanResponse::create)
-                          .collect(Collectors.toList());
+        List<ClanEntity> clanCapitalList = clanRepository.findClanCapitalList();
+
+        return clanCapitalList.stream()
+                              .map(clanResponseConverter::convert)
+                              .collect(Collectors.toList());
     }
 
     public LeagueClanRes getLeagueClan(String clanTag) throws IOException {

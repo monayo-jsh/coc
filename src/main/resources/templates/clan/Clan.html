@@ -22,124 +22,6 @@
 
 
   <script>
-    function clearSearchResult() {
-      const searchResultElement = document.querySelector('.search-result');
-
-      const searchedClanCard = searchResultElement.querySelector('.card');
-      if (searchedClanCard) {
-        searchResultElement.removeChild(searchedClanCard);
-      }
-    }
-
-    async function addClan(element) {
-      const cardElement = element.closest('.card');
-      const { dataset } = cardElement;
-      const { clanTag, clanName } = dataset;
-
-      if (!confirm(`${clanName}(${clanTag})를 등록하시겠습니까?\n`)) {
-        return;
-      }
-
-      const requestBody = {
-        tag: clanTag,
-        name: clanName
-      }
-
-      const registeredClan = await registerClan(requestBody)
-      if (!registeredClan) {
-        return;
-      }
-
-      const [clanDetail] = await fetchClansFromExternal([registeredClan]);
-      clanDetail.order = registeredClan.order;
-      clanDetail.clanContent = registeredClan.clanContent;
-      const clansListElement = document.querySelector('.clan-list');
-      renderClan(clanDetail, clansListElement);
-
-      clearSearchResult();
-    }
-
-  function replaceFooter(searchResultElement) {
-      const targetCardFooter = searchResultElement.querySelector('.card-footer');
-
-      const clanCardRegisterFooterTemplate = document.querySelector("#clan-card-register-footer");
-      const clanCardRegisterFooter = document.importNode(clanCardRegisterFooterTemplate.content, true);
-      const cardFooter = clanCardRegisterFooter.querySelector('.card-footer');
-
-      targetCardFooter.replaceWith(cardFooter);
-    }
-
-    function searchClan() {
-        const searchInput = document.querySelector('#search-input');
-        if (!searchInput.value) {
-          alert('클랜 태그를 입력해주세요.');
-          return;
-        }
-
-        findClan(searchInput.value)
-        .then((clan) => {
-          clearSearchResult();
-
-          const searchResultElement = document.querySelector('.search-result');
-          renderClan(clan, searchResultElement);
-          replaceFooter(searchResultElement);
-
-          searchResultElement.querySelector('.btn-close').remove();
-        })
-        .catch((error) => {
-          clearSearchResult();
-
-          const clanCardNotFoundTemplate = document.querySelector("#clan-card-not-found");
-          const clanCard = document.importNode(clanCardNotFoundTemplate.content, true);
-          const emptyCard = clanCard.querySelector('.card');
-
-          const searchResultElement = document.querySelector('.search-result');
-          searchResultElement.appendChild(emptyCard);
-        })
-    }
-
-  function removeClan(element) {
-      const cardElement = element.closest('.card');
-      const { dataset } = cardElement;
-      const { clanTag, clanName } = dataset;
-
-      if (!confirm(`${clanName}(${clanTag})를 제거하시겠습니까?\n`)) {
-        return;
-      }
-
-      deleteClan(clanTag)
-        .then((response) => {
-          cardElement.remove();
-        })
-    }
-
-    function convYn(yn) {
-      if (yn === 'Y') return "비노출"
-      return "노출"
-    }
-
-    async function changeContentYn(element) {
-      const cardElement = element.closest('.card');
-      const { clanTag } = cardElement.dataset;
-      const { dataset } = element;
-      const { btnName, yn, menuName } = dataset;
-
-      if (!confirm(`${btnName} 메뉴에서 ${convYn(yn)}하시겠습니까?`)) {
-        return;
-      }
-
-      const changeYn = yn === 'Y' ? 'N' : 'Y';
-      const requestBody = {}
-      requestBody.tag = clanTag;
-      requestBody[menuName] = changeYn;
-
-      const result = await updateClanContent(requestBody);
-      if (result) {
-        // 성공 처리
-        element.dataset.yn = changeYn;
-        settingDisabled(element);
-      }
-    }
 
     let leagueMap = {}
     async function loadLeagues() {
@@ -177,17 +59,16 @@
 
       if (warLeagueIconClassName !== 'Unranked') {
         warLeagueElement.classList.add(warLeagueIconClassName);
-        return;
-      }
-
-      const leagueLabel = leagueMap[name];
-      if (leagueLabel) {
-        const {iconUrls} = leagueLabel;
-        const {small} = iconUrls;
-        const imgElement = document.createElement('img');
-        imgElement.src = small;
-        imgElement.classList.add('clan-war-league-badge', 'icon');
-        warLeagueElement.replaceWith(imgElement);
+      } else {
+        const leagueLabel = leagueMap[name];
+        if (leagueLabel) {
+          const {iconUrls} = leagueLabel;
+          const {small} = iconUrls;
+          const imgElement = document.createElement('img');
+          imgElement.src = small;
+          imgElement.classList.add('clan-war-league-badge', 'icon');
+          warLeagueElement.replaceWith(imgElement);
+        }
       }
     }
 
@@ -314,34 +195,11 @@
     <div class="text" data-text="Searching"></div>
   </div>
 
-  <div class="form-register-clan">
-
-    <div class="search w270">
-      <div class="search-box">
-        <div class="search-field">
-          <input placeholder="등록하실 클랜 태그를 입력해주세요..." class="input" type="text" id="search-input">
-          <div class="search-box-icon">
-            <button class="btn-icon-content" onclick="searchClan(); return false;">
-              <i class="search-icon">
-                <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
-              </i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="search-result"></div>
-  </div>
-
   <div class="clan-list"></div>
 </div>
 </body>
 <template id="clan-card">
   <div class="card">
-    <div class="card-button color-red btn-close" onclick="removeClan(this); return false;">
-      <i class="fa-regular fa-circle-xmark"></i>
-    </div>
     <div class="card-img">
       <img class="clan-badge icon">
       <div class="clan-war-league-badge img-icon icon"></div>
@@ -357,38 +215,22 @@
       </div>
     </div>
     <div class="card-footer">
-      <div class="card-button btn-clan-war" data-btn-name="클랜전 현황" data-menu-name="clan_war_yn" onclick="changeContentYn(this); return false;">
+      <div class="card-button btn-clan-war">
         <i class="icon-clan-war"></i>
         <span class="chip">클랜전</span>
       </div>
-      <div class="card-button btn-clan-war-league" data-btn-name="리그전 현황" data-menu-name="clan_war_league_yn" onclick="changeContentYn(this); return false;">
+      <div class="card-button btn-clan-war-league">
         <i class="icon-clan-war-league"></i>
         <span class="chip">리그전</span>
       </div>
-      <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
+      <div class="card-button btn-clan-capital">
         <i class="icon-clan-capital"></i>
         <span class="chip">습격전</span>
       </div>
-      <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clan_war_parallel_yn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
+      <div class="card-button btn-clan-war-parallel">
         <i class="icon-clan-war"></i>
         <span class="chip">병행클랜전</span>
       </div>
-    </div>
-  </div>
-</template>
-<template id="clan-card-not-found">
-  <div class="card empty">
-    <div class="card-info">
-      <div class="text-title">
-        <span>클랜 정보 없음</span>
-      </div>
-    </div>
-  </div>
-</template>
-<template id="clan-card-register-footer">
-  <div class="card-footer justify-content-right">
-    <div class="card-button color-green" onclick="addClan(this); return false;">
-      <i class="fa-regular fa-square-plus"></i>
     </div>
   </div>
 </template>

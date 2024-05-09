@@ -12,6 +12,11 @@ public class ViewNormalController {
         return "Home";
     }
 
+    @GetMapping("/clan")
+    public String viewClan() {
+        return "clan/Clan";
+    }
+
     @GetMapping("/clan/member")
     public String viewClanMember() {
         return "clan/Member";

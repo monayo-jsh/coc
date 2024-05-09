@@ -15,6 +15,9 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
   <title>습격전 현황</title>
 
   <script>
@@ -100,6 +103,8 @@
         const leagueIcon = capitalCardElement.querySelector('.league-icon');
         leagueIcon.src = small;
         leagueIcon.classList.remove('display-none');
+
+        leagueIcon.dataset.league = name;
       }
     }
 
@@ -239,6 +244,14 @@
       captionCardSubTitleElement.classList.remove('display-none');
     }
 
+    function settingLeagueIconTooltip(capitalCardElement) {
+      const leagueIcon = capitalCardElement.querySelector('.league-icon');
+      const { league } = leagueIcon.dataset;
+      if (league) {
+        settingTooltip(leagueIcon, league);
+      }
+    }
+
     async function renderCapitalCard(capitalRaidElement, capitalClan) {
       const capitalCardTemplate = document.querySelector('#capital-card');
       const capitalCard = document.importNode(capitalCardTemplate.content, true);
@@ -249,7 +262,7 @@
       capitalCardElement.innerHTML = capitalCardElement.innerHTML
                                                        .replace(/{CLAN_NAME}/, capitalClan.name);
 
-      capitalRaidElement.appendChild(capitalCard);
+      capitalRaidElement.appendChild(capitalCardElement);
 
       await renderCapital(capitalCardElement, capitalClan);
       await renderCapitalSeason(capitalCardElement, capitalClan);
@@ -258,6 +271,8 @@
       capitalCardElement.querySelector('.row.content').classList.remove('display-none');
       const footerSection = capitalCardElement.querySelector('.footer-section');
       if (footerSection) footerSection.classList.remove('display-none');
+
+      settingLeagueIconTooltip(capitalCardElement);
     }
 
     async function writeCapitalClans() {

@@ -1,5 +1,7 @@
 package open.api.coc.clans.service;
 
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
+
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
@@ -10,9 +12,12 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.database.entity.ClanContentEntity;
 import open.api.coc.clans.database.entity.ClanEntity;
+import open.api.coc.clans.database.repository.ClanContentRepository;
 import open.api.coc.clans.database.repository.ClanRepository;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -28,6 +33,8 @@ import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -37,6 +44,7 @@ public class ClansService {
     private final ClanApiService clanApiService;
 
     private final ClanRepository clanRepository;
+    private final ClanContentRepository clanContentRepository;
 
     private final ClanResponseConverter clanResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
@@ -69,7 +77,7 @@ public class ClansService {
         List<ClanEntity> clans = clanRepository.findAll();
 
         return clans.stream()
-                    .map(ClanResponse::create)
+                    .map(clanResponseConverter::convert)
                     .sorted(Comparator.comparing(ClanResponse::getOrder))
                     .collect(Collectors.toList());
     }
@@ -142,5 +150,26 @@ public class ClansService {
                        .filter(Optional::isPresent)
                        .map(clan -> clanResponseConverter.convert(clan.get()))
                        .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateClanContentStatus(ClanContent request) {
+
+        ClanContentEntity clanContent = clanContentRepository.findById(request.getTag())
+                                                             .orElseThrow(() -> createNotFoundException("클랜[%s] 컨텐츠 정보".formatted(request.getTag())));
+
+        if (StringUtils.hasText(request.getClanWarYn())) {
+            clanContent.setClanWarYn(request.getClanWarYn());
+        }
+
+        if (StringUtils.hasText(request.getClanWarLeagueYn())) {
+            clanContent.setWarLeagueYn(request.getClanWarLeagueYn());
+        }
+
+        if (StringUtils.hasText(request.getClanCapitalYn())) {
+            clanContent.setClanCapitalYn(request.getClanCapitalYn());
+        }
+
+        clanContentRepository.save(clanContent);
     }
 }

@@ -8,6 +8,16 @@ CREATE TABLE TB_CLAN(
     PRIMARY KEY (TAG)
 );
 
+DROP TABLE IF EXISTS TB_CLAN_CONTENT;
+CREATE TABLE TB_CLAN_CONTENT (
+    TAG VARCHAR(100),
+    CLAN_WAR_YN varchar(1) default 'N' not null,
+    WAR_LEAGUE_YN varchar(1) default 'N' not null,
+    CLAN_CAPITAL_YN varchar(1) default 'N' not null,
+    CLAN_WAR_PARALLEL_YN varchar(1) default 'N' not null,
+    PRIMARY KEY (TAG)
+);
+
 -- insert into tb_clan values('#2QJUL08V9', '아카데미', 1, now());
 -- insert into tb_clan values('#2QG0G20RR', '아카데미 2.0', 2, now());
 -- insert into tb_clan values('#2LPP8PUCG', '아카데미 3.0', 3, now());
@@ -22,3 +32,18 @@ CREATE TABLE TB_CLAN(
 -- insert into tb_clan values('#2PLJJLY89', '가래떡에 꿀', 22, now());
 -- insert into tb_clan values('#2PUPJ09VP', '가래떡에 설탕', 23, now());
 -- insert into tb_clan values('#2LJ0U02YJ', '아카데미 쉼터', 99, now());
+
+-- insert into tb_clan_content(tag) values('#2QJUL08V9');
+-- insert into tb_clan_content(tag) values('#2QG0G20RR');
+-- insert into tb_clan_content(tag) values('#2LPP8PUCG');
+-- insert into tb_clan_content(tag) values('#2L209LC8P');
+-- insert into tb_clan_content(tag) values('#2QV0R0L8R');
+-- insert into tb_clan_content(tag) values('#2GJGRU920');
+-- insert into tb_clan_content(tag) values('#2GPGU92Q2');
+-- insert into tb_clan_content(tag) values('#2GY9YL0J9');
+-- insert into tb_clan_content(tag) values('#2QJLPVPQU');
+-- insert into tb_clan_content(tag) values('#229V992R8');
+-- insert into tb_clan_content(tag) values('#2G9GU9PLU');
+-- insert into tb_clan_content(tag) values('#2PLJJLY89');
+-- insert into tb_clan_content(tag) values('#2PUPJ09VP');
+-- insert into tb_clan_content(tag) values('#2LJ0U02YJ');

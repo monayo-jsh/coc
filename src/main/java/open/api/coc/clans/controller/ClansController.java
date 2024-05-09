@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -13,6 +15,8 @@ import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +33,16 @@ public class ClansController {
     public ResponseEntity<List<ClanResponse>> getClans() {
         return ResponseEntity.ok()
                              .body(clansService.getClanList());
+    }
+
+    @PutMapping("content")
+    public ResponseEntity<ClanContentRequest> putContent(@RequestBody ClanContentRequest clanContentRequest) {
+
+        ClanContent clanContent = ClanContent.create(clanContentRequest);
+        clansService.updateClanContentStatus(clanContent);
+
+        return ResponseEntity.ok()
+                             .body(clanContentRequest);
     }
 
     @GetMapping("/war")

@@ -45,6 +45,9 @@ public class ClanResponse {
     private List<ClanMemberResponse> memberList;
 
     private Integer order;
+
+    private ClanContentResponse clanContent;
+
     public static ClanResponse create(AcademeClan clan) {
         return ClanResponse.builder()
                            .name(clan.getName())
@@ -52,11 +55,4 @@ public class ClanResponse {
                            .build();
     }
 
-    public static ClanResponse create(ClanEntity clan) {
-        return ClanResponse.builder()
-                           .tag(clan.getTag())
-                           .name(clan.getName())
-                           .order(clan.getOrder())
-                           .build();
-    }
 }

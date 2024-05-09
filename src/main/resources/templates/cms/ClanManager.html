@@ -22,35 +22,31 @@
 
 
   <script>
+    function removeClan(element) {
+      const cardElement = element.closest('.card');
+      const { dataset } = cardElement;
+      const { clanTag, clanName } = dataset;
+
+      if (!confirm(`${clanName}(${clanTag})를 제거하시겠습니까?\n`)) {
+        return;
+      }
+
+      deleteClan(clanTag)
+        .then((response) => {
+          cardElement.remove();
+        })
+    }
+
     function convYn(yn) {
       if (yn === 'Y') return "비노출"
       return "노출"
     }
 
-    async function updateClanContent(requestBody) {
-        return await axios.put('/clans/content', requestBody)
-                          .then((response) => {
-                            alert('처리되었습니다.');
-                            return true;
-                          })
-                          .catch((error) => {
-                            let message = error.message;
-                            const { response } = error;
-                            if (response && response.data) {
-                              message = response.data;
-                            }
-
-                            alert(message);
-
-                            console.error(error);
-                            return false;
-                          })
-
-    }
-
     async function changeContentYn(element) {
+      const cardElement = element.closest('.card');
+      const { clanTag } = cardElement.dataset;
       const { dataset } = element;
-      const { btnName, tag, yn, menuName } = dataset;
+      const { btnName, yn, menuName } = dataset;
 
       if (!confirm(`${btnName} 메뉴에서 ${convYn(yn)}하시겠습니까?`)) {
         return;
@@ -58,7 +54,7 @@
 
       const changeYn = yn === 'Y' ? 'N' : 'Y';
       const requestBody = {}
-      requestBody.tag = tag;
+      requestBody.tag = clanTag;
       requestBody[menuName] = changeYn;
 
       const result = await updateClanContent(requestBody);
@@ -136,8 +132,7 @@
       return memberList.filter(member => member.role === 'leader');
     }
 
-    function settingDataYn(btnElement, clanTag, yn) {
-      btnElement.dataset.tag = clanTag;
+    function settingDataYn(btnElement, yn) {
       btnElement.dataset.yn = yn;
       settingDisabled(btnElement);
     }
@@ -156,11 +151,11 @@
       const { tag, clanWarYn, clanWarLeagueYn, clanCapitalYn, clanWarParallelYn } = clanContent;
 
       const btnClanWar = card.querySelector('.btn-clan-war');
-      settingDataYn(btnClanWar, tag, clanWarYn);
+      settingDataYn(btnClanWar, clanWarYn);
       const btnClanWarLeague = card.querySelector('.btn-clan-war-league');
-      settingDataYn(btnClanWarLeague, tag, clanWarLeagueYn);
+      settingDataYn(btnClanWarLeague, clanWarLeagueYn);
       const btnClanCapital = card.querySelector('.btn-clan-capital');
-      settingDataYn(btnClanCapital, tag, clanCapitalYn);
+      settingDataYn(btnClanCapital, clanCapitalYn);
 
     }
 
@@ -174,6 +169,10 @@
 
       const { name, tag, badgeUrls, warLeague, capitalLeague, memberList, clanContent } = clan;
       const [leader] = findLeader(memberList);
+
+      // dataset
+      card.dataset.clanTag = tag;
+      card.dataset.clanName = name;
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
@@ -267,7 +266,7 @@
       <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
         <i class="icon-clan-capital"></i>
       </div>
-      <div class="card-button" onclick="alert('삭제 예정');">
+      <div class="card-button color-red" onclick="removeClan(this); return false;">
         <i class="fa-regular fa-square-minus"></i>
       </div>
     </div>

@@ -2,12 +2,55 @@ const URI_CLANS = '/clans'; //전체 클랜 목록 조회
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
 
+const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
+
 function deviceArray(array, size) {
   const result = [];
   for (let i = 0; i < array.length; i += size) {
     result.push(array.slice(i, i + size));
   }
   return result;
+}
+
+async function deleteClan(clanTag) {
+  const uri = `${URI_CLANS}/${encodeURIComponent(clanTag)}`
+  return await axios.delete(uri)
+                    .then((response) => {
+                      alert('처리되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return false;
+                    })
+}
+
+async function updateClanContent(requestBody) {
+  return await axios.put(URI_CLAN_CONTENT, requestBody)
+                    .then((response) => {
+                      alert('처리되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return false;
+                    })
 }
 
 async function fetchClans() {

@@ -34,6 +34,7 @@ import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 @Slf4j
@@ -171,5 +172,19 @@ public class ClansService {
         }
 
         clanContentRepository.save(clanContent);
+    }
+
+    @Transactional
+    public void deleteClan(String clanTag) {
+        ClanEntity clan = clanRepository.findById(clanTag)
+                                        .orElse(null);
+
+        if (ObjectUtils.isEmpty(clan)) {
+            // 클랜 없는 경우 성공
+            return;
+        }
+
+        clanRepository.deleteById(clanTag);
+        clanContentRepository.deleteById(clanTag);
     }
 }

@@ -13,6 +13,7 @@ import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,6 +34,14 @@ public class ClansController {
     public ResponseEntity<List<ClanResponse>> getClans() {
         return ResponseEntity.ok()
                              .body(clansService.getClanList());
+    }
+
+    @DeleteMapping("{clanTag}")
+    public ResponseEntity<?> deleteClan(@PathVariable String clanTag) {
+
+        clansService.deleteClan(clanTag);
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("content")

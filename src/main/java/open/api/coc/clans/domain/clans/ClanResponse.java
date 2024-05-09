@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.common.AcademeClan;
+import open.api.coc.clans.database.entity.ClanEntity;
 
 @Getter
 @Builder
@@ -42,6 +43,10 @@ public class ClanResponse {
 
     private Integer members;
     private List<ClanMemberResponse> memberList;
+
+    private Integer order;
+
+    private ClanContentResponse clanContent;
 
     public static ClanResponse create(AcademeClan clan) {
         return ClanResponse.builder()

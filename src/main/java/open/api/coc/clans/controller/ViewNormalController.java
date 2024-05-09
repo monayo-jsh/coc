@@ -4,12 +4,17 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class ViewController {
+public class ViewNormalController {
 
     /** 편의 기능 페이지 */
     @GetMapping("")
     public String viewHome() {
         return "Home";
+    }
+
+    @GetMapping("/clan")
+    public String viewClan() {
+        return "clan/Clan";
     }
 
     @GetMapping("/clan/member")
@@ -33,9 +38,4 @@ public class ViewController {
         return "capital/Raid";
     }
 
-    /** 운영 기능 페이지 */
-    @GetMapping("/clan/cms")
-    public String viewAdminHome() {
-        return "cms/Admin";
-    }
 }

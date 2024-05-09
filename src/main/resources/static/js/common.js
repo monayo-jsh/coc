@@ -2,6 +2,14 @@ function renderPage(uri) {
   location.href = uri;
 }
 
+function launchAppWithOpenClanProfile(tag) {
+  if (!confirm("게임을 실행하시겠습니까?")) {
+    return;
+  }
+
+  location.href = `clashofclans://action=OpenClanProfile&tag=${tag}`;
+}
+
 function addClassDim(element) {
   element.classList.add('dim')
 }
@@ -21,15 +29,4 @@ function hideWifiLoading(dimElementClassName) {
     const loader = document.querySelector('#wifi-loader');
     loader.classList.add('display-none');
   }, 100)
-}
-
-function convName(role) {
-  if (!role) return role;
-  switch (role.toUpperCase()) {
-    case 'LEADER': return '대표';
-    case 'COLEADER': return '공동대표'
-    case 'ADMIN': return '장로';
-    case 'MEMBER': return '일반';
-    default: return role;
-  }
 }

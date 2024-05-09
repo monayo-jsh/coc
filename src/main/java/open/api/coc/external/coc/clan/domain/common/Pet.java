@@ -5,7 +5,7 @@ import static open.api.coc.clans.common.exception.handler.ExceptionHandler.creat
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
-import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.common.exception.NotFoundException;
 
 @Getter
 public enum Pet {
@@ -31,14 +31,14 @@ public enum Pet {
         return Arrays.stream(values())
                      .filter(hero -> Objects.equals(hero.getName(), name))
                      .findFirst()
-                     .orElseThrow(() -> createNotFoundException("펫 정의 코드를 찾지 못함"));
+                     .orElseThrow(() -> createNotFoundException("펫(%s) 정의 코드를 찾지 못함".formatted(name)));
     }
 
     public static boolean isPets(String name) {
         try {
             Pet pet = findByName(name);
             return true;
-        } catch (CustomRuntimeException e) {
+        } catch (NotFoundException e) {
             return false;
         }
     }

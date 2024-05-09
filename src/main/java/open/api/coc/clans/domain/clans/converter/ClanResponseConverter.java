@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.ClanEntity;
 import open.api.coc.clans.domain.clans.ClanMemberResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
@@ -22,6 +23,8 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
     private final LabelResponseConverter labelResponseConverter;
     private final ClanCapitalResponseConverter clanCapitalResponseConverter;
     private final ClanMemberResponseConverter clanMemberResponseConverter;
+
+    private final ClanContentResponseConverter clanContentResponseConverter;
 
     @Override
     public ClanResponse convert(Clan source) {
@@ -49,6 +52,15 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
                            .clanCapital(clanCapitalResponseConverter.convert(source.getClanCapital()))
                            .members(source.getMembers())
                            .memberList(makeMemberList(source.getMemberList()))
+                           .build();
+    }
+
+    public ClanResponse convert(ClanEntity clanEntity) {
+        return ClanResponse.builder()
+                           .tag(clanEntity.getTag())
+                           .name(clanEntity.getName())
+                           .order(clanEntity.getOrder())
+                           .clanContent(clanContentResponseConverter.convert(clanEntity.getClanContent()))
                            .build();
     }
 

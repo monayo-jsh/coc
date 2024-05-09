@@ -2,16 +2,24 @@ package open.api.coc.clans.controller;
 
 import java.io.IOException;
 import java.util.List;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.*;
+import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanContentRequest;
+import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanMemberListRes;
+import open.api.coc.clans.domain.clans.ClanRequest;
+import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
-import open.api.coc.external.coc.clan.ClanApiService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,13 +30,35 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClansController {
 
     private final ClansService clansService;
-    private final ClanApiService clanApiService;
     private final ClanWarLeagueScheduler scheduler;
 
     @GetMapping("")
     public ResponseEntity<List<ClanResponse>> getClans() {
         return ResponseEntity.ok()
-                             .body(clansService.getClanResList());
+                             .body(clansService.getClanList());
+    }
+
+    @PostMapping("{clanTag}")
+    public ResponseEntity<ClanResponse> registerClan(@RequestBody ClanRequest clanRequest) {
+        ClanResponse clan = clansService.registerClan(clanRequest);
+        return ResponseEntity.ok()
+                             .body(clan);
+    }
+
+    @DeleteMapping("{clanTag}")
+    public ResponseEntity<?> deleteClan(@PathVariable String clanTag) {
+        clansService.deleteClan(clanTag);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("content")
+    public ResponseEntity<ClanContentRequest> putContent(@RequestBody ClanContentRequest clanContentRequest) {
+
+        ClanContent clanContent = ClanContent.create(clanContentRequest);
+        clansService.updateClanContentStatus(clanContent);
+
+        return ResponseEntity.ok()
+                             .body(clanContentRequest);
     }
 
     @GetMapping("/war")
@@ -50,6 +80,12 @@ public class ClansController {
     public ResponseEntity<List<ClanResponse>> getClansCapital() {
         return ResponseEntity.ok()
                              .body(clansService.getClanCaptialList());
+    }
+
+    @GetMapping("/detail")
+    public ResponseEntity<List<ClanResponse>> getClanDetail(@RequestParam List<String> clanTags) {
+        List<ClanResponse> clans = clansService.findClanByClanTags(clanTags);
+        return ResponseEntity.ok().body(clans);
     }
 
     @GetMapping("/members")

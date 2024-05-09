@@ -11,6 +11,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
 
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/league.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -37,20 +38,12 @@
 
   function callApp(element) {
       const card = element.closest('div.card');
-      // if (card.classList.contains("dim")) {
-      //   // 종료된 경우
-      //   return;
-      // }
-
-      if (!confirm("게임을 실행하시겠습니까?")) {
-        return;
-      }
 
       const { dataset } = card;
       const { clanTag } = dataset;
 
-      location.href = `clashofclans://action=OpenClanProfile&tag=${clanTag}`;
-    }
+    launchAppWithOpenClanProfile(clanTag);
+  }
 
     async function fetchCapitalClans() {
       return await axios.get("/clans/capital")
@@ -274,29 +267,6 @@
       for (const capitalClan of capitalClans) {
         renderCapitalCard(capitalRaidElement, capitalClan);
       }
-    }
-
-    async function fetchLeagues() {
-      return await axios.get("/leagues")
-                        .then((response) => {
-                          const { data } = response
-                          return data;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-
-                          const { code } = error;
-                          if (code === 'ERR_NETWORK') {
-                            return {};
-                          }
-
-                          const { response } = error;
-                          const { status } = response
-                          // 서버 이용 불가로 메인 화면 이동
-                          if (status >= 500) {
-                            location.href = "/";
-                          }
-                        });
     }
 
     function switchAttacks(element) {

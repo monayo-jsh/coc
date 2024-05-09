@@ -15,12 +15,15 @@ public class ClanContent {
     private final String clanWarYn;
     private final String clanWarLeagueYn;
     private final String clanCapitalYn;
+    private final String clanWarParallelYn;
 
-    private ClanContent(String tag, String clanWarYn, String clanWarLeagueYn, String clanCapitalYn) {
+    private ClanContent(String tag, String clanWarYn, String clanWarLeagueYn, String clanCapitalYn,
+                        String clanWarParallelYn) {
         this.tag = tag;
         this.clanWarYn = clanWarYn;
         this.clanWarLeagueYn = clanWarLeagueYn;
         this.clanCapitalYn = clanCapitalYn;
+        this.clanWarParallelYn = clanWarParallelYn;
     }
 
     public static ClanContent create(ClanContentRequest clanContentRequest) {
@@ -29,6 +32,7 @@ public class ClanContent {
                                              .clanWarYn(clanContentRequest.getClanWarYn())
                                              .clanWarLeagueYn(clanContentRequest.getClanWarLeagueYn())
                                              .clanCapitalYn(clanContentRequest.getClanCapitalYn())
+                                             .clanWarParallelYn(clanContentRequest.getClanWarParallelYn())
                                              .build();
 
         clanContent.validate();
@@ -43,10 +47,9 @@ public class ClanContent {
         if (validateYn(clanWarYn)) return;
         if (validateYn(clanWarLeagueYn)) return;
         if (validateYn(clanCapitalYn)) return;
+        if (validateYn(clanWarParallelYn)) return;
 
-        if (isEmpty(clanWarYn) && isEmpty(clanWarLeagueYn) && isEmpty(clanCapitalYn)) {
-            throw BadRequestException.create(ExceptionCode.INVALID_PARAMETER, "컨텐츠 항목 사용여부 미입력");
-        }
+        throw BadRequestException.create(ExceptionCode.INVALID_PARAMETER, "컨텐츠 항목 사용여부 미입력");
     }
 
     private boolean validateYn(String yn) {

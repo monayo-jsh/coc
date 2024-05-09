@@ -171,6 +171,10 @@ public class ClansService {
             clanContent.setClanCapitalYn(request.getClanCapitalYn());
         }
 
+        if (StringUtils.hasText(request.getClanWarParallelYn())) {
+            clanContent.setClanWarParallelYn(request.getClanWarParallelYn());
+        }
+
         clanContentRepository.save(clanContent);
     }
 

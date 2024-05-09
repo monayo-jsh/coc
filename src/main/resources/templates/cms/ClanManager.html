@@ -157,6 +157,8 @@
       const btnClanCapital = card.querySelector('.btn-clan-capital');
       settingDataYn(btnClanCapital, clanCapitalYn);
 
+      const btnClanWarParallel = card.querySelector('.btn-clan-war-parallel');
+      settingDataYn(btnClanWarParallel, clanWarParallelYn);
     }
 
     function renderClan(clan) {
@@ -265,6 +267,9 @@
       </div>
       <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
         <i class="icon-clan-capital"></i>
+      </div>
+      <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clan_war_parallel_yn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
+        <i class="icon-clan-war"></i>
       </div>
       <div class="card-button color-red" onclick="removeClan(this); return false;">
         <i class="fa-regular fa-square-minus"></i>

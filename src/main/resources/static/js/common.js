@@ -30,3 +30,13 @@ function hideWifiLoading(dimElementClassName) {
     loader.classList.add('display-none');
   }, 100)
 }
+
+function settingTooltip(element, tooltip) {
+  // tooltip 설정
+  // 사용하는 페이징 상단 라이브러리 추가 필요함
+  // <script src="https://unpkg.com/@popperjs/core@2"></script>
+  // <script src="https://unpkg.com/tippy.js@6"></script>
+  tippy(element, {
+    content: tooltip
+  });
+}

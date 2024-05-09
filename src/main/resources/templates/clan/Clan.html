@@ -18,6 +18,9 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
   <title>클랜 관리</title>
 
 
@@ -70,6 +73,8 @@
           warLeagueElement.replaceWith(imgElement);
         }
       }
+
+      settingTooltip(warLeagueElement, `[리그전] ${name}`);
     }
 
     function renderCapitalLeagueBadge(capitalLeague, card) {
@@ -82,6 +87,8 @@
         const { small } = iconUrls;
         const leagueBadge = card.querySelector('.capital-league-badge');
         leagueBadge.src = small;
+
+        settingTooltip(leagueBadge, `[습격전] ${name}`);
       }
     }
 
@@ -103,6 +110,14 @@
       }
     }
 
+    function settingTooltipYn(btnClanWar, name, clanWarYn) {
+      settingTooltip(btnClanWar, `${name} ${getActiveName(clanWarYn)}`);
+
+      function getActiveName(clanWarYn) {
+        return clanWarYn === 'Y' ? '활성화' : '비활성화';
+      }
+    }
+
     function renderClanContent(clanContent, card) {
       if (!clanContent) return;
 
@@ -110,13 +125,17 @@
 
       const btnClanWar = card.querySelector('.btn-clan-war');
       settingDataYn(btnClanWar, clanWarYn);
+      settingTooltipYn(btnClanWar, '클랜전', clanWarYn);
       const btnClanWarLeague = card.querySelector('.btn-clan-war-league');
       settingDataYn(btnClanWarLeague, clanWarLeagueYn);
+      settingTooltipYn(btnClanWarLeague, '리그전', clanWarLeagueYn)
       const btnClanCapital = card.querySelector('.btn-clan-capital');
       settingDataYn(btnClanCapital, clanCapitalYn);
+      settingTooltipYn(btnClanCapital, '습격전', clanCapitalYn)
 
       const btnClanWarParallel = card.querySelector('.btn-clan-war-parallel');
       settingDataYn(btnClanWarParallel, clanWarParallelYn);
+      settingTooltipYn(btnClanWarParallel, '병행클랜전', clanWarParallelYn)
     }
 
     function renderClan(clan, targetElement) {

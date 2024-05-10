@@ -11,6 +11,7 @@ import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
+import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
@@ -104,6 +105,12 @@ public class ClansController {
     public ResponseEntity<ClanMemberListRes> getClanMembers(@PathVariable String clanTag) {
         ClanMemberListRes clanMemberList = clansService.findClanMembersByClanTag(clanTag);
         return ResponseEntity.ok().body(clanMemberList);
+    }
+
+    @GetMapping("/{clanTag}/assigned/members")
+    public ResponseEntity<List<PlayerResponse>> getClanAssignedMembers(@PathVariable String clanTag) {
+        List<PlayerResponse> assignedMembers = clansService.findClanAssignedMembers(clanTag);
+        return ResponseEntity.ok().body(assignedMembers);
     }
 
     @GetMapping("/{clanTag}/current/war")

@@ -8,6 +8,7 @@ CREATE TABLE TB_CLAN(
     PRIMARY KEY (TAG)
 );
 
+/* 클랜 컨텐츠 관리 */
 DROP TABLE IF EXISTS TB_CLAN_CONTENT;
 CREATE TABLE TB_CLAN_CONTENT (
     TAG VARCHAR(100),
@@ -16,6 +17,15 @@ CREATE TABLE TB_CLAN_CONTENT (
     CLAN_CAPITAL_YN varchar(1) default 'N' not null,
     CLAN_WAR_PARALLEL_YN varchar(1) default 'N' not null,
     PRIMARY KEY (TAG)
+);
+
+/* 클랜 배정 유저 관리 */
+DROP TABLE IF EXISTS TB_CLAN_ASSIGNED_PLAYER;
+CREATE TABLE TB_CLAN_ASSIGNED_PLAYER (
+    CLAN_TAG VARCHAR(100),
+    SEASON_DATE VARCHAR(6),
+    PLAYER_TAG VARCHAR(100),
+    PRIMARY KEY (CLAN_TAG, SEASON_DATE, PLAYER_TAG)
 );
 
 -- insert into tb_clan values('#2QJUL08V9', '아카데미', 1, now());
@@ -47,3 +57,6 @@ CREATE TABLE TB_CLAN_CONTENT (
 -- insert into tb_clan_content(tag) values('#2PLJJLY89');
 -- insert into tb_clan_content(tag) values('#2PUPJ09VP');
 -- insert into tb_clan_content(tag) values('#2LJ0U02YJ');
+
+-- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QJUL08V9', '202405', '#JU0PUPPG');
+-- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QG0G20RR', '202405', '#QJJRPPGCR');

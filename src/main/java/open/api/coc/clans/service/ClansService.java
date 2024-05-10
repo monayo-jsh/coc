@@ -3,7 +3,9 @@ package open.api.coc.clans.service;
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +16,10 @@ import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.database.entity.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.ClanContentEntity;
 import open.api.coc.clans.database.entity.ClanEntity;
+import open.api.coc.clans.database.repository.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.ClanContentRepository;
 import open.api.coc.clans.database.repository.ClanRepository;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
@@ -29,6 +33,7 @@ import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseCo
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
+import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
@@ -49,11 +54,14 @@ public class ClansService {
 
     private final ClanRepository clanRepository;
     private final ClanContentRepository clanContentRepository;
+    private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
 
     private final ClanResponseConverter clanResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
+
+    private final PlayersService playersService;
 
     public ClanResponse findClanByClanTag(String clanTag) {
         Clan clan = clanApiService.findClanByClanTag(clanTag)
@@ -233,5 +241,19 @@ public class ClansService {
                          .order(clanMaxOrders + 1)
                          .regDate(LocalDateTime.now())
                          .build();
+    }
+
+    public List<PlayerResponse> findClanAssignedMembers(String clanTag) {
+        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDateByClanTag(clanTag);
+        if (ObjectUtils.isEmpty(latestSeasonDate)) {
+            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        }
+
+        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findByClanTagAndSeasonDate(clanTag, latestSeasonDate);
+
+        List<String> playerTags = clanAssignedPlayers.stream()
+                                                      .map(ClanAssignedPlayerEntity::getPlayerTag)
+                                                      .toList();
+        return playersService.findPlayerBy(playerTags);
     }
 }

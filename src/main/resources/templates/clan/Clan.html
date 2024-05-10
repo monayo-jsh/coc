@@ -192,6 +192,15 @@
       await loadLeagues();
       await getClans();
     }
+
+    function callApp(element) {
+      const card = element.closest('div.card');
+
+      const { dataset } = card;
+      const { clanTag } = dataset;
+
+      launchAppWithOpenClanProfile(clanTag);
+    }
   </script>
 
 </head>
@@ -250,6 +259,9 @@
         <i class="icon-clan-war"></i>
         <span class="chip">병행클랜전</span>
       </div>
+    </div>
+    <div class="card-footer justify-content-center cursor-pointer" onclick="callApp(this);">
+      <span class="button-chip">visit</span>
     </div>
   </div>
 </template>

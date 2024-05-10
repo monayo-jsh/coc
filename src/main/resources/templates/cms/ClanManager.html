@@ -247,12 +247,30 @@
       settingDataYn(btnClanWarParallel, clanWarParallelYn);
     }
 
+    function renderLabel(label, card) {
+      const clanLabelTemplate = document.querySelector("#clan-label-template");
+      const clanLabel = document.importNode(clanLabelTemplate.content, true);
+      const labelIcon = clanLabel.querySelector('.label-icon');
+
+      const { iconUrls } = label;
+      const { small } = iconUrls;
+
+      labelIcon.src = small;
+
+      const targetElement = card.querySelector('.text-body');
+      targetElement.appendChild(clanLabel);
+    }
+
+    function renderLabels(labels, card) {
+      labels.forEach((label) => renderLabel(label, card))
+    }
+
     function renderClan(clan, targetElement) {
       const clanCardTemplate = document.querySelector("#clan-card");
       const clanCard = document.importNode(clanCardTemplate.content, true);
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanContent } = clan;
+      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, labels, clanContent } = clan;
       const [leader] = findLeader(memberList);
 
       // dataset
@@ -272,6 +290,8 @@
       renderCapitalLeagueBadge(capitalLeague, card);
 
       renderClanContent(clanContent, card);
+
+      renderLabels(labels, card);
 
       settingTooltips(card);
 
@@ -438,6 +458,11 @@
 <template id="clan-card-register-button">
   <div class="card-button color-green btn-add" onclick="addClan(this); return false;">
     <i class="fa-regular fa-square-plus"></i>
+  </div>
+</template>
+<template id="clan-label-template">
+  <div class="chip clan-label">
+    <img class="icon label-icon">
   </div>
 </template>
 </html>

@@ -136,3 +136,12 @@
   width: 15px;
   height: 15px;
 }
+
+.chip.clan-label {
+  background-color: unset;
+}
+
+.icon.label-icon {
+  width: 25px;
+  height: 25px;
+}

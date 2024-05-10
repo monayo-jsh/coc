@@ -74,7 +74,7 @@
         }
       }
 
-      settingTooltip(warLeagueElement, `[리그전] ${name}`);
+      card.innerHTML = card.innerHTML.replace(/{CLAN_WAR_LABEL}/, convLeagueName(name));
     }
 
     function renderCapitalLeagueBadge(capitalLeague, card) {
@@ -87,9 +87,9 @@
         const { small } = iconUrls;
         const leagueBadge = card.querySelector('.capital-league-badge');
         leagueBadge.src = small;
-
-        settingTooltip(leagueBadge, `[습격전] ${name}`);
       }
+
+      card.innerHTML = card.innerHTML.replace(/{CLAN_CAPITAL_LABEL}/, convLeagueName(name))
     }
 
     function findLeader(memberList) {
@@ -138,12 +138,35 @@
       settingTooltipYn(btnClanWarParallel, '병행클랜전', clanWarParallelYn)
     }
 
+    function settingTooltips(element) {
+      const clanTagChip = element.querySelector('.clan-tag');
+      settingTooltip(clanTagChip, '클랜 태그');
+
+      const clanTypeChip = element.querySelector('.clan-type');
+      settingTooltip(clanTypeChip, '가입 유형');
+
+      const clanLeaderChip = element.querySelector('.clan-leader');
+      settingTooltip(clanLeaderChip, '대표 계정');
+
+      const clanMemberChip = element.querySelector('.clan-members');
+      settingTooltip(clanMemberChip, '클랜 인원');
+
+      const iconTrophiesChip = element.querySelector('.clan-trophies');
+      settingTooltip(iconTrophiesChip, '클랜 트로피');
+
+      const clanWarLeagueChip = element.querySelector('.clan-war-league');
+      settingTooltip(clanWarLeagueChip, '클랜 리그전');
+
+      const clanCapitalChip = element.querySelector('.clan-capital');
+      settingTooltip(clanCapitalChip, '습격전');
+    }
+
     function renderClan(clan, targetElement) {
       const clanCardTemplate = document.querySelector("#clan-card");
       const clanCard = document.importNode(clanCardTemplate.content, true);
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, badgeUrls, warLeague, capitalLeague, memberList, clanContent } = clan;
+      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanContent } = clan;
       const [leader] = findLeader(memberList);
 
       // dataset
@@ -153,7 +176,10 @@
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
                            .replace(/{CLAN_TAG}/, tag)
-                           .replace(/{CLAN_LEADER}/, leader.name);
+                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
+                           .replace(/{CLAN_LEADER}/, leader.name)
+                           .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
+                           .replace(/{CLAN_MEMBERS}/, members);
 
       renderClanBadge(badgeUrls, card);
       renderWarLeagueBadge(warLeague, card);
@@ -161,7 +187,10 @@
 
       renderClanContent(clanContent, card);
 
+      settingTooltips(card);
+
       targetElement.appendChild(card);
+
     }
 
     function renderClans(clans) {
@@ -228,18 +257,31 @@
 </body>
 <template id="clan-card">
   <div class="card">
-    <div class="card-img">
-      <img class="clan-badge icon">
-      <div class="clan-war-league-badge img-icon icon"></div>
-      <img class="capital-league-badge icon">
-    </div>
     <div class="card-info">
       <div class="text-title">
-        <span>{CLAN_NAME}</span>
+        <img class="clan-badge icon">
+        <span class="title">{CLAN_NAME}</span>
       </div>
       <div class="text-body">
-        <div class="chip">{CLAN_TAG}</div>
-        <div class="chip bg-blue">{CLAN_LEADER}</div>
+        <div class="chip clan-tag">{CLAN_TAG}</div>
+        <div class="chip bg-orange clan-type">{CLAN_TYPE}</div>
+        <div class="chip bg-blue clan-leader">{CLAN_LEADER}</div>
+        <div class="chip bg-green clan-members">
+          <i class="fa-solid fa-user color-white"></i>
+          <span class="chip-label">{CLAN_MEMBERS}</span>
+        </div>
+        <div class="chip bg-gold clan-trophies">
+          <div class="icon trophies"></div>
+          <span class="chip-label">{CLAN_TROPHIES}</span>
+        </div>
+        <div class="chip bg-crimson clan-war-league">
+          <div class="clan-war-league-badge img-icon icon"></div>
+          <span class="chip-label">{CLAN_WAR_LABEL}</span>
+        </div>
+        <div class="chip bg-forestgreen clan-capital">
+          <img class="capital-league-badge icon">
+          <span class="chip-label">{CLAN_CAPITAL_LABEL}</span>
+        </div>
       </div>
     </div>
     <div class="card-footer">

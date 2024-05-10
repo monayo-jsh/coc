@@ -46,38 +46,23 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-.card-img {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  background-color: #d7d7d7;
-  height: 50px;
-  width: 100%;
-  border-radius: .5rem;
-  transition: .3s ease;
-
-  .clan-badge {
-    width: 35px;
-    height: 35px;
-  }
-
-  .capital-league-badge {
-    width: 35px;
-    height: 35px;
-  }
-
-  .clan-war-league-badge {
-    width: 35px;
-    height: 35px;
-  }
-
-  .icon:not(:first-child) {
-    margin-left: 5px;
-  }
+.clan-badge {
+  width: 55px;
+  height: 55px;
 }
 
-.card-info {
-  padding-top: 10px;
+.clan-war-league-badge {
+  width: 25px;
+  height: 25px;
+}
+
+.capital-league-badge {
+  width: 25px;
+  height: 25px;
+}
+
+.title {
+  margin-left: 5px;
 }
 
 .card-footer {
@@ -91,16 +76,19 @@
 
 /*Text*/
 .text-title {
+  display: flex;
+  align-items: center;
   font-weight: 900;
   font-size: 1.2em;
-  line-height: 1.5;
 }
 
 .text-body {
   display: flex;
+  flex-wrap: wrap;
   margin-top: 5px;
   font-size: .9em;
   padding-bottom: 10px;
+  padding-top: 10px;
 
   .description {
     white-space: pre-wrap;
@@ -122,13 +110,15 @@
   }
 }
 
-.btn-close {
+.btn-add, .btn-remove {
   position: absolute;
-  top: -10px;
-  right: -10px;
+  top: 0;
+  right: 0;
 }
 
 .chip {
+  display: flex;
+  align-items: center;
   margin: 3px;
   font-size: 12px;
   font-weight: unset;
@@ -138,6 +128,11 @@
   font-size: 30px;
 }
 
-.fa-circle-xmark:before {
-  font-size: 20px;
+.fa-rectangle-xmark:before {
+  font-size: 30px;
+}
+
+.icon.trophies {
+  width: 15px;
+  height: 15px;
 }

@@ -407,12 +407,3 @@
   align-items: center;
   justify-content: space-around;
 }
-
-.icon.trophies {
-  width: 36px;
-  height: 36px;
-  background-image: url(/static/images/etc/trophies.png);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-}

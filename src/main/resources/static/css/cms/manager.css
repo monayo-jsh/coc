@@ -14,6 +14,72 @@
   }
 }
 
+.card-basic {
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.card-assigned-player-wrapper {
+  position: relative;
+  min-height: 300px;
+}
+
+.card-assigned-player {
+
+  .caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: bold;
+  }
+
+  .player-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .layout-left, .layout-right {
+      display: flex;
+      align-items: center;
+    }
+
+    .player-info-item:not(:first-child) {
+      margin: 0 5px;
+    }
+
+    .player-info-item {
+
+      .big-text {
+        font-size: 11px;
+      }
+      .regular-text {
+        font-size: 9px;
+      }
+    }
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+  padding: 10px 0;
+  border-top: 1px solid gray;
+  display: flex;
+  justify-content: space-between;
+
+  .regular-text {
+    margin-left: 5px;
+    font-size: 12px;
+  }
+}
+
+.player-list {
+
+  .not-joined {
+    color: red;
+  }
+}
+
 .clan-manager {
   position: relative;
   padding: 10px;
@@ -70,7 +136,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 10px;
+  padding: 10px 0;
   border-top: 1px solid #ddd;
 }
 

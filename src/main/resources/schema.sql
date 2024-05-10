@@ -59,4 +59,41 @@ CREATE TABLE TB_CLAN_ASSIGNED_PLAYER (
 -- insert into tb_clan_content(tag) values('#2LJ0U02YJ');
 
 -- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QJUL08V9', '202405', '#JU0PUPPG');
--- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QG0G20RR', '202405', '#QJJRPPGCR');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

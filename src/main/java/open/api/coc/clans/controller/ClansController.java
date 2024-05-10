@@ -3,6 +3,7 @@ package open.api.coc.clans.controller;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
@@ -108,8 +109,8 @@ public class ClansController {
     }
 
     @GetMapping("/{clanTag}/assigned/members")
-    public ResponseEntity<List<PlayerResponse>> getClanAssignedMembers(@PathVariable String clanTag) {
-        List<PlayerResponse> assignedMembers = clansService.findClanAssignedMembers(clanTag);
+    public ResponseEntity<ClanAssignedMemberListResponse> getClanAssignedMembers(@PathVariable String clanTag) {
+        ClanAssignedMemberListResponse assignedMembers = clansService.findClanAssignedMembers(clanTag);
         return ResponseEntity.ok().body(assignedMembers);
     }
 

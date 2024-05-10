@@ -17,14 +17,6 @@ function overridePlayer(memberMap, member) {
 
     Object.assign(member, fetchMember); //member override
   }
-
-  function calcHeroLevelSum(heroes) {
-    if (!heroes) return 0;
-    return filterVillage(heroes).reduce((levelSum, hero) => {
-      levelSum += hero.level
-      return levelSum
-    }, 0)
-  }
 }
 
 function makePlayerRequest(players) {

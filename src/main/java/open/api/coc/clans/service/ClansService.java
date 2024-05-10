@@ -22,6 +22,7 @@ import open.api.coc.clans.database.entity.ClanEntity;
 import open.api.coc.clans.database.repository.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.ClanContentRepository;
 import open.api.coc.clans.database.repository.ClanRepository;
+import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
@@ -243,7 +244,7 @@ public class ClansService {
                          .build();
     }
 
-    public List<PlayerResponse> findClanAssignedMembers(String clanTag) {
+    public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {
         String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDateByClanTag(clanTag);
         if (ObjectUtils.isEmpty(latestSeasonDate)) {
             latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
@@ -254,6 +255,8 @@ public class ClansService {
         List<String> playerTags = clanAssignedPlayers.stream()
                                                       .map(ClanAssignedPlayerEntity::getPlayerTag)
                                                       .toList();
-        return playersService.findPlayerBy(playerTags);
+        List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
+
+        return ClanAssignedMemberListResponse.create(clanTag, latestSeasonDate, players);
     }
 }

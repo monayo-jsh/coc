@@ -3,10 +3,13 @@ const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
 function deviceArray(array, size) {
+  if (array.length === 1) return [array];
+
   const result = [];
   for (let i = 0; i < array.length; i += size) {
     result.push(array.slice(i, i + size));
@@ -173,4 +176,17 @@ async function fetchClanMembers(clans) {
              })
 
   return allClanMembers;
+}
+
+async function fetchClanAssignedMembers(clanTag) {
+  const URI = URI_CLAN_ASSIGNED_MEMBERS.replace(/{clanTag}/, encodeURIComponent(clanTag));
+  return await axios.get(URI)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
 }

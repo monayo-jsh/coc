@@ -145,3 +145,53 @@
   width: 25px;
   height: 25px;
 }
+
+
+/** filter css */
+.radio-group-wrapper {
+  width: 270px;
+  height: 60px;
+  background-color: antiquewhite;
+  border-radius: 40px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.041);
+  align-items: center;
+  justify-content: center;
+  display: flex;
+
+  .radio-group {
+    list-style: none;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background-color: transparent;
+  }
+
+  .input-radio {
+    display: none;
+  }
+
+  .radio-item i.icon {
+    width: 35px;
+    height: 35px;
+    opacity: 0.8;
+    cursor: pointer;
+    padding: 13px 20px;
+    transition: 0.2s;
+  }
+
+  .radio-item i.icon:hover {
+    transition: 0.1s;
+    position: relative;
+    margin-top: -2px;
+    opacity: 1;
+  }
+
+  .input-radio:checked + label .radio-item i.icon {
+    transition: 0.1s;
+    position: relative;
+    margin-top: -2px;
+    opacity: 1;
+  }
+
+}

@@ -25,6 +25,32 @@
 
 
   <script>
+    function filterClanList(element, type) {
+      if (element.checked) {
+        // 다른 설정된 필터링 제거
+        const inputRadios = document.querySelectorAll('.input-radio[name=filter-content]');
+        inputRadios.forEach((inputRadio) => {
+          if (inputRadio !== element) {
+            // 다른 필터링 옵션 제거
+            inputRadio.checked = false;
+          }
+        })
+      }
+
+      if (!element.checked) {
+        // 필터링 제거
+        type = '';
+      }
+
+      let drawClans = clanList.filter((clan) => {
+        if (!type) return true; // all
+
+        const { clanContent } = clan;
+        return clanContent[type] === 'Y';
+      })
+
+      renderClans(drawClans);
+    }
 
     let leagueMap = {}
     async function loadLeagues() {
@@ -215,24 +241,34 @@
 
     function renderClans(clans) {
       const clansListElement = document.querySelector('.clan-list');
-      clans.forEach((clan) => renderClan(clan, clansListElement))
+      clansListElement.innerHTML = ""; //clear
+      clans.forEach((clan) => renderClan(clan, clansListElement));
+
+      if (clansListElement.children.length === 0) {
+        const emptyDiv = document.createElement('div');
+        emptyDiv.classList.add('card');
+        emptyDiv.style.textAlign = 'center';
+        emptyDiv.innerHTML = '클랜 정보 없음';
+        clansListElement.appendChild(emptyDiv)
+      }
     }
+
+    const clanList = [];
 
     async function getClans() {
       showWifiLoading('.clan-manager');
       let clans = await fetchClans();
       let clanDetailMap = makeClanMapByTag(await fetchClansFromExternal(clans));
 
-      let resultClans = [];
       clans.forEach(clan => {
         // 객체 병합
         const clanDetail = clanDetailMap[clan.tag];
         clanDetail.order = clan.order;
         clanDetail.clanContent = clan.clanContent;
-        resultClans.push(clanDetail);
+        clanList.push(clanDetail);
       });
 
-      renderClans(resultClans)
+      renderClans(clanList);
 
       hideWifiLoading('.clan-manager');
     }
@@ -270,6 +306,35 @@
       <circle class="front" cx="17" cy="17" r="14"></circle>
     </svg>
     <div class="text" data-text="Searching"></div>
+  </div>
+
+  <div class="radio-group-wrapper">
+    <ul class="radio-group">
+      <input class="input-radio" name="filter-content" id="filter-clan-war" type="checkbox" onchange="filterClanList(this, 'clanWarYn')"/>
+      <label for="filter-clan-war">
+        <li class="radio-item">
+          <i class="icon icon-clan-war"></i>
+        </li>
+      </label>
+      <input class="input-radio" name="filter-content" id="filter-clan-war-league" type="checkbox" onchange="filterClanList(this, 'clanWarLeagueYn')" />
+      <label for="filter-clan-war-league">
+        <li class="radio-item">
+          <i class="icon icon-clan-war-league"></i>
+        </li>
+      </label>
+      <input class="input-radio" name="filter-content" id="filter-clan-capital" type="checkbox" onchange="filterClanList(this, 'clanCapitalYn')" />
+      <label for="filter-clan-capital">
+        <li class="radio-item">
+          <i class="icon icon-clan-capital"></i>
+        </li>
+      </label>
+      <input class="input-radio" name="filter-content" id="filter-clan-war-parallel" type="checkbox" onchange="filterClanList(this, 'clanWarParallelYn')" />
+      <label for="filter-clan-war-parallel">
+        <li class="radio-item">
+          <i class="icon icon-clan-war"></i>
+        </li>
+      </label>
+    </ul>
   </div>
 
   <div class="clan-list"></div>

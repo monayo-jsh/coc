@@ -123,10 +123,12 @@
         return;
       }
 
-      const { capitalLeague, clanCapital } = clan;
+      const { capitalLeague, clanCapital, clanCapitalPoints } = clan;
 
       renderCapitalLeagueIcon(capitalLeague, capitalCardElement);
       renderCapitalHallLevel(clanCapital, capitalCardElement);
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML.replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
     }
 
     async function fetchCapitalRaidSeason(capitalClan) {
@@ -248,7 +250,7 @@
       const leagueIcon = capitalCardElement.querySelector('.league-icon');
       const { league } = leagueIcon.dataset;
       if (league) {
-        settingTooltip(leagueIcon, league);
+        settingTooltip(leagueIcon, convLeagueName(league));
       }
     }
 
@@ -368,8 +370,8 @@
           <img class="league-icon display-none" src="" alt="">
         </div>
         <div class="item">
-          <span class="big-text">{CAPITAL_HALL_LEVEL}</span>
-          <span class="regular-text">캐피탈 홀</span>
+          <span class="big-text color">{CLAN_CAPITAL_POINTS}</span>
+          <span class="regular-text">트로피</span>
         </div>
         <div class="item">
           <span class="big-text color">{ATTACK_LIMIT}</span>

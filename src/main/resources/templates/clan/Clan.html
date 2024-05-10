@@ -115,7 +115,7 @@
         leagueBadge.src = small;
       }
 
-      card.innerHTML = card.innerHTML.replace(/{CLAN_CAPITAL_LABEL}/, convLeagueName(name))
+      card.innerHTML = card.innerHTML.replace(/{CLAN_CAPITAL_LABEL}/, convLeagueName(name));
     }
 
     function findLeader(memberList) {
@@ -184,7 +184,10 @@
       settingTooltip(clanWarLeagueChip, '클랜 리그전');
 
       const clanCapitalChip = element.querySelector('.clan-capital');
-      settingTooltip(clanCapitalChip, '습격전');
+      settingTooltip(clanCapitalChip, '습격전 리그');
+
+      const clanCapitalPointsChip = element.querySelector('.clan-capital-points');
+      settingTooltip(clanCapitalPointsChip, '습격전 포인트');
     }
 
     function renderLabel(label, card) {
@@ -210,7 +213,7 @@
       const clanCard = document.importNode(clanCardTemplate.content, true);
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, labels, clanContent } = clan;
+      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanCapitalPoints, labels, clanContent } = clan;
       const [leader] = findLeader(memberList);
 
       // dataset
@@ -223,7 +226,8 @@
                            .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
                            .replace(/{CLAN_LEADER}/, leader.name)
                            .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
-                           .replace(/{CLAN_MEMBERS}/, members);
+                           .replace(/{CLAN_MEMBERS}/, members)
+                           .replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
 
       renderClanBadge(badgeUrls, card);
       renderWarLeagueBadge(warLeague, card);
@@ -358,6 +362,10 @@
         <div class="chip bg-gold clan-trophies">
           <div class="icon trophies"></div>
           <span class="chip-label">{CLAN_TROPHIES}</span>
+        </div>
+        <div class="chip bg-pink clan-capital-points">
+          <div class="icon icon-clan-capital"></div>
+          <span class="chip-label">{CLAN_CAPITAL_POINTS}</span>
         </div>
         <div class="chip bg-crimson clan-war-league">
           <div class="clan-war-league-badge img-icon icon"></div>

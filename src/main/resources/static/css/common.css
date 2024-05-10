@@ -204,6 +204,11 @@ body::before {
   padding: 0 2px;
 }
 
+.bg-pink {
+  background-color: #e87186;
+  color: white;
+}
+
 .bg-gold {
   background-color: #a18700;
   color: #ffef9c;

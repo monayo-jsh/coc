@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
 import open.api.coc.clans.domain.common.TroopsResponse;
@@ -34,4 +35,6 @@ public class PlayerResponse {
 
     private List<TroopsResponse> pets;
 
+    @Setter
+    private Integer heroTotalLevel;
 }

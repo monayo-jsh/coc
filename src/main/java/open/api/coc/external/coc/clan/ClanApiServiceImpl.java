@@ -94,7 +94,7 @@ public class ClanApiServiceImpl implements ClanApiService {
     }
 
     private Optional<Player> findPlayer(String playTag) {
-        log.info("{} [{}]", clashOfClanConfig.getPlayerUri(), playTag);
+        log.debug("{} [{}]", clashOfClanConfig.getPlayerUri(), playTag);
         return Optional.ofNullable(restClient.get()
                                              .uri(clashOfClanConfig.getPlayerUri(), playTag)
                                              .retrieve()

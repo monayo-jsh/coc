@@ -35,21 +35,34 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
     private final TroopseResponseConverter troopseResponseConverter;
     @Override
     public PlayerResponse convert(Player source) {
-        return PlayerResponse.builder()
-                             .name(source.getName())
-                             .tag(source.getTag())
-                             .expLevel(source.getExpLevel())
-                             .townHallLevel(source.getTownHallLevel())
-                             .trophies(source.getTrophies())
-                             .bestTrophies(source.getBestTrophies())
-                             .attackWins(source.getAttackWins())
-                             .defenseWins(source.getDefenseWins())
-                             .warStars(source.getWarStars())
-                             .clan(makePlayerClan(source.getClan()))
-                             .heroes(makeHeroes(source.getHeroes()))
-                             .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
-                             .pets(makePets(source.getTroops()))
-                             .build();
+        PlayerResponse player = PlayerResponse.builder()
+                                              .name(source.getName())
+                                              .tag(source.getTag())
+                                              .expLevel(source.getExpLevel())
+                                              .townHallLevel(source.getTownHallLevel())
+                                              .trophies(source.getTrophies())
+                                              .bestTrophies(source.getBestTrophies())
+                                              .attackWins(source.getAttackWins())
+                                              .defenseWins(source.getDefenseWins())
+                                              .warStars(source.getWarStars())
+                                              .clan(makePlayerClan(source.getClan()))
+                                              .heroes(makeHeroes(source.getHeroes()))
+                                              .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
+                                              .pets(makePets(source.getTroops()))
+                                              .build();
+
+        player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
+        return player;
+    }
+
+    private Integer calcHeroTotalLevel(List<HeroResponse> heroes) {
+        if (CollectionUtils.isEmpty(heroes)) return 0;
+
+        return heroes.stream()
+                     .filter(HeroResponse::isHomeHero)
+                     .map(HeroResponse::getLevel)
+                     .reduce(0, Integer::sum);
+
     }
 
     private PlayerClanResponse makePlayerClan(PlayerClan clan) {

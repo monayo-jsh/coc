@@ -76,7 +76,7 @@
         const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
         const playerInfo = playerInfoElement.querySelector('.player-info');
 
-        const { townHallLevel, name, tag, heroes } = player;
+        const { townHallLevel, name, tag, heroTotalLevel, clan } = player;
 
         const joinedClan = clanMembersMap[player.tag];
         const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
@@ -85,7 +85,8 @@
                                          .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
                                          .replace(/{NAME}/, name)
                                          .replace(/{TAG}/, tag)
-                                         .replace(/{HERO_LEVEL}/, calcHeroLevelSum(heroes))
+                                         .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
+                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '알 수 없음')
                                          .replace(/{JOINED}/, joinedStatusName);
 
         if (!joinedClan) {
@@ -126,7 +127,7 @@
       const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
       seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
 
-      renderAssignedPlayer(clanAssignedPlayers.players, clanMembersMap, cardElement);
+      renderAssignedPlayer(sortByHeroTotalLevel(clanAssignedPlayers.players), clanMembersMap, cardElement);
 
       // 로딩바 숨김
       const loaderElement = cardAssignedPlayerWrapper.querySelector('.loader-circle');
@@ -574,16 +575,19 @@
         <div class="town-hall th{TOWNHALL_LEVEL}"></div>
       </div>
       <div class="player-info-item">
-        <div class="big-text">{NAME}</div>
-        <div class="chip regular-text">({TAG})</div>
+        <div class="info">
+          <div class="chip bg-crimson small-text">{HERO_TOTAL_LEVEL}</div>
+          <div class="big-text">{NAME}</div>
+        </div>
+        <div class="chip small-text">{TAG}</div>
       </div>
     </div>
     <div class="layout-right">
       <div class="player-info-item">
-        <div class="big-text">{HERO_LEVEL}</div>
+        <div class="regular-text">{CURRENT_CLAN}</div>
       </div>
       <div class="player-info-item joined">
-        <div class="big-text">{JOINED}</div>
+        <div class="regular-text">{JOINED}</div>
       </div>
     </div>
   </div>

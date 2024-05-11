@@ -182,3 +182,8 @@ function calcHeroLevelSum(heroes) {
     return levelSum
   }, 0)
 }
+
+function sortByHeroTotalLevel(players) {
+  // 영웅레벨 순 -> 이름 순
+  return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
+}

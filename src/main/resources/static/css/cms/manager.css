@@ -20,6 +20,7 @@
 }
 
 .card-assigned-player-wrapper {
+  padding: 10px 0;
   position: relative;
   min-height: 300px;
 }
@@ -58,6 +59,7 @@
 
       .info {
         display: flex;
+        align-items: center;
       }
 
       .big-text {
@@ -164,10 +166,8 @@
 .text-body {
   display: flex;
   flex-wrap: wrap;
-  margin-top: 5px;
   font-size: .9em;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding: 10px 0;
 
   .description {
     white-space: pre-wrap;

@@ -19,4 +19,9 @@ public class ViewAdminController {
     public String viewAdminClanManager() {
         return "cms/ClanManager";
     }
+
+    @GetMapping("/login")
+    public String viewAdminLoginForm() {
+        return "cms/Login";
+    }
 }

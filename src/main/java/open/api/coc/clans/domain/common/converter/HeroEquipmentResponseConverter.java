@@ -11,21 +11,22 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
 
     @Override
     public HeroEquipmentResponse convert(HeroEquipment source) {
+        HeroEquipmentConfig heroEquipment = getHeroEquipment(source.getName());
         return HeroEquipmentResponse.builder()
-                                    .code(getHeroEquipmentCode(source.getName()))
+                                    .code(heroEquipment.getCode())
                                     .name(source.getName())
                                     .village(source.getVillage())
                                     .level(source.getLevel())
                                     .maxLevel(source.getMaxLevel())
+                                    .rarity(heroEquipment.getRarity())
                                     .build();
     }
 
-    private Integer getHeroEquipmentCode(String name) {
+    private HeroEquipmentConfig getHeroEquipment(String name) {
         try {
-            HeroEquipmentConfig heroEquipment = HeroEquipmentConfig.findByName(name);
-            return heroEquipment.getCode();
+            return HeroEquipmentConfig.findByName(name);
         } catch (Exception ignored) {
-            return Integer.MAX_VALUE;
+            return HeroEquipmentConfig.UNKNOWN;
         }
     }
 }

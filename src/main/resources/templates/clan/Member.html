@@ -209,7 +209,7 @@
     }
 
     function renderImgIcon(contentsElement, icon) {
-      const { name, level, maxLevel, village } = icon;
+      const { name, level, maxLevel, village, rarity } = icon;
 
       // 본 마을 영웅 장비만 표기
       if (village !== 'home') return;
@@ -223,6 +223,7 @@
                                        .replace(/\./g, "");
 
       imgIconElement.classList.add(equipmentIconClassName);
+      imgIconElement.classList.add(rarity); // 장비 등급
 
       imgIconElement.innerHTML = imgIconElement.innerHTML
                                                .replace(/{LEVEL}/, level)

@@ -73,3 +73,11 @@
 .img-icon.hog_rider_puppet {
   background-image: url("/static/images/hero/equipment/Hog_Rider_Puppet.png");
 }
+
+.img-icon.normal {
+  background-color: skyblue;
+}
+
+.img-icon.epic {
+  background-color: mediumpurple;
+}

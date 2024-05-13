@@ -3,11 +3,13 @@ package open.api.coc.clans.database.entity;
 import jakarta.persistence.Column;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor

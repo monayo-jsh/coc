@@ -17,6 +17,7 @@ import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.ClanAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.ClanContentEntity;
 import open.api.coc.clans.database.entity.ClanEntity;
 import open.api.coc.clans.database.repository.ClanAssignedPlayerRepository;
@@ -258,5 +259,16 @@ public class ClansService {
         List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
 
         return ClanAssignedMemberListResponse.create(clanTag, latestSeasonDate, players);
+    }
+
+    @Transactional
+    public void deleteClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
+        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
+                                                                                    .clanTag(clanTag)
+                                                                                    .seasonDate(seasonDate)
+                                                                                    .playerTag(playerTag)
+                                                                                    .build();
+
+        clanAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
     }
 }

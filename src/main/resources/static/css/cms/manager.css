@@ -209,6 +209,10 @@
   right: 0;
 }
 
+.btn-remove-member {
+  margin-left: 5px;
+}
+
 .chip {
   display: flex;
   align-items: center;

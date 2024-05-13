@@ -12,7 +12,6 @@ import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
-import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
@@ -112,6 +111,16 @@ public class ClansController {
     public ResponseEntity<ClanAssignedMemberListResponse> getClanAssignedMembers(@PathVariable String clanTag) {
         ClanAssignedMemberListResponse assignedMembers = clansService.findClanAssignedMembers(clanTag);
         return ResponseEntity.ok().body(assignedMembers);
+    }
+
+    @DeleteMapping("/{clanTag}/assigned/{seasonDate}/{playerTag}")
+    public ResponseEntity<?> deleteClanAssignedMember(@PathVariable String clanTag,
+                                                      @PathVariable String seasonDate,
+                                                      @PathVariable String playerTag) {
+
+        clansService.deleteClanAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{clanTag}/current/war")

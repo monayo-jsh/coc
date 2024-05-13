@@ -30,6 +30,7 @@ public class Player {
 
     private Integer warStars;
 
+    private String warPreference;
     private PlayerClan clan;
 
     private List<Hero> heroes;

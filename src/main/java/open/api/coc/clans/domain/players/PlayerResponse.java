@@ -28,6 +28,7 @@ public class PlayerResponse {
 
     private Integer warStars;
 
+    private String warPreference;
     private PlayerClanResponse clan;
 
     private List<HeroResponse> heroes;

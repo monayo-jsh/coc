@@ -113,6 +113,16 @@ public class ClansController {
         return ResponseEntity.ok().body(assignedMembers);
     }
 
+    @PostMapping("/{clanTag}/assigned/{seasonDate}/{playerTag}")
+    public ResponseEntity<?> postClanAssignedMember(@PathVariable String clanTag,
+                                                    @PathVariable String seasonDate,
+                                                    @PathVariable String playerTag) {
+
+        clansService.postClanAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{clanTag}/assigned/{seasonDate}/{playerTag}")
     public ResponseEntity<?> deleteClanAssignedMember(@PathVariable String clanTag,
                                                       @PathVariable String seasonDate,

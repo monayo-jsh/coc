@@ -10,10 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClanAssignedPlayerRepository extends JpaRepository<ClanAssignedPlayerEntity, ClanAssignedPlayerPKEntity> {
 
-    @Query("select max(cap.seasonDate) from tb_clan_assigned_player cap where cap.clanTag = :clanTag")
+    @Query("select max(cap.id.seasonDate) from tb_clan_assigned_player cap where cap.clanTag = :clanTag")
     String findLatestSeasonDateByClanTag(String clanTag);
 
-    List<ClanAssignedPlayerEntity> findByClanTagAndSeasonDate(String clanTag, String SeasonDate);
+    @Query("select cap from tb_clan_assigned_player cap where cap.clanTag = :clanTag and cap.id.seasonDate = :seasonDate")
+    List<ClanAssignedPlayerEntity> findByClanTagAndSeasonDate(String clanTag, String seasonDate);
 
 
 }

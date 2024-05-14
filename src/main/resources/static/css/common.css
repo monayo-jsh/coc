@@ -197,6 +197,7 @@ body::before {
   border-radius: 15px;
   background: #5c5c5c;
   color: white;
+  cursor: pointer;
 }
 
 .chip-label {

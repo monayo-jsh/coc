@@ -21,7 +21,7 @@ public class PlayersService {
     private final PlayerResponseConverter playerResponseConverter;
 
     public PlayerResponse findPlayerBy(String playerTag) {
-        Player player = clanApiService.findPlayerBy(playerTag)
+        Player player = clanApiService.fetchPlayerBy(playerTag)
                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "플레이어 조회 실패"));
 
         return playerResponseConverter.convert(player);

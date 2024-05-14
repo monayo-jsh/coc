@@ -1,6 +1,7 @@
 package open.api.coc.clans.database.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,10 +16,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
+@Embeddable
 public class ClanAssignedPlayerPKEntity implements Serializable {
-
-    @Column(name = "clan_tag", length = 100)
-    private String clanTag;
 
     @Column(name = "season_date", nullable = false, length = 6)
     private String seasonDate;

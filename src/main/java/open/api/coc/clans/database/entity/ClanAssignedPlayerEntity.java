@@ -1,32 +1,45 @@
 package open.api.coc.clans.database.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Persistable;
 
+@Builder
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "tb_clan_assigned_player")
-@IdClass(ClanAssignedPlayerPKEntity.class)
-public class ClanAssignedPlayerEntity {
+public class ClanAssignedPlayerEntity implements Persistable<ClanAssignedPlayerPKEntity> {
 
-    @Id
+    @EmbeddedId
+    private ClanAssignedPlayerPKEntity id;
+
     @Column(name = "clan_tag", length = 100)
     private String clanTag;
 
-    @Id
-    @Column(name = "season_date", nullable = false, length = 6)
-    private String seasonDate;
+    @Transient
+    @Builder.Default
+    private boolean isNew = true;
 
-    @Id
-    @Column(name = "player_tag", nullable = false, length = 100)
-    private String playerTag;
+    @PrePersist
+    @PostLoad
+    void markNotNew() {
+        this.isNew = false;
+    }
+
+    @Override
+    public ClanAssignedPlayerPKEntity getId() {
+        return id;
+    }
 
 }

@@ -64,7 +64,25 @@
       cardAssignedPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
     }
 
-  function renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
+    function isWarPreferenceIn(warPreference) {
+      return warPreference === 'in';
+    }
+
+    function convWarPreferenceName(warPreference) {
+      return isWarPreferenceIn(warPreference) ? '참가' : '불참';
+    }
+
+    function renderWarPreference(warPreference, playerInfo) {
+      const warPreferenceElement = playerInfo.querySelector('.war-preference');
+
+      warPreferenceElement.innerHTML = warPreferenceElement.innerHTML
+                                                           .replace(/{WAR_PREFERENCE}/, convWarPreferenceName(warPreference));
+
+      const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
+      warPreferenceElement.classList.add(bgColor)
+    }
+
+    function renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
 
       const playerInfoTemplate = document.querySelector('#clan-player-info-template');
 
@@ -72,11 +90,12 @@
       playerList.innerHTML = ""; // clear
 
       let joinedSize = 0;
+      let warPreferenceSize = 0;
       for (const player of clanAssignedPlayers) {
         const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
         const playerInfo = playerInfoElement.querySelector('.player-info');
 
-        const { townHallLevel, name, tag, heroTotalLevel, clan } = player;
+        const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
 
         const joinedClan = clanMembersMap[player.tag];
         const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
@@ -86,13 +105,19 @@
                                          .replace(/{NAME}/, name)
                                          .replace(/{TAG}/, tag)
                                          .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
-                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '알 수 없음')
+                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음')
                                          .replace(/{JOINED}/, joinedStatusName);
+
+        renderWarPreference(warPreference, playerInfo);
 
         if (!joinedClan) {
           playerInfo.classList.add('not-joined');
         } else {
           joinedSize++;
+
+          if (isWarPreferenceIn(warPreference)) {
+            warPreferenceSize++;
+          }
         }
 
         playerList.appendChild(playerInfoElement);
@@ -100,6 +125,7 @@
 
       cardElement.querySelector('#total_size').innerHTML = clanAssignedPlayers.length;
       cardElement.querySelector('#joined_size').innerHTML = joinedSize;
+      cardElement.querySelector('#war_preference_size').innerHTML = warPreferenceSize;
     }
 
     function formatDate(date) {
@@ -552,11 +578,17 @@
 
         <div class="body display-none">
           <div class="support-area">
-            <span class="regular-text">(<span id="total_size"></span> 중 <span id="joined_size"></span> 명 이동완료)</span>
-            <div class="toggle-button-simple filter">
-              <div class="toggle-button-simple-cover">
-                <input type="checkbox" class="tgl tgl-skewed" onchange="filterNotJoined(this); return false;">
-                <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
+            <div class="info">
+              <span class="regular-text">배정 인원 : <span id="total_size"></span> 명</span>
+              <span class="regular-text">이동 인원 : <span id="joined_size"></span> 명</span>
+              <span class="regular-text">전쟁 선호 : <span id="war_preference_size"></span> 명 <span class="small-text">(이동 계정 기준)</span></span>
+            </div>
+            <div class="button-area">
+              <div class="toggle-button-simple filter">
+                <div class="toggle-button-simple-cover">
+                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterNotJoined(this); return false;">
+                  <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
+                </div>
               </div>
             </div>
           </div>
@@ -583,7 +615,10 @@
           <div class="chip bg-crimson small-text">{HERO_TOTAL_LEVEL}</div>
           <div class="big-text">{NAME}</div>
         </div>
-        <div class="chip small-text">{TAG}</div>
+        <div class="info additional">
+          <div class="chip small-text">{TAG}</div>
+          <div class="chip small-text war-preference">{WAR_PREFERENCE}</div>
+        </div>
       </div>
     </div>
     <div class="layout-right">

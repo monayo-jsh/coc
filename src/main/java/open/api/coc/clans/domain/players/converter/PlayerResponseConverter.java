@@ -45,6 +45,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .attackWins(source.getAttackWins())
                                               .defenseWins(source.getDefenseWins())
                                               .warStars(source.getWarStars())
+                                              .warPreference(source.getWarPreference())
                                               .clan(makePlayerClan(source.getClan()))
                                               .heroes(makeHeroes(source.getHeroes()))
                                               .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))

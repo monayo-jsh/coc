@@ -17,4 +17,6 @@ public class HeroEquipmentResponse {
     private Integer level;
     private Integer maxLevel;
 
+    private String rarity;
+
 }

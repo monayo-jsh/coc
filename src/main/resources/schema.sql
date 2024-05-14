@@ -43,7 +43,7 @@ CREATE INDEX IDX_01 ON TB_CLAN_ASSIGNED_PLAYER (CLAN_TAG, SEASON_DATE);
 -- insert into tb_clan values('#2PLJJLY89', '가래떡에 꿀', 22, now());
 -- insert into tb_clan values('#2PUPJ09VP', '가래떡에 설탕', 23, now());
 -- insert into tb_clan values('#2LJ0U02YJ', '아카데미 쉼터', 99, now());
-
+--
 -- insert into tb_clan_content(tag) values('#2QJUL08V9');
 -- insert into tb_clan_content(tag) values('#2QG0G20RR');
 -- insert into tb_clan_content(tag) values('#2LPP8PUCG');
@@ -58,5 +58,5 @@ CREATE INDEX IDX_01 ON TB_CLAN_ASSIGNED_PLAYER (CLAN_TAG, SEASON_DATE);
 -- insert into tb_clan_content(tag) values('#2PLJJLY89');
 -- insert into tb_clan_content(tag) values('#2PUPJ09VP');
 -- insert into tb_clan_content(tag) values('#2LJ0U02YJ');
-
+--
 -- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QJUL08V9', '202405', '#JU0PUPPG');

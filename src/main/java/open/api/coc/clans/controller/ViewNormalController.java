@@ -38,4 +38,6 @@ public class ViewNormalController {
         return "capital/Raid";
     }
 
+
+
 }

@@ -1,4 +1,5 @@
 const URI_PLAYERS = '/players' //멤버 상세 조회
+const URI_PLAYERS_REALTIME = '/players/{playerTag}' //멤버 상세 조회 (항시 실연동)
 
 function deviceArray(array, size) {
   const result = [];
@@ -58,4 +59,17 @@ function makeMemberMapByTag(clanMembers) {
     memberMap[member.tag] = member
     return memberMap
   }, {});
+}
+
+async function findPlayer(playerTag) {
+  const uri = URI_PLAYERS_REALTIME.replace(/{playerTag}/, encodeURIComponent(playerTag));
+  return await axios.get(uri)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      throw error;
+                    });
 }

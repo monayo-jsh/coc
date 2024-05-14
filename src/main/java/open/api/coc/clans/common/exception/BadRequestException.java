@@ -10,9 +10,9 @@ public class BadRequestException extends RuntimeException {
     private final String code;
     private String message;
 
-    public BadRequestException(ExceptionCode exceptionCode) {
-        this.code = exceptionCode.getCode();
-        this.message = exceptionCode.getMessage();
+    public BadRequestException(String code, String message) {
+        this.code = code;
+        this.message = message;
     }
 
     public void addExtraMessage(String message) {
@@ -23,9 +23,13 @@ public class BadRequestException extends RuntimeException {
     }
 
     public static BadRequestException create(ExceptionCode exceptionCode, String message) {
-        BadRequestException badRequestException = new BadRequestException(exceptionCode);
+        BadRequestException badRequestException = new BadRequestException(exceptionCode.getCode(), exceptionCode.getMessage());
         badRequestException.addExtraMessage(message);
         return badRequestException;
+    }
+
+    public static BadRequestException create(String code, String message) {
+        return new BadRequestException(code, message);
     }
 
 }

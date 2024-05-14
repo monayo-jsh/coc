@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.common.exception.handler.ExceptionHandler;
 import open.api.coc.clans.database.entity.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.ClanContentEntity;
@@ -254,7 +256,7 @@ public class ClansService {
         List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findByClanTagAndSeasonDate(clanTag, latestSeasonDate);
 
         List<String> playerTags = clanAssignedPlayers.stream()
-                                                      .map(ClanAssignedPlayerEntity::getPlayerTag)
+                                                      .map(clanAssignedPlayerEntity -> clanAssignedPlayerEntity.getId().getPlayerTag())
                                                       .toList();
         List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
 
@@ -262,9 +264,38 @@ public class ClansService {
     }
 
     @Transactional
+    public void postClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
+        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
+                                                                                    .seasonDate(seasonDate)
+                                                                                    .playerTag(playerTag)
+                                                                                    .build();
+
+        Optional<ClanAssignedPlayerEntity> findClanAssignedPlayer = clanAssignedPlayerRepository.findById(clanAssignedPlayerPK);
+        if (findClanAssignedPlayer.isPresent()) {
+            ClanAssignedPlayerEntity clanAssignedPlayerEntity = findClanAssignedPlayer.get();
+            if (Objects.equals(clanTag, clanAssignedPlayerEntity.getClanTag())) {
+                // 이미 배정
+                return;
+            }
+
+            ClanEntity clanEntity = clanRepository.findById(clanAssignedPlayerEntity.getClanTag())
+                                                  .orElseThrow(() -> ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA,
+                                                                                                                clanAssignedPlayerEntity.getClanTag() + "에 배정된 상태"));
+
+            throw ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "[%s] 배정된 상태".formatted(clanEntity.getName()));
+        }
+
+        ClanAssignedPlayerEntity clanAssignedPlayer = ClanAssignedPlayerEntity.builder()
+                                                                              .id(clanAssignedPlayerPK)
+                                                                              .clanTag(clanTag)
+                                                                              .build();
+
+        clanAssignedPlayerRepository.save(clanAssignedPlayer);
+    }
+
+    @Transactional
     public void deleteClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
         ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
-                                                                                    .clanTag(clanTag)
                                                                                     .seasonDate(seasonDate)
                                                                                     .playerTag(playerTag)
                                                                                     .build();

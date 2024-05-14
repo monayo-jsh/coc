@@ -33,6 +33,11 @@ public class SecurityConfig {
         return http.httpBasic(AbstractHttpConfigurer::disable)
                 .headers(header -> header.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .formLogin(login -> login.loginPage("/clan/cms/login").permitAll())
+                .rememberMe(remember -> remember
+                        .key("AcademyCMS")
+                        .rememberMeParameter("academy-cms-remember-me")
+                        .rememberMeCookieName("academy-cms-remember-me")
+                        .userDetailsService(users()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers(PathRequest.toH2Console()).permitAll()
@@ -41,7 +46,6 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()).build();
 
     }
-
 
 
     @Bean

@@ -57,6 +57,10 @@
             <i class='bx bxs-lock-alt'></i>
             <input type="password" name="password" placeholder="Password">
           </div>
+          <div class="input-group">
+            <label for="remember-me" >로그인 유지</label>
+            <input type="checkbox" id="remember-me" name="academy-cms-remember-me" style="display: flex">
+          </div>
           <button type="submit">로그인</button>
         </form>
       </div>
@@ -107,6 +111,8 @@
     container.classList.add('sign-in')
   }, 200)
 
+
+
   $(document).ready(function() {
     $('.form.sign-in').submit(function(event) {
       event.preventDefault(); // 기본 제출 동작 막기
@@ -114,23 +120,26 @@
       // 폼 데이터 가져오기
       const username = $('input[name="username"]').val();
       const password = $('input[name="password"]').val();
+      const academyCmsRememberMe = $('input[name="academy-cms-remember-me"]').is(":checked");
+
 
       // 폼 데이터를 객체로 만들기
       const userInfo = {
         username: username,
-        password: password
+        password: password,
+        "academy-cms-remember-me": academyCmsRememberMe
       };
-      console.log(userInfo)
+        console.log(userInfo)
       // AJAX 요청 보내기
       $.ajax({
         type: "POST",
         url: "/clan/cms/login",
         data: userInfo,
         success: function(response) {
-          alert('성공');
           location.href="/clan/cms"
         },
         error: function(e){
+          console.error(e);
           alert('error!!');
         }
       });

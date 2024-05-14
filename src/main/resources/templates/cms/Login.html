@@ -127,10 +127,10 @@
         url: "/clan/cms/login",
         data: userInfo,
         success: function(response) {
-          alert('성공');
           location.href="/clan/cms"
         },
         error: function(e){
+          console.error(e);
           alert('error!!');
         }
       });

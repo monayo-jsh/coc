@@ -15,6 +15,7 @@
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/league.js"></script>
   <script src="/static/js/api/clan.js"></script>
   <script src="/static/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -274,9 +275,12 @@
                                          .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
                                          .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
 
+        const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
         if (league) {
-          const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
-          const { iconUrls } = league
+          const { iconUrls } = league;
+          leagueIconImg.src = iconUrls.tiny;
+        } else {
+          const { iconUrls } = leagueMap['Unranked'];
           leagueIconImg.src = iconUrls.tiny;
         }
 
@@ -400,7 +404,17 @@
       switchCardElement.addEventListener('change', switchCard);
     }
 
+  let leagueMap = {}
+  async function loadLeagues() {
+    // 리그 목록 조회
+    const leagues = await fetchLeagues();
+    leagues.map(league => {
+      leagueMap[league.name] = league;
+    });
+  }
+
     window.onload = async () => {
+      await loadLeagues();
       await getClanMembers();
       initSearchKeyword();
       initSwitchCard();

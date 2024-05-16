@@ -26,6 +26,9 @@ public class Player {
     private Integer trophies;
     private Integer bestTrophies;
 
+    private Integer donations;
+    private Integer donationsReceived;
+
     private Integer attackWins;
     private Integer defenseWins;
 

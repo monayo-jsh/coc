@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/button.css" />
+  <link rel="stylesheet" href="/static/css/loader.css" />
+  <link rel="stylesheet" href="/static/css/clan/member.css" />
+  <link rel="stylesheet" href="/static/css/townhall.css" />
+  <link rel="stylesheet" href="/static/css/hero.css" />
+  <link rel="stylesheet" href="/static/css/heroEquipment.css" />
+  <link rel="stylesheet" href="/static/css/pet.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/player.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    dayjs.locale('ko')
+  </script>
+  <title>클랜원 현황</title>
+
+  <script>
+  function cardClick(e, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const classList = e.closest('.member.row').classList;
+
+      const activeClassName = 'active';
+      if (classList.contains(activeClassName)) {
+        classList.remove(activeClassName);
+      } else {
+        classList.add(activeClassName);
+      }
+
+      // 장비 보기 켜져 있으면 닫기
+      e.querySelectorAll('.hero.active')
+       .forEach((ele) => ele.classList.remove(activeClassName));
+    }
+    function heroClick(e, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const classList = e.classList;
+
+      const activeClassName = 'active';
+
+      e.closest('.heroes')
+       .querySelectorAll('.hero.active')
+       .forEach((ele) => {
+         if (ele !== e) {
+           //다른 장비가 켜져있으면 닫기
+           ele.classList.remove(activeClassName);
+         }
+       });
+
+      if (classList.contains(activeClassName)) {
+        classList.remove(activeClassName);
+      } else {
+        classList.add(activeClassName);
+      }
+    }
+
+    function sortByTrophies(members) {
+      // 트로피 순 > 이름 순
+      return members.map(member => member)
+                    .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
+    }
+
+  function sortByHeroLevelSum(members) {
+    // 웅합 순 > 트로피 순
+    return members.map(member => member)
+                  .sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || b.trophies - a.trophies);
+  }
+
+    // 사용자 목록
+    const members = []
+
+  function clearClanMembers() {
+    const clanMembers = document.querySelector('.clan-members');
+    clanMembers.innerHTML = '';
+  }
+
+    function scrollTop() {
+      //스크롤 상단 이동
+      document.querySelector('.clan-members').scrollTo({
+        top: 0
+      })
+    }
+
+    function drawMember(members) {
+      scrollTop();
+      clearClanMembers();
+      renderMembers(members);
+      switchCard(); //카드 앞/뒤 설정
+    }
+
+    function getSearchKeyword() {
+      return document.querySelector('.search-input');
+    }
+
+    function initDisplayName(drawMembers) {
+      drawMembers.forEach((member) => member.displayName = member.name);
+    }
+
+    function renderMemberSortByTrophies(drawMembers = members) {
+      initDisplayName(drawMembers);
+      const searchKeyword = getSearchKeyword();
+      if (searchKeyword.value) {
+        drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
+      }
+
+      const sortedMembers = sortByTrophies(drawMembers);
+      drawMember(sortedMembers);
+    }
+
+    function rederMemberSortByHeroLevelSum(drawMembers = members) {
+      initDisplayName(drawMembers);
+      const searchKeyword = getSearchKeyword();
+      if (searchKeyword.value) {
+        drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
+      }
+      const sortedMembers = sortByHeroLevelSum(drawMembers);
+      drawMember(sortedMembers)
+    }
+
+    async function getClanMembers() {
+      showWifiLoading('.clan-members');
+      let players = await fetchAllClanPlayers();
+      members.push(...players);
+      hideWifiLoading('.clan-members');
+
+      renderMemberSortByTrophies();
+    }
+
+    function renderEquipments(heroElement, equipments) {
+      const equipmentWrapperElement = heroElement.querySelector('.equipment-wrapper');
+
+      for(const equipment of equipments) {
+        renderImgIcon(equipmentWrapperElement, equipment);
+      }
+    }
+
+    function renderHero(memberHtml, hero) {
+      const { name, level, maxLevel, village, equipments } = hero;
+
+      // 본 마을 영웅만 표기
+      if (village !== 'home') return;
+
+      const heroesElement = memberHtml.querySelector('.inner-section .heroes');
+      const memberHeroTemplate = document.querySelector('#member-hero');
+      const memberHero = document.importNode(memberHeroTemplate.content, true);
+      const heroElement = memberHero.querySelector('.hero');
+
+
+      let heroIconClassName = name.toLowerCase().replace(/\s/g, "_")
+      heroElement.classList.add(heroIconClassName);
+
+      heroElement.innerHTML = heroElement.innerHTML
+                                         .replace(/{LEVEL}/, level)
+                                         .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      heroesElement.appendChild(heroElement);
+
+      if (equipments) {
+        renderEquipments(heroElement, equipments);
+      }
+    }
+
+    function renderHeroes(memberHtml, player) {
+      const { heroes } = player
+      if (!heroes) return;
+
+      for (const hero of heroes) {
+        renderHero(memberHtml, hero);
+      }
+    }
+
+
+    function renderHeroEquipments(memberHtml, player) {
+      const { heroEquipments } = player
+      if (!heroEquipments || !heroEquipments.length) return;
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '영웅 장비');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const heroEquipment of heroEquipments) {
+        renderImgIcon(contentsElement, heroEquipment);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
+      cardBackElement.appendChild(innerSectionElement);
+    }
+
+    function renderImgIcon(contentsElement, icon) {
+      const { name, level, maxLevel, village, rarity } = icon;
+
+      // 본 마을 영웅 장비만 표기
+      if (village !== 'home') return;
+
+      const iconsTemplate = document.querySelector('#icons');
+      const icons = document.importNode(iconsTemplate.content, true);
+      const imgIconElement = icons.querySelector('.img-icon');
+
+      let equipmentIconClassName = name.toLowerCase()
+                                       .replace(/\s/g, "_")
+                                       .replace(/\./g, "");
+
+      imgIconElement.classList.add(equipmentIconClassName);
+      imgIconElement.classList.add(rarity); // 장비 등급
+
+      imgIconElement.innerHTML = imgIconElement.innerHTML
+                                               .replace(/{LEVEL}/, level)
+                                               .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      contentsElement.appendChild(imgIconElement);
+    }
+
+    function renderPets(memberHtml, player) {
+      const { pets } = player
+      if (!pets || !pets.length) return;
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '펫');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const pet of pets) {
+        renderImgIcon(contentsElement, pet);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
+      cardBackElement.appendChild(innerSectionElement);
+    }
+
+    function renderMembers(members) {
+      const clanMembersElement = document.querySelector('.clan-members');
+
+      const memberTemplate = document.querySelector('#member');
+      let no = clanMembersElement.children.length + 1;
+      for(const player of members) {
+        const templateMember = document.importNode(memberTemplate.content, true);
+        const memberHtml = templateMember.querySelector('.member');
+
+        const { displayName, name, tag, clan, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
+
+        memberHtml.innerHTML = memberHtml.innerHTML
+                                         .replace(/{NAME}/g, `${no}. ${displayName || name}`)
+                                         .replace(/{TAG}/g, tag)
+                                         .replace(/{CLAN_NAME}/g, clan?.name)
+                                         .replace(/{TROPHIES}/g, trophies)
+                                         .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
+                                         .replace(/{EXP_LEVEL}/g, expLevel)
+                                         .replace(/{HERO_LEVEL}/g, heroTotalLevel)
+                                         .replace(/{IS_HERO_MAX_LEVEL}/g, heroTotalLevel === heroTotalMaxLevel ? 'is-max' : '')
+                                         .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
+                                         .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
+
+        if (league) {
+          const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+          const { iconUrls } = league
+          leagueIconImg.src = iconUrls.tiny;
+        }
+
+        clanMembersElement.appendChild(memberHtml);
+        no++;
+
+        renderHeroes(memberHtml, player);
+        renderHeroEquipments(memberHtml, player);
+        renderPets(memberHtml, player);
+      }
+    }
+
+    function ch2pattern(ch) {
+      const offset = 44032; /* '가'의 코드 */
+      // 한국어 음절
+      if (/[가-힣]/.test(ch)) {
+        const chCode = ch.charCodeAt(0) - offset;
+        // 종성이 있으면 문자 그대로를 찾는다.
+        if (chCode % 28 > 0) {
+          return ch;
+        }
+        const begin = Math.floor(chCode / 28) * 28 + offset;
+        const end = begin + 27;
+        return `[\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
+      }
+      // 한글 자음
+      if (/[ㄱ-ㅎ]/.test(ch)) {
+        const con2syl = {
+          'ㄱ': '가'.charCodeAt(0),
+          'ㄲ': '까'.charCodeAt(0),
+          'ㄴ': '나'.charCodeAt(0),
+          'ㄷ': '다'.charCodeAt(0),
+          'ㄸ': '따'.charCodeAt(0),
+          'ㄹ': '라'.charCodeAt(0),
+          'ㅁ': '마'.charCodeAt(0),
+          'ㅂ': '바'.charCodeAt(0),
+          'ㅃ': '빠'.charCodeAt(0),
+          'ㅅ': '사'.charCodeAt(0),
+        };
+        const begin = con2syl[ch] || ( ( ch.charCodeAt(0) - 12613 /* 'ㅅ'의 코드 */ ) * 588 + con2syl['ㅅ'] );
+        const end = begin + 587;
+        return `[${ch}\\u${begin.toString(16)}-\\u${end.toString(16)}]`;
+      }
+      // 그 외엔 그대로 내보냄
+      // escapeRegExp는 lodash에서 가져옴
+      return _.escapeRegExp(ch);
+    }
+
+    function createFuzzyMatcher(input) {
+      const pattern = input.split('')
+                           .map(ch2pattern)
+                           .map(pattern => `(${pattern})`)
+                           .join('.*?');
+
+      return new RegExp(pattern);
+    }
+
+    function filterKeywordMatchedMembers(searchKeyword, members) {
+      const regexp = createFuzzyMatcher(searchKeyword);
+      return members.filter((member) => {
+                      return regexp.test(member.name);
+                    }).map((member) => {
+                      const displayName = member.name;
+                      member.displayName = displayName.replace(regexp, (match, ...groups) => {
+                        const letters = groups.slice(0, match.length);
+                        let lastIndex = 0;
+                        let highlighted = [];
+                        for(let i=0,l=letters.length; i < l; i++) {
+                          const idx = match.indexOf(letters[i], lastIndex);
+                          highlighted.push(match.substring(lastIndex, idx));
+                          highlighted.push(`<mark>${letters[i]}</mark>`);
+                          lastIndex = idx + 1;
+                        }
+                        return highlighted.join('');
+                      })
+                      return member;
+                    })
+    }
+
+    function refreshRenderingMembers() {
+      const sortElement = document.querySelector('input[class=radio-button]:checked');
+      switch (sortElement.id) {
+        case 'hero-level-sum':
+          rederMemberSortByHeroLevelSum();
+          return;
+        default:
+          renderMemberSortByTrophies();
+          return;
+      }
+    }
+
+    function initSearchKeyword() {
+      // search event 등록
+      const searchKeyword = getSearchKeyword();
+      searchKeyword.addEventListener('keyup', refreshRenderingMembers);
+      searchKeyword.addEventListener('search', refreshRenderingMembers);
+    }
+
+    function getSwitchCardElement() {
+      return document.querySelector('.switch-card');
+    }
+
+    function switchCard() {
+      const swatchCardElement = getSwitchCardElement();
+      const activeClassName = 'active';
+
+      const memberCardElements = document.querySelectorAll('.member.row');
+      if (swatchCardElement.checked) {
+        memberCardElements.forEach((element) => element.classList.add(activeClassName));
+
+        // 장비 보기 켜져 있으면 닫기
+        document.querySelectorAll('.hero.active')
+                .forEach((ele) => ele.classList.remove(activeClassName));
+      } else {
+        memberCardElements.forEach((element) => element.classList.remove(activeClassName));
+      }
+    }
+
+    function initSwitchCard() {
+      const switchCardElement = getSwitchCardElement();
+      switchCardElement.addEventListener('change', switchCard);
+    }
+
+    window.onload = async () => {
+      await getClanMembers();
+      initSearchKeyword();
+      initSwitchCard();
+    }
+  </script>
+</head>
+<body>
+  <div class="content-wrapper">
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
+
+    <div class="support-area">
+
+      <div class="container">
+        <div class="radio-tile-group">
+          <div class="input-container">
+            <input id="trophies" class="radio-button" type="radio" name="radio" checked onchange="renderMemberSortByTrophies();">
+            <div class="radio-tile">
+              <div class="icon trophies"></div>
+              <label for="trophies" class="radio-tile-label">트로피순</label>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <input id="hero-level-sum" class="radio-button" type="radio" name="radio" onchange="rederMemberSortByHeroLevelSum();">
+            <div class="radio-tile">
+              <div class="icon hero barbarian_king"></div>
+              <label for="hero-level-sum" class="radio-tile-label">웅합순</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="group">
+          <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+          <label>
+            <input placeholder="Search ..." type="search" class="search-input">
+          </label>
+        </div>
+        <div class="toggle-button-cover">
+          <div class="toggle-button">
+            <input type="checkbox" class="checkbox switch-card">
+            <div class="knobs" data-toggle-on="앞면" data-toggle-off="뒷면"></div>
+            <div class="layer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="clan-members"></div>
+  </div>
+</body>
+<template id="member">
+  <div class="member row" onclick="cardClick(this, event); return false;">
+    <div class="card-front">
+
+      <div class="layout-title">
+        <div class="cell">
+          <div class="user">{NAME}</div>
+          <div class="labels">
+            <span class="chip">{TAG}</span>
+            <span class="chip">{CLAN_NAME}</span>
+          </div>
+        </div>
+        <div class="cell trophies">
+          <div class="count">
+            {TROPHIES}
+            <div class="icon"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-section">
+        <div class="layout-badge">
+          <img class="cell league-icon" src="" alt="">
+          <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
+          <div class="cell xp"><span class="level">{EXP_LEVEL}</span></div>
+          <div class="cell hero-level"><div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div></div>
+        </div>
+        <div class="layout-donations">
+          <div class="cell donations">
+            <span class="label">지원</span>
+            <span class="count">{DONATIONS}</span>
+          </div>
+          <div class="cell donations-received">
+            <span class="label">받음</span>
+            <span class="count">{DONATIONS_RECEIVED}</span>
+          </div>
+        </div>
+      </div>
+      <div class="inner-section hero-wrapper">
+        <div class="heroes"></div>
+      </div>
+    </div>
+
+    <div class="card-back">
+
+      <div class="layout-title">
+        <div class="cell">
+          <div class="user">{NAME}</div>
+          <div class="labels">
+            <span class="chip">{TAG}</span>
+            <span class="chip">{CLAN_NAME}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="inner-content">
+
+      </div>
+    </div>
+  </div>
+</template>
+<template id="inner-section">
+  <div class="inner-section">
+    <div class="label">{LABEL}</div>
+    <div class="contents"></div>
+  </div>
+</template>
+<template id="member-hero">
+  <div class="hero" onclick="heroClick(this, event); return false;">
+    <div class="level-icon {IS_MAX}">{LEVEL}</div>
+    <div class="equipment-wrapper"></div>
+  </div>
+</template>
+<template id="icons">
+  <div class="img-icon">
+    <div class="level-icon {IS_MAX}">{LEVEL}</div>
+  </div>
+</template>
+</html>

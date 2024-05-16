@@ -17,6 +17,7 @@ import jakarta.persistence.MapsId;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,5 +67,9 @@ public class PlayerTroopsEntity implements Persistable<PlayerItemPKEntity> {
 
     public void changePlayer(PlayerEntity player) {
         this.player = player;
+    }
+
+    public boolean isPet() {
+        return Objects.equals(type, TroopType.PET);
     }
 }

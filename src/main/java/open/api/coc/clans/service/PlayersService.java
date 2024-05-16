@@ -85,8 +85,16 @@ public class PlayersService {
                          .toList();
     }
 
-    public List<PlayerEntity> findAllPlayers() {
+    public List<PlayerEntity> findAllPlayerEntities() {
         return playerRepository.findAll();
+    }
+
+    public List<PlayerResponse> findAllPlayers() {
+        List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
+                      .map(playerResponseConverter::convert)
+                      .collect(Collectors.toList());
     }
 
     @Transactional
@@ -354,10 +362,13 @@ public class PlayersService {
         playerEntity.setTownHallLevel(player.getTownHallLevel());
         playerEntity.setTrophies(player.getTrophies());
         playerEntity.setBestTrophies(player.getBestTrophies());
+        playerEntity.setDonations(player.getDonations());
+        playerEntity.setDonationsReceived(player.getDonationsReceived());
         playerEntity.setWarStars(player.getWarStars());
         playerEntity.setAttackWins(player.getAttackWins());
         playerEntity.setDefenseWins(player.getDefenseWins());
 
+        playerEntity.setWarPreference(WarPreferenceType.out);
         if (Objects.nonNull(player.getWarPreference())) {
             playerEntity.setWarPreference(WarPreferenceType.valueOf(player.getWarPreference()));
         }

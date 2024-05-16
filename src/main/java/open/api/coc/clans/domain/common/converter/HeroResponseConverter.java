@@ -4,12 +4,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.config.HeroConfig;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -47,6 +49,16 @@ public class HeroResponseConverter implements Converter<Hero, HeroResponse> {
         } catch (Exception ignored) {
             return Integer.MAX_VALUE;
         }
+    }
+
+    public @NonNull HeroResponse convert(PlayerHeroEntity source) {
+        return HeroResponse.builder()
+                           .code(getHeroCode(source.getId().getName()))
+                           .name(source.getId().getName())
+                           .village("home")
+                           .level(source.getLevelInfo().getLevel())
+                           .maxLevel(source.getLevelInfo().getMaxLevel())
+                           .build();
     }
 
 }

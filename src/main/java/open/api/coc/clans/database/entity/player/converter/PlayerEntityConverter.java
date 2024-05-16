@@ -21,6 +21,8 @@ public class PlayerEntityConverter implements Converter<Player, PlayerEntity> {
                            .townHallLevel(source.getTownHallLevel())
                            .trophies(source.getTrophies())
                            .bestTrophies(source.getBestTrophies())
+                           .donations(source.getDonations())
+                           .donationsReceived(source.getDonationsReceived())
                            .attackWins(source.getAttackWins())
                            .defenseWins(source.getDefenseWins())
                            .warStars(source.getWarStars())

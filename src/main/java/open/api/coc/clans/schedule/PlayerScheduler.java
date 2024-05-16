@@ -107,7 +107,7 @@ public class PlayerScheduler {
 
     private void processSyncPlayers() {
 
-        List<PlayerEntity> players = playersService.findAllPlayers();
+        List<PlayerEntity> players = playersService.findAllPlayerEntities();
 
         final int offset = 50;
         for (int fromIndex = 0; fromIndex < players.size(); fromIndex += offset) {

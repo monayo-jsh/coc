@@ -1,6 +1,7 @@
 package open.api.coc.clans.domain.players.converter;
 
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.domain.clans.converter.IconUrlResponseConverter;
 import open.api.coc.clans.domain.players.PlayerClanResponse;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
@@ -20,6 +21,14 @@ public class PlayerClanResponseConverter implements Converter<PlayerClan, Player
                                  .tag(source.getTag())
                                  .clanLevel(source.getClanLevel())
                                  .badgeUrls(iconUrlResConverter.convert(source.getBadgeUrls()))
+                                 .build();
+    }
+
+    public PlayerClanResponse convert(ClanEntity source) {
+        return PlayerClanResponse.builder()
+                                 .name(source.getName())
+                                 .tag(source.getTag())
+                                 .badgeUrls(iconUrlResConverter.convert(source.getBadgeUrl().getIconUrl()))
                                  .build();
     }
 }

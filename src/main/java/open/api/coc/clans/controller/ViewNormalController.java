@@ -27,6 +27,11 @@ public class ViewNormalController {
         return "clan/Member";
     }
 
+    @GetMapping("/clan/member/new")
+    public String viewClanMemberNew() {
+        return "clan/NewMember";
+    }
+
     @GetMapping("/clan/war")
     public String viewClanWar() {
         return "clan/War";

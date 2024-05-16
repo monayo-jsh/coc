@@ -63,6 +63,12 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     @Column(name = "warStars", nullable = false)
     private Integer warStars;
 
+    @Column(name = "donations", nullable = false)
+    private Integer donations;
+
+    @Column(name = "donations_received", nullable = false)
+    private Integer donationsReceived;
+
     @Column(name = "attackWins", nullable = false)
     private Integer attackWins;
 

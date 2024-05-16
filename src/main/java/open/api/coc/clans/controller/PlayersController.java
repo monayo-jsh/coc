@@ -21,6 +21,12 @@ public class PlayersController {
 
     private final PlayersService playersService;
 
+    @GetMapping("/all")
+    public ResponseEntity<List<PlayerResponse>> getAllPlayer() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllPlayers());
+    }
+
     @GetMapping("")
     public ResponseEntity<List<PlayerResponse>> getPlayer(@RequestParam List<String> playerTags) {
         return ResponseEntity.ok()

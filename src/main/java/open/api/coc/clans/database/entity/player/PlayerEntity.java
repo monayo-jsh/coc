@@ -18,6 +18,7 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -80,17 +81,21 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     @JoinColumn(name = "league_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private LeagueEntity league;
 
+    @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
-    private List<PlayerHeroEntity> heroes;
+    private List<PlayerHeroEntity> heroes = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
-    private List<PlayerHeroEquipmentEntity> heroEquipments;
+    private List<PlayerHeroEquipmentEntity> heroEquipments = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
-    private List<PlayerTroopsEntity> troops;
+    private List<PlayerTroopsEntity> troops = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
-    private List<PlayerSpellEntity> spells;
+    private List<PlayerSpellEntity> spells = new ArrayList<>();
 
     @Transient
     @Builder.Default
@@ -117,12 +122,22 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
         this.clan = clan;
     }
 
+    public void addHero(PlayerHeroEntity hero) {
+        hero.changePlayer(this);
+        this.heroes.add(hero);
+    }
+
     public void changeHeroes(List<PlayerHeroEntity> heroes) {
         this.heroes = heroes;
 
         for (PlayerHeroEntity hero : this.heroes) {
             hero.changePlayer(this);
         }
+    }
+
+    public void addHeroEquipment(PlayerHeroEquipmentEntity heroEquipment) {
+        heroEquipment.changePlayer(this);
+        heroEquipments.add(heroEquipment);
     }
 
     public void changeHeroEquipments(List<PlayerHeroEquipmentEntity> heroEquipments) {
@@ -133,6 +148,11 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
         }
     }
 
+    public void addTroop(PlayerTroopsEntity troop) {
+        troop.changePlayer(this);
+        this.troops.add(troop);
+    }
+
     public void changeTroops(List<PlayerTroopsEntity> troops) {
         this.troops = troops;
 
@@ -141,6 +161,10 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
         }
     }
 
+    public void addSpell(PlayerSpellEntity spell) {
+        spell.changePlayer(this);
+        this.spells.add(spell);
+    }
     public void changeSpells(List<PlayerSpellEntity> spells) {
         this.spells = spells;
 

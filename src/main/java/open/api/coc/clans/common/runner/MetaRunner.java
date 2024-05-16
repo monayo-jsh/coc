@@ -20,9 +20,9 @@ public class MetaRunner implements CommandLineRunner {
     private final ClanApiService clanApiService;
     private final LeagueRepository leagueRepository;
     private final LeagueEntityConverter leagueEntityConverter;
+
     @Override
     public void run(String... args) {
-
         Optional<LabelList> findLeagues = clanApiService.findLeagues();
         if (findLeagues.isEmpty()) {
             log.info("leagues is empty ...");

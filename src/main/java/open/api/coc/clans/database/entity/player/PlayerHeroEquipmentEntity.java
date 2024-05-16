@@ -50,7 +50,7 @@ public class PlayerHeroEquipmentEntity implements Persistable<PlayerItemPKEntity
 
     @MapsId(value = "playerTag")
     @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "player_tag")
+    @JoinColumn(name = "player_tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private PlayerEntity player;
 
     @Transient

@@ -85,6 +85,10 @@ public class PlayersService {
                          .toList();
     }
 
+    public List<PlayerEntity> findAllPlayers() {
+        return playerRepository.findAll();
+    }
+
     @Transactional
     public void registerPlayer(String playerTag) {
         Player player = clanApiService.fetchPlayerBy(playerTag)
@@ -205,7 +209,7 @@ public class PlayersService {
     }
 
     @Transactional
-    public void updatePlayer(String playerTag) {
+    public boolean updatePlayer(String playerTag) {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
                                                     .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
@@ -222,15 +226,22 @@ public class PlayersService {
         modifyClan(playerEntity, player.getClan());
 
         playerRepository.save(playerEntity);
+
+        return true;
     }
 
-    private void modifyClan(PlayerEntity playerEntity, PlayerClan clan) {
-        if (Objects.isNull(clan)) {
-            playerEntity.setClan(null);
+    private void modifyClan(PlayerEntity player, PlayerClan playerClan) {
+        if (Objects.isNull(playerClan)) {
+            player.setClan(null);
             return;
         }
 
-        playerEntity.changeClan(clanEntityConverter.convert(clan));
+        ClanEntity clan = clanRepository.findById(playerClan.getTag()).orElse(null);
+        if (Objects.isNull(clan)) {
+            clan = createClan(playerClan);
+        }
+
+        player.changeClan(clan);
     }
 
     private void modifyLeague(PlayerEntity playerEntity, Label league) {
@@ -250,7 +261,7 @@ public class PlayersService {
             PlayerSpellEntity dbPlayerSpellEntity = dbPlayerSpellEntityMap.get(key);
             PlayerSpellEntity realPlayerSpellEntity = realPlayerSpellEntitiyMap.get(key);
             if (Objects.isNull(dbPlayerSpellEntity)) {
-                playerEntity.getSpells().add(realPlayerSpellEntity);
+                playerEntity.addSpell(realPlayerSpellEntity);
                 continue;
             }
 
@@ -266,7 +277,7 @@ public class PlayersService {
             PlayerTroopsEntity dbPlayerTroopsEntity = dbPlayerTroopsEntityMap.get(key);
             PlayerTroopsEntity realPlayerTroopsEntity = realPlayerTroopsEntitiyMap.get(key);
             if (Objects.isNull(dbPlayerTroopsEntity)) {
-                playerEntity.getTroops().add(realPlayerTroopsEntity);
+                playerEntity.addTroop(realPlayerTroopsEntity);
                 continue;
             }
 
@@ -283,7 +294,7 @@ public class PlayersService {
             PlayerHeroEquipmentEntity dbPlayerHeroEntity = dbPlayerHeroEquipmentEntityMap.get(key);
             PlayerHeroEquipmentEntity playerHeroEntity = realPlayerHeroEntityMap.get(key);
             if (Objects.isNull(dbPlayerHeroEntity)) {
-                playerEntity.getHeroEquipments().add(playerHeroEntity);
+                playerEntity.addHeroEquipment(playerHeroEntity);
                 continue;
             }
 
@@ -301,7 +312,7 @@ public class PlayersService {
             PlayerHeroEntity dbPlayerHeroEntity = dbPlayerHeroEntityMap.get(key);
             PlayerHeroEntity playerHeroEntity = realPlayerHeroEntityMap.get(key);
             if (Objects.isNull(dbPlayerHeroEntity)) {
-                playerEntity.getHeroes().add(playerHeroEntity);
+                playerEntity.addHero(playerHeroEntity);
                 continue;
             }
 
@@ -338,11 +349,11 @@ public class PlayersService {
     }
 
     private void modifyPlayer(PlayerEntity playerEntity, Player player) {
-        playerEntity.setName(playerEntity.getName());
-        playerEntity.setExpLevel(playerEntity.getExpLevel());
-        playerEntity.setTownHallLevel(playerEntity.getTownHallLevel());
+        playerEntity.setName(player.getName());
+        playerEntity.setExpLevel(player.getExpLevel());
+        playerEntity.setTownHallLevel(player.getTownHallLevel());
         playerEntity.setTrophies(player.getTrophies());
-        playerEntity.setBestTrophies(playerEntity.getBestTrophies());
+        playerEntity.setBestTrophies(player.getBestTrophies());
         playerEntity.setWarStars(player.getWarStars());
         playerEntity.setAttackWins(player.getAttackWins());
         playerEntity.setDefenseWins(player.getDefenseWins());

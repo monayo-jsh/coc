@@ -40,7 +40,8 @@ public class ClansController {
     }
 
     @PostMapping("{clanTag}")
-    public ResponseEntity<ClanResponse> registerClan(@RequestBody ClanRequest clanRequest) {
+    public ResponseEntity<ClanResponse> registerClan(@PathVariable String clanTag,
+                                                     @RequestBody ClanRequest clanRequest) {
         ClanResponse clan = clansService.registerClan(clanRequest);
         return ResponseEntity.ok()
                              .body(clan);

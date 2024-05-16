@@ -45,7 +45,7 @@
     async function addClan(element) {
       const cardElement = element.closest('.card');
       const { dataset } = cardElement;
-      const { clanTag, clanName } = dataset;
+      const { clanTag, clanName, badgeUrls } = dataset;
 
       if (!confirm(`${clanName}(${clanTag})를 등록하시겠습니까?\n`)) {
         return;
@@ -53,7 +53,8 @@
 
       const requestBody = {
         tag: clanTag,
-        name: clanName
+        name: clanName,
+        badge_url: JSON.parse(badgeUrls)
       }
 
       const registeredClan = await registerClan(requestBody)
@@ -287,6 +288,7 @@
       // dataset
       card.dataset.clanTag = tag;
       card.dataset.clanName = name;
+      card.dataset.badgeUrls = JSON.stringify(badgeUrls);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -30,6 +31,8 @@ public class Player {
 
     private Integer warStars;
 
+    private Label league;
+
     private String warPreference;
     private PlayerClan clan;
 
@@ -37,5 +40,6 @@ public class Player {
     private List<HeroEquipment> heroEquipment;
 
     private List<Troops> troops;
+    private List<Troops> spells;
 
 }

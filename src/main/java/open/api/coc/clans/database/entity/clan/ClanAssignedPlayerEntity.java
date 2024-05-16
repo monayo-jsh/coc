@@ -1,10 +1,12 @@
-package open.api.coc.clans.database.entity;
+package open.api.coc.clans.database.entity.clan;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +21,11 @@ import org.springframework.data.domain.Persistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "tb_clan_assigned_player")
+@Table(
+    indexes = {
+        @Index(name = "TCAP_IDX_01", columnList = "clan_tag, season_date")
+    }
+)
 public class ClanAssignedPlayerEntity implements Persistable<ClanAssignedPlayerPKEntity> {
 
     @EmbeddedId

@@ -1,5 +1,6 @@
 package open.api.coc.external.coc.clan.domain.common;
 
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,9 @@ public class HeroEquipment {
 
     private Integer level;
     private Integer maxLevel;
+
+    public boolean isVillageHome() {
+        return Objects.equals("home", village);
+    }
 
 }

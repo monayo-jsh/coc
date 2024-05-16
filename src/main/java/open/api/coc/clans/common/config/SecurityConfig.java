@@ -43,6 +43,7 @@ public class SecurityConfig {
                         authorize.requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers(BLACK_LIST).authenticated()
                                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
                                 .anyRequest().authenticated()).build();
 
     }

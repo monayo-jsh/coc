@@ -1,6 +1,7 @@
 package open.api.coc.clans.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +19,11 @@ import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverte
 import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.database.entity.player.PlayerSpellEntity;
+import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
+import open.api.coc.clans.database.entity.player.common.WarPreferenceType;
 import open.api.coc.clans.database.entity.player.converter.PlayerEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEquipmentEntityConverter;
@@ -32,6 +37,7 @@ import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
+import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
@@ -130,29 +136,32 @@ public class PlayersService {
     }
 
     private void createPlayerHeroEntities(PlayerEntity playerEntity, Player player) {
-        playerEntity.changeHeroes(player.getHeroes()
-                                        .stream()
-                                        .filter(Hero::isVillageHome)
-                                        .map(hero -> playerHeroEntityConverter.convert(player.getTag(), hero))
-                                        .collect(Collectors.toList()));
+        List<PlayerHeroEntity> playerHeroEntities = makePlayerHeroEntities(playerEntity.getPlayerTag(), player.getHeroes());
+        playerEntity.changeHeroes(playerHeroEntities);
+    }
+
+    private List<PlayerHeroEntity> makePlayerHeroEntities(String playerTag, List<Hero> heroes) {
+        return heroes.stream()
+                     .filter(Hero::isVillageHome)
+                     .map(hero -> playerHeroEntityConverter.convert(playerTag, hero))
+                     .collect(Collectors.toList());
+
     }
 
     private void createPlayerHeroEquipmentEntities(PlayerEntity playerEntity, Player player) {
-        List<PlayerHeroEquipmentEntity> playerHeroEquipmentEntities = player.getHeroEquipment()
-                                                                            .stream()
-                                                                            .filter(HeroEquipment::isVillageHome)
-                                                                            .map(heroEquipment -> playerHeroEquipmentEntityConverter.convert(player.getTag(), heroEquipment))
-                                                                            .collect(Collectors.toList());
+        List<PlayerHeroEquipmentEntity> playerHeroEquipmentEntities = makePlayerHeroEquipmentEntities(playerEntity.getPlayerTag(), player.getHeroEquipment());
+        convertHeroEquipmentWearYn(player.getHeroes(), playerHeroEquipmentEntities);
+        playerEntity.changeHeroEquipments(playerHeroEquipmentEntities);
+    }
 
-        for (Hero hero : player.getHeroes()) {
+    private void convertHeroEquipmentWearYn(List<Hero> heroes, List<PlayerHeroEquipmentEntity> playerHeroEquipmentEntities) {
+        Map<String, PlayerHeroEquipmentEntity> playerHeroEquipmentEntityMap = playerHeroEquipmentEntitiesToMap(playerHeroEquipmentEntities);
+        for (Hero hero : heroes) {
             if (hero.isNotVillageHome()) continue;
 
 
             for (HeroEquipment heroEquipment : hero.getEquipment()) {
-                PlayerHeroEquipmentEntity findPlayerHeroEquipmentEntity = playerHeroEquipmentEntities.stream()
-                                                                                                  .filter(playerHeroEquipmentEntity -> playerHeroEquipmentEntity.isEqualsHeroEquipmentName(heroEquipment.getName()))
-                                                                                                  .findFirst()
-                                                                                                  .orElse(null);
+                PlayerHeroEquipmentEntity findPlayerHeroEquipmentEntity = playerHeroEquipmentEntityMap.get(heroEquipment.getName());
 
                 // NotFound Hero Equipment..
                 if (Objects.isNull(findPlayerHeroEquipmentEntity)) continue;
@@ -160,25 +169,190 @@ public class PlayersService {
                 findPlayerHeroEquipmentEntity.setWearYn(YnType.Y);
             }
         }
-        playerEntity.changeHeroEquipments(playerHeroEquipmentEntities);
+    }
+
+    private List<PlayerHeroEquipmentEntity> makePlayerHeroEquipmentEntities(String playerTag, List<HeroEquipment> heroEquipments) {
+        return heroEquipments.stream()
+                             .filter(HeroEquipment::isVillageHome)
+                             .map(heroEquipment -> playerHeroEquipmentEntityConverter.convert(playerTag, heroEquipment))
+                             .collect(Collectors.toList());
+
     }
 
     private void createPlayerTroopsEntities(PlayerEntity playerEntity, Player player) {
-        playerEntity.changeTroops(player.getTroops()
-                                        .stream()
-                                        .filter(Troops::isVillageHome)
-                                        .map(troops -> playerTroopEntityConverter.convert(player.getTag(), troops))
-                                        .collect(Collectors.toList()));
+        List<PlayerTroopsEntity> playerTroopsEntities = makePlayerTroopsEntities(playerEntity.getPlayerTag(), player.getTroops());
+        playerEntity.changeTroops(playerTroopsEntities);
+    }
+
+    private List<PlayerTroopsEntity> makePlayerTroopsEntities(String playerTag, List<Troops> troops) {
+        return troops.stream()
+                     .filter(Troops::isVillageHome)
+                     .map(troop -> playerTroopEntityConverter.convert(playerTag, troop))
+                     .collect(Collectors.toList());
+
     }
 
     private void createPlayerSpellEntities(PlayerEntity playerEntity, Player player) {
-        playerEntity.changeSpells(player.getSpells()
-                                        .stream()
-                                        .filter(Troops::isVillageHome)
-                                        .map(spell -> playerSpellEntityConverter.convert(player.getTag(), spell))
-                                        .collect(Collectors.toList()));
+        List<PlayerSpellEntity> playerSpellEntities = makePlayerSpellEntities(playerEntity.getPlayerTag(), player.getSpells());
+        playerEntity.changeSpells(playerSpellEntities);
     }
 
+    private List<PlayerSpellEntity> makePlayerSpellEntities(String playerTag, List<Troops> spells) {
+        return spells.stream()
+                     .filter(Troops::isVillageHome)
+                     .map(spell -> playerSpellEntityConverter.convert(playerTag, spell))
+                     .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updatePlayer(String playerTag) {
+        PlayerEntity playerEntity = playerRepository.findById(playerTag)
+                                                    .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+
+        Player player = clanApiService.fetchPlayerBy(playerTag)
+                                      .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+
+        modifyPlayer(playerEntity, player);
+        modifyPlayerHero(playerEntity, player.getHeroes());
+        modifyPlayerHeroEquipment(playerEntity, player);
+        modifyPlayerTroops(playerEntity, player.getTroops());
+        modifyPlayerSpells(playerEntity, player.getSpells());
+
+        modifyLeague(playerEntity, player.getLeague());
+        modifyClan(playerEntity, player.getClan());
+
+        playerRepository.save(playerEntity);
+    }
+
+    private void modifyClan(PlayerEntity playerEntity, PlayerClan clan) {
+        if (Objects.isNull(clan)) {
+            playerEntity.setClan(null);
+            return;
+        }
+
+        playerEntity.changeClan(clanEntityConverter.convert(clan));
+    }
+
+    private void modifyLeague(PlayerEntity playerEntity, Label league) {
+        if (Objects.isNull(league)) {
+            playerEntity.setLeague(null);
+            return;
+        }
+
+        playerEntity.changeLeague(leagueEntityConverter.convert(league));
+    }
+
+    private void modifyPlayerSpells(PlayerEntity playerEntity, List<Troops> spells) {
+        Map<String, PlayerSpellEntity> dbPlayerSpellEntityMap = playerSpellEntityToMap(playerEntity.getSpells());
+        Map<String, PlayerSpellEntity> realPlayerSpellEntitiyMap = playerSpellEntityToMap(makePlayerSpellEntities(playerEntity.getPlayerTag(), spells));
+
+        for (String key : realPlayerSpellEntitiyMap.keySet()) {
+            PlayerSpellEntity dbPlayerSpellEntity = dbPlayerSpellEntityMap.get(key);
+            PlayerSpellEntity realPlayerSpellEntity = realPlayerSpellEntitiyMap.get(key);
+            if (Objects.isNull(dbPlayerSpellEntity)) {
+                playerEntity.getSpells().add(realPlayerSpellEntity);
+                continue;
+            }
+
+            dbPlayerSpellEntity.setLevelInfo(realPlayerSpellEntity.getLevelInfo());
+        }
+    }
+
+    private void modifyPlayerTroops(PlayerEntity playerEntity, List<Troops> troops) {
+        Map<String, PlayerTroopsEntity> dbPlayerTroopsEntityMap = playerTroopEntitiesToMap(playerEntity.getTroops());
+        Map<String, PlayerTroopsEntity> realPlayerTroopsEntitiyMap = playerTroopEntitiesToMap(makePlayerTroopsEntities(playerEntity.getPlayerTag(), troops));
+
+        for (String key : realPlayerTroopsEntitiyMap.keySet()) {
+            PlayerTroopsEntity dbPlayerTroopsEntity = dbPlayerTroopsEntityMap.get(key);
+            PlayerTroopsEntity realPlayerTroopsEntity = realPlayerTroopsEntitiyMap.get(key);
+            if (Objects.isNull(dbPlayerTroopsEntity)) {
+                playerEntity.getTroops().add(realPlayerTroopsEntity);
+                continue;
+            }
+
+            dbPlayerTroopsEntity.setLevelInfo(realPlayerTroopsEntity.getLevelInfo());
+        }
+    }
+
+    private void modifyPlayerHeroEquipment(PlayerEntity playerEntity, Player player) {
+        Map<String, PlayerHeroEquipmentEntity> dbPlayerHeroEquipmentEntityMap = playerHeroEquipmentEntitiesToMap(playerEntity.getHeroEquipments());
+        List<PlayerHeroEquipmentEntity> playerHeroEquipmentEntities = makePlayerHeroEquipmentEntities(playerEntity.getPlayerTag(), player.getHeroEquipment());
+        Map<String, PlayerHeroEquipmentEntity> realPlayerHeroEntityMap = playerHeroEquipmentEntitiesToMap(playerHeroEquipmentEntities);
+
+        for (String key : realPlayerHeroEntityMap.keySet()) {
+            PlayerHeroEquipmentEntity dbPlayerHeroEntity = dbPlayerHeroEquipmentEntityMap.get(key);
+            PlayerHeroEquipmentEntity playerHeroEntity = realPlayerHeroEntityMap.get(key);
+            if (Objects.isNull(dbPlayerHeroEntity)) {
+                playerEntity.getHeroEquipments().add(playerHeroEntity);
+                continue;
+            }
+
+            dbPlayerHeroEntity.setLevelInfo(playerHeroEntity.getLevelInfo());
+        }
+
+        convertHeroEquipmentWearYn(player.getHeroes(), playerHeroEquipmentEntities);
+    }
+
+    private void modifyPlayerHero(PlayerEntity playerEntity, List<Hero> heroes) {
+        Map<String, PlayerHeroEntity> dbPlayerHeroEntityMap = playerHeroEntitiesToMap(playerEntity.getHeroes());
+        Map<String, PlayerHeroEntity> realPlayerHeroEntityMap = playerHeroEntitiesToMap(makePlayerHeroEntities(playerEntity.getPlayerTag(), heroes));
+
+        for (String key : realPlayerHeroEntityMap.keySet()) {
+            PlayerHeroEntity dbPlayerHeroEntity = dbPlayerHeroEntityMap.get(key);
+            PlayerHeroEntity playerHeroEntity = realPlayerHeroEntityMap.get(key);
+            if (Objects.isNull(dbPlayerHeroEntity)) {
+                playerEntity.getHeroes().add(playerHeroEntity);
+                continue;
+            }
+
+            dbPlayerHeroEntity.setLevelInfo(playerHeroEntity.getLevelInfo());
+        }
+    }
+
+    private Map<String, PlayerSpellEntity> playerSpellEntityToMap(List<PlayerSpellEntity> playerSpellEntities) {
+        return playerSpellEntities.stream()
+                                  .collect(Collectors.toMap((playerSpellEntity -> playerSpellEntity.getId()
+                                                                                                   .getName()), playerSpellEntity -> playerSpellEntity));
+
+    }
+
+    private Map<String, PlayerTroopsEntity> playerTroopEntitiesToMap(List<PlayerTroopsEntity> playerTroopsEntities) {
+        return playerTroopsEntities.stream()
+                                 .collect(Collectors.toMap((playerTroopsEntity -> playerTroopsEntity.getId()
+                                                                                                    .getName()), playerTroopsEntity -> playerTroopsEntity));
+
+    }
+
+    private Map<String, PlayerHeroEquipmentEntity> playerHeroEquipmentEntitiesToMap(List<PlayerHeroEquipmentEntity> playerHeroEquipmentEntities) {
+        return playerHeroEquipmentEntities.stream()
+                                          .collect(Collectors.toMap((playerHeroEquipmentEntity -> playerHeroEquipmentEntity.getId()
+                                                                                                                           .getName()), playerHeroEquipmentEntity -> playerHeroEquipmentEntity));
+
+    }
+
+    private Map<String, PlayerHeroEntity> playerHeroEntitiesToMap(List<PlayerHeroEntity> playerHeroEntities) {
+        return playerHeroEntities.stream()
+                                 .collect(Collectors.toMap((playerHeroEntity -> playerHeroEntity.getId()
+                                                                                                .getName()), playerHeroEntity -> playerHeroEntity));
+
+    }
+
+    private void modifyPlayer(PlayerEntity playerEntity, Player player) {
+        playerEntity.setName(playerEntity.getName());
+        playerEntity.setExpLevel(playerEntity.getExpLevel());
+        playerEntity.setTownHallLevel(playerEntity.getTownHallLevel());
+        playerEntity.setTrophies(player.getTrophies());
+        playerEntity.setBestTrophies(playerEntity.getBestTrophies());
+        playerEntity.setWarStars(player.getWarStars());
+        playerEntity.setAttackWins(player.getAttackWins());
+        playerEntity.setDefenseWins(player.getDefenseWins());
+
+        if (Objects.nonNull(player.getWarPreference())) {
+            playerEntity.setWarPreference(WarPreferenceType.valueOf(player.getWarPreference()));
+        }
+    }
+
+    @Transactional
     public void deletePlayer(String playerTag) {
         Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
         if (findPlayer.isEmpty()) {

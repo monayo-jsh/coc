@@ -13,13 +13,11 @@ import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.converter.ClanEntityConverter;
-import open.api.coc.clans.database.entity.common.IconUrlEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
-import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
 import open.api.coc.clans.database.entity.player.converter.PlayerEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEntityConverter;
@@ -28,14 +26,12 @@ import open.api.coc.clans.database.entity.player.converter.PlayerSpellEntityConv
 import open.api.coc.clans.database.entity.player.converter.PlayerTroopEntityConverter;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
-import open.api.coc.clans.database.repository.player.PlayerHeroRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
-import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
@@ -183,4 +179,12 @@ public class PlayersService {
                                         .collect(Collectors.toList()));
     }
 
+    public void deletePlayer(String playerTag) {
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isEmpty()) {
+            return;
+        }
+
+        playerRepository.delete(findPlayer.get());
+    }
 }

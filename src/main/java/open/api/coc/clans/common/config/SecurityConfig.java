@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(BLACK_LIST).authenticated()
                                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/**").permitAll()
+                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
                                 .anyRequest().authenticated()).build();
 
     }

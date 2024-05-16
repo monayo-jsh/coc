@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +36,14 @@ public class PlayersController {
     public ResponseEntity<?> savePlayer(@PathVariable String playerTag) {
 
         playersService.registerPlayer(playerTag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{playerTag}")
+    public ResponseEntity<?> deletePlayer(@PathVariable String playerTag) {
+
+        playersService.deletePlayer(playerTag);
 
         return ResponseEntity.ok().build();
     }

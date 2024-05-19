@@ -266,7 +266,7 @@
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/g, `${no}. ${displayName || name}`)
                                          .replace(/{TAG}/g, tag)
-                                         .replace(/{CLAN_NAME}/g, clan?.name)
+                                         .replace(/{CLAN_NAME}/g, clan ? clan.name : '클랜 없음')
                                          .replace(/{TROPHIES}/g, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
                                          .replace(/{EXP_LEVEL}/g, expLevel)

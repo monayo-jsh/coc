@@ -2,6 +2,12 @@
   display: none !important;
 }
 
+.card-wrapper.empty-clan {
+  height: 100px;
+  display: flex;
+  align-items: center;
+}
+
 .card-wrapper {
   width: 100%;
   max-width: 1080px;

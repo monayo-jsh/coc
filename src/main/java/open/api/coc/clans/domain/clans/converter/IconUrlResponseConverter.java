@@ -1,5 +1,6 @@
 package open.api.coc.clans.domain.clans.converter;
 
+import open.api.coc.clans.database.entity.common.IconUrlEntity;
 import open.api.coc.clans.domain.clans.IconUrlResponse;
 import open.api.coc.external.coc.clan.domain.common.IconUrl;
 import org.springframework.core.convert.converter.Converter;
@@ -10,6 +11,15 @@ public class IconUrlResponseConverter implements Converter<IconUrl, IconUrlRespo
 
     @Override
     public IconUrlResponse convert(IconUrl source) {
+        return IconUrlResponse.builder()
+                              .tiny(source.getTiny())
+                              .small(source.getSmall())
+                              .medium(source.getMedium())
+                              .large(source.getLarge())
+                              .build();
+    }
+
+    public IconUrlResponse convert(IconUrlEntity source) {
         return IconUrlResponse.builder()
                               .tiny(source.getTiny())
                               .small(source.getSmall())

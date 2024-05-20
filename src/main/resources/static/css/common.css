@@ -98,8 +98,8 @@ body::before {
 }
 
 .logo {
-  width: 230px;
-  height: 230px;
+  width: 200px;
+  height: 200px;
   background-image: url("/static/images/logo.png");
   background-size: contain;
   background-repeat: no-repeat;
@@ -191,12 +191,13 @@ body::before {
   width: fit-content;
   font-size: 0.8rem;
   font-weight: bold;
-  word-break: break-all;
+  word-break: keep-all;
   border: var(--default-border);
   padding: 3px 15px;
   border-radius: 15px;
   background: #5c5c5c;
   color: white;
+  cursor: pointer;
 }
 
 .chip-label {

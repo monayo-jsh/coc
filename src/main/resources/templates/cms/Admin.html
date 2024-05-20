@@ -8,14 +8,6 @@
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
 
-  <style>
-    .home-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-  </style>
-
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/clan.js"></script>
@@ -36,44 +28,8 @@
         return;
       }
 
-      let clans = await fetchClans();
-      const clanMembers = await fetchClanMembers(clans);
-      await fetchPlayerDetail(clanMembers);
-
-      exportExcel(clanMembers);
-    }
-
-    async function checkClashOfClanServer() {
-      axios.get("/leagues")
-           .then((response) => {})
-           .catch((error) => {
-             const { response } = error;
-             const { status, data } = response;
-
-             let msg = 'Clash of Clan API Server\n'
-             const { reason, message } = data;
-             if (reason) {
-               msg += `\nreason: ${reason}`;
-             }
-             if (message) {
-               msg += `\nmessage: ${message}`;
-             }
-
-             msg += `\n\n위와 같은 사유로 편의기능을 제공 불가`;
-
-             const codeContainerElement = document.querySelector('#code');
-             codeContainerElement.value = msg;
-
-             const homeWrapperElement = document.querySelector('.home-wrapper');
-             homeWrapperElement.classList.add('display-none');
-
-             const errorElement = document.querySelector('.error');
-             errorElement.classList.remove('display-none');
-           })
-    }
-
-    window.onload = async () => {
-      await checkClashOfClanServer()
+      let clanAllPlayers = await fetchAllClanPlayers();
+      exportExcel(clanAllPlayers);
     }
   </script>
 
@@ -108,14 +64,21 @@
   </div>
   <div class="home-wrapper">
     <div class="logo"></div>
-    <div class="cards">
-      <div class="card red" onclick="downloadAllClanMembers(); return false;">
-        <p class="tip">전체 클랜원</p>
-        <p class="second-text">(엑셀 다운)</p>
+
+    <div class="card-group">
+
+      <div class="cards">
+        <div class="card red-1" onclick="downloadAllClanMembers(); return false;">
+          <p class="tip">전체 클랜원</p>
+          <p class="second-text">(엑셀 다운)</p>
+        </div>
       </div>
-      <div class="card violet" onclick="renderPage('/clan/cms/clan/manager'); return false;">
-        <p class="tip">클랜 관리</p>
-        <p class="second-text">(클랜 등록/삭제)</p>
+
+      <div class="cards">
+        <div class="card violet" onclick="renderPage('/clan/cms/clan/manager'); return false;">
+          <p class="tip">클랜 관리</p>
+          <p class="second-text">(클랜 등록/삭제)</p>
+        </div>
       </div>
     </div>
   </div>

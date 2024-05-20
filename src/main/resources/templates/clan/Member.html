@@ -15,12 +15,16 @@
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/league.js"></script>
   <script src="/static/js/api/clan.js"></script>
   <script src="/static/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
 
   <script>
     dayjs.locale('ko')
@@ -78,7 +82,7 @@
   function sortByHeroLevelSum(members) {
     // 웅합 순 > 트로피 순
     return members.map(member => member)
-                  .sort((a, b) => b.heroLevelSum - a.heroLevelSum || b.trophies - a.trophies);
+                  .sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || b.trophies - a.trophies);
   }
 
     // 사용자 목록
@@ -134,12 +138,8 @@
 
     async function getClanMembers() {
       showWifiLoading('.clan-members');
-      let clans = await fetchClans();
-
-      const clanMembers = await fetchClanMembers(clans);
-      members.push(...clanMembers);
-
-      await fetchPlayerDetail(members);
+      let players = await fetchAllClanPlayers();
+      members.push(...players);
       hideWifiLoading('.clan-members');
 
       renderMemberSortByTrophies();
@@ -174,7 +174,9 @@
 
       heroesElement.appendChild(heroElement);
 
-      renderEquipments(heroElement, equipments)
+      if (equipments) {
+        renderEquipments(heroElement, equipments);
+      }
     }
 
     function renderHeroes(memberHtml, player) {
@@ -253,7 +255,41 @@
       cardBackElement.appendChild(innerSectionElement);
     }
 
-    function renderMembers(members) {
+  function createPlayerLabel(name, tooltip) {
+    const playerLabelTemplate = document.querySelector('#player-label');
+    const playerLabel = document.importNode(playerLabelTemplate.content, true);
+    const clanLabel = playerLabel.querySelector('.chip');
+    clanLabel.innerHTML = clanLabel.innerHTML.replace(/{LABEL_NAME}/, name);
+
+    settingTooltip(clanLabel, tooltip);
+    return clanLabel;
+  }
+
+  function renderPlayerLabels(memberHtml, player) {
+    const playerLabels = memberHtml.querySelector('.player-labels');
+    const { tag, clan, assignedClan, role } = player;
+
+    const tagLabel = createPlayerLabel(tag, '플레이어 태그');
+    playerLabels.appendChild(tagLabel);
+
+    if (assignedClan) {
+      const assignedClanLabel = createPlayerLabel(assignedClan.name, '배정 클랜');
+      assignedClanLabel.classList.add('bg-green');
+      playerLabels.appendChild(assignedClanLabel);
+    }
+
+    // if (clan) {
+    //   const clanLabel = createPlayerLabel(clan.name, '현재 클랜');
+    //   playerLabels.appendChild(clanLabel);
+    // }
+
+    // if (role) {
+    //   const clanRoleLabel = createPlayerLabel(convRoleName(role), '클랜 권한');
+    //   playerLabels.appendChild(clanRoleLabel);
+    // }
+  }
+
+  function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
       const memberTemplate = document.querySelector('#member');
@@ -262,24 +298,28 @@
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { displayName, name, tag, clan, role, townHallLevel, expLevel, heroLevelSum, league, trophies, donations, donationsReceived } = player
+        const { displayName, name, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/g, `${no}. ${displayName || name}`)
-                                         .replace(/{TAG}/g, tag)
-                                         .replace(/{CLAN_NAME}/g, clan.name)
-                                         .replace(/{CLAN_ROLE}/g, convName(role))
                                          .replace(/{TROPHIES}/g, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
                                          .replace(/{EXP_LEVEL}/g, expLevel)
-                                         .replace(/{HERO_LEVEL}/g, heroLevelSum)
-                                         .replace(/{IS_HERO_MAX_LEVEL}/g, heroLevelSum === 305 ? 'is-max' : '')
+                                         .replace(/{HERO_LEVEL}/g, heroTotalLevel)
+                                         .replace(/{IS_HERO_MAX_LEVEL}/g, heroTotalLevel === heroTotalMaxLevel ? 'is-max' : '')
                                          .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
                                          .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
 
+        renderPlayerLabels(memberHtml, player)
+
         const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
-        const { iconUrls } = league
-        leagueIconImg.src = iconUrls.tiny;
+        if (league) {
+          const { iconUrls } = league;
+          leagueIconImg.src = iconUrls.tiny;
+        } else {
+          const { iconUrls } = leagueMap['Unranked'];
+          leagueIconImg.src = iconUrls.tiny;
+        }
 
         clanMembersElement.appendChild(memberHtml);
         no++;
@@ -401,7 +441,17 @@
       switchCardElement.addEventListener('change', switchCard);
     }
 
+  let leagueMap = {}
+  async function loadLeagues() {
+    // 리그 목록 조회
+    const leagues = await fetchLeagues();
+    leagues.map(league => {
+      leagueMap[league.name] = league;
+    });
+  }
+
     window.onload = async () => {
+      await loadLeagues();
       await getClanMembers();
       initSearchKeyword();
       initSwitchCard();
@@ -459,7 +509,7 @@
         <div class="toggle-button-cover">
           <div class="toggle-button">
             <input type="checkbox" class="checkbox switch-card">
-            <div class="knobs" data-toggle-on="앞면" data-toggle-off="뒷면"></div>
+            <div class="knobs" data-toggle-on="요약" data-toggle-off="상세"></div>
             <div class="layer"></div>
           </div>
         </div>
@@ -469,16 +519,13 @@
   </div>
 </body>
 <template id="member">
-  <div class="member row" onclick="cardClick(this, event); return false;">
+  <div class="member row">
     <div class="card-front">
 
       <div class="layout-title">
         <div class="cell">
           <div class="user">{NAME}</div>
-          <div class="labels">
-            <span class="chip">{TAG}</span>
-            <span class="chip">{CLAN_NAME}</span>
-            <span class="chip">{CLAN_ROLE}</span>
+          <div class="player-labels">
           </div>
         </div>
         <div class="cell trophies">
@@ -510,6 +557,9 @@
       <div class="inner-section hero-wrapper">
         <div class="heroes"></div>
       </div>
+      <div class="inner-section button-wrapper">
+        <div class="button-chip" onclick="cardClick(this, event); return false;">상세정보</div>
+      </div>
     </div>
 
     <div class="card-back">
@@ -518,9 +568,7 @@
         <div class="cell">
           <div class="user">{NAME}</div>
           <div class="labels">
-            <span class="chip">{TAG}</span>
-            <span class="chip">{CLAN_NAME}</span>
-            <span class="chip">{CLAN_ROLE}</span>
+            <div class="button-chip" onclick="cardClick(this, event); return false;">닫기</div>
           </div>
         </div>
       </div>
@@ -538,7 +586,7 @@
   </div>
 </template>
 <template id="member-hero">
-  <div class="hero" onclick="heroClick(this, event); return false;">
+  <div class="hero cursor-pointer" onclick="heroClick(this, event); return false;">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
     <div class="equipment-wrapper"></div>
   </div>
@@ -547,5 +595,8 @@
   <div class="img-icon">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
   </div>
+</template>
+<template id="player-label">
+  <span class="chip">{LABEL_NAME}</span>
 </template>
 </html>

@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
+import open.api.coc.external.coc.clan.domain.common.IconUrl;
 import org.springframework.util.ObjectUtils;
 
 @Getter
@@ -16,6 +17,9 @@ public class ClanRequest {
 
     @JsonProperty("name")
     private final String name;
+
+    @JsonProperty("badge_url")
+    private final IconUrl badgeUrl;
 
     public void validate() {
         if (isEmpty(tag)) {

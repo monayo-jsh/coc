@@ -12,7 +12,9 @@ public enum HeroConfig {
     BARBARIAN_KING(1, "Barbarian King"),
     ARCHER_QUEEN(2, "Archer Queen"),
     GRAND_WARDEN(3, "Grand Warden"),
-    ROYAL_CHAMPION(4, "Royal Champion");
+    ROYAL_CHAMPION(4, "Royal Champion"),
+
+    UNKNOWN(Integer.MAX_VALUE, "unknown");
 
     private final int code;
     private final String name;

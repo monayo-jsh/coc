@@ -4,6 +4,7 @@ const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
+const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
@@ -188,5 +189,45 @@ async function fetchClanAssignedMembers(clanTag) {
                     .catch((error) => {
                       console.error(error);
                       return [];
+                    });
+}
+
+async function assignedClanPlayer(clanTag, seasonDate, playerTag) {
+  const uri = `${URI_CLAN_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
+                                         .replace(/{seasonDate}/, seasonDate)
+                                         .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+
+  return await axios.post(uri)
+                    .then((response) => {
+                      alert('배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
+  const uri = `${URI_CLAN_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
+                                         .replace(/{seasonDate}/, seasonDate)
+                                         .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+
+  return await axios.delete(uri)
+                    .then((response) => {
+                      alert('삭제 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return false;
                     });
 }

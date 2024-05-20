@@ -8,20 +8,27 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
-import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
-import open.api.coc.clans.database.entity.ClanAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.ClanContentEntity;
-import open.api.coc.clans.database.entity.ClanEntity;
-import open.api.coc.clans.database.repository.ClanAssignedPlayerRepository;
-import open.api.coc.clans.database.repository.ClanContentRepository;
-import open.api.coc.clans.database.repository.ClanRepository;
+import open.api.coc.clans.common.exception.handler.ExceptionHandler;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
+import open.api.coc.clans.database.entity.clan.ClanContentEntity;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.common.YnType;
+import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
+import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
+import open.api.coc.clans.database.repository.clan.ClanContentRepository;
+import open.api.coc.clans.database.repository.clan.ClanRepository;
+import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
@@ -58,10 +65,12 @@ public class ClansService {
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
 
     private final ClanResponseConverter clanResponseConverter;
+    private final IconUrlEntityConverter iconUrlEntityConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
+    private final PlayerRepository playerRepository;
     private final PlayersService playersService;
 
     public ClanResponse findClanByClanTag(String clanTag) {
@@ -200,8 +209,8 @@ public class ClansService {
             return;
         }
 
-        clanRepository.deleteById(clanTag);
-        clanContentRepository.deleteById(clanTag);
+        clan.setVisibleYn(YnType.N);
+        clanRepository.save(clan);
     }
 
     @Transactional
@@ -210,29 +219,26 @@ public class ClansService {
 
         Optional<ClanEntity> clanEntity = clanRepository.findById(clanRequest.getTag());
         if (clanEntity.isPresent()) {
-            throw BadRequestException.create(ExceptionCode.ALREADY_DATA, "%s(%s)".formatted(clanRequest.getName(), clanRequest.getTag()));
+            ClanEntity updateClanEntity = clanEntity.get();
+            updateClanEntity.setVisibleYn(YnType.Y);
+            ClanEntity resultClan = clanRepository.save(updateClanEntity);
+            return clanResponseConverter.convert(resultClan);
         }
 
         Integer clanMaxOrders = clanRepository.selectMaxOrders();
+        if (Objects.isNull(clanMaxOrders)) {
+            clanMaxOrders = 0;
+        }
 
-        ClanContentEntity createClanContent = createClanContentEntity(clanRequest.getTag());
         ClanEntity createClan = createClanEntity(clanRequest, clanMaxOrders);
-        createClan.changeClanContent(createClanContent);
-
+        createClan.changeClanContent(ClanContentEntity.empty(clanRequest.getTag()));
+        createClan.changeBadgeUrl(ClanBadgeEntity.builder()
+                                                 .tag(clanRequest.getTag())
+                                                 .iconUrl(iconUrlEntityConverter.convert(clanRequest.getBadgeUrl()))
+                                                 .build());
         clanRepository.save(createClan);
 
         return clanResponseConverter.convert(createClan);
-    }
-
-    private ClanContentEntity createClanContentEntity(String tag) {
-        final String defaultStatusYN = "N";
-        return ClanContentEntity.builder()
-                                .tag(tag)
-                                .clanWarYn(defaultStatusYN)
-                                .warLeagueYn(defaultStatusYN)
-                                .clanCapitalYn(defaultStatusYN)
-                                .clanWarParallelYn(defaultStatusYN)
-                                .build();
     }
 
     private ClanEntity createClanEntity(ClanRequest clanRequest, Integer clanMaxOrders) {
@@ -240,6 +246,7 @@ public class ClansService {
                          .tag(clanRequest.getTag())
                          .name(clanRequest.getName())
                          .order(clanMaxOrders + 1)
+                         .visibleYn(YnType.Y)
                          .regDate(LocalDateTime.now())
                          .build();
     }
@@ -253,10 +260,59 @@ public class ClansService {
         List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findByClanTagAndSeasonDate(clanTag, latestSeasonDate);
 
         List<String> playerTags = clanAssignedPlayers.stream()
-                                                      .map(ClanAssignedPlayerEntity::getPlayerTag)
+                                                      .map(clanAssignedPlayerEntity -> clanAssignedPlayerEntity.getId().getPlayerTag())
                                                       .toList();
         List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
 
         return ClanAssignedMemberListResponse.create(clanTag, latestSeasonDate, players);
+    }
+
+    @Transactional
+    public void postClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
+
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isEmpty()) {
+            // 배정 시 등록되지 않은 클랜원은 등록 처리
+            playersService.registerPlayer(playerTag);
+        }
+
+        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
+                                                                                    .seasonDate(seasonDate)
+                                                                                    .playerTag(playerTag)
+                                                                                    .build();
+
+        Optional<ClanAssignedPlayerEntity> findClanAssignedPlayer = clanAssignedPlayerRepository.findById(clanAssignedPlayerPK);
+        if (findClanAssignedPlayer.isPresent()) {
+            ClanAssignedPlayerEntity clanAssignedPlayerEntity = findClanAssignedPlayer.get();
+            if (Objects.equals(clanTag, clanAssignedPlayerEntity.getClan().getTag())) {
+                // 이미 배정
+                return;
+            }
+
+            ClanEntity clanEntity = clanRepository.findById(clanAssignedPlayerEntity.getClan().getTag())
+                                                  .orElseThrow(() -> ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA,
+                                                                                                                clanAssignedPlayerEntity.getClan().getName() + "에 배정된 상태"));
+
+            throw ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "[%s] 배정된 상태".formatted(clanEntity.getName()));
+        }
+
+        ClanEntity clan = clanRepository.findById(clanTag)
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(clanTag)));
+        ClanAssignedPlayerEntity clanAssignedPlayer = ClanAssignedPlayerEntity.builder()
+                                                                              .id(clanAssignedPlayerPK)
+                                                                              .clan(clan)
+                                                                              .build();
+
+        clanAssignedPlayerRepository.save(clanAssignedPlayer);
+    }
+
+    @Transactional
+    public void deleteClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
+        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
+                                                                                    .seasonDate(seasonDate)
+                                                                                    .playerTag(playerTag)
+                                                                                    .build();
+
+        clanAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
     }
 }

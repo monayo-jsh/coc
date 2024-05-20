@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.ClanEntity;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.domain.clans.ClanMemberResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;

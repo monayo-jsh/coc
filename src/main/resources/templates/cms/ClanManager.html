@@ -8,6 +8,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/townhall.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/warLeague.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/cms/manager.css" />
 
@@ -15,12 +16,18 @@
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/league.js"></script>
   <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/player.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+  dayjs.locale('ko')
+  </script>
 
   <title>클랜 관리</title>
 
@@ -38,7 +45,7 @@
     async function addClan(element) {
       const cardElement = element.closest('.card');
       const { dataset } = cardElement;
-      const { clanTag, clanName } = dataset;
+      const { clanTag, clanName, badgeUrls } = dataset;
 
       if (!confirm(`${clanName}(${clanTag})를 등록하시겠습니까?\n`)) {
         return;
@@ -46,7 +53,8 @@
 
       const requestBody = {
         tag: clanTag,
-        name: clanName
+        name: clanName,
+        badge_url: JSON.parse(badgeUrls)
       }
 
       const registeredClan = await registerClan(requestBody)
@@ -64,7 +72,10 @@
     }
 
     function clearFooter(searchResultElement) {
-      searchResultElement.querySelector('.card-footer').remove();
+      const cardFooters = searchResultElement.querySelectorAll('.card-footer');
+      for (const cardFooter of cardFooters) {
+        cardFooter.remove();
+      }
     }
 
     function replaceRemoveToAddButton(searchResultElement) {
@@ -110,7 +121,7 @@
       const { dataset } = cardElement;
       const { clanTag, clanName } = dataset;
 
-      if (!confirm(`${clanName}(${clanTag})를 제거하시겠습니까?\n`)) {
+      if (!confirm(`[클랜] ${clanName}(${clanTag})를 삭제하시겠습니까?\n`)) {
         return;
       }
 
@@ -277,6 +288,7 @@
       // dataset
       card.dataset.clanTag = tag;
       card.dataset.clanName = name;
+      card.dataset.badgeUrls = JSON.stringify(badgeUrls);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
@@ -350,6 +362,260 @@
       hideWifiLoading('.clan-manager');
     }
 
+    function closeAssignedPlayer(element) {
+      const cardElement = element.closest('div.card');
+
+      const cardBasic = cardElement.querySelector('.card-basic');
+      cardBasic.classList.remove('display-none');
+
+      const cardAssignedPlayerWrapper = cardElement.querySelector('.card-assigned-player-wrapper');
+      cardAssignedPlayerWrapper.classList.add('display-none');
+
+      const loaderElement = cardAssignedPlayerWrapper.querySelector('.loader-circle');
+      loaderElement.classList.remove('display-none');
+
+      // 필터 초기화
+      cardAssignedPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
+    }
+
+    function isWarPreferenceIn(warPreference) {
+      return warPreference === 'in';
+    }
+
+    function convWarPreferenceName(warPreference) {
+      return isWarPreferenceIn(warPreference) ? '참가' : '불참';
+    }
+
+    function renderWarPreference(warPreference, playerInfo) {
+      const warPreferenceElement = playerInfo.querySelector('.war-preference');
+
+      warPreferenceElement.innerHTML = warPreferenceElement.innerHTML
+                                                           .replace(/{WAR_PREFERENCE}/, convWarPreferenceName(warPreference));
+
+      const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
+      warPreferenceElement.classList.add(bgColor)
+    }
+
+
+    function renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
+
+      const { clanTag, seasonDate, players } = clanAssignedPlayers;
+
+      const playerInfoTemplate = document.querySelector('#clan-player-info-template');
+
+      const playerList = cardElement.querySelector('.card-assigned-player .player-list');
+      playerList.innerHTML = ""; // clear
+
+      const sortedPlayers = sortByHeroTotalLevel(players);
+      let joinedSize = 0;
+      let warPreferenceSize = 0;
+      for (const player of sortedPlayers) {
+        const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
+        const playerInfo = playerInfoElement.querySelector('.player-info');
+
+        const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
+
+        const joinedClan = clanMembersMap[player.tag];
+        const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
+
+        // dataset
+        playerInfo.dataset.clanTag = clanTag;
+        playerInfo.dataset.seasonDate = seasonDate;
+        playerInfo.dataset.name = name;
+        playerInfo.dataset.playerTag = tag;
+        playerInfo.dataset.joinedStatus = !!joinedClan;
+        playerInfo.dataset.warPreference = isWarPreferenceIn(warPreference);
+
+        // render
+        playerInfo.innerHTML = playerInfo.innerHTML
+                                         .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{TAG}/, tag)
+                                         .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
+                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음')
+                                         .replace(/{JOINED}/, joinedStatusName);
+
+        renderWarPreference(warPreference, playerInfo);
+
+        if (!joinedClan) {
+          playerInfo.classList.add('not-joined');
+        } else {
+          joinedSize++;
+
+          if (isWarPreferenceIn(warPreference)) {
+            warPreferenceSize++;
+          }
+        }
+
+        playerList.appendChild(playerInfoElement);
+      }
+
+      cardElement.querySelector('#total_size').innerHTML = players.length;
+      cardElement.querySelector('#joined_size').innerHTML = joinedSize;
+      cardElement.querySelector('#war_preference_size').innerHTML = warPreferenceSize;
+    }
+
+    function formatDate(date) {
+      const formattedDate = dayjs(date).format('YY년 MM월');
+      return `[${formattedDate}] `;
+    }
+
+    async function viewAssignedPlayer(element) {
+
+      const cardElement = element.closest('div.card');
+      const { clanTag } = cardElement.dataset;
+
+      // 기본 카드 숨김
+      const cardBasic = cardElement.querySelector('.card-basic');
+      cardBasic.classList.add('display-none');
+
+      // 로딩바 노출
+      const cardAssignedPlayerWrapper = cardElement.querySelector('.card-assigned-player-wrapper');
+      cardAssignedPlayerWrapper.classList.remove('display-none');
+
+      const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
+
+      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembersMap = makeMapByTag(clanMembers);
+
+      const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
+      seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
+
+      // dataset
+      cardElement.dataset.seasonDate = clanAssignedPlayers.seasonDate;
+
+      renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement);
+
+      // 로딩바 숨김
+      const loaderElement = cardAssignedPlayerWrapper.querySelector('.loader-circle');
+      loaderElement.classList.add('display-none');
+
+      // 배정클랜원 노출
+      const cardAssignedPlayer = cardElement.querySelector('.card-assigned-player .body');
+      cardAssignedPlayer.classList.remove('display-none');
+
+    }
+
+    function filterNotJoined(element) {
+      const cardAssignedPlayerElement = element.closest('.card-assigned-player');
+      const playerListElement = cardAssignedPlayerElement.querySelector('.player-list');
+
+      for (const playerInfo of playerListElement.children) {
+        if (element.checked) {
+          if (!playerInfo.classList.contains('not-joined')) {
+            playerInfo.classList.add('display-none');
+          }
+          continue;
+        }
+
+        playerInfo.classList.remove('display-none');
+      }
+    }
+
+    async function assignedMember(element) {
+      const playerInfoElement = element.closest('.player-info');
+      const { dataset } = playerInfoElement;
+      const { clanTag, seasonDate, playerTag, name } = dataset;
+
+      assignedClanPlayer(clanTag, seasonDate, playerTag)
+      .then((response) => {
+        // 화면 갱신
+        setTimeout(() => viewAssignedPlayer(element), 100);
+      })
+    }
+
+    async function removeAssignedMember(element) {
+      const playerInfoElement = element.closest('.player-info');
+      const { dataset } = playerInfoElement;
+      const { clanTag, seasonDate, name, playerTag, joinedStatus, warPreference } = dataset;
+
+      if (!confirm(`${name} (${playerTag}) 계정을 배정클랜원에서 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      const result = deleteAssignedMember(clanTag, seasonDate, playerTag);
+      if (result) {
+        const cardElement = playerInfoElement.closest('div.card');
+        const totalSize = cardElement.querySelector('#total_size');
+        totalSize.innerHTML = Number(totalSize.innerHTML) - 1; // 배정인원 갱신
+        if (joinedStatus) {
+          const joinedSize = cardElement.querySelector('#joined_size');
+          joinedSize.innerHTML = Number(joinedSize.innerHTML) - 1; // 이동인원 갱신
+        }
+        if (warPreference) {
+          const warPreferenceSize = cardElement.querySelector('#war_preference_size');
+          warPreferenceSize.innerHTML = Number(warPreferenceSize.innerHTML) - 1; // 선호인원 갱신
+        }
+        playerInfoElement.remove();
+      }
+    }
+
+    function appendButtonAssigned(playerInfoElement) {
+      const buttonAssigned = document.querySelector('#button-player-assigned');
+      const buttonAssignedElement = document.importNode(buttonAssigned.content, true);
+      const playerInfoItem = buttonAssignedElement.querySelector('.player-info-item');
+
+      const layoutRight = playerInfoElement.querySelector('.layout-right');
+      layoutRight.innerHTML = ""; // clear
+      layoutRight.appendChild(playerInfoItem);
+    }
+
+    function searchPlayer(element) {
+      const cardAssignedPlayer = element.closest('.card-assigned-player');
+
+      const assignedPlayerForm = cardAssignedPlayer.querySelector('.assigned-player-form');
+      const searchInput = assignedPlayerForm.querySelector('.player-search-input');
+      if (!searchInput.value) {
+        alert('플레이어 태그를 입력해주세요.');
+        return;
+      }
+
+      const clanCardElement = element.closest('div.card');
+      const { clanTag, seasonDate } = clanCardElement.dataset;
+
+      const searchResultElement = assignedPlayerForm.querySelector('.player-search-result');
+      searchResultElement.innerHTML = ""; //clear
+
+      findPlayer(searchInput.value)
+      .then(player => {
+        const playerInfoTemplate = document.querySelector('#clan-player-info-template');
+        const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
+        const playerInfo = playerInfoElement.querySelector('.player-info');
+
+        const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
+
+        // dataset
+        playerInfo.dataset.clanTag = clanTag;
+        playerInfo.dataset.seasonDate = seasonDate;
+        playerInfo.dataset.name = name;
+        playerInfo.dataset.playerTag = tag;
+
+        // render
+        playerInfo.innerHTML = playerInfo.innerHTML
+                                         .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{TAG}/, tag)
+                                         .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
+                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음');
+
+        renderWarPreference(warPreference, playerInfo);
+
+        // clear
+        playerInfo.querySelector('.btn-remove-member').remove();
+
+        appendButtonAssigned(playerInfo);
+
+        searchResultElement.appendChild(playerInfoElement);
+      })
+      .catch(error => {
+          const playerNotFoundTemplate = document.querySelector("#player-not-found");
+          const playerCard = document.importNode(playerNotFoundTemplate.content, true);
+          const emptyCard = playerCard.querySelector('.card');
+
+          searchResultElement.appendChild(emptyCard);
+      })
+    }
+
     window.onload = async () => {
       await loadLeagues();
       await getClans();
@@ -381,7 +647,7 @@
     <div class="search w270">
       <div class="search-box">
         <div class="search-field">
-          <input placeholder="등록하실 클랜 태그를 입력해주세요..." class="input" type="text" id="search-input">
+          <input placeholder="등록하실 클랜 태그를 입력해주세요" class="input" type="text" id="search-input">
           <div class="search-box-icon">
             <button class="btn-icon-content" onclick="searchClan(); return false;">
               <i class="search-icon">
@@ -404,55 +670,144 @@
     <div class="card-button color-red btn-remove" onclick="removeClan(this); return false;">
       <i class="fa-regular fa-rectangle-xmark"></i>
     </div>
-    <div class="card-info">
-      <div class="text-title">
-        <img class="clan-badge icon">
-        <span class="title">{CLAN_NAME}</span>
+
+    <div class="text-title">
+      <img class="clan-badge icon">
+      <span class="title">{CLAN_NAME}</span>
+    </div>
+
+    <div class="card-basic">
+
+      <div class="card-info">
+
+        <div class="text-body">
+          <div class="chip clan-tag">{CLAN_TAG}</div>
+          <div class="chip bg-orange clan-type">{CLAN_TYPE}</div>
+          <div class="chip bg-blue clan-leader">{CLAN_LEADER}</div>
+          <div class="chip bg-green clan-members">
+            <i class="fa-solid fa-user color-white"></i>
+            <span class="chip-label">{CLAN_MEMBERS}</span>
+          </div>
+          <div class="chip bg-gold clan-trophies">
+            <div class="icon trophies"></div>
+            <span class="chip-label">{CLAN_TROPHIES}</span>
+          </div>
+          <div class="chip bg-pink clan-capital-points">
+            <div class="icon icon-clan-capital"></div>
+            <span class="chip-label">{CLAN_CAPITAL_POINTS}</span>
+          </div>
+          <div class="chip bg-crimson clan-war-league">
+            <div class="clan-war-league-badge img-icon icon"></div>
+            <span class="chip-label">{CLAN_WAR_LABEL}</span>
+          </div>
+          <div class="chip bg-forestgreen clan-capital">
+            <img class="capital-league-badge icon">
+            <span class="chip-label">{CLAN_CAPITAL_LABEL}</span>
+          </div>
+        </div>
       </div>
-      <div class="text-body">
-        <div class="chip clan-tag">{CLAN_TAG}</div>
-        <div class="chip bg-orange clan-type">{CLAN_TYPE}</div>
-        <div class="chip bg-blue clan-leader">{CLAN_LEADER}</div>
-        <div class="chip bg-green clan-members">
-          <i class="fa-solid fa-user color-white"></i>
-          <span class="chip-label">{CLAN_MEMBERS}</span>
+
+      <div class="card-footer">
+        <div class="card-button btn-clan-war" data-btn-name="클랜전 현황" data-menu-name="clan_war_yn" onclick="changeContentYn(this); return false;">
+          <i class="icon-clan-war"></i>
+          <span class="chip">클랜전</span>
         </div>
-        <div class="chip bg-gold clan-trophies">
-          <div class="icon trophies"></div>
-          <span class="chip-label">{CLAN_TROPHIES}</span>
+        <div class="card-button btn-clan-war-league" data-btn-name="리그전 현황" data-menu-name="clan_war_league_yn" onclick="changeContentYn(this); return false;">
+          <i class="icon-clan-war-league"></i>
+          <span class="chip">리그전</span>
         </div>
-        <div class="chip bg-pink clan-capital-points">
-          <div class="icon icon-clan-capital"></div>
-          <span class="chip-label">{CLAN_CAPITAL_POINTS}</span>
+        <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
+          <i class="icon-clan-capital"></i>
+          <span class="chip">습격전</span>
         </div>
-        <div class="chip bg-crimson clan-war-league">
-          <div class="clan-war-league-badge img-icon icon"></div>
-          <span class="chip-label">{CLAN_WAR_LABEL}</span>
+        <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clan_war_parallel_yn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
+          <i class="icon-clan-war"></i>
+          <span class="chip">병행클랜전</span>
         </div>
-        <div class="chip bg-forestgreen clan-capital">
-          <img class="capital-league-badge icon">
-          <span class="chip-label">{CLAN_CAPITAL_LABEL}</span>
+      </div>
+
+      <div class="card-footer">
+        <div class="card-button cursor-pointer" onclick="viewAssignedPlayer(this);">
+          <span class="button-chip">배정클랜원</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card-assigned-player-wrapper display-none">
+      <div class="loader-circle">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+      </div>
+
+      <div class="card-assigned-player">
+        <div class="caption">
+          <div class="layout-left">
+            <span class="season-date"></span>배정클랜원
+          </div>
+          <div class="layout-right">
+            <div class="button-chip" onclick="closeAssignedPlayer(this);">닫기</div>
+          </div>
+        </div>
+
+        <div class="manager-button-area">
+          <!--            <div class="button-chip bg-orange">일괄 배정</div>-->
+          <!--            <div class="button-chip bg-crimson">일괄 삭제</div>-->
+        </div>
+
+        <div class="assigned-player-form">
+          <div class="search">
+            <div class="search-box">
+              <div class="search-field">
+                <input placeholder="플레이어 태그를 입력해주세요" class="input player-search-input" type="text">
+                <div class="search-box-icon">
+                  <button class="btn-icon-content" onclick="searchPlayer(this); return false;">
+                    <i class="search-icon">
+                      <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+                    </i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="player-search-result"></div>
+          </div>
+        </div>
+
+        <div class="body display-none">
+
+          <div class="support-area">
+            <div class="info">
+              <span class="regular-text">배정 인원 : <span id="total_size"></span> 명</span>
+              <span class="regular-text">이동 인원 : <span id="joined_size"></span> 명</span>
+              <span class="regular-text">전쟁 선호 : <span id="war_preference_size"></span> 명 <span class="small-text">(이동 계정 기준)</span></span>
+            </div>
+            <div class="button-area">
+              <div class="toggle-button-simple filter">
+                <div class="toggle-button-simple-cover">
+                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterNotJoined(this); return false;">
+                  <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="player-list"></div>
+
         </div>
       </div>
     </div>
-    <div class="card-footer">
-      <div class="card-button btn-clan-war" data-btn-name="클랜전 현황" data-menu-name="clan_war_yn" onclick="changeContentYn(this); return false;">
-        <i class="icon-clan-war"></i>
-        <span class="chip">클랜전</span>
-      </div>
-      <div class="card-button btn-clan-war-league" data-btn-name="리그전 현황" data-menu-name="clan_war_league_yn" onclick="changeContentYn(this); return false;">
-        <i class="icon-clan-war-league"></i>
-        <span class="chip">리그전</span>
-      </div>
-      <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
-        <i class="icon-clan-capital"></i>
-        <span class="chip">습격전</span>
-      </div>
-      <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clan_war_parallel_yn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
-        <i class="icon-clan-war"></i>
-        <span class="chip">병행클랜전</span>
-      </div>
-    </div>
+
   </div>
 </template>
 <template id="clan-card-not-found">
@@ -464,6 +819,18 @@
     </div>
   </div>
 </template>
+<template id="player-not-found">
+  <div class="player card empty">
+    <div class="text-title">
+      <span>사용자 정보 없음</span>
+    </div>
+  </div>
+</template>
+<template id="button-player-assigned">
+  <div class="player-info-item">
+    <div class="button-chip bg-green" onclick="assignedMember(this); return false;">배정</div>
+  </div>
+</template>
 <template id="clan-card-register-button">
   <div class="card-button color-green btn-add" onclick="addClan(this); return false;">
     <i class="fa-regular fa-square-plus"></i>
@@ -472,6 +839,34 @@
 <template id="clan-label-template">
   <div class="chip clan-label">
     <img class="icon label-icon">
+  </div>
+</template>
+<template id="clan-player-info-template">
+  <div class="player-info">
+    <div class="layout-left">
+      <div class="player-info-item">
+        <div class="town-hall th{TOWNHALL_LEVEL}"></div>
+      </div>
+      <div class="player-info-item">
+        <div class="info">
+          <div class="chip bg-crimson small-text">{HERO_TOTAL_LEVEL}</div>
+          <div class="big-text">{NAME}</div>
+          <i class="fa-regular fa-square-minus color-red btn-remove-member cursor-pointer" onclick="removeAssignedMember(this); return false;"></i>
+        </div>
+        <div class="info additional">
+          <div class="chip small-text">{TAG}</div>
+          <div class="chip small-text war-preference">{WAR_PREFERENCE}</div>
+        </div>
+      </div>
+    </div>
+    <div class="layout-right">
+      <div class="player-info-item current-clan">
+        <div class="regular-text">{CURRENT_CLAN}</div>
+      </div>
+      <div class="player-info-item joined">
+        <div class="regular-text">{JOINED}</div>
+      </div>
+    </div>
   </div>
 </template>
 </html>

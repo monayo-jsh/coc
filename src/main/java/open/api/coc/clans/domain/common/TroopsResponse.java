@@ -10,8 +10,8 @@ import lombok.Getter;
 public class TroopsResponse {
 
     private String name;
-    private String level;
-    private String maxLevel;
+    private Integer level;
+    private Integer maxLevel;
     private String village;
 
 }

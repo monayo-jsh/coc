@@ -4,7 +4,6 @@
 
 body {
   margin: 0;
-  height: 100%;
   display: flex;
   justify-content: center;
   overflow-y: hidden;
@@ -64,6 +63,23 @@ body {
       font-size: .8em;
     }
   }
+
+  .destruction-percentage {
+    display: flex;
+    justify-content: left;
+    padding: 3px;
+    color: #fff;
+
+    .icon-damage {
+      width: 18px;
+      height: 16px;
+    }
+
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
 }
 
 .summary .clan {
@@ -114,6 +130,72 @@ body {
   .attacks {
     display: flex;
     justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+  .destruction-percentage {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+}
+
+.sub-summary {
+  display: flex;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #0000007a;
+  position: relative;
+  justify-content: flex-end;
+  align-items: center;
+
+  .team-size {
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+  }
+
+  .support-area {
+    .toggle-button {
+      .knobs::before {
+        background-color: #818181;
+        width: 45px;
+      }
+
+      .layer {
+        background-color: #cbcfd0;
+      }
+
+      .checkbox:checked:active + .knobs:before {
+        margin-left: 0;
+      }
+
+      .checkbox:checked + .knobs:before {
+        background-color: #474646;
+        left: 16px;
+        width: 45px;
+      }
+
+      .checkbox:checked ~ .layer {
+        background-color: #9fa1a2;
+      }
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .member-attack {
+    height: 600px !important;
   }
 }
 

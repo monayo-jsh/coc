@@ -1,0 +1,68 @@
+.img-icon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.img-icon.BronzeLeagueIII {
+  background-image: url(/static/images/warleague/BronzeLeagueIII.png);
+}
+.img-icon.BronzeLeagueII {
+  background-image: url(/static/images/warleague/BronzeLeagueII.png);
+}
+.img-icon.BronzeLeagueI {
+  background-image: url(/static/images/warleague/BronzeLeagueI.png);
+}
+
+.img-icon.SilverLeagueIII {
+  background-image: url(/static/images/warleague/SilverLeagueIII.png);
+}
+.img-icon.SilverLeagueII {
+  background-image: url(/static/images/warleague/SilverLeagueII.png);
+}
+.img-icon.SilverLeagueI {
+  background-image: url(/static/images/warleague/SilverLeagueI.png);
+}
+
+.img-icon.GoldLeagueIII {
+  background-image: url(/static/images/warleague/GoldLeagueIII.png);
+}
+.img-icon.GoldLeagueII {
+  background-image: url(/static/images/warleague/GoldLeagueII.png);
+}
+.img-icon.GoldLeagueI {
+  background-image: url(/static/images/warleague/GoldLeagueI.png);
+}
+
+.img-icon.MasterLeagueIII {
+  background-image: url(/static/images/warleague/MasterLeagueIII.png);
+}
+.img-icon.MasterLeagueII {
+  background-image: url(/static/images/warleague/MasterLeagueII.png);
+}
+.img-icon.MasterLeagueI {
+  background-image: url(/static/images/warleague/MasterLeagueI.png);
+}
+
+.img-icon.CrystalLeagueIII {
+  background-image: url(/static/images/warleague/CrystalLeagueIII.png);
+}
+.img-icon.CrystalLeagueII {
+  background-image: url(/static/images/warleague/CrystalLeagueII.png);
+}
+.img-icon.CrystalLeagueI {
+  background-image: url(/static/images/warleague/CrystalLeagueI.png);
+}
+
+.img-icon.ChampionLeagueIII {
+  background-image: url(/static/images/warleague/ChampionLeagueIII.png);
+}
+.img-icon.ChampionLeagueII {
+  background-image: url(/static/images/warleague/ChampionLeagueII.png);
+}
+.img-icon.ChampionLeagueI {
+  background-image: url(/static/images/warleague/ChampionLeagueI.png);
+}

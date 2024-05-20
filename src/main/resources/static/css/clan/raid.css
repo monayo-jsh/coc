@@ -49,6 +49,24 @@
     letter-spacing: 2px;
   }
 
+  .row.support-area {
+    display: flex;
+    justify-content: right;
+
+    .toggle-button {
+      width: 70px;
+      height: 35px;
+
+      .knobs::before {
+        width: 25px;
+      }
+
+      .checkbox:checked + .knobs:before {
+        left: 32px;
+      }
+    }
+  }
+
   .row.loader {
     margin-top: 35px;
   }
@@ -56,6 +74,24 @@
   .row.error {
     margin-top: 25px;
     justify-content: center;
+  }
+
+  .row.header {
+    align-items: center;
+    justify-content: center;
+
+    .league-icon {
+      height: 35px;
+    }
+
+    .clan-icon {
+      height: 35px;
+      display: flex;
+    }
+
+    .title {
+      margin-left: 5px;
+    }
   }
 
   .row {
@@ -70,6 +106,10 @@
       padding: 5px;
       color: rgba(170, 222, 243, 0.721);
 
+      .league-icon {
+        height: 40px;
+      }
+
       .big-text {
         font-size: 14px;
         display: block;
@@ -78,11 +118,14 @@
       .regular-text {
         font-size: 12px;
       }
+
+      .small-text {
+        font-size: 10px;
+      }
     }
 
-    .item:nth-child(2) {
+    .item:not(:first-child) {
       border-left: 1px solid rgba(255, 255, 255, 0.126);
-      border-right: 1px solid rgba(255, 255, 255, 0.126);
     }
   }
 
@@ -109,6 +152,8 @@
     height: 100px;
     overflow-y: auto;
     scrollbar-width: none;
+    border: 1px solid;
+    border-radius: 5px;
 
     .record {
       display: flex;
@@ -119,12 +164,17 @@
       margin-top: 3px;
     }
 
-    .record.under {
+    .record.UnAttacked {
 
       .regular-text {
         color: red;
       }
 
+    }
+
+    .record.empty-un-attacked {
+      display: flex;
+      justify-content: center;
     }
   }
 

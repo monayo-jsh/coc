@@ -34,6 +34,7 @@ class ClashOfClanConfigTest {
 
         assertThat(clashOfClanConfig.getPlayerUri()).isNotBlank();
 
+        assertThat(clashOfClanConfig.getLeaguesUri()).isNotBlank();
     }
 
 }

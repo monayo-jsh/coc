@@ -1,7 +1,6 @@
 package open.api.coc.clans.common.exception.handler;
 
-import open.api.coc.clans.common.ExceptionCode;
-import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.common.exception.NotFoundException;
 
 public class ExceptionHandler {
 
@@ -13,8 +12,8 @@ public class ExceptionHandler {
         throw createNotFoundException(notFoundName);
     }
 
-    public static CustomRuntimeException createNotFoundException(String notFoundName) {
-        return CustomRuntimeException.create(ExceptionCode.ERROR_NOT_FOUND, notFoundName);
+    public static NotFoundException createNotFoundException(String notFoundName) {
+        return NotFoundException.create(notFoundName);
     }
 
 }

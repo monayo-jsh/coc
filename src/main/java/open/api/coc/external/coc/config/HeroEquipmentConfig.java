@@ -9,32 +9,47 @@ import lombok.Getter;
 @Getter
 public enum HeroEquipmentConfig {
 
-    GIANT_GAUNTLET(1, "Giant Gauntlet"),
-    FROZEN_ARROW(2, "Frozen Arrow"),
-    FIREBALL(3, "Fireball"),
-    BARBARIAN_PUPPET(4, "Barbarian Puppet"),
-    RAGE_VIAL(5, "Rage Vial"),
-    ARCHER_PUPPET(6, "Archer Puppet"),
-    INVISIBILITY_VIAL(7, "Invisibility Vial"),
-    ETERNAL_TOME(8, "Eternal Tome"),
-    LIFE_GEM(9, "Life Gem"),
-    SEEKING_SHIELD(10, "Seeking Shield"),
-    ROYAL_GEM(11, "Royal Gem"),
-    EARTHQUAKE_BOOTS(12, "Earthquake Boots"),
-    HOG_RIDER_PUPPET(13, "Hog Rider Puppet"),
-    VAMPSTACHE(14, "Vampstache"),
-    HASTE_VIAL(15, "Haste Vial"),
-    GIANT_ARROW(16, "Giant Arrow"),
-    HEALER_PUPPET(17, "Healer Puppet"),
-    RAGE_GEM(18, "Rage Gem"),
-    HEALING_TOME(19, "Healing Tome");
+    // 바바리안 킹
+    BARBARIAN_PUPPET(100, "Barbarian Puppet", "normal"),
+    EARTHQUAKE_BOOTS(101, "Earthquake Boots", "normal"),
+    RAGE_VIAL(102, "Rage Vial", "normal"),
+    VAMPSTACHE(103, "Vampstache", "normal"),
+
+    GIANT_GAUNTLET(120, "Giant Gauntlet", "epic"),
+    SPIKY_BALL(121, "Spiky Ball", "epic"),
+
+    // 아처 퀸
+    ARCHER_PUPPET(200, "Archer Puppet", "normal"),
+    GIANT_ARROW(201, "Giant Arrow", "normal"),
+    INVISIBILITY_VIAL(202, "Invisibility Vial", "normal"),
+    HEALER_PUPPET(203, "Healer Puppet", "normal"),
+
+    FROZEN_ARROW(220, "Frozen Arrow", "epic"),
+
+    // 그랜드 워든
+    LIFE_GEM(300, "Life Gem", "normal"),
+    RAGE_GEM(301, "Rage Gem", "normal"),
+    ETERNAL_TOME(302, "Eternal Tome", "normal"),
+    HEALING_TOME(303, "Healing Tome", "normal"),
+
+    FIREBALL(320, "Fireball", "epic"),
+
+    // 로얄 챔피언
+    ROYAL_GEM(400, "Royal Gem", "normal"),
+    HASTE_VIAL(401, "Haste Vial", "normal"),
+    SEEKING_SHIELD(402, "Seeking Shield", "normal"),
+    HOG_RIDER_PUPPET(403, "Hog Rider Puppet", "normal"),
+
+    UNKNOWN(Integer.MAX_VALUE, "unknown", "unknown");
 
     private final int code;
     private final String name;
+    private final String rarity;
 
-    HeroEquipmentConfig(int code, String name) {
+    HeroEquipmentConfig(int code, String name, String rarity) {
         this.code = code;
         this.name = name;
+        this.rarity = rarity;
     }
 
     public static HeroEquipmentConfig findByName(String name) {

@@ -20,13 +20,14 @@ import org.thymeleaf.util.StringUtils;
 public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCapitalRaidSeason, ClanCapitalRaidSeasonResponse> {
 
     private final ClanCapitalRaidSeasonMemberResponseConverter clanCapitalRaidSeasonMemberResponseConverter;
+    private final TimeConverter timeConverter;
 
     @Override
     public ClanCapitalRaidSeasonResponse convert(ClanCapitalRaidSeason source) {
         return ClanCapitalRaidSeasonResponse.builder()
                                             .state(source.getState())
-                                            .startTime(toEpochMilliSecond(source.getStartTime()))
-                                            .endTime(toEpochMilliSecond(source.getEndTime()))
+                                            .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))
+                                            .endTime(timeConverter.toEpochMilliSecond(source.getEndTime()))
                                             .members(makeMembers(source.getMembers()))
                                             .build();
     }
@@ -39,12 +40,4 @@ public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCap
                       .collect(Collectors.toList());
     }
 
-    private long toEpochMilliSecond(String time) {
-        if (StringUtils.isEmpty(time)) return 0;
-
-        final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-        return ZonedDateTime.parse(time, DateTimeFormatter.ofPattern(TIME_PATTERN))
-                            .toInstant()
-                            .toEpochMilli();
-    }
 }

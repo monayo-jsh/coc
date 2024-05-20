@@ -10,9 +10,9 @@ import lombok.Setter;
 public class ClanMemberListRes {
 
     private String clanTag;
-    private final List<ClanMemberRes> members;
+    private final List<ClanMemberResponse> members;
 
-    private ClanMemberListRes(List<ClanMemberRes> members) {
+    private ClanMemberListRes(List<ClanMemberResponse> members) {
         this.members = members;
     }
 
@@ -20,7 +20,7 @@ public class ClanMemberListRes {
         return new ClanMemberListRes(Collections.emptyList());
     }
 
-    public static ClanMemberListRes create(List<ClanMemberRes> members) {
+    public static ClanMemberListRes create(List<ClanMemberResponse> members) {
         return new ClanMemberListRes(members);
     }
 }

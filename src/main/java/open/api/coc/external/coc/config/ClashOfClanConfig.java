@@ -20,7 +20,8 @@ public class ClashOfClanConfig {
 
         private final Clans clans;
         private final Players players;
-
+        private final Leagues leagues;
+        private final ClanWarLeagues clanWarLeagues;
 
         @RequiredArgsConstructor
         private static class Clans {
@@ -28,6 +29,7 @@ public class ClashOfClanConfig {
             private final String clanTag;
             private final String capitalRaidSeasons;
             private final String currentWar;
+            private final String leagueGroup;
             private final String members;
 
             public String getClanTag() {
@@ -39,6 +41,7 @@ public class ClashOfClanConfig {
             public String getCurrentWar() {
                 return prefix + currentWar;
             }
+            public String getLeagueGroup() { return prefix + leagueGroup; }
             public String getMembers() { return prefix + members; }
         }
 
@@ -51,26 +54,49 @@ public class ClashOfClanConfig {
                 return prefix + player;
             }
         }
+
+        @RequiredArgsConstructor
+        private static class Leagues {
+            private final String prefix;
+            private final String leagues;
+
+            public String getLeagues() {
+                return prefix + leagues;
+            }
+        }
+
+        @RequiredArgsConstructor
+        private static class ClanWarLeagues {
+            private final String prefix;
+            private final String roundTag;
+            public String getClanWarLeagues() { return prefix + roundTag; }
+        }
     }
 
     public String getClansClanTagUri() {
-        return getDomain() + getEndPoint().getClans().getClanTag();
+        return getEndPoint().getClans().getClanTag();
     }
 
     public String getClansClanTagCapitalRaidSeasonsUri() {
-        return getDomain() + getEndPoint().getClans().getCapitalRaidSeasons();
+        return getEndPoint().getClans().getCapitalRaidSeasons();
     }
 
     public String getClansClanTagCurrentWarUri() {
-        return getDomain() + getEndPoint().getClans().getCurrentWar();
+        return getEndPoint().getClans().getCurrentWar();
     }
-
+    public String getClansClanTagCurrentLeagueGroupUri() { return getEndPoint().getClans().getLeagueGroup(); }
     public String getClansClanMembersUri() {
-        return getDomain() + getEndPoint().getClans().getMembers();
+        return getEndPoint().getClans().getMembers();
     }
 
     public String getPlayerUri() {
-        return getDomain() + getEndPoint().getPlayers().getPlayer();
+        return getEndPoint().getPlayers().getPlayer();
     }
+
+    public String getLeaguesUri() {
+        return getEndPoint().getLeagues().getLeagues();
+    }
+
+    public String getClanWarLeagueUri() { return getEndPoint().getClanWarLeagues().getClanWarLeagues();}
 
 }

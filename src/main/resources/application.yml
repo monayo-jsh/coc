@@ -8,6 +8,22 @@ spring:
     cache: false
   mvc:
     static-path-pattern: /static/**
+  h2:
+    console:
+      enabled: true
+      path: /cms-db-console
+      settings:
+        web-allow-others: true
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:~/database/h2
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
 
 external:
   coc:
@@ -19,7 +35,18 @@ external:
         clan-tag: /{clanTag}
         capital-raid-seasons: /{clanTag}/capitalraidseasons
         current-war: /{clanTag}/currentwar
+        league-group: /{clanTag}/currentwar/leaguegroup
         members: /{clanTag}/members
       players:
         prefix: /v1/players
         player: /{playerTag}
+      leagues:
+        prefix: /v1
+        leagues: /leagues
+      clanwarleagues:
+        prefix: /v1/clanwarleagues/wars
+        round-tag: /{roundTag}
+
+cms:
+  admin-id: ${ADMIN_ID}
+  admin-password: ${ADMIN_PASSWORD}

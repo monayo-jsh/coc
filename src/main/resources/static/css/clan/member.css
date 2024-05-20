@@ -12,10 +12,18 @@
 .support-area {
   padding: 5px;
 
+  .container:not(:first-child) {
+    margin-top: 7px;
+  }
+
   .container {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    .toggle-button-cover {
+      margin-left: 5px;
+    }
   }
 
   .radio-tile-group {
@@ -83,6 +91,46 @@
 
 }
 
+.group {
+  display: flex;
+  line-height: 28px;
+  align-items: center;
+  position: relative;
+  max-width: 270px;
+
+  .search-input {
+    width: 100%;
+    height: 40px;
+    line-height: 28px;
+    padding: 0 1rem 0 2.5rem;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    outline: none;
+    background-color: #f3f3f4;
+    color: #0d0c22;
+    transition: .3s ease;
+  }
+
+  .search-input::placeholder {
+    color: #9e9ea7;
+  }
+
+  .search-input:focus, input:hover {
+    outline: none;
+    border-color: rgba(7, 154, 217, 0.4);
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(7,154,217,0.1);
+  }
+
+  .icon-search {
+    position: absolute;
+    left: 1rem;
+    fill: #9e9ea7;
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
 @media (max-width: 320px) {
   .clan-members {
     width: 270px;
@@ -90,6 +138,7 @@
 }
 
 .clan-members {
+  width: 100%;
   height: 100vh;
   overflow-y: scroll;
   scrollbar-width: none;
@@ -107,8 +156,6 @@
   width: 100%;
   min-width: 250px;
   max-width: 300px;
-  min-height: 160px;
-  max-height: 250px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -128,12 +175,6 @@
 
   .user {
     font-size: 1em;
-    font-weight: bold;
-    word-break: break-all;
-  }
-
-  .label-clan {
-    font-size: .7em;
     font-weight: bold;
     word-break: break-all;
   }
@@ -160,6 +201,16 @@
       font-size: .9em;
       word-break: keep-all;
     }
+  }
+
+  .hero-level {
+
+    .level-icon {
+      position: unset;
+      width: 30px;
+      height: 30px;
+    }
+
   }
 
   .donations,
@@ -232,21 +283,11 @@
   justify-content: unset;
   align-items: center;
 
-  .label {
-
-    .level-icon {
-      position: unset;
-      width: 30px;
-      height: 30px;
-    }
-  }
-
   .heroes {
     width: 100%;
     display: flex;
-    margin-left: 5px;
 
-    .hero {
+    .hero:not(:first-child) {
       margin-left: 10px;
     }
   }
@@ -302,11 +343,23 @@
   margin: 5px;
   display: none;
   transform: rotateY(180deg);
-  overflow-y: scroll;
-  scrollbar-width: none;
+
+  .inner-content {
+    height: 160px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+  .layout-title {
+    .cell {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+  }
 
   .inner-section {
-    margin: 5px 0;
+    margin-bottom: 5px;
     flex-direction: column;
     background-color: #e2e2e2;
     border-radius: 5px;
@@ -343,7 +396,7 @@
 
 .equipment-wrapper {
   position: relative;
-  background-color: #2b2b2bb0;
+  background-color: #e2e2e2;
   border-radius: 10px;
   height: 45px;
   width: 90px;
@@ -353,13 +406,8 @@
   display: none;
   align-items: center;
   justify-content: space-around;
-}
 
-.icon.trophies {
-  width: 36px;
-  height: 36px;
-  background-image: url(/static/images/etc/trophies.png);
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
+  .img-icon {
+    border-radius: 10px;
+  }
 }

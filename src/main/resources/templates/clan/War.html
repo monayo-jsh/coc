@@ -6,6 +6,7 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/button.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
@@ -40,8 +41,8 @@
 
         clanWarContents.classList.add(`clan-${cardIndex}`)
         clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+                .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
+                .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
 
         settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
           targetClanWar.innerHTML = clanWarContents.innerHTML;
@@ -89,10 +90,10 @@
         const { name, townHallLevel, mapPosition } = opponentMember
 
         attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                                                       .replace(/{USER_HALL_LEVEL}/, townHallLevel)
-                                                       .replace(/{OPPONENT_NAME}/, `${mapPosition}. ${name}`)
-                                                       .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
-                                                       .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
+                .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                .replace(/{OPPONENT_NAME}/, `${mapPosition}. ${name}`)
+                .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
+                .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
 
         const starElements = attackInfoElement.querySelectorAll('.fa-star');
         for (let i=0; i<stars; i++) {
@@ -119,7 +120,7 @@
         const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
         const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
         attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                                                       .replace(/{ATTACK_NO}/, `공격${no++}`);
+                .replace(/{ATTACK_NO}/, `공격${no++}`);
 
         attackListElement.appendChild(attackInfoElement);
       }
@@ -147,9 +148,9 @@
         const { name, tag, townHallLevel, mapPosition, attacks } = member;
         const totalStars = getSumByStars(attacks);
         memberElement.innerHTML = memberElement.innerHTML
-                                               .replace(/{USER_HALL_LEVEL}/, townHallLevel)
-                                               .replace(/{USER_NAME}/, `${mapPosition}. ${name}`)
-                                               .replace(/{USER_STARS}/, totalStars)
+                .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                .replace(/{USER_NAME}/, `${mapPosition}. ${name}`)
+                .replace(/{USER_STARS}/, totalStars)
 
         const attackListElement = cloneTemplateMember.querySelector('.attack-list');
         appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember);
@@ -171,40 +172,57 @@
       });
     }
 
+    const clanWar = {}
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
       await axios.get(uri)
-                 .then((response) => {
-                   const { data } = response;
-                   const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+              .then((response) => {
+                const { data } = response;
+                const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
 
-                   const totalStarCount = teamSize * 3;
+                const totalStarCount = teamSize * 3;
 
-                   clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
-                                                                            .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
-                                                                            .replace(/{CLAN_STAR_COUNT}/, clan.stars)
-                                                                            .replace(/{CLAN_ATTACK}/, clan.attacks)
-                                                                            .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
-                                                                            .replace(/{WAR_STATE}/, convWarState(state))
-                                                                            .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
-                                                                            .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
-                                                                            .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                                                                            .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember);
+                clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                        .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                        .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                        .replace(/{CLAN_ATTACK}/, clan.attacks)
+                        .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                        .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                        .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                        .replace(/{WAR_STATE}/, convWarState(state))
+                        .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
+                        .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                        .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                        .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                        .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                        .replace(/{TEAM_SIZE}/, teamSize);
 
-                   const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
-                   clanIcon.src = clan.badge.small
+                const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+                clanIcon.src = clan.badge.small
 
-                   const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
-                   opponentIcon.src = opponent.badge.small
+                const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+                opponentIcon.src = opponent.badge.small
 
-                   let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember)
-                 })
-                 .catch((error) => {
-                   console.error(error);
-                 });
+                if (teamSize) {
+                  const subSummary = clanWarContentsElement.querySelector('.sub-summary');
+                  subSummary.classList.remove('display-none');
+                }
+
+                let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+                memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
+                settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
+              })
+              .catch((error) => {
+                console.error(error);
+                const { response } = error;
+                const { status } = response
+                // 서버 이용 불가로 메인 화면 이동
+                if (status >= 500) {
+                  location.href = "/";
+                }
+              });
 
       function convWarState(state) {
         switch(state) {
@@ -228,73 +246,101 @@
       }
     }
 
+    function getUriForClanWarViewType() {
+      const urlSearchParams = new URLSearchParams(location.search);
+      const viewType = urlSearchParams.get('type');
+      return `/clans/war?view=${viewType}`;
+    }
+
     function getClans() {
       showWifiLoading('.card-container');
 
-      axios.get('/clans/war')
-           .then((response) => {
-             const { data } = response;
+      const uri = getUriForClanWarViewType();
+      axios.get(uri)
+              .then((response) => {
+                const { data } = response;
 
-             const carousel = document.querySelector(".carousel");
-             for (let index = 0; index<data.length; index++) {
-               const { tag, name } = data[index];
+                const carousel = document.querySelector(".carousel");
+                for (let index = 0; index<data.length; index++) {
+                  const { tag, name } = data[index];
 
-               const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-               const clanWarContents = templateClanWar.querySelector('.card-contents');
+                  const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+                  const clanWarContents = templateClanWar.querySelector('.card-contents');
 
-               clanWarContents.classList.add(`clan-${index}`, 'display-none');
-               clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                          .replace(/{CLAN_TAG}/, tag)
-                                                          .replace(/{CLAN_NAME}/g, name);
+                  clanWarContents.classList.add(`clan-${index}`, 'display-none');
+                  clanWarContents.innerHTML = clanWarContents.innerHTML
+                          .replace(/{CLAN_TAG}/, tag)
+                          .replace(/{CLAN_NAME}/g, name);
 
-               if (index === 0) {
-                 settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
-                 clanWarContents.classList.remove('display-none');
-               }
+                  if (index === 0) {
+                    settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
+                    clanWarContents.classList.remove('display-none');
+                  }
 
-               carousel.appendChild(templateClanWar);
-             }
+                  carousel.appendChild(templateClanWar);
+                }
 
-             initCardSlide();
-           })
-           .catch((error) => {
-             console.error(error);
-           });
+                initCardSlide();
+              })
+              .catch((error) => {
+                console.error(error);
+              });
     }
 
+    function switchAttacks(element) {
+      const memberAttackElements = element.closest('.clan-war').querySelector('.member-attack');
+
+      const { dataset } = memberAttackElements;
+      const { attacksPerMember } = dataset;
+
+      for (const memberAttack of memberAttackElements.children) {
+        if (element.checked) {
+          if (memberAttack.querySelectorAll('.attack-info:not(.not)').length === Number(attacksPerMember)) {
+            memberAttack.classList.add('display-none');
+          }
+        } else {
+          memberAttack.classList.remove('display-none');
+        }
+      }
+    }
+
+    window.onload = async () => {
+      await getClans();
+    }
   </script>
   <title>클랜전 현황</title>
 </head>
-<body onload="getClans()">
-  <section class="card-wrapper" >
-    <div id="wifi-loader" class="display-none">
-      <svg class="circle-outer" viewBox="0 0 86 86">
-        <circle class="back" cx="43" cy="43" r="40"></circle>
-        <circle class="front" cx="43" cy="43" r="40"></circle>
-        <circle class="new" cx="43" cy="43" r="40"></circle>
-      </svg>
-      <svg class="circle-middle" viewBox="0 0 60 60">
-        <circle class="back" cx="30" cy="30" r="27"></circle>
-        <circle class="front" cx="30" cy="30" r="27"></circle>
-      </svg>
-      <svg class="circle-inner" viewBox="0 0 34 34">
-        <circle class="back" cx="17" cy="17" r="14"></circle>
-        <circle class="front" cx="17" cy="17" r="14"></circle>
-      </svg>
-      <div class="text" data-text="Searching"></div>
-    </div>
+<body>
+<section class="card-wrapper" >
+  <div id="wifi-loader" class="display-none">
+    <svg class="circle-outer" viewBox="0 0 86 86">
+      <circle class="back" cx="43" cy="43" r="40"></circle>
+      <circle class="front" cx="43" cy="43" r="40"></circle>
+      <circle class="new" cx="43" cy="43" r="40"></circle>
+    </svg>
+    <svg class="circle-middle" viewBox="0 0 60 60">
+      <circle class="back" cx="30" cy="30" r="27"></circle>
+      <circle class="front" cx="30" cy="30" r="27"></circle>
+    </svg>
+    <svg class="circle-inner" viewBox="0 0 34 34">
+      <circle class="back" cx="17" cy="17" r="14"></circle>
+      <circle class="front" cx="17" cy="17" r="14"></circle>
+    </svg>
+    <div class="text" data-text="Searching"></div>
+  </div>
 
-    <i class="fa-solid fa-arrow-left button" id="prev"></i>
-    <div class="card-container">
-      <div class="carousel"></div>
-    </div>
-    <i class="fa-solid fa-arrow-right button" id="next"></i>
-  </section>
+  <i class="fa-solid fa-arrow-left button" id="prev"></i>
+  <div class="card-container">
+    <div class="carousel"></div>
+  </div>
+  <i class="fa-solid fa-arrow-right button" id="next"></i>
+</section>
 </body>
 
 <template id="section-clan-war">
   <div class="card-contents">
     <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
       <div class="summary">
 
         <div class="clan">
@@ -306,6 +352,10 @@
           <div class="attacks">
             <div class="icon-sword"></div>
             <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+          </div>
+          <div class="destruction-percentage">
+            <div class="icon-damage"></div>
+            <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
           </div>
         </div>
 
@@ -336,8 +386,27 @@
             <div class="icon-sword"></div>
           </div>
 
+          <div class="destruction-percentage">
+            <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+            <div class="icon-damage"></div>
+          </div>
         </div>
 
+      </div>
+
+      <div class="sub-summary display-none">
+        <div class="team-size">
+          {TEAM_SIZE}인전
+        </div>
+        <div class="support-area">
+          <div class="toggle-button-cover">
+            <div class="toggle-button">
+              <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
+              <div class="knobs" data-toggle-on="전체 공격" data-toggle-off="남은 공격"></div>
+              <div class="layer"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="member-attack"></div>
@@ -352,7 +421,7 @@
         <div class="town-hall th{USER_HALL_LEVEL}"></div>
         <div class="title">
           <div class="name">{USER_NAME}</div>
-<!--          <div class="role">{USER_ROLE}</div>-->
+          <!--          <div class="role">{USER_ROLE}</div>-->
         </div>
       </div>
       <div class="info">

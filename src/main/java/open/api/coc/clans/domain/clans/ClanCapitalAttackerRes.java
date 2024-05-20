@@ -1,7 +1,7 @@
 package open.api.coc.clans.domain.clans;
 
 import lombok.Getter;
-import open.api.coc.clans.common.Clan;
+import open.api.coc.clans.common.AcademeClan;
 
 @Getter
 public class ClanCapitalAttackerRes {
@@ -10,7 +10,7 @@ public class ClanCapitalAttackerRes {
     private final Integer attackCount;
 
     private ClanCapitalAttackerRes(String clanTag, Integer attackCount) {
-        Clan clan = Clan.findByTag(clanTag);
+        AcademeClan clan = AcademeClan.findByTag(clanTag);
 
         this.tag = clan.getTag();
         this.name = clan.getName();

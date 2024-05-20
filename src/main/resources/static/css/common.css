@@ -23,7 +23,7 @@ li {
 }
 
 body {
-  height: 100vh;
+  padding: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -62,6 +62,7 @@ body::before {
       url(/static/images/hero/equipment/Royal_Gem.png)
       url(/static/images/hero/equipment/Seeking_Shield.png)
       url(/static/images/hero/equipment/Vampstache.png)
+      url(/static/images/hero/equipment/Spiky_Ball.png)
 
       url(/static/images/etc/trophies.png)
       url(/static/images/etc/max_level.png)
@@ -145,6 +146,14 @@ body::before {
   opacity: 0.8;
 }
 
+.disabled {
+  opacity: 0.5;
+}
+
+.color-white {
+  color: white !important;
+}
+
 .color-yellow {
   color: yellow !important;
 }
@@ -159,11 +168,248 @@ body::before {
   cursor: pointer !important;
 }
 
+.justify-content-center {
+  justify-content: center !important;
+}
+
+.justify-content-right {
+  justify-content: right !important;
+}
+
+.chip {
+  width: fit-content;
+  font-size: 0.5rem;
+  font-weight: bold;
+  word-break: break-all;
+  border: var(--default-border);
+  padding: 3px 5px;
+  border-radius: 15px;
+  background: antiquewhite;
+}
+
+.button-chip {
+  width: fit-content;
+  font-size: 0.8rem;
+  font-weight: bold;
+  word-break: break-all;
+  border: var(--default-border);
+  padding: 3px 15px;
+  border-radius: 15px;
+  background: #5c5c5c;
+  color: white;
+}
+
+.chip-label {
+  margin-left: 5px;
+  padding: 0 2px;
+}
+
+.bg-pink {
+  background-color: #e87186;
+  color: white;
+}
+
+.bg-gold {
+  background-color: #a18700;
+  color: #ffef9c;
+}
+
+.bg-forestgreen {
+  background-color: forestgreen;
+  color: white;
+}
+
+.bg-crimson {
+  background-color: crimson;
+  color: white;
+}
+
+.bg-orange {
+  background-color: #ff9800;
+  color: white;
+}
+
+.bg-blue {
+  background-color: #4687f0;
+  color: white;
+}
+
+.bg-green {
+  background-color: green;
+  color: white;
+}
+
+.search {
+  --input-line: #7f7f7f;
+  --input-text-color: #7f7f7f;
+  --input-text-hover-color: transparent;
+  --input-border-color: #c0c0c0;
+  --input-border-hover-color: #b4b4b4;
+  --input-bg-color: #ffffff;
+  --search-max-width: 270px;
+  --search-min-width: 150px;
+  --border-radius: 5px;
+  --transition-cubic-bezier: 150ms cubic-bezier(0.4,0,0.2,1);
+}
+
+.search-box {
+  max-width: var(--search-max-width);
+  min-width: var(--search-min-width);
+  height: 35px;
+  border: 1px solid var(--input-border-color);
+  border-radius: var(--border-radius);
+  padding: 5px 15px;
+  background: var(--input-bg-color);
+  transition: var(--transition-cubic-bezier);
+}
+
+.search-box:hover {
+  border-color: var(--input-border-hover-color);
+}
+
+/*Section input*/
+.search-field {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  left: -5px;
+  border: 0;
+}
+
+.input {
+  width: calc(100% - 29px);
+  height: 100%;
+  border: 0;
+  border-color: transparent;
+  font-size: 12px;
+  padding-right: 0px;
+  color: var(--input-line);
+  background: var(--input-bg-color);
+  border-right: 2px solid var(--input-border-color);
+  outline: none;
+}
+
+.input::-webkit-input-placeholder {
+  color: var(--input-text-color);
+}
+
+.input::-moz-input-placeholder {
+  color: var(--input-text-color);
+}
+
+.input::-ms-input-placeholder {
+  color: var(--input-text-color);
+}
+
+.input:focus::-webkit-input-placeholder {
+  color: var(--input-text-hover-color);
+}
+
+.input:focus::-moz-input-placeholder {
+  color: var(--input-text-hover-color);
+}
+
+.input:focus::-ms-input-placeholder {
+  color: var(--input-text-hover-color);
+}
+
+/*Search button*/
+.search-box-icon {
+  width: 52px;
+  height: 35px;
+  position: absolute;
+  top: -6px;
+  right: -21px;
+  background: transparent;
+  border-bottom-right-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  transition: var(--transition-cubic-bezier);
+}
+
+.btn-icon-content {
+  width: 52px;
+  height: 35px;
+  top: -6px;
+  right: -21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-bottom-right-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+  transition: var(--transition-cubic-bezier);
+  opacity: .4;
+}
+
+.search-icon {
+  width: 21px;
+  height: 21px;
+  position: absolute;
+  top: 7px;
+  right: 15px;
+}
+
+.w270 {
+  width: 270px;
+}
+
+/* tippy theme custom */
+.tippy-box[data-theme~='darkgray'] {
+  background-color: rgba(87, 87, 87, 0.9);
+  color: white;
+}
+
+
+/** image icon */
 .icon-sword {
   width: 36px;
   height: 36px;
   background-image: url("/static/images/etc/sword.png");
   background-size: contain;
   background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-damage {
+  width: 36px;
+  height: 36px;
+  background-image: url("/static/images/etc/damage.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-clan-war {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/ClanWars.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-clan-war-league {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/WarLeagues.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-clan-capital {
+  width: 35px;
+  height: 35px;
+  background-image: url("/static/images/etc/CapitalGold.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon.trophies {
+  width: 35px;
+  height: 35px;
+  background-image: url(/static/images/etc/trophies.png);
+  background-repeat: no-repeat;
+  background-size: contain;
   background-position: center;
 }

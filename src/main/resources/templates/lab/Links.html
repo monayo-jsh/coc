@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/links.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    function initButtons() {
+       const buttons = [
+         {
+           name: 'FC(도전) & FW(친선전) & 내전방 (0306)',
+           link: 'https://open.kakao.com/o/gajuborg',
+         },
+         {
+           name: '길정리 & 라인정리 연구소 (0306)',
+           link: 'https://open.kakao.com/o/gF51tNpg',
+         },
+         {
+           name: '라벌방 (1027)',
+           link: 'https://open.kakao.com/o/g75osURf',
+         },
+         {
+           name: '스매쉬방 - 핵연구소 (0306)',
+           link: 'https://open.kakao.com/o/ggaJPkRf',
+         },
+         {
+           name: '퀸힐 연구방 (0306)',
+           link: 'https://open.kakao.com/o/gmsAKLjg',
+         },
+         {
+           name: '지상스팸방 - 발트라연구소 (0306)',
+           link: 'https://open.kakao.com/o/g8TeB5ng',
+         }
+
+       ]
+
+      renderButtons(buttons);
+    }
+
+    function renderButtons(buttons) {
+      for(const button of buttons) {
+        renderButton(button);
+      }
+    }
+
+    function renderButton(button) {
+      const buttonTemplate = document.querySelector('#button-template');
+      const buttonElement = document.importNode(buttonTemplate.content, true);
+      const createButton = buttonElement.querySelector('.button');
+
+      const { name, link } = button;
+      createButton.innerHTML = createButton.innerHTML
+                                           .replace(/{LINK}/, link)
+                                           .replace(/{NAME}/, name);
+
+      const linkList = document.querySelector('.link-list');
+      linkList.appendChild(createButton);
+    }
+
+    window.onload = () => {
+      initButtons();
+    }
+  </script>
+
+  <title>아카데미 연구소 링크</title>
+</head>
+<body>
+  <div class="content-wrapper">
+    <div class="logo"></div>
+
+    <div class="description">
+      새로운 연구소 개설 희망시 운영진DM 주세요
+    </div>
+
+    <div class="contents">
+
+      <div class="link-list">
+      </div>
+
+    </div>
+  </div>
+</body>
+<template id="button-template">
+  <div class="button">
+    <div class="button-chip" onclick="renderPage('{LINK}'); return false;">{NAME}</div>
+  </div>
+</template>
+</html>

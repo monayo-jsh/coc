@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +28,8 @@ import org.springframework.data.domain.Persistable;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_player_spell")
+@Entity
+@Table(name = "tb_player_spell")
 public class PlayerSpellEntity implements Persistable<PlayerItemPKEntity> {
 
     @EmbeddedId

@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,8 @@ import org.springframework.data.domain.Persistable;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_player_hero_equipment")
+@Entity
+@Table(name = "tb_player_hero_equipment")
 public class PlayerHeroEquipmentEntity implements Persistable<PlayerItemPKEntity> {
 
     @EmbeddedId
@@ -74,5 +76,13 @@ public class PlayerHeroEquipmentEntity implements Persistable<PlayerItemPKEntity
 
     public boolean isEqualsHeroEquipmentName(String heroEquipmentName) {
         return Objects.equals(id.getName(), heroEquipmentName);
+    }
+
+    public boolean isEqualsHeroTargetName(String heroName) {
+        return Objects.equals(this.targetHeroName, heroName);
+    }
+
+    public boolean isWear() {
+        return Objects.equals(YnType.Y, this.wearYn);
     }
 }

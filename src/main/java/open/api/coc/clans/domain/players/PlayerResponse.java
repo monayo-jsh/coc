@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
@@ -31,6 +32,7 @@ public class PlayerResponse {
 
     private LabelResponse league;
 
+    private String role;
     private String warPreference;
     private PlayerClanResponse clan;
 
@@ -46,4 +48,7 @@ public class PlayerResponse {
     private Integer heroTotalLevel;
     @Setter
     private Integer heroTotalMaxLevel;
+
+    @Setter
+    private ClanResponse assignedClan;
 }

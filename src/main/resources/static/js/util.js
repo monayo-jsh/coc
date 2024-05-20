@@ -106,7 +106,7 @@ function exportExcel(members) {
  * @param role
  * @returns {*|string}
  */
-function convName(role) {
+function convRoleName(role) {
   if (!role) return role;
   switch (role.toUpperCase()) {
     case 'LEADER': return '대표';

@@ -17,6 +17,7 @@ public class PlayerEntityConverter implements Converter<Player, PlayerEntity> {
         return PlayerEntity.builder()
                            .name(source.getName())
                            .playerTag(source.getTag())
+                           .role(source.getRole())
                            .expLevel(source.getExpLevel())
                            .townHallLevel(source.getTownHallLevel())
                            .trophies(source.getTrophies())

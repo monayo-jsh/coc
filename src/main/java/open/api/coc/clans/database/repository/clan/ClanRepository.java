@@ -10,19 +10,19 @@ import org.springframework.stereotype.Repository;
 public interface ClanRepository extends JpaRepository<ClanEntity, String> {
 
     @Override
-    @Query("select c from tb_clan c join fetch c.clanContent where c.visibleYn = 'Y'")
+    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y'")
     List<ClanEntity> findAll();
 
-    @Query("select max(c.order) from tb_clan c")
+    @Query("select max(c.order) from ClanEntity c")
     Integer selectMaxOrders();
 
-    @Query("select c from tb_clan c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarYn = 'Y'")
+    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarYn = 'Y'")
     List<ClanEntity> findClanWarList();
 
-    @Query("select c from tb_clan c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanCapitalYn = 'Y'")
+    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanCapitalYn = 'Y'")
     List<ClanEntity> findClanCapitalList();
 
-    @Query("select c from tb_clan c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarParallelYn = 'Y'")
+    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarParallelYn = 'Y'")
     List<ClanEntity> findClanWarParallelList();
 
 }

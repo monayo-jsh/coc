@@ -36,6 +36,7 @@ public class Player {
 
     private Label league;
 
+    private String role;
     private String warPreference;
     private PlayerClan clan;
 

@@ -274,21 +274,23 @@ public class ClansService {
         Optional<ClanAssignedPlayerEntity> findClanAssignedPlayer = clanAssignedPlayerRepository.findById(clanAssignedPlayerPK);
         if (findClanAssignedPlayer.isPresent()) {
             ClanAssignedPlayerEntity clanAssignedPlayerEntity = findClanAssignedPlayer.get();
-            if (Objects.equals(clanTag, clanAssignedPlayerEntity.getClanTag())) {
+            if (Objects.equals(clanTag, clanAssignedPlayerEntity.getClan().getTag())) {
                 // 이미 배정
                 return;
             }
 
-            ClanEntity clanEntity = clanRepository.findById(clanAssignedPlayerEntity.getClanTag())
+            ClanEntity clanEntity = clanRepository.findById(clanAssignedPlayerEntity.getClan().getTag())
                                                   .orElseThrow(() -> ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA,
-                                                                                                                clanAssignedPlayerEntity.getClanTag() + "에 배정된 상태"));
+                                                                                                                clanAssignedPlayerEntity.getClan().getName() + "에 배정된 상태"));
 
             throw ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "[%s] 배정된 상태".formatted(clanEntity.getName()));
         }
 
+        ClanEntity clan = clanRepository.findById(clanTag)
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(clanTag)));
         ClanAssignedPlayerEntity clanAssignedPlayer = ClanAssignedPlayerEntity.builder()
                                                                               .id(clanAssignedPlayerPK)
-                                                                              .clanTag(clanTag)
+                                                                              .clan(clan)
                                                                               .build();
 
         clanAssignedPlayerRepository.save(clanAssignedPlayer);

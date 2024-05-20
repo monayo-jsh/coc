@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,8 @@ import org.springframework.data.domain.Persistable;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_clan_content")
+@Entity
+@Table(name = "tb_clan_content")
 public class ClanContentEntity implements Persistable<String> {
 
     @Id

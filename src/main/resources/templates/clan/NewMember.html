@@ -23,6 +23,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
   <script>
     dayjs.locale('ko')
   </script>
@@ -252,7 +255,41 @@
       cardBackElement.appendChild(innerSectionElement);
     }
 
-    function renderMembers(members) {
+  function createPlayerLabel(name, tooltip) {
+    const playerLabelTemplate = document.querySelector('#player-label');
+    const playerLabel = document.importNode(playerLabelTemplate.content, true);
+    const clanLabel = playerLabel.querySelector('.chip');
+    clanLabel.innerHTML = clanLabel.innerHTML.replace(/{LABEL_NAME}/, name);
+
+    settingTooltip(clanLabel, tooltip);
+    return clanLabel;
+  }
+
+  function renderPlayerLabels(memberHtml, player) {
+    const playerLabels = memberHtml.querySelector('.player-labels');
+    const { tag, clan, assignedClan, role } = player;
+
+    const tagLabel = createPlayerLabel(tag, '플레이어 태그');
+    playerLabels.appendChild(tagLabel);
+
+    if (assignedClan) {
+      const assignedClanLabel = createPlayerLabel(assignedClan.name, '배정 클랜');
+      assignedClanLabel.classList.add('bg-green');
+      playerLabels.appendChild(assignedClanLabel);
+    }
+
+    // if (clan) {
+    //   const clanLabel = createPlayerLabel(clan.name, '현재 클랜');
+    //   playerLabels.appendChild(clanLabel);
+    // }
+
+    // if (role) {
+    //   const clanRoleLabel = createPlayerLabel(convRoleName(role), '클랜 권한');
+    //   playerLabels.appendChild(clanRoleLabel);
+    // }
+  }
+
+  function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
       const memberTemplate = document.querySelector('#member');
@@ -261,12 +298,10 @@
         const templateMember = document.importNode(memberTemplate.content, true);
         const memberHtml = templateMember.querySelector('.member');
 
-        const { displayName, name, tag, clan, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
+        const { displayName, name, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
 
         memberHtml.innerHTML = memberHtml.innerHTML
                                          .replace(/{NAME}/g, `${no}. ${displayName || name}`)
-                                         .replace(/{TAG}/g, tag)
-                                         .replace(/{CLAN_NAME}/g, clan ? clan.name : '클랜 없음')
                                          .replace(/{TROPHIES}/g, trophies)
                                          .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
                                          .replace(/{EXP_LEVEL}/g, expLevel)
@@ -274,6 +309,8 @@
                                          .replace(/{IS_HERO_MAX_LEVEL}/g, heroTotalLevel === heroTotalMaxLevel ? 'is-max' : '')
                                          .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
                                          .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
+
+        renderPlayerLabels(memberHtml, player)
 
         const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
         if (league) {
@@ -472,7 +509,7 @@
         <div class="toggle-button-cover">
           <div class="toggle-button">
             <input type="checkbox" class="checkbox switch-card">
-            <div class="knobs" data-toggle-on="앞면" data-toggle-off="뒷면"></div>
+            <div class="knobs" data-toggle-on="요약" data-toggle-off="상세"></div>
             <div class="layer"></div>
           </div>
         </div>
@@ -482,15 +519,13 @@
   </div>
 </body>
 <template id="member">
-  <div class="member row" onclick="cardClick(this, event); return false;">
+  <div class="member row">
     <div class="card-front">
 
       <div class="layout-title">
         <div class="cell">
           <div class="user">{NAME}</div>
-          <div class="labels">
-            <span class="chip">{TAG}</span>
-            <span class="chip">{CLAN_NAME}</span>
+          <div class="player-labels">
           </div>
         </div>
         <div class="cell trophies">
@@ -522,6 +557,9 @@
       <div class="inner-section hero-wrapper">
         <div class="heroes"></div>
       </div>
+      <div class="inner-section button-wrapper">
+        <div class="button-chip" onclick="cardClick(this, event); return false;">상세정보</div>
+      </div>
     </div>
 
     <div class="card-back">
@@ -530,8 +568,7 @@
         <div class="cell">
           <div class="user">{NAME}</div>
           <div class="labels">
-            <span class="chip">{TAG}</span>
-            <span class="chip">{CLAN_NAME}</span>
+            <div class="button-chip" onclick="cardClick(this, event); return false;">닫기</div>
           </div>
         </div>
       </div>
@@ -549,7 +586,7 @@
   </div>
 </template>
 <template id="member-hero">
-  <div class="hero" onclick="heroClick(this, event); return false;">
+  <div class="hero cursor-pointer" onclick="heroClick(this, event); return false;">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
     <div class="equipment-wrapper"></div>
   </div>
@@ -558,5 +595,8 @@
   <div class="img-icon">
     <div class="level-icon {IS_MAX}">{LEVEL}</div>
   </div>
+</template>
+<template id="player-label">
+  <span class="chip">{LABEL_NAME}</span>
 </template>
 </html>

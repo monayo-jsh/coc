@@ -25,6 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.BaseEntity;
 import open.api.coc.clans.database.entity.league.LeagueEntity;
@@ -75,6 +76,9 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     @Column(name = "defenseWins", nullable = false)
     private Integer defenseWins;
 
+    @Column(name = "role")
+    private String role;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "war_preference")
     private WarPreferenceType warPreference;
@@ -86,6 +90,9 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "league_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private LeagueEntity league;
+
+    @Transient
+    private ClanAssignedPlayerEntity clanAssignedPlayer;
 
     @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)

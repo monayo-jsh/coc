@@ -11,6 +11,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,7 +29,8 @@ import org.springframework.data.domain.Persistable;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "tb_clan")
+@Entity
+@Table(name = "tb_clan")
 public class ClanEntity implements Persistable<String> {
 
     @Id

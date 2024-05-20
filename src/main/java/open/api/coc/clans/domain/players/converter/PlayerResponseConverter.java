@@ -54,6 +54,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .attackWins(source.getAttackWins())
                                               .defenseWins(source.getDefenseWins())
                                               .warStars(source.getWarStars())
+                                              .role(source.getRole())
                                               .warPreference(source.getWarPreference())
                                               .clan(makePlayerClan(source.getClan()))
                                               .heroes(makeHeroes(source.getHeroes()))
@@ -143,9 +144,10 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .donationsReceived(source.getDonationsReceived())
                                               .league(makeLeague(source.getLeague()))
                                               .warStars(source.getWarStars())
+                                              .role(source.getRole())
                                               .warPreference(source.getWarPreference().name())
                                               .clan(makePlayerClanResponse(source.getClan()))
-                                              .heroes(makeHeroResponse(source.getHeroes()))
+                                              .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))
                                               .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))
                                               .pets(makePetResponse(source.getTroops()))
                                               .build();
@@ -165,13 +167,26 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         return clanResponseConverter.convert(clan);
     }
 
-    private List<HeroResponse> makeHeroResponse(List<PlayerHeroEntity> heroes) {
+    private List<HeroResponse> makeHeroResponse(List<PlayerHeroEntity> heroes, List<PlayerHeroEquipmentEntity> heroEquipments) {
         if (CollectionUtils.isEmpty(heroes)) return Collections.emptyList();
 
         return heroes.stream()
-                     .map(heroResponseConverter::convert)
+                     .map(hero -> {
+                         HeroResponse heroResponse = heroResponseConverter.convert(hero);
+                         settingWearEquipments(heroResponse, heroEquipments);
+                         return heroResponse;
+                     })
                      .sorted(Comparator.comparingInt(HeroResponse::getCode))
                      .collect(Collectors.toList());
+    }
+
+    private void settingWearEquipments(HeroResponse hero, List<PlayerHeroEquipmentEntity> heroEquipments) {
+        List<HeroEquipmentResponse> heroWearEquipmentResponses = heroEquipments.stream()
+                                                                               .filter(heroEquipment -> heroEquipment.isEqualsHeroTargetName(hero.getName()) && heroEquipment.isWear())
+                                                                               .map(heroEquipmentResponseConverter::convert)
+                                                                               .toList();
+
+        hero.getEquipments().addAll(heroWearEquipmentResponses);
     }
 
     private List<HeroEquipmentResponse> makeHeroEquipmentResponse(List<PlayerHeroEquipmentEntity> heroEquipments) {

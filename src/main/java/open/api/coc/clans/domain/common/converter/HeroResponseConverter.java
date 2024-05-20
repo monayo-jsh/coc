@@ -1,5 +1,6 @@
 package open.api.coc.clans.domain.common.converter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public class HeroResponseConverter implements Converter<Hero, HeroResponse> {
                            .village("home")
                            .level(source.getLevelInfo().getLevel())
                            .maxLevel(source.getLevelInfo().getMaxLevel())
+                           .equipments(new ArrayList<>())
                            .build();
     }
 

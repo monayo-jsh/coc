@@ -191,7 +191,7 @@ body::before {
   width: fit-content;
   font-size: 0.8rem;
   font-weight: bold;
-  word-break: break-all;
+  word-break: keep-all;
   border: var(--default-border);
   padding: 3px 15px;
   border-radius: 15px;

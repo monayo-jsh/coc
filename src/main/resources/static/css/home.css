@@ -1,64 +1,108 @@
-.cards {
+.contents {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.cards .red {
-  background-color: #f43f5e;
+.card.red-1 {
+  background-color: #ff5a77;
+}
+.card.red-2 {
+  background-color: #fd375a;
+}
+.card.red-3 {
+  background-color: #ff2148;
 }
 
-.cards .blue {
+.card.blue {
   background-color: #3b82f6;
 }
 
-.cards .green {
+.card.green {
   background-color: #22c55e;
 }
 
 
-.cards .black {
+.card.black {
   background-color: black;
 }
 
-.cards .coral {
+.card.coral {
   background-color: #ff7f50;
 
 }
 
-.cards .violet {
+.card.violet {
   background-color: #b13bf6;
 }
 
+.card.yellow {
+  background-color: #e8c42a;
+}
 
-.cards .card {
+.card-group {
+  gap: 5px;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+}
+
+.description {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  border: 1px solid #e9e7e7;
+  padding: 5px;
+  border-radius: 10px;
+  background-color: #ffffd6;
+  color: #4c4c4c;
+}
+
+.cards {
+  gap: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 400px) {
+  .card {
+    width: 140px !important;
+  }
+}
+
+.card {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  height: 90px;
-  width: 250px;
+  height: 60px;
+  width: 180px;
   border-radius: 10px;
   color: white;
   cursor: pointer;
   transition: 400ms;
 }
 
-.cards .card p.tip {
+.card p.tip {
   font-size: 1em;
   font-weight: 700;
 }
 
-.cards .card p.second-text {
+.card p.second-text {
   font-size: .7em;
 }
 
-.cards .card:hover {
-  transform: scale(1.1, 1.1);
+.card:hover {
+  transform: scale(1.05, 1.05);
 }
 
-.cards:hover > .card:not(:hover) {
-  filter: blur(10px);
+.card-group:hover > .card:not(:hover) {
+  /*filter: blur(10px);*/
   transform: scale(0.9, 0.9);
 }

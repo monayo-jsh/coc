@@ -98,8 +98,8 @@ body::before {
 }
 
 .logo {
-  width: 230px;
-  height: 230px;
+  width: 200px;
+  height: 200px;
   background-image: url("/static/images/logo.png");
   background-size: contain;
   background-repeat: no-repeat;

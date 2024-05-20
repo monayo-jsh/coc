@@ -32,7 +32,6 @@ public class ViewNormalController {
         return "clan/War";
     }
 
-
     @GetMapping("/clan/league")
     public String viewAdmin() {
         return "clan/League";
@@ -42,7 +41,5 @@ public class ViewNormalController {
     public String viewCapitalRaid() {
         return "capital/Raid";
     }
-
-
 
 }

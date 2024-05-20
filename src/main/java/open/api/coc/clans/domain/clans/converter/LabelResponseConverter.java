@@ -2,6 +2,8 @@ package open.api.coc.clans.domain.clans.converter;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.common.IconUrlEntity;
+import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.domain.clans.IconUrlResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.external.coc.clan.domain.common.IconUrl;
@@ -24,10 +26,23 @@ public class LabelResponseConverter implements Converter<Label, LabelResponse> {
                             .build();
     }
 
+    public LabelResponse convert(LeagueEntity source) {
+        return LabelResponse.builder()
+                            .id(source.getId())
+                            .name(source.getName())
+                            .iconUrls(makeIconUrlResponse(source.getIconUrl()))
+                            .build();
+    }
+
     private IconUrlResponse makeIconUrls(IconUrl iconUrl) {
         // 공통 사용 객체로 응답 규격마다 없는 경우가 있음
         if (Objects.isNull(iconUrl)) return null;
         return iconUrlResConverter.convert(iconUrl);
     }
 
+    private IconUrlResponse makeIconUrlResponse(IconUrlEntity iconUrl) {
+        // 공통 사용 객체로 응답 규격마다 없는 경우가 있음
+        if (Objects.isNull(iconUrl)) return null;
+        return iconUrlResConverter.convert(iconUrl);
+    }
 }

@@ -1,4 +1,5 @@
 const URI_PLAYERS = '/players' //멤버 상세 조회
+const URI_PLAYERS_ALL = '/players/all' //전체 클랜원 조회
 const URI_PLAYERS_REALTIME = '/players/{playerTag}' //멤버 상세 조회 (항시 실연동)
 
 function deviceArray(array, size) {
@@ -71,5 +72,17 @@ async function findPlayer(playerTag) {
                     .catch((error) => {
                       console.error(error);
                       throw error;
+                    });
+}
+
+async function fetchAllClanPlayers() {
+  return await axios.get(URI_PLAYERS_ALL)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
                     });
 }

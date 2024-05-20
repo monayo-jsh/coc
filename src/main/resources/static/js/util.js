@@ -49,6 +49,7 @@ function convertToKorean(name) {
     case 'Phoenix': return "피닉스";
     case 'Spirit Fox': return "스피릿 폭스";
     case 'Angry Jelly': return "앵그리 젤리";
+    case 'Spiky Ball': return "스파이키 볼";
   }
 
   return name;
@@ -67,7 +68,7 @@ function formattedPlayers(players) {
     const heroEquipmentMap = convertArrayToMap(player.heroEquipments);
     const petMap = convertArrayToMap(player.pets);
     return {
-      '클랜': player.clan.name,
+      '클랜': player.clan ? player.clan.name : '',
       '이름': player.name,
       '태그': player.tag,
       '타운홀': player.townHallLevel,
@@ -79,7 +80,7 @@ function formattedPlayers(players) {
       '지원받은수': player.donationsReceived,
       '시즌 공격수': player.attackWins,
       '시즌 방어수': player.defenseWins,
-      '영웅합': player.heroLevelSum,
+      '영웅합': player.heroTotalLevel,
       ...heroMap,
       ...heroEquipmentMap,
       ...petMap,
@@ -92,6 +93,8 @@ function formattedPlayers(players) {
  * @param members
  */
 function exportExcel(members) {
+  // 이름순
+  members = members.sort((a, b) => a.name.localeCompare(b.name) || b.heroTotalLevel - a.heroTotalLevel);
   const players = formattedPlayers(members);
 
   const workbook = XLSX.utils.book_new();
@@ -106,7 +109,7 @@ function exportExcel(members) {
  * @param role
  * @returns {*|string}
  */
-function convName(role) {
+function convRoleName(role) {
   if (!role) return role;
   switch (role.toUpperCase()) {
     case 'LEADER': return '대표';

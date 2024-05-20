@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity;
+package open.api.coc.clans.database.entity.clan;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

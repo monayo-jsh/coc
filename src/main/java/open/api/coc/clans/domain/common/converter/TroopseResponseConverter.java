@@ -1,5 +1,6 @@
 package open.api.coc.clans.domain.common.converter;
 
+import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
 import open.api.coc.clans.domain.common.TroopsResponse;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import org.springframework.core.convert.converter.Converter;
@@ -18,4 +19,12 @@ public class TroopseResponseConverter implements Converter<Troops, TroopsRespons
                              .build();
     }
 
+    public TroopsResponse convert(PlayerTroopsEntity source) {
+        return TroopsResponse.builder()
+                             .name(source.getId().getName())
+                             .level(source.getLevelInfo().getLevel())
+                             .maxLevel(source.getLevelInfo().getMaxLevel())
+                             .village("home")
+                             .build();
+    }
 }

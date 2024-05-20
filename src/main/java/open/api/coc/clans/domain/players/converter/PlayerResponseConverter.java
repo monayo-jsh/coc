@@ -6,6 +6,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.league.LeagueEntity;
+import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
+import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
+import open.api.coc.clans.domain.clans.LabelResponse;
+import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
 import open.api.coc.clans.domain.common.TroopsResponse;
@@ -29,6 +37,7 @@ import org.springframework.util.ObjectUtils;
 @RequiredArgsConstructor
 public class PlayerResponseConverter implements Converter<Player, PlayerResponse> {
 
+    private final LabelResponseConverter labelResponseConverter;
     private final PlayerClanResponseConverter clanResponseConverter;
     private final HeroResponseConverter heroResponseConverter;
     private final HeroEquipmentResponseConverter heroEquipmentResponseConverter;
@@ -45,6 +54,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .attackWins(source.getAttackWins())
                                               .defenseWins(source.getDefenseWins())
                                               .warStars(source.getWarStars())
+                                              .role(source.getRole())
                                               .warPreference(source.getWarPreference())
                                               .clan(makePlayerClan(source.getClan()))
                                               .heroes(makeHeroes(source.getHeroes()))
@@ -62,6 +72,16 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         return heroes.stream()
                      .filter(HeroResponse::isHomeHero)
                      .map(HeroResponse::getLevel)
+                     .reduce(0, Integer::sum);
+
+    }
+
+    private Integer calcHeroTotalMaxLevel(List<HeroResponse> heroes) {
+        if (CollectionUtils.isEmpty(heroes)) return 0;
+
+        return heroes.stream()
+                     .filter(HeroResponse::isHomeHero)
+                     .map(HeroResponse::getMaxLevel)
                      .reduce(0, Integer::sum);
 
     }
@@ -98,4 +118,92 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                      .collect(Collectors.toList());
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+    public PlayerResponse convert(PlayerEntity source) {
+        PlayerResponse player = PlayerResponse.builder()
+                                              .name(source.getName())
+                                              .tag(source.getPlayerTag())
+                                              .expLevel(source.getExpLevel())
+                                              .townHallLevel(source.getTownHallLevel())
+                                              .trophies(source.getTrophies())
+                                              .bestTrophies(source.getBestTrophies())
+                                              .attackWins(source.getAttackWins())
+                                              .defenseWins(source.getDefenseWins())
+                                              .donations(source.getDonations())
+                                              .donationsReceived(source.getDonationsReceived())
+                                              .league(makeLeague(source.getLeague()))
+                                              .warStars(source.getWarStars())
+                                              .role(source.getRole())
+                                              .warPreference(source.getWarPreference().name())
+                                              .clan(makePlayerClanResponse(source.getClan()))
+                                              .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))
+                                              .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))
+                                              .pets(makePetResponse(source.getTroops()))
+                                              .build();
+
+        player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
+        player.setHeroTotalMaxLevel(calcHeroTotalMaxLevel(player.getHeroes()));
+        return player;
+    }
+
+    private LabelResponse makeLeague(LeagueEntity league) {
+        if (ObjectUtils.isEmpty(league)) return null;
+        return labelResponseConverter.convert(league);
+    }
+
+    private PlayerClanResponse makePlayerClanResponse(ClanEntity clan) {
+        if (ObjectUtils.isEmpty(clan)) return null;
+        return clanResponseConverter.convert(clan);
+    }
+
+    private List<HeroResponse> makeHeroResponse(List<PlayerHeroEntity> heroes, List<PlayerHeroEquipmentEntity> heroEquipments) {
+        if (CollectionUtils.isEmpty(heroes)) return Collections.emptyList();
+
+        return heroes.stream()
+                     .map(hero -> {
+                         HeroResponse heroResponse = heroResponseConverter.convert(hero);
+                         settingWearEquipments(heroResponse, heroEquipments);
+                         return heroResponse;
+                     })
+                     .sorted(Comparator.comparingInt(HeroResponse::getCode))
+                     .collect(Collectors.toList());
+    }
+
+    private void settingWearEquipments(HeroResponse hero, List<PlayerHeroEquipmentEntity> heroEquipments) {
+        List<HeroEquipmentResponse> heroWearEquipmentResponses = heroEquipments.stream()
+                                                                               .filter(heroEquipment -> heroEquipment.isEqualsHeroTargetName(hero.getName()) && heroEquipment.isWear())
+                                                                               .map(heroEquipmentResponseConverter::convert)
+                                                                               .toList();
+
+        hero.getEquipments().addAll(heroWearEquipmentResponses);
+    }
+
+    private List<HeroEquipmentResponse> makeHeroEquipmentResponse(List<PlayerHeroEquipmentEntity> heroEquipments) {
+        if (CollectionUtils.isEmpty(heroEquipments)) return Collections.emptyList();
+
+        return heroEquipments.stream()
+                             .map(heroEquipmentResponseConverter::convert)
+                             .sorted(Comparator.comparingInt(HeroEquipmentResponse::getCode))
+                             .collect(Collectors.toList());
+    }
+
+    private List<TroopsResponse> makePetResponse(List<PlayerTroopsEntity> troops) {
+        if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
+
+        return troops.stream()
+                     .filter(PlayerTroopsEntity::isPet)
+                     .map(troopseResponseConverter::convert)
+                     .collect(Collectors.toList());
+    }
 }

@@ -78,7 +78,7 @@
 
   .row.header {
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 
     .league-icon {
       height: 35px;
@@ -90,7 +90,19 @@
     }
 
     .title {
-      margin-left: 5px;
+      margin-left: 15px;
+    }
+
+    .state {
+      cursor: unset;
+    }
+
+    .layout-right {
+      display: flex;
+
+      .button-chip:not(:first-child) {
+        margin-left: 3px;
+      }
     }
   }
 

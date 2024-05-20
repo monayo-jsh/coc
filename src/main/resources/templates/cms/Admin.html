@@ -28,44 +28,8 @@
         return;
       }
 
-      let clans = await fetchClans();
-      const clanMembers = await fetchClanMembers(clans);
-      await fetchPlayerDetail(clanMembers);
-
-      exportExcel(clanMembers);
-    }
-
-    async function checkClashOfClanServer() {
-      axios.get("/leagues")
-           .then((response) => {})
-           .catch((error) => {
-             const { response } = error;
-             const { status, data } = response;
-
-             let msg = 'Clash of Clan API Server\n'
-             const { reason, message } = data;
-             if (reason) {
-               msg += `\nreason: ${reason}`;
-             }
-             if (message) {
-               msg += `\nmessage: ${message}`;
-             }
-
-             msg += `\n\n위와 같은 사유로 편의기능을 제공 불가`;
-
-             const codeContainerElement = document.querySelector('#code');
-             codeContainerElement.value = msg;
-
-             const homeWrapperElement = document.querySelector('.home-wrapper');
-             homeWrapperElement.classList.add('display-none');
-
-             const errorElement = document.querySelector('.error');
-             errorElement.classList.remove('display-none');
-           })
-    }
-
-    window.onload = async () => {
-      await checkClashOfClanServer()
+      let clanAllPlayers = await fetchAllClanPlayers();
+      exportExcel(clanAllPlayers);
     }
   </script>
 

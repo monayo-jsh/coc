@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.common.AcademeClan;
-import open.api.coc.clans.database.entity.ClanEntity;
 
 @Getter
 @Builder

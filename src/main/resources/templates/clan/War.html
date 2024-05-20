@@ -260,6 +260,15 @@
               .then((response) => {
                 const { data } = response;
 
+                if (!data || !data.length) {
+                  hideWifiLoading('.card-container');
+                  const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+                  clanWarCard.classList.add('display-none');
+                  const clanWarEmptyCard = document.querySelector('.empty-clan');
+                  clanWarEmptyCard.classList.remove('display-none');
+                  return;
+                }
+
                 const carousel = document.querySelector(".carousel");
                 for (let index = 0; index<data.length; index++) {
                   const { tag, name } = data[index];
@@ -311,7 +320,10 @@
   <title>클랜전 현황</title>
 </head>
 <body>
-<section class="card-wrapper" >
+<section class="card-wrapper empty-clan display-none">
+  <div>클랜 정보 없음</div>
+</section>
+<section class="card-wrapper">
   <div id="wifi-loader" class="display-none">
     <svg class="circle-outer" viewBox="0 0 86 86">
       <circle class="back" cx="43" cy="43" r="40"></circle>

@@ -1,7 +1,7 @@
 package open.api.coc.clans.domain.clans.converter;
 
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.ClanContentEntity;
+import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.domain.clans.ClanContentResponse;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

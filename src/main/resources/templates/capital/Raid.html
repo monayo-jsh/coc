@@ -223,7 +223,7 @@
                                                        .replace(/{COLOR}/, convColor(remainAttacks))
                                                        .replace(/{REMAIN_ATTACKS}/, remainAttacks);
 
-      const stateElement = document.querySelector('.state');
+      const stateElement = capitalCardElement.querySelector('.state');
 
       if ( state === 'ended' || remainAttacks === 0 ) {
         addClassDim(capitalCardElement);

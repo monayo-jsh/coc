@@ -159,7 +159,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(to left, #c3c3c3, transparent), linear-gradient(to right, #c3c3c3, transparent);
+  background: linear-gradient(to left, #f0f0f0, transparent), linear-gradient(to right, #c3c3c3, transparent);
   border: var(--default-border);
   border-radius: 0 0 10px 0;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
@@ -371,7 +371,7 @@
   .inner-section {
     margin-bottom: 5px;
     flex-direction: column;
-    background-color: #e2e2e2;
+    background-color: transparent;
     border-radius: 5px;
 
     .label {

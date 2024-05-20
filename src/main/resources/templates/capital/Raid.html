@@ -92,6 +92,8 @@
       const errorContentElement = errorContent.querySelector('.row');
       const rowContentElement = capitalCardElement.querySelector('.row.content');
 
+      capitalCardElement.querySelector('.state').remove();
+
       rowContentElement.replaceWith(errorContentElement);
     }
 
@@ -197,6 +199,11 @@
       return members.sort((a, b) => b.capitalResourcesLooted - a.capitalResourcesLooted);
     }
 
+    function convStateName(state) {
+      if (state === 'ended') return '종료';
+      return '진행중';
+    }
+
     async function renderCapitalSeason(capitalCardElement, capitalClan) {
       const capitalRaidSeason = await fetchCapitalRaidSeason(capitalClan);
 
@@ -211,13 +218,19 @@
       const remainAttacks = totalAttackLimit - members.length;
 
       capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{STATE}/, convStateName(state))
                                                        .replace(/{ATTACK_LIMIT}/, totalAttackLimit)
                                                        .replace(/{COLOR}/, convColor(remainAttacks))
                                                        .replace(/{REMAIN_ATTACKS}/, remainAttacks);
 
+      const stateElement = document.querySelector('.state');
+
       if ( state === 'ended' || remainAttacks === 0 ) {
         addClassDim(capitalCardElement);
+        stateElement.classList.add('bg-crimson');
       }
+
+      stateElement.classList.remove('display-none');
 
       renderCapitalMemberRecord(capitalCardElement, sortByCapitalResourcesLooted(members));
 
@@ -337,7 +350,7 @@
   <div class="capital-raid">
     <div class="card caption">
       <div class="bottom-section">
-        <span class="title">습격전 시즌</span>
+        <span class="title">습격전 현황</span>
         <span class="sub-title display-none">{PERIOD}</span>
       </div>
     </div>
@@ -348,7 +361,11 @@
 
     <div class="bottom-section">
       <div class="row header">
-        <span class="title cursor-pointer" onclick="callApp(this); return false;">{CLAN_NAME}</span>
+        <span class="title">{CLAN_NAME}</span>
+        <div class="layout-right">
+          <span class="button-chip state display-none">{STATE}</span>
+          <span class="button-chip cursor-pointer" onclick="callApp(this); return false;">visit</span>
+        </div>
       </div>
       <div class="row loader">
         <div class="loader-circle">

@@ -87,7 +87,7 @@ public class PlayersService {
     public List<PlayerResponse> findPlayerBy(List<String> playerTags) {
         // 조회 성공한 목록만 반환
         return playerTags.stream()
-                         .map(clanApiService::findPlayerBy)
+                         .map(playerRepository::findById)
                          .filter(Optional::isPresent)
                          .map(player -> playerResponseConverter.convert(player.get()))
                          .toList();

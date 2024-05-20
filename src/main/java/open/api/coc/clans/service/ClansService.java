@@ -24,9 +24,11 @@ import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
+import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
+import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
@@ -68,6 +70,7 @@ public class ClansService {
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
+    private final PlayerRepository playerRepository;
     private final PlayersService playersService;
 
     public ClanResponse findClanByClanTag(String clanTag) {
@@ -266,6 +269,13 @@ public class ClansService {
 
     @Transactional
     public void postClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
+
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isEmpty()) {
+            // 배정 시 등록되지 않은 클랜원은 등록 처리
+            playersService.registerPlayer(playerTag);
+        }
+
         ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
                                                                                     .seasonDate(seasonDate)
                                                                                     .playerTag(playerTag)

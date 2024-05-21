@@ -193,7 +193,7 @@
 
       const memberRecordTemplate = document.querySelector('#member-record');
       for(const member of members) {
-        const { name, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
+        const { tag, name, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
         const memberRecord = document.importNode(memberRecordTemplate.content, true);
         const memberRecordElement = memberRecord.querySelector('.record');
 
@@ -202,6 +202,7 @@
 
         memberRecordElement.innerHTML = memberRecordElement.innerHTML
                                                            .replace(/{NAME}/, name)
+                                                           .replace(/{TAG}/, tag)
                                                            .replace(/{ATTACKS}/, attacks)
                                                            .replace(/{RESOURCES_LOOTED}/, Number(capitalResourcesLooted).toLocaleString());
 
@@ -444,6 +445,8 @@
 
     <div class="item">
       <span class="regular-text">{NAME}</span>
+      <br>
+      <span class="small-text chip color-black">{TAG}</span>
     </div>
 
     <div class="item">

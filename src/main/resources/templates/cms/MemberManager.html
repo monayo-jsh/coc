@@ -136,22 +136,9 @@
       drawMember(sortedMembers)
     }
 
-  function settingAssignClan(players, latestClanAssignedPlayers) {
-    const latestClanAssignedPlayerMap = convertArrayToMapByTag(latestClanAssignedPlayers);
-
-    for(const player of players) {
-      const clanAssignedPlayer = latestClanAssignedPlayerMap[player.tag];
-      if (clanAssignedPlayer && clanAssignedPlayer.clan) {
-        player.assignedClan = clanAssignedPlayer.clan;
-      }
-    }
-  }
-
-  async function getClanMembers() {
+    async function getClanMembers() {
       showWifiLoading('.clan-members');
       let players = await fetchAllClanPlayers();
-      let latestClanAssignedPlayers = await latestClanAssignedMembers();
-      settingAssignClan(players, latestClanAssignedPlayers.players);
       members.push(...players);
       hideWifiLoading('.clan-members');
 

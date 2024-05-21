@@ -1,7 +1,5 @@
 package open.api.coc.clans.service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -48,7 +46,6 @@ import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -60,7 +57,6 @@ public class PlayersService {
     private final LeagueRepository leagueRepository;
 
     private final ClanRepository clanRepository;
-    private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
 
@@ -98,19 +94,10 @@ public class PlayersService {
     }
 
     public List<PlayerResponse> findAllPlayers() {
-        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
-        if (ObjectUtils.isEmpty(latestSeasonDate)) {
-            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
-
-        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
-        Map<String, ClanAssignedPlayerEntity> clanAssignedPlayerMap = clanAssignedPlayers.stream().collect(Collectors.toMap(ClanAssignedPlayerEntity::getPlayerTag, clanAssignedPlayer -> clanAssignedPlayer));
-
-        List<PlayerEntity> players = playerRepository.findAll(latestSeasonDate);
+        List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
                       .map(playerResponseConverter::convert)
-                      .map(player -> settingAssignedClan(player, clanAssignedPlayerMap))
                       .collect(Collectors.toList());
     }
 

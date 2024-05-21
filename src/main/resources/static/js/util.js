@@ -62,6 +62,13 @@ function convertArrayToMap(array) {
   }, {});
 }
 
+function convertArrayToMapByTag(array) {
+  return array.reduce((map, row) => {
+    map[convertToKorean(row.tag)] = row;
+    return map
+  }, {});
+}
+
 function formattedPlayers(players) {
   return players.map(player => {
     const heroMap = convertArrayToMap(player.heroes);

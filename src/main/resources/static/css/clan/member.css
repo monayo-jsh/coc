@@ -433,7 +433,23 @@
   }
 }
 
-.btn-remove-member {
+.btn-member {
   margin-left: 5px;
   font-size: 14px;
+  cursor: pointer;
+}
+
+.player-form {
+
+  .search {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .search-box {
+    width: 270px;
+  }
+
 }

@@ -23,10 +23,11 @@ import open.api.coc.clans.domain.common.converter.HeroResponseConverter;
 import open.api.coc.clans.domain.common.converter.TroopseResponseConverter;
 import open.api.coc.clans.domain.players.PlayerClanResponse;
 import open.api.coc.clans.domain.players.PlayerResponse;
-import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
+import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.Pet;
+import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.core.convert.converter.Converter;
@@ -52,8 +53,11 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .townHallLevel(source.getTownHallLevel())
                                               .trophies(source.getTrophies())
                                               .bestTrophies(source.getBestTrophies())
+                                              .donations(source.getDonations())
+                                              .donationsReceived(source.getDonationsReceived())
                                               .attackWins(source.getAttackWins())
                                               .defenseWins(source.getDefenseWins())
+                                              .league(makeLeague(source.getLeague()))
                                               .warStars(source.getWarStars())
                                               .role(source.getRole())
                                               .warPreference(source.getWarPreference())
@@ -64,6 +68,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
+        player.setHeroTotalMaxLevel(calcHeroTotalMaxLevel(player.getHeroes()));
         return player;
     }
 
@@ -119,7 +124,10 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                      .collect(Collectors.toList());
     }
 
-
+    private LabelResponse makeLeague(Label league) {
+        if (ObjectUtils.isEmpty(league)) return null;
+        return labelResponseConverter.convert(league);
+    }
 
 
 

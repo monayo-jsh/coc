@@ -40,11 +40,11 @@ public class PlayersController {
     }
 
     @PostMapping("/{playerTag}")
-    public ResponseEntity<?> savePlayer(@PathVariable String playerTag) {
+    public ResponseEntity<PlayerResponse> savePlayer(@PathVariable String playerTag) {
 
-        playersService.registerPlayer(playerTag);
+        PlayerResponse player = playersService.registerPlayer(playerTag);
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(player);
     }
 
     @PutMapping("/{playerTag}")

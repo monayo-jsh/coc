@@ -1,5 +1,7 @@
 package open.api.coc.clans.service;
 
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createBadRequestException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -102,7 +104,13 @@ public class PlayersService {
     }
 
     @Transactional
-    public void registerPlayer(String playerTag) {
+    public PlayerResponse registerPlayer(String playerTag) {
+
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isPresent()) {
+            throw createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "이미 등록된 클랜원");
+        }
+
         Player player = clanApiService.fetchPlayerBy(playerTag)
                                       .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
@@ -116,7 +124,8 @@ public class PlayersService {
         createLeague(playerEntity, player);
         createClan(playerEntity, player);
 
-        playerRepository.save(playerEntity);
+        PlayerEntity createdPlayer = playerRepository.save(playerEntity);
+        return playerResponseConverter.convert(createdPlayer);
     }
 
     private void createClan(PlayerEntity playerEntity, Player player) {

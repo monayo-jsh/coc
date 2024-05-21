@@ -179,6 +179,7 @@
     word-break: break-all;
     display: flex;
     align-items: center;
+    line-height: 1.5;
   }
 
   .league-icon {
@@ -430,4 +431,9 @@
   .chip:not(:first-child) {
     margin-left: 2px;
   }
+}
+
+.btn-remove-member {
+  margin-left: 5px;
+  font-size: 14px;
 }

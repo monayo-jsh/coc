@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -34,7 +34,6 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
-import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -57,6 +56,7 @@ public class PlayersService {
     private final LeagueRepository leagueRepository;
 
     private final ClanRepository clanRepository;
+    private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
 
@@ -99,18 +99,6 @@ public class PlayersService {
         return players.stream()
                       .map(playerResponseConverter::convert)
                       .collect(Collectors.toList());
-    }
-
-    private PlayerResponse settingAssignedClan(PlayerResponse player, Map<String, ClanAssignedPlayerEntity> clanAssignedPlayerMap) {
-        ClanAssignedPlayerEntity clanAssignedPlayerEntity = clanAssignedPlayerMap.get(player.getTag());
-        if (Objects.isNull(clanAssignedPlayerEntity)) return player;
-
-        player.setAssignedClan(ClanResponse.builder()
-                                           .tag(clanAssignedPlayerEntity.getClan().getTag())
-                                           .name(clanAssignedPlayerEntity.getClan().getName())
-                                           .build());
-
-        return player;
     }
 
     @Transactional
@@ -398,6 +386,21 @@ public class PlayersService {
             return;
         }
 
-        playerRepository.delete(findPlayer.get());
+        PlayerEntity player = findPlayer.get();
+        playerRepository.delete(player);
+
+        deleteClanAssigned(player);
+    }
+
+    private void deleteClanAssigned(PlayerEntity player) {
+        String latestAssignedSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
+        if (Objects.isNull(latestAssignedSeasonDate)) {
+            return;
+        }
+
+        clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
+                                                                          .seasonDate(latestAssignedSeasonDate)
+                                                                          .playerTag(player.getPlayerTag())
+                                                                          .build());
     }
 }

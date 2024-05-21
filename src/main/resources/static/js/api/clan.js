@@ -3,6 +3,7 @@ const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/latest/assigned/members` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
 
@@ -229,5 +230,17 @@ async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
                     .catch((error) => {
                       console.error(error);
                       return false;
+                    });
+}
+
+async function latestClanAssignedMembers() {
+  return await axios.get(URI_LATEST_CLAN_ASSIGNED_MEMBERS)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
                     });
 }

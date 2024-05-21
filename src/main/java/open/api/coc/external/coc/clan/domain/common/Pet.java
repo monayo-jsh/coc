@@ -10,21 +10,23 @@ import open.api.coc.clans.common.exception.NotFoundException;
 @Getter
 public enum Pet {
 
-    LASSI("L.A.S.S.I"),
-    MIGHTY_YAK("Mighty Yak"),
-    ELECTRO_OWL("Electro Owl"),
-    UNICORN("Unicorn"),
-    PHOENIX("Phoenix"),
-    POISON_LIZARD("Poison Lizard"),
-    DIGGY("Diggy"),
-    FROSTY("Frosty"),
-    SPIRIT_FOX("Spirit Fox"),
-    ANGRY_JELLY("Angry Jelly");
+    LASSI("L.A.S.S.I", "라씨"),
+    MIGHTY_YAK("Mighty Yak", "마이트 야크"),
+    ELECTRO_OWL("Electro Owl", "일렉트로 아울"),
+    UNICORN("Unicorn", "유니콘"),
+    PHOENIX("Phoenix", "피닉스"),
+    POISON_LIZARD("Poison Lizard", "독마뱀"),
+    DIGGY("Diggy", "디기"),
+    FROSTY("Frosty", "프로스티"),
+    SPIRIT_FOX("Spirit Fox", "스피릿 폭스"),
+    ANGRY_JELLY("Angry Jelly", "앵그리 젤리");
 
     private final String name;
+    private final String koreanName;
 
-    Pet(String name) {
+    Pet(String name, String koreanName) {
         this.name = name;
+        this.koreanName = koreanName;
     }
 
     public static Pet findByName(String name) {

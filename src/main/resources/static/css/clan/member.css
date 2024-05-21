@@ -179,6 +179,7 @@
     word-break: break-all;
     display: flex;
     align-items: center;
+    line-height: 1.5;
   }
 
   .league-icon {
@@ -430,4 +431,25 @@
   .chip:not(:first-child) {
     margin-left: 2px;
   }
+}
+
+.btn-member {
+  margin-left: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.player-form {
+
+  .search {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .search-box {
+    width: 270px;
+  }
+
 }

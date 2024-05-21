@@ -1,7 +1,7 @@
 package open.api.coc.clans.service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createBadRequestException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -36,7 +36,6 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
-import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -48,7 +47,6 @@ import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 @Slf4j
 @Service
@@ -98,36 +96,21 @@ public class PlayersService {
     }
 
     public List<PlayerResponse> findAllPlayers() {
-        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
-        if (ObjectUtils.isEmpty(latestSeasonDate)) {
-            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
-
-        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
-        Map<String, ClanAssignedPlayerEntity> clanAssignedPlayerMap = clanAssignedPlayers.stream().collect(Collectors.toMap(ClanAssignedPlayerEntity::getPlayerTag, clanAssignedPlayer -> clanAssignedPlayer));
-
-        List<PlayerEntity> players = playerRepository.findAll(latestSeasonDate);
+        List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
                       .map(playerResponseConverter::convert)
-                      .map(player -> settingAssignedClan(player, clanAssignedPlayerMap))
                       .collect(Collectors.toList());
     }
 
-    private PlayerResponse settingAssignedClan(PlayerResponse player, Map<String, ClanAssignedPlayerEntity> clanAssignedPlayerMap) {
-        ClanAssignedPlayerEntity clanAssignedPlayerEntity = clanAssignedPlayerMap.get(player.getTag());
-        if (Objects.isNull(clanAssignedPlayerEntity)) return player;
-
-        player.setAssignedClan(ClanResponse.builder()
-                                           .tag(clanAssignedPlayerEntity.getClan().getTag())
-                                           .name(clanAssignedPlayerEntity.getClan().getName())
-                                           .build());
-
-        return player;
-    }
-
     @Transactional
-    public void registerPlayer(String playerTag) {
+    public PlayerResponse registerPlayer(String playerTag) {
+
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isPresent()) {
+            throw createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "이미 등록된 클랜원");
+        }
+
         Player player = clanApiService.fetchPlayerBy(playerTag)
                                       .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
@@ -141,7 +124,8 @@ public class PlayersService {
         createLeague(playerEntity, player);
         createClan(playerEntity, player);
 
-        playerRepository.save(playerEntity);
+        PlayerEntity createdPlayer = playerRepository.save(playerEntity);
+        return playerResponseConverter.convert(createdPlayer);
     }
 
     private void createClan(PlayerEntity playerEntity, Player player) {
@@ -411,6 +395,21 @@ public class PlayersService {
             return;
         }
 
-        playerRepository.delete(findPlayer.get());
+        PlayerEntity player = findPlayer.get();
+        playerRepository.delete(player);
+
+        deleteClanAssigned(player);
+    }
+
+    private void deleteClanAssigned(PlayerEntity player) {
+        String latestAssignedSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
+        if (Objects.isNull(latestAssignedSeasonDate)) {
+            return;
+        }
+
+        clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
+                                                                          .seasonDate(latestAssignedSeasonDate)
+                                                                          .playerTag(player.getPlayerTag())
+                                                                          .build());
     }
 }

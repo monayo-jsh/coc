@@ -2,71 +2,26 @@ function filterVillage(array, village = 'home') {
   return array.filter(data => data.village === village);
 }
 
-function convertToKorean(name) {
-  switch (name) {
-    // 영웅
-    case 'Barbarian King': return "바바리안 킹";
-    case 'Archer Queen': return "아처 퀸";
-    case 'Grand Warden': return "그랜드 워든";
-    case 'Royal Champion': return "로얄 챔피언";
-
-    // 장비
-    // 바바리안 킹
-    case 'Barbarian Puppet': return "바바리안 인형";
-    case 'Earthquake Boots': return "지진 부츠";
-    case 'Giant Gauntlet': return "자이언트 건틀릿";
-    case 'Rage Vial': return "분노 마법 병";
-    case 'Vampstache': return "흡혈 수염";
-
-    // 아처 퀸
-    case 'Archer Puppet': return "아처 인형";
-    case 'Giant Arrow': return "자이언트 화살";
-    case 'Frozen Arrow': return "얼음 화살";
-    case 'Invisibility Vial': return "투명 마법 병";
-    case 'Healer Puppet': return "치유사 인형";
-
-    // 그랜드 워든
-    case 'Life Gem': return "생명의 보석";
-    case 'Rage Gem': return "분노 보석";
-    case 'Fireball': return "파이어 볼";
-    case 'Eternal Tome': return "영원의 책";
-    case 'Healing Tome': return "치유의 책";
-
-    // 로얄 챔피언
-    case 'Royal Gem': return "로얄 보석";
-    case 'Haste Vial': return "신속 마법 병";
-    case 'Seeking Shield': return "추적 방패";
-    case 'Hog Rider Puppet': return "호그 라이더 인형";
-
-    // 펫
-    case 'L.A.S.S.I': return "L.A.S.S.I";
-    case 'Electro Owl': return "일렉트로 아울";
-    case 'Mighty Yak': return "마이트 야크";
-    case 'Unicorn': return "유니콘";
-    case 'Frosty': return "프로스티";
-    case 'Diggy': return "디기";
-    case 'Poison Lizard': return "독마뱀";
-    case 'Phoenix': return "피닉스";
-    case 'Spirit Fox': return "스피릿 폭스";
-    case 'Angry Jelly': return "앵그리 젤리";
-    case 'Spiky Ball': return "스파이키 볼";
-  }
-
-  return name;
+function convertArrayToLevelMapByKoreanName(array) {
+  return filterVillage(array).reduce((map, row) => {
+    const { koreanName, level } = row;
+    map[koreanName] = level
+    return map
+  }, {});
 }
 
-function convertArrayToMap(array) {
-  return filterVillage(array).reduce((map, row) => {
-    map[convertToKorean(row.name)] = row.level
+function convertArrayToMapByTag(array) {
+  return array.reduce((map, row) => {
+    map[row.tag] = row;
     return map
   }, {});
 }
 
 function formattedPlayers(players) {
   return players.map(player => {
-    const heroMap = convertArrayToMap(player.heroes);
-    const heroEquipmentMap = convertArrayToMap(player.heroEquipments);
-    const petMap = convertArrayToMap(player.pets);
+    const heroMap = convertArrayToLevelMapByKoreanName(player.heroes);
+    const heroEquipmentMap = convertArrayToLevelMapByKoreanName(player.heroEquipments);
+    const petMap = convertArrayToLevelMapByKoreanName(player.pets);
     return {
       '클랜': player.clan ? player.clan.name : '',
       '이름': player.name,

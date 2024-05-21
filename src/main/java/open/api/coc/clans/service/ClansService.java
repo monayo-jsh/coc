@@ -42,12 +42,14 @@ import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -72,6 +74,7 @@ public class ClansService {
 
     private final PlayerRepository playerRepository;
     private final PlayersService playersService;
+    private final PlayerResponseConverter playerResponseConverter;
 
     public ClanResponse findClanByClanTag(String clanTag) {
         Clan clan = clanApiService.findClanByClanTag(clanTag)
@@ -314,5 +317,21 @@ public class ClansService {
                                                                                     .build();
 
         clanAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
+    }
+
+    public ClanAssignedMemberListResponse getLatestClanAssignedMembers() {
+
+        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
+        if (ObjectUtils.isEmpty(latestSeasonDate)) {
+            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        }
+
+        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
+
+        List<PlayerResponse> players = clanAssignedPlayers.stream()
+                                                          .map(playerResponseConverter::convert)
+                                                          .collect(Collectors.toList());
+
+        return ClanAssignedMemberListResponse.create(Strings.EMPTY, latestSeasonDate, players);
     }
 }

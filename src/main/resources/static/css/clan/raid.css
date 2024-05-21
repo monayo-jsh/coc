@@ -176,15 +176,15 @@
       margin-top: 3px;
     }
 
-    .record.UnAttacked {
+    .record.un-attacked {
 
       .regular-text {
-        color: red;
+        color: red !important;
       }
 
     }
 
-    .record.Warning {
+    .record.demoted-attacked, .record.Warning {
       .regular-text {
         color: yellow;
       }
@@ -212,6 +212,12 @@
     display: flex;
     flex-direction: column;
     padding: 0 !important;
+
+    .record {
+      .item:first-child {
+        flex: 70%;
+      }
+    }
   }
 
 }

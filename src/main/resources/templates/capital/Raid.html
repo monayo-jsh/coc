@@ -338,11 +338,13 @@
 
       // reset
       emptyElement.classList.add('display-none');
+      membersElement.classList.remove('align-items-center');
       membersElement.classList.remove('justify-content-center');
 
       if (type === 'all') return;
       if (filterCount === 0) {
         emptyElement.classList.remove('display-none');
+        membersElement.classList.add('align-items-center');
         membersElement.classList.add('justify-content-center');
       }
     }

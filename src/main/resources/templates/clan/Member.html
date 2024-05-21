@@ -305,43 +305,56 @@
   function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
-      const memberTemplate = document.querySelector('#member');
       let no = clanMembersElement.children.length + 1;
       for(const player of members) {
-        const templateMember = document.importNode(memberTemplate.content, true);
-        const memberHtml = templateMember.querySelector('.member');
-
-        const { displayName, name, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
-
-        memberHtml.innerHTML = memberHtml.innerHTML
-                                         .replace(/{NAME}/g, `${no}. ${displayName || name}`)
-                                         .replace(/{TROPHIES}/g, trophies)
-                                         .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
-                                         .replace(/{EXP_LEVEL}/g, expLevel)
-                                         .replace(/{HERO_LEVEL}/g, heroTotalLevel)
-                                         .replace(/{IS_HERO_MAX_LEVEL}/g, heroTotalLevel === heroTotalMaxLevel ? 'is-max' : '')
-                                         .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
-                                         .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
-
-        renderPlayerLabels(memberHtml, player)
-
-        const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
-        if (league) {
-          const { iconUrls } = league;
-          leagueIconImg.src = iconUrls.tiny;
-        } else {
-          const { iconUrls } = leagueMap['Unranked'];
-          leagueIconImg.src = iconUrls.tiny;
-        }
-
+        const memberHtml = renderMember(no, player);
         clanMembersElement.appendChild(memberHtml);
         no++;
-
-        renderHeroes(memberHtml, player);
-        renderHeroEquipments(memberHtml, player);
-        renderPets(memberHtml, player);
       }
     }
+
+  function renderMember(no, player) {
+    const memberTemplate = document.querySelector('#member');
+    const templateMember = document.importNode(memberTemplate.content, true);
+    const memberHtml = templateMember.querySelector('.member');
+
+    const { displayName, name, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
+
+    memberHtml.dataset.tag = tag;
+    memberHtml.dataset.name = name;
+
+    let writeName = ""
+    if (no) writeName += `${no}. `;
+    if (displayName) writeName += displayName;
+    else writeName = name;
+
+    memberHtml.innerHTML = memberHtml.innerHTML
+                                     .replace(/{NAME}/g, writeName)
+                                     .replace(/{TROPHIES}/g, trophies)
+                                     .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
+                                     .replace(/{EXP_LEVEL}/g, expLevel)
+                                     .replace(/{HERO_LEVEL}/g, heroTotalLevel)
+                                     .replace(/{IS_HERO_MAX_LEVEL}/g, heroTotalLevel === heroTotalMaxLevel ? 'is-max' : '')
+                                     .replace(/{DONATIONS}/g, Number(donations).toLocaleString())
+                                     .replace(/{DONATIONS_RECEIVED}/g, Number(donationsReceived).toLocaleString());
+
+    renderPlayerLabels(memberHtml, player)
+
+    const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+    if (league) {
+      const { iconUrls } = league;
+      leagueIconImg.src = iconUrls.tiny;
+    } else {
+      const { iconUrls } = leagueMap['Unranked'];
+      leagueIconImg.src = iconUrls.tiny;
+    }
+
+    renderHeroes(memberHtml, player);
+    renderHeroEquipments(memberHtml, player);
+    renderPets(memberHtml, player);
+
+    return memberHtml;
+  }
 
     function ch2pattern(ch) {
       const offset = 44032; /* '가'의 코드 */

@@ -212,7 +212,12 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return troops.stream()
                      .filter(PlayerTroopsEntity::isPet)
-                     .map(troopseResponseConverter::convert)
+                     .map(playerTroopsEntity -> {
+                         TroopsResponse petResponse = troopseResponseConverter.convert(playerTroopsEntity);
+                         Pet pet = Pet.findByName(petResponse.getName());
+                         petResponse.setKoreanName(pet.getKoreanName());
+                         return petResponse;
+                     })
                      .collect(Collectors.toList());
     }
 

@@ -14,6 +14,7 @@ public class HeroResponse {
     private Integer code;
 
     private String name;
+    private String koreanName;
     private String village;
     private Integer level;
     private Integer maxLevel;

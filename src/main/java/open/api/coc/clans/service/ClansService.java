@@ -255,7 +255,7 @@ public class ClansService {
     }
 
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {
-        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDateByClanTag(clanTag);
+        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
         if (ObjectUtils.isEmpty(latestSeasonDate)) {
             latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         }

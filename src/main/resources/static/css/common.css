@@ -150,6 +150,10 @@ body::before {
   opacity: 0.5;
 }
 
+.color-black {
+  color: black !important;
+}
+
 .color-white {
   color: white !important;
 }
@@ -180,7 +184,7 @@ body::before {
   width: fit-content;
   font-size: 0.5rem;
   font-weight: bold;
-  word-break: break-all;
+  word-break: keep-all;
   border: var(--default-border);
   padding: 3px 5px;
   border-radius: 15px;

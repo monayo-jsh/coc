@@ -132,13 +132,21 @@
       }
 
       .small-text {
-        font-size: 10px;
+        font-size: 9px;
       }
     }
 
     .item:not(:first-child) {
       border-left: 1px solid rgba(255, 255, 255, 0.126);
     }
+  }
+
+}
+
+.members .record {
+
+  .item:first-child {
+    flex: 60%;
   }
 
 }
@@ -176,15 +184,21 @@
       margin-top: 3px;
     }
 
-    .record.UnAttacked {
+    .record.un-attacked {
 
       .regular-text {
-        color: red;
+        color: red !important;
       }
 
     }
 
-    .record.empty-un-attacked {
+    .record.demoted-attacked {
+      .regular-text {
+        color: yellow;
+      }
+    }
+
+    .record.empty {
       display: flex;
       justify-content: center;
     }
@@ -209,4 +223,21 @@ i {
 .expand i {
   transition: 0.3s;
   transform: rotate(180deg);
+}
+
+.radio-inputs {
+  background-color: transparent;
+
+  .radio {
+
+    .name {
+      color: white;
+    }
+
+    input:checked + .name {
+      color: rgba(51, 65, 85, 1);
+    }
+
+  }
+
 }

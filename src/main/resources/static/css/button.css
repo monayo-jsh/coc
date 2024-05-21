@@ -374,3 +374,40 @@ button.refresh:hover svg {
 .toggle-button-simple .tgl-skewed:checked + .tgl-btn:active:after {
   left: 10%;
 }
+
+
+.radio-inputs {
+  display: flex;
+  flex-wrap: wrap;
+  border-radius: 0.5rem;
+  background-color: #EEE;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
+  font-size: 12px;
+
+  .radio {
+    flex: 1 1 auto;
+    text-align: center;
+
+    .name {
+      display: flex;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.5rem;
+      border: none;
+      padding: 5px 12px;
+      color: rgba(51, 65, 85, 1);
+      transition: all .15s ease-in-out;
+    }
+
+    input {
+      display: none;
+    }
+
+    input:checked + .name {
+      background-color: #fff;
+      font-weight: 600;
+    }
+  }
+
+}

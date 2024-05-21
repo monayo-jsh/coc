@@ -3,6 +3,9 @@ package open.api.coc.clans.domain.clans.converter;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -19,6 +22,12 @@ public class TimeUtils implements TimeConverter{
         return ZonedDateTime.parse(time, FORMATTER)
                 .toInstant()
                 .toEpochMilli();
+    }
+
+    @Override
+    public LocalDate toLocalDate(long epochMilli) {
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"))
+                .toLocalDate();
     }
 
 }

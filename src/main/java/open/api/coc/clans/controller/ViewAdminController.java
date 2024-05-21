@@ -25,9 +25,16 @@ public class ViewAdminController {
         return "cms/ClanManager";
     }
 
+    /** 운영 기능 로그인 페이지 */
     @GetMapping("/login")
     public String viewAdminLoginForm() {
         return "cms/Login";
+    }
+
+    /** 운영 기능 습격전 관리 페이지 */
+    @GetMapping("/raid")
+    public String viewAdminRaid() {
+        return "cms/Raid";
     }
 
 }

@@ -98,35 +98,54 @@ CREATE TABLE TB_PLAYER_TROOPS (
     PRIMARY KEY (PLAYER_TAG, NAME)
 );
 
--- insert into tb_clan values('#2QJUL08V9', '아카데미', 1, now());
--- insert into tb_clan values('#2QG0G20RR', '아카데미 2.0', 2, now());
--- insert into tb_clan values('#2LPP8PUCG', '아카데미 3.0', 3, now());
--- insert into tb_clan values('#2L209LC8P', '아카데미 4.0', 4, now());
--- insert into tb_clan values('#2QV0R0L8R', '아카데미 5.0', 5, now());
--- insert into tb_clan values('#2GJGRU920', 'Academe', 6, now());
--- insert into tb_clan values('#2GPGU92Q2', 'TEAM Academe', 7, now());
--- insert into tb_clan values('#2GY9YL0J9', 'TEAM Bcademe', 8, now());
--- insert into tb_clan values('#2QJLPVPQU', 'TEAM Ccademe', 9, now());
--- insert into tb_clan values('#229V992R8', '클랜전리그', 20, now());
--- insert into tb_clan values('#2G9GU9PLU', '육룡이 나르샤', 21, now());
--- insert into tb_clan values('#2PLJJLY89', '가래떡에 꿀', 22, now());
--- insert into tb_clan values('#2PUPJ09VP', '가래떡에 설탕', 23, now());
--- insert into tb_clan values('#2LJ0U02YJ', '아카데미 쉼터', 99, now());
---
--- insert into tb_clan_content(tag) values('#2QJUL08V9');
--- insert into tb_clan_content(tag) values('#2QG0G20RR');
--- insert into tb_clan_content(tag) values('#2LPP8PUCG');
--- insert into tb_clan_content(tag) values('#2L209LC8P');
--- insert into tb_clan_content(tag) values('#2QV0R0L8R');
--- insert into tb_clan_content(tag) values('#2GJGRU920');
--- insert into tb_clan_content(tag) values('#2GPGU92Q2');
--- insert into tb_clan_content(tag) values('#2GY9YL0J9');
--- insert into tb_clan_content(tag) values('#2QJLPVPQU');
--- insert into tb_clan_content(tag) values('#229V992R8');
--- insert into tb_clan_content(tag) values('#2G9GU9PLU');
--- insert into tb_clan_content(tag) values('#2PLJJLY89');
--- insert into tb_clan_content(tag) values('#2PUPJ09VP');
--- insert into tb_clan_content(tag) values('#2LJ0U02YJ');
+CREATE TABLE TB_RAID (
+    RAID_ID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    START_DATE DATE,
+    END_DATE DATE,
+    CLAN_TAG VARCHAR(255)
+);
+
+-- 테이블 TB_RAIDER 생성
+CREATE TABLE TB_RAIDER (
+    RAIDER_SEQ BIGINT AUTO_INCREMENT PRIMARY KEY,
+    TAG VARCHAR(255),
+    NAME VARCHAR(255),
+    RESOURCE_LOOTED INT,
+    RAID_ID BIGINT,
+    FOREIGN KEY (RAID_ID) REFERENCES TB_RAID(RAID_ID) ON DELETE CASCADE
+);
+
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QJUL08V9', '아카데미', 2, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QG0G20RR', '아카데미 2.0', 2, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2LPP8PUCG', '아카데미 3.0', 3, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2L209LC8P', '아카데미 4.0', 4, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QV0R0L8R', '아카데미 5.0', 5, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2GJGRU920', 'Academe', 6, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2GPGU92Q2', 'TEAM Academe', 7, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2GY9YL0J9', 'TEAM Bcademe', 8, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QJLPVPQU', 'TEAM Ccademe', 9, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#229V992R8', '클랜전리그', 20, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2G9GU9PLU', '육룡이 나르샤', 21, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2PLJJLY89', '가래떡에 꿀', 22, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2PUPJ09VP', '가래떡에 설탕', 23, CURRENT_TIMESTAMP(6), 'Y');
+insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2LJ0U02YJ', '아카데미 쉼터', 99, CURRENT_TIMESTAMP(6), 'Y');
+
+
+
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','Y','N','#2QJUL08V9');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','Y','N','#2QG0G20RR');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','Y','N','#2LPP8PUCG');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','Y','N','#2L209LC8P');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','N','N','#2QV0R0L8R');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('Y','Y','Y','N','#2GJGRU920');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','Y','N','N','#2GPGU92Q2');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','N','N','Y','#2GY9YL0J9');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','N','N','Y','#2QJLPVPQU');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','Y','N','N','#229V992R8');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','Y','N','N','#2G9GU9PLU');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','Y','N','N','#2PLJJLY89');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','Y','N','N','#2PUPJ09VP');
+insert into tb_clan_content(CLAN_WAR_YN, WAR_LEAGUE_YN, CLAN_CAPITAL_YN, CLAN_WAR_PARALLEL_YN, TAG) values('N','N','N','N','#2LJ0U02YJ');
 --
 -- insert into TB_CLAN_ASSIGNED_PLAYER values ('#2QJUL08V9', '202405', '#JU0PUPPG');
 

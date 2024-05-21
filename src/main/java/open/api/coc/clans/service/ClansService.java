@@ -132,6 +132,7 @@ public class ClansService {
                               .collect(Collectors.toList());
     }
 
+
     public LeagueClanRes getLeagueClan(String clanTag) throws IOException {
         AcademeClan clan = AcademeClan.findByTag(clanTag);
         return LeagueClanRes.create(clan);

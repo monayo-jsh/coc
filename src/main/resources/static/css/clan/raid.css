@@ -132,21 +132,13 @@
       }
 
       .small-text {
-        font-size: 9px;
+        font-size: 10px;
       }
     }
 
     .item:not(:first-child) {
       border-left: 1px solid rgba(255, 255, 255, 0.126);
     }
-  }
-
-}
-
-.members .record {
-
-  .item:first-child {
-    flex: 60%;
   }
 
 }
@@ -184,23 +176,31 @@
       margin-top: 3px;
     }
 
-    .record.un-attacked {
+    .record.UnAttacked {
 
       .regular-text {
-        color: red !important;
+        color: red;
       }
 
     }
 
-    .record.demoted-attacked {
+    .record.Warning {
       .regular-text {
         color: yellow;
       }
     }
 
-    .record.empty {
+    .record.empty-un-attacked {
       display: flex;
       justify-content: center;
+    }
+
+    .record.empty-violation {
+      display: flex;
+      justify-content: center;
+      .regular-text {
+        color: yellow;
+      }
     }
   }
 
@@ -223,21 +223,4 @@ i {
 .expand i {
   transition: 0.3s;
   transform: rotate(180deg);
-}
-
-.radio-inputs {
-  background-color: transparent;
-
-  .radio {
-
-    .name {
-      color: white;
-    }
-
-    input:checked + .name {
-      color: rgba(51, 65, 85, 1);
-    }
-
-  }
-
 }

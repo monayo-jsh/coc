@@ -30,6 +30,8 @@ import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
+import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
+import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
@@ -334,5 +336,36 @@ public class ClansService {
                                                           .collect(Collectors.toList());
 
         return ClanAssignedMemberListResponse.create(Strings.EMPTY, latestSeasonDate, players);
+    }
+
+    @Transactional
+    public void registerClanAssignedMembers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        List<ClanAssignedPlayerEntity> clanAssignedPlayers = makeClanAssignedPlayerEntities(clanAssignedPlayerBulk);
+
+        // 배정 일괄 삭제
+        clanAssignedPlayerRepository.deleteAllBySeasonDate(clanAssignedPlayerBulk.getSeasonDate());
+
+        // 배정 일괄 등록
+        clanAssignedPlayerRepository.saveAll(clanAssignedPlayers);
+    }
+
+    private List<ClanAssignedPlayerEntity> makeClanAssignedPlayerEntities(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        return clanAssignedPlayerBulk.getPlayers()
+                                     .stream()
+                                     .map(player -> makeClanAssignedPlayerEntity(clanAssignedPlayerBulk.getSeasonDate(), player))
+                                     .collect(Collectors.toList());
+    }
+
+    private ClanAssignedPlayerEntity makeClanAssignedPlayerEntity(String seasonDate, ClanAssignedPlayer player) {
+        ClanEntity clan = clanRepository.findById(player.getClanTag())
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(player.getClanTag())));
+
+        return ClanAssignedPlayerEntity.builder()
+                                       .id(ClanAssignedPlayerPKEntity.builder()
+                                                                     .seasonDate(seasonDate)
+                                                                     .playerTag(player.getPlayerTag())
+                                                                     .build())
+                                       .clan(clan)
+                                       .build();
     }
 }

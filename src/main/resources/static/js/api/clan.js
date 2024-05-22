@@ -3,9 +3,11 @@ const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+
 const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/latest/assigned/members` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
+const URI_CLAN_ASSIGNED_MEMBER_BULK = `/clans/assigned/members` //클랜 일괄 배정
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
@@ -199,6 +201,31 @@ async function assignedClanPlayer(clanTag, seasonDate, playerTag) {
                                          .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
 
   return await axios.post(uri)
+                    .then((response) => {
+                      alert('배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function registerClanAssignedPlayers(seasonDate, players) {
+  const requestBody = {
+    season_date: seasonDate,
+    players: players
+  }
+
+  return await axios.post(URI_CLAN_ASSIGNED_MEMBER_BULK, requestBody)
                     .then((response) => {
                       alert('배정 되었습니다.');
                       return true;

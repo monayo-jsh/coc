@@ -327,3 +327,60 @@
   }
 
 }
+
+@media (max-width: 320px) {
+  .form-button-area {
+    padding-right: 0;
+  }
+}
+
+.form-button-area {
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  padding-right: .8em;
+}
+
+.assigned-player-upload {
+  width: 100%;
+  margin-top: 10px;
+
+  .assigned-player-upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.input-month {
+  border: 1px solid gray;
+  border-radius: 5px;
+  width: 110px;
+  padding: 5px;
+  background-position: top 45% right 5px;
+}
+
+.button-chip {
+  i {
+    margin-left: 3px;
+    transition: 0.3s;
+  }
+  i:before {
+    line-height: 1.5;
+  }
+}
+
+.button-chip.expand i {
+  transition: 0.3s;
+  transform: rotate(180deg);
+}
+
+.description {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+}

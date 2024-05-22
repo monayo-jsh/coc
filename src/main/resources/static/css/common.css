@@ -422,3 +422,82 @@ body::before {
   background-size: contain;
   background-position: center;
 }
+
+
+
+.file-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cacaca;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 48px 35px -48px rgba(0, 0, 0, 0.1);
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      height: 30px;
+      fill: rgba(75, 85, 99, 1);
+    }
+  }
+
+  .text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(75, 85, 99, 1);
+    }
+  }
+
+  input {
+    display: none;
+  }
+}
+
+.table {
+  border: 1px solid #e2e2e2;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+
+  .table-caption {
+    border: 1px solid red;
+    border-left: 3px solid red;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+    text-align: left;
+    padding-left: 10px;
+  }
+
+  .table-tbody {
+
+    .table-tr {
+
+      .table-th, .table-td {
+        padding: 5px;
+      }
+
+      .table-th {
+        width: 20%;
+      }
+
+      .table-td {
+        width: 60%;
+      }
+    }
+  }
+
+}

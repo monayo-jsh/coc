@@ -328,7 +328,7 @@
 
 }
 
-@media (max-width: 320px) {
+@media (max-width: 400px) {
   .form-button-area {
     padding-right: 0;
   }

@@ -11,6 +11,7 @@ const URI_CLAN_ASSIGNED_MEMBER_BULK = `/clans/assigned/members` //클랜 일괄 
 
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/members` //리그 배정 멤버 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
+const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //리그 일괄 배정
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
@@ -329,3 +330,27 @@ async function deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag) {
                     });
 }
 
+async function registerClanLeagueAssignedPlayers(seasonDate, players) {
+  const requestBody = {
+    season_date: seasonDate,
+    players: players
+  }
+
+  return await axios.post(URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK, requestBody)
+                    .then((response) => {
+                      alert('리그 배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}

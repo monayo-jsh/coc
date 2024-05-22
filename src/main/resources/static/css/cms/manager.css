@@ -346,10 +346,24 @@
   display: flex;
   justify-content: right;
   padding-right: .8em;
+
+  .button-chip:not(:first-child) {
+    margin-left: 3px;
+  }
+}
+
+.form-upload-area {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: right;
+}
+
+.assigned-player-upload:not(:first-child) {
+  margin-left: 5px;
 }
 
 .assigned-player-upload {
-  width: 100%;
   margin-top: 10px;
 
   .assigned-player-upload-form {
@@ -383,11 +397,25 @@
 }
 
 .description {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
 }
 
 .button-wrapper {
   display: flex;
   justify-content: center;
+}
+
+.table-caption.league {
+  border: 1px solid red;
+  border-left: 3px solid red;
+  background-color: red;
+}
+
+.table {
+  border-color: green;
+}
+
+.table.league {
+  border-color: red;
 }

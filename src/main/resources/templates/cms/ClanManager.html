@@ -41,8 +41,8 @@
 
 
   <script>
-    function displayUploadForm(element) {
-      const assignedPlayerUpload = document.querySelector('.assigned-player-upload');
+    function displayUploadForm(element, type) {
+      const assignedPlayerUpload = document.querySelector(`.${type}.assigned-player-upload`);
       if (assignedPlayerUpload.classList.contains('display-none')) {
         assignedPlayerUpload.classList.remove('display-none');
         element.classList.add('expand');
@@ -51,8 +51,10 @@
         element.classList.remove('expand');
       }
     }
+
     function changeFile(element) {
-      const assignedPlayerUploadForm = element.closest('.assigned-player-upload-form');
+      const assignedPlayerUpload = element.closest('.assigned-player-upload');
+      const assignedPlayerUploadForm = assignedPlayerUpload.querySelector('.assigned-player-upload-form');
       const label = assignedPlayerUploadForm.querySelector('.label');
 
       const { files } = element;
@@ -65,13 +67,14 @@
       label.innerHTML = file.name;
     }
     function readExcelFile(element) {
-      const assignedPlayerUploadForm = element.closest('.assigned-player-upload-form');
-      const inputMonthElement = assignedPlayerUploadForm.querySelector('.input-month');
+      const assignedPlayerUpload = element.closest('.assigned-player-upload');
+      const isAssignedLeague = assignedPlayerUpload.classList.contains('league');
+      const inputMonthElement = assignedPlayerUpload.querySelector('.input-month');
       if (!inputMonthElement.value) {
         alert('배정 월을 선택해주세요.');
         return;
       }
-      const fileInput = assignedPlayerUploadForm.querySelector('.assigned-player-excel');
+      const fileInput = assignedPlayerUpload.querySelector('.assigned-player-excel');
       const { files } = fileInput;
       if (!files.length) {
         alert('배정 엑셀 파일을 선택해주세요');
@@ -87,18 +90,21 @@
         let [firstSheetName] = workBook.SheetNames
         let readAssignedPlayers = XLSX.utils.sheet_to_json(workBook.Sheets[firstSheetName]);
 
-        uploadClanAssignedPlayers(seasonDate, readAssignedPlayers);
+        const clanAssignedPlayers = convertObject(readAssignedPlayers);
+        const isInvalid = validateClanAssignedPlayers(clanAssignedPlayers);
+        if (isInvalid) return;
+
+        if (isAssignedLeague) {
+          // 리그 배정
+          registerClanLeagueAssignedPlayers(seasonDate, clanAssignedPlayers);
+          return;
+        }
+
+        // 클랜 배정
+        registerClanAssignedPlayers(seasonDate, clanAssignedPlayers);
       };
 
       reader.readAsBinaryString(file);
-    }
-
-    function uploadClanAssignedPlayers(seasonDate, players) {
-      const clanAssignedPlayers = convertObject(players);
-      const isInvalid = validateClanAssignedPlayers(clanAssignedPlayers);
-      if (isInvalid) return;
-
-      registerClanAssignedPlayers(seasonDate, clanAssignedPlayers);
     }
 
     function convertObject(players) {
@@ -879,7 +885,7 @@
 
     function initMonthPicker() {
       const firstDayOfMonth = dayjs().date(1).format('YYYY-MM-DD');
-      const monthPicker = document.querySelector('input.input-month');
+      const monthPickers = document.querySelectorAll('input.input-month');
       const options = {
         type: 'year-month-picker',
         format: 'YYYY-MM',
@@ -890,7 +896,9 @@
         months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
         monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
       }
-      jSuites.calendar(monthPicker, options);
+      for (const monthPicker of monthPickers) {
+        jSuites.calendar(monthPicker, options);
+      }
     }
 
     window.onload = async () => {
@@ -941,53 +949,103 @@
   </div>
 
   <div class="form-button-area">
-    <div class="button-chip" onclick="displayUploadForm(this); return false;">
-      <span>배정클랜원 일괄등록</span>
+    <div class="button-chip bg-green" onclick="displayUploadForm(this, 'clan'); return false;">
+      <span>배정클랜 일괄등록</span>
+      <i class="fa-solid fa-caret-up"></i>
+    </div>
+    <div class="button-chip bg-crimson" onclick="displayUploadForm(this, 'league'); return false;">
+      <span>리그배정 일괄등록</span>
       <i class="fa-solid fa-caret-up"></i>
     </div>
   </div>
-  <div class="assigned-player-upload display-none">
-    <div class="assigned-player-upload-form">
-      <table class="table">
-        <caption class="table-caption">
-          <span class="description color-red">
-            배정월의 기존 배정 정보는 초기화되며,<br>엑셀 파일로 일괄 재배정됩니다.
+  <div class="form-upload-area">
+    <div class="clan assigned-player-upload display-none">
+      <div class="assigned-player-upload-form">
+        <table class="table">
+          <caption class="table-caption">
+          <span class="description">
+            클랜 배정월의 배정된 정보는 초기화되며,<br>엑셀 파일로 일괄 재배정됩니다.
           </span>
-        </caption>
-        <tbody class="table-tbody">
-        <tr class="table-tr">
-          <th class="table-th">배정월</th>
-          <td class="table-td">
-            <div class="picker">
-              <input type="text" class="input-month">
-            </div>
-          </td>
-        </tr>
-        <tr class="table-tr">
-          <th class="table-th">
-            엑셀 파일
-          </th>
-          <td class="table-td">
-            <label class="file-upload-form" for="assigned-player-excel">
-              <div class="icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24"><g stroke-width="0" id="SVGRepo_bgCarrier"></g><g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g><g id="SVGRepo_iconCarrier"> <path fill="" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" clip-rule="evenodd" fill-rule="evenodd"></path> </g></svg>
+          </caption>
+          <tbody class="table-tbody">
+          <tr class="table-tr">
+            <th class="table-th">배정월</th>
+            <td class="table-td">
+              <div class="picker">
+                <input type="text" class="input-month">
               </div>
-              <div class="text">
-                <span class="label">Click to upload excel</span>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">
+              파일
+            </th>
+            <td class="table-td">
+              <label class="file-upload-form" for="assigned-player-excel">
+                <div class="icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24"><g stroke-width="0" id="SVGRepo_bgCarrier"></g><g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g><g id="SVGRepo_iconCarrier"> <path fill="" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" clip-rule="evenodd" fill-rule="evenodd"></path> </g></svg>
+                </div>
+                <div class="text">
+                  <span class="label">Click to upload excel</span>
+                </div>
+                <input type="file" id="assigned-player-excel" class="assigned-player-excel" accept=".xlsx" onchange="changeFile(this); return false;">
+              </label>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <td colspan="2" class="table-td">
+              <div class="button-wrapper">
+                <div class="button-chip bg-green" onclick="readExcelFile(this); return false;">클랜 배정</div>
               </div>
-              <input type="file" id="assigned-player-excel" class="assigned-player-excel" accept=".xlsx" onchange="changeFile(this); return false;">
-            </label>
-          </td>
-        </tr>
-        <tr class="table-tr">
-          <td colspan="2" class="table-td">
-            <div class="button-wrapper">
-              <div class="button-chip bg-green" onclick="readExcelFile(this); return false;">클랜 배정</div>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="league assigned-player-upload display-none">
+      <div class="assigned-player-upload-form">
+        <table class="table league">
+          <caption class="table-caption league">
+          <span class="description">
+            리그 배정월의 배정된 정보는 초기화되며,<br>엑셀 파일로 일괄 재배정됩니다.
+          </span>
+          </caption>
+          <tbody class="table-tbody">
+          <tr class="table-tr">
+            <th class="table-th">배정월</th>
+            <td class="table-td">
+              <div class="picker">
+                <input type="text" class="input-month">
+              </div>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">
+              파일
+            </th>
+            <td class="table-td">
+              <label class="file-upload-form" for="league-assigned-player-excel">
+                <div class="icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="" viewBox="0 0 24 24"><g stroke-width="0" id="SVGRepo_bgCarrier"></g><g stroke-linejoin="round" stroke-linecap="round" id="SVGRepo_tracerCarrier"></g><g id="SVGRepo_iconCarrier"> <path fill="" d="M10 1C9.73478 1 9.48043 1.10536 9.29289 1.29289L3.29289 7.29289C3.10536 7.48043 3 7.73478 3 8V20C3 21.6569 4.34315 23 6 23H7C7.55228 23 8 22.5523 8 22C8 21.4477 7.55228 21 7 21H6C5.44772 21 5 20.5523 5 20V9H10C10.5523 9 11 8.55228 11 8V3H18C18.5523 3 19 3.44772 19 4V9C19 9.55228 19.4477 10 20 10C20.5523 10 21 9.55228 21 9V4C21 2.34315 19.6569 1 18 1H10ZM9 7H6.41421L9 4.41421V7ZM14 15.5C14 14.1193 15.1193 13 16.5 13C17.8807 13 19 14.1193 19 15.5V16V17H20C21.1046 17 22 17.8954 22 19C22 20.1046 21.1046 21 20 21H13C11.8954 21 11 20.1046 11 19C11 17.8954 11.8954 17 13 17H14V16V15.5ZM16.5 11C14.142 11 12.2076 12.8136 12.0156 15.122C10.2825 15.5606 9 17.1305 9 19C9 21.2091 10.7909 23 13 23H20C22.2091 23 24 21.2091 24 19C24 17.1305 22.7175 15.5606 20.9844 15.122C20.7924 12.8136 18.858 11 16.5 11Z" clip-rule="evenodd" fill-rule="evenodd"></path> </g></svg>
+                </div>
+                <div class="text">
+                  <span class="label">Click to upload excel</span>
+                </div>
+                <input type="file" id="league-assigned-player-excel" class="assigned-player-excel" accept=".xlsx" onchange="changeFile(this); return false;">
+              </label>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <td colspan="2" class="table-td">
+              <div class="button-wrapper">
+                <div class="button-chip bg-crimson" onclick="readExcelFile(this); return false;">리그 배정</div>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 

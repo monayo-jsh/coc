@@ -123,7 +123,7 @@ public class ClansController {
     }
 
     @PostMapping("/assigned/members")
-    public ResponseEntity<?> getClanAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
+    public ResponseEntity<?> postClanAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
 
         ClanAssignedPlayerBulk clanAssignedPlayerBulk = ClanAssignedPlayerBulk.create(request);
 
@@ -177,6 +177,16 @@ public class ClansController {
                                                       @PathVariable String playerTag) {
 
         clansService.deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/league/assigned/members")
+    public ResponseEntity<?> postClanLeagueAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
+
+        ClanAssignedPlayerBulk clanAssignedPlayerBulk = ClanAssignedPlayerBulk.create(request);
+
+        clansService.registerClanLeagueAssignedMembers(clanAssignedPlayerBulk);
 
         return ResponseEntity.ok().build();
     }

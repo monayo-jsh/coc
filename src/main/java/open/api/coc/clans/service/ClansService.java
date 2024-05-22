@@ -436,4 +436,35 @@ public class ClansService {
 
         clanLeagueAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
     }
+
+    @Transactional
+    public void registerClanLeagueAssignedMembers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        List<ClanLeagueAssignedPlayerEntity> clanAssignedPlayers = makeClanLeagueAssignedPlayerEntities(clanAssignedPlayerBulk);
+
+        // 배정 일괄 삭제
+        clanLeagueAssignedPlayerRepository.deleteAllBySeasonDate(clanAssignedPlayerBulk.getSeasonDate());
+
+        // 배정 일괄 등록
+        clanLeagueAssignedPlayerRepository.saveAll(clanAssignedPlayers);
+    }
+
+    private List<ClanLeagueAssignedPlayerEntity> makeClanLeagueAssignedPlayerEntities(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        return clanAssignedPlayerBulk.getPlayers()
+                                     .stream()
+                                     .map(player -> makeClanLeagueAssignedPlayerEntity(clanAssignedPlayerBulk.getSeasonDate(), player))
+                                     .collect(Collectors.toList());
+    }
+
+    private ClanLeagueAssignedPlayerEntity makeClanLeagueAssignedPlayerEntity(String seasonDate, ClanAssignedPlayer player) {
+        ClanEntity clan = clanRepository.findById(player.getClanTag())
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(player.getClanTag())));
+
+        return ClanLeagueAssignedPlayerEntity.builder()
+                                             .id(ClanAssignedPlayerPKEntity.builder()
+                                                                           .seasonDate(seasonDate)
+                                                                           .playerTag(player.getPlayerTag())
+                                                                           .build())
+                                             .clan(clan)
+                                             .build();
+    }
 }

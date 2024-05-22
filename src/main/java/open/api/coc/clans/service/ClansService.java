@@ -389,6 +389,45 @@ public class ClansService {
     }
 
     @Transactional
+    public void postLeagueAssignedMember(String clanTag, String seasonDate, String playerTag) {
+
+        Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
+        if (findPlayer.isEmpty()) {
+            // 배정 시 등록되지 않은 클랜원은 등록 처리
+            playersService.registerPlayer(playerTag);
+        }
+
+        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
+                                                                                    .seasonDate(seasonDate)
+                                                                                    .playerTag(playerTag)
+                                                                                    .build();
+
+        Optional<ClanLeagueAssignedPlayerEntity> findClanLeagueAssignedPlayer = clanLeagueAssignedPlayerRepository.findById(clanAssignedPlayerPK);
+        if (findClanLeagueAssignedPlayer.isPresent()) {
+            ClanLeagueAssignedPlayerEntity clanLeagueAssignedPlayer = findClanLeagueAssignedPlayer.get();
+            if (Objects.equals(clanTag, clanLeagueAssignedPlayer.getClan().getTag())) {
+                // 이미 배정
+                return;
+            }
+
+            ClanEntity clanEntity = clanRepository.findById(clanLeagueAssignedPlayer.getClan().getTag())
+                                                  .orElseThrow(() -> ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA,
+                                                                                                                clanLeagueAssignedPlayer.getClan().getName() + "에 배정된 상태"));
+
+            throw ExceptionHandler.createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "[%s] 리그 배정된 상태".formatted(clanEntity.getName()));
+        }
+
+        ClanEntity clan = clanRepository.findById(clanTag)
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(clanTag)));
+        ClanLeagueAssignedPlayerEntity clanLeagueAssignedPlayer = ClanLeagueAssignedPlayerEntity.builder()
+                                                                                    .id(clanAssignedPlayerPK)
+                                                                                    .clan(clan)
+                                                                                    .build();
+
+        clanLeagueAssignedPlayerRepository.save(clanLeagueAssignedPlayer);
+    }
+
+    @Transactional
     public void deleteClanLeagueAssignedMember(String clanTag, String seasonDate, String playerTag) {
         ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
                                                                                     .seasonDate(seasonDate)

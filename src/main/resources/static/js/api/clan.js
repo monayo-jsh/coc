@@ -289,6 +289,30 @@ async function fetchClanLeagueAssignedMembers(clanTag) {
                     });
 }
 
+async function assignedLeaguePlayer(clanTag, seasonDate, playerTag) {
+  const uri = `${URI_CLAN_LEAGUE_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
+                                                .replace(/{seasonDate}/, seasonDate)
+                                                .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+
+  return await axios.post(uri)
+                    .then((response) => {
+                      alert('배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
 async function deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag) {
   const uri = `${URI_CLAN_LEAGUE_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
                                                 .replace(/{seasonDate}/, seasonDate)

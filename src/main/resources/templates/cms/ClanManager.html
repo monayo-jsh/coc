@@ -557,7 +557,7 @@
         renderAdditionalLabel(infoAdditionalElement, tag);
         const warPreferenceLabel = renderAdditionalLabel(infoAdditionalElement, convWarPreferenceName(warPreference));
         const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
-        warPreferenceLabel.classList.add(bgColor)
+        warPreferenceLabel.classList.add(bgColor);
 
         if (!joinedClan) {
           playerInfo.classList.add('not-joined');
@@ -637,13 +637,25 @@
     async function assignedMember(element) {
       const playerInfoElement = element.closest('.player-info');
       const { dataset } = playerInfoElement;
-      const { clanTag, seasonDate, playerTag, name } = dataset;
+      const { assignedType, clanTag, seasonDate, playerTag, name } = dataset;
 
-      assignedClanPlayer(clanTag, seasonDate, playerTag)
-      .then((response) => {
-        // 화면 갱신
-        setTimeout(() => viewAssignedPlayer(element), 100);
-      })
+      if (assignedType === 'clan') {
+        assignedClanPlayer(clanTag, seasonDate, playerTag)
+        .then((response) => {
+          // 화면 갱신
+          setTimeout(() => viewAssignedPlayer(element), 100);
+        })
+        return;
+      }
+
+      if (assignedType === 'league') {
+        assignedLeaguePlayer(clanTag, seasonDate, playerTag)
+        .then((response) => {
+          // 화면 갱신
+          setTimeout(() => viewLeagueAssignedPlayer(element), 100);
+        })
+        return;
+      }
     }
 
     function removeClanAssignedPlayer(dataset, playerInfoElement) {
@@ -695,11 +707,14 @@
       }
 
       if (assignedType === 'clan') {
+        // 클랜 배정 삭제
         return removeClanAssignedPlayer(dataset, playerInfoElement);
       }
 
-      // 리그 배정 삭제
-      removeLeagueAssignedPlayer(dataset, playerInfoElement);
+      if (assignedType === 'league') {
+        // 리그 배정 삭제
+        return removeLeagueAssignedPlayer(dataset, playerInfoElement);
+      }
     }
 
     function appendButtonAssigned(playerInfoElement) {
@@ -720,6 +735,8 @@
         return;
       }
 
+      const isAssignedLeague = assignedPlayerForm.classList.contains('assigned-league');
+
       const clanCardElement = element.closest('div.card');
       const { clanTag, seasonDate } = clanCardElement.dataset;
 
@@ -735,7 +752,7 @@
         const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
 
         // dataset
-        playerInfo.dataset.assignedType = 'league';
+        playerInfo.dataset.assignedType = isAssignedLeague ? 'league' : 'clan';
         playerInfo.dataset.clanTag = clanTag;
         playerInfo.dataset.seasonDate = seasonDate;
         playerInfo.dataset.name = name;
@@ -749,7 +766,11 @@
                                          .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
                                          .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음');
 
-        renderWarPreference(warPreference, playerInfo);
+        const infoAdditionalElement = playerInfo.querySelector('.info.additional');
+        renderAdditionalLabel(infoAdditionalElement, tag);
+        const warPreferenceLabel = renderAdditionalLabel(infoAdditionalElement, convWarPreferenceName(warPreference));
+        const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
+        warPreferenceLabel.classList.add(bgColor);
 
         // clear
         playerInfo.querySelector('.btn-remove-member').remove();
@@ -825,6 +846,7 @@
         const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
 
         // dataset
+        playerInfo.dataset.assignedType = 'league';
         playerInfo.dataset.clanTag = clanTag;
         playerInfo.dataset.seasonDate = seasonDate;
         playerInfo.dataset.name = name;
@@ -960,7 +982,7 @@
         <tr class="table-tr">
           <td colspan="2" class="table-td">
             <div class="button-wrapper">
-              <div class="button-chip bg-green" onclick="readExcelFile(this); return false;">배정</div>
+              <div class="button-chip bg-green" onclick="readExcelFile(this); return false;">클랜 배정</div>
             </div>
           </td>
         </tr>
@@ -1075,7 +1097,7 @@
           <!--            <div class="button-chip bg-crimson">일괄 삭제</div>-->
         </div>
 
-        <div class="assigned-player-form">
+        <div class="assigned-player-form assigned-clan">
           <div class="search">
             <div class="search-box">
               <div class="search-field">
@@ -1149,7 +1171,7 @@
           <!--            <div class="button-chip bg-crimson">일괄 삭제</div>-->
         </div>
 
-        <div class="assigned-player-form">
+        <div class="assigned-player-form assigned-league">
           <div class="search">
             <div class="search-box">
               <div class="search-field">

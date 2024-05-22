@@ -71,14 +71,15 @@
       return isWarPreferenceIn(warPreference) ? '참가' : '불참';
     }
 
-    function renderWarPreference(warPreference, playerInfo) {
-      const warPreferenceElement = playerInfo.querySelector('.war-preference');
+    function renderAdditionalLabel(infoAdditionalElement, tag) {
+      const playerInfoAdditionalTemplate = document.querySelector('#player-info-additional-template');
+      const playerInfoAdditional = document.importNode(playerInfoAdditionalTemplate.content, true);
+      const chip = playerInfoAdditional.querySelector('.chip');
+      chip.innerHTML = chip.innerHTML.replace(/{NAME}/, tag);
 
-      warPreferenceElement.innerHTML = warPreferenceElement.innerHTML
-                                                           .replace(/{WAR_PREFERENCE}/, convWarPreferenceName(warPreference));
+      infoAdditionalElement.appendChild(chip);
 
-      const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
-      warPreferenceElement.classList.add(bgColor)
+      return chip;
     }
 
     function renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
@@ -107,7 +108,11 @@
                                          .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음')
                                          .replace(/{JOINED}/, joinedStatusName);
 
-        renderWarPreference(warPreference, playerInfo);
+        const infoAdditionalElement = playerInfo.querySelector('.info.additional');
+        renderAdditionalLabel(infoAdditionalElement, tag);
+        const warPreferenceLabel = renderAdditionalLabel(infoAdditionalElement, convWarPreferenceName(warPreference));
+        const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
+        warPreferenceLabel.classList.add(bgColor);
 
         if (!joinedClan) {
           playerInfo.classList.add('not-joined');
@@ -630,5 +635,8 @@
       </div>
     </div>
   </div>
+</template>
+<template id="player-info-additional-template">
+  <div class="chip small-text">{NAME}</div>
 </template>
 </html>

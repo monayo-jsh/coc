@@ -162,7 +162,15 @@ public class ClansController {
     }
 
 
+    @DeleteMapping("/{clanTag}/league/assigned/{seasonDate}/{playerTag}")
+    public ResponseEntity<?> deleteClanLeagueAssignedMember(@PathVariable String clanTag,
+                                                      @PathVariable String seasonDate,
+                                                      @PathVariable String playerTag) {
 
+        clansService.deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
+    }
 
 
 

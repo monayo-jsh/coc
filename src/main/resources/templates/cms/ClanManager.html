@@ -537,6 +537,7 @@
         const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
 
         // dataset
+        playerInfo.dataset.assignedType = 'clan';
         playerInfo.dataset.clanTag = clanTag;
         playerInfo.dataset.seasonDate = seasonDate;
         playerInfo.dataset.name = name;
@@ -645,30 +646,60 @@
       })
     }
 
-    async function removeAssignedMember(element) {
-      const playerInfoElement = element.closest('.player-info');
-      const { dataset } = playerInfoElement;
-      const { clanTag, seasonDate, name, playerTag, joinedStatus, warPreference } = dataset;
+    function removeClanAssignedPlayer(dataset, playerInfoElement) {
 
-      if (!confirm(`${name} (${playerTag}) 계정을 배정클랜원에서 삭제하시겠습니까?`)) {
-        return;
-      }
-
+      const { clanTag, seasonDate, playerTag, joinedStatus, warPreference } = dataset;
       const result = deleteAssignedMember(clanTag, seasonDate, playerTag);
       if (result) {
         const cardElement = playerInfoElement.closest('div.card');
-        const totalSize = cardElement.querySelector('#total_size');
+        const totalSize = cardElement.querySelector('.total-size');
         totalSize.innerHTML = Number(totalSize.innerHTML) - 1; // 배정인원 갱신
-        if (joinedStatus) {
-          const joinedSize = cardElement.querySelector('#joined_size');
+        if (JSON.parse(joinedStatus)) {
+          const joinedSize = cardElement.querySelector('.joined-size');
           joinedSize.innerHTML = Number(joinedSize.innerHTML) - 1; // 이동인원 갱신
         }
         if (warPreference) {
-          const warPreferenceSize = cardElement.querySelector('#war_preference_size');
+          const warPreferenceSize = cardElement.querySelector('.war-preference-size');
           warPreferenceSize.innerHTML = Number(warPreferenceSize.innerHTML) - 1; // 선호인원 갱신
         }
         playerInfoElement.remove();
       }
+
+    }
+
+    function removeLeagueAssignedPlayer(dataset, playerInfoElement) {
+
+      const { clanTag, seasonDate, playerTag, joinedStatus } = dataset;
+      const result = deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
+      if (result) {
+        const cardLeagueAssignedPlayer = playerInfoElement.closest('.card-league-assigned-player');
+        const totalSize = cardLeagueAssignedPlayer.querySelector('.total-size');
+        totalSize.innerHTML = Number(totalSize.innerHTML) - 1; // 배정인원 갱신
+        if (JSON.parse(joinedStatus)) {
+          const joinedSize = cardLeagueAssignedPlayer.querySelector('.joined-size');
+          joinedSize.innerHTML = Number(joinedSize.innerHTML) - 1; // 이동인원 갱신
+        }
+        playerInfoElement.remove();
+      }
+
+    }
+
+    async function removeAssignedMember(element) {
+      const playerInfoElement = element.closest('.player-info');
+      const { dataset } = playerInfoElement;
+      const { assignedType, name, playerTag } = dataset;
+
+      const displayName = assignedType === 'clan' ? '클랜' : '리그'
+      if (!confirm(`${name} (${playerTag}) 계정을 ${displayName} 배정에서 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      if (assignedType === 'clan') {
+        return removeClanAssignedPlayer(dataset, playerInfoElement);
+      }
+
+      // 리그 배정 삭제
+      removeLeagueAssignedPlayer(dataset, playerInfoElement);
     }
 
     function appendButtonAssigned(playerInfoElement) {
@@ -704,6 +735,7 @@
         const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
 
         // dataset
+        playerInfo.dataset.assignedType = 'league';
         playerInfo.dataset.clanTag = clanTag;
         playerInfo.dataset.seasonDate = seasonDate;
         playerInfo.dataset.name = name;

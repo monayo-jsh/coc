@@ -205,7 +205,7 @@ async function assignedClanPlayer(clanTag, seasonDate, playerTag) {
 
   return await axios.post(uri)
                     .then((response) => {
-                      alert('배정 되었습니다.');
+                      alert('클랜 배정 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -230,7 +230,7 @@ async function registerClanAssignedPlayers(seasonDate, players) {
 
   return await axios.post(URI_CLAN_ASSIGNED_MEMBER_BULK, requestBody)
                     .then((response) => {
-                      alert('배정 되었습니다.');
+                      alert('클랜 배정 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -254,7 +254,7 @@ async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
 
   return await axios.delete(uri)
                     .then((response) => {
-                      alert('삭제 되었습니다.');
+                      alert('배정 제외 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -296,7 +296,7 @@ async function assignedLeaguePlayer(clanTag, seasonDate, playerTag) {
 
   return await axios.post(uri)
                     .then((response) => {
-                      alert('배정 되었습니다.');
+                      alert('리그 배정 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -320,7 +320,7 @@ async function deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag) {
 
   return await axios.delete(uri)
                     .then((response) => {
-                      alert('삭제 되었습니다.');
+                      alert('리그 배정 제외 되었습니다.');
                       return true;
                     })
                     .catch((error) => {

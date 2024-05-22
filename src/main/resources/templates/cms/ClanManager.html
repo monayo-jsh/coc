@@ -619,8 +619,8 @@
     }
 
     function filterNotJoined(element) {
-      const cardAssignedPlayerElement = element.closest('.card-assigned-player');
-      const playerListElement = cardAssignedPlayerElement.querySelector('.player-list');
+      const assignedCard = element.closest('.assigned-card');
+      const playerListElement = assignedCard.querySelector('.player-list');
 
       for (const playerInfo of playerListElement.children) {
         if (element.checked) {
@@ -1082,7 +1082,7 @@
         <div class="bar12"></div>
       </div>
 
-      <div class="card-assigned-player">
+      <div class="card-assigned-player assigned-card">
         <div class="caption">
           <div class="layout-left">
             <span class="season-date"></span>배정클랜원
@@ -1156,7 +1156,7 @@
         <div class="bar12"></div>
       </div>
 
-      <div class="card-league-assigned-player">
+      <div class="card-league-assigned-player assigned-card">
         <div class="caption">
           <div class="layout-left">
             <span class="season-date"></span>리그배정 클랜원

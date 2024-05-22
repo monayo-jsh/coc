@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
+import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
+import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
@@ -118,6 +120,16 @@ public class ClansController {
     public ResponseEntity<ClanAssignedMemberListResponse> getClanAssignedMembers(@PathVariable String clanTag) {
         ClanAssignedMemberListResponse assignedMembers = clansService.findClanAssignedMembers(clanTag);
         return ResponseEntity.ok().body(assignedMembers);
+    }
+
+    @PostMapping("/assigned/members")
+    public ResponseEntity<?> getClanAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
+
+        ClanAssignedPlayerBulk clanAssignedPlayerBulk = ClanAssignedPlayerBulk.create(request);
+
+        clansService.registerClanAssignedMembers(clanAssignedPlayerBulk);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{clanTag}/assigned/{seasonDate}/{playerTag}")

@@ -14,8 +14,8 @@ public interface ClanAssignedPlayerRepository extends JpaRepository<ClanAssigned
     @Query("select max(cap.id.seasonDate) from ClanAssignedPlayerEntity cap")
     String findLatestSeasonDate();
 
-    @Query("select cap from ClanAssignedPlayerEntity cap where cap.clan.tag = :clanTag and cap.id.seasonDate = :seasonDate")
-    List<ClanAssignedPlayerEntity> findByClanTagAndSeasonDate(String clanTag, String seasonDate);
+    @Query("select cap from ClanAssignedPlayerEntity cap where cap.id.seasonDate = :seasonDate and cap.clan.tag = :clanTag")
+    List<ClanAssignedPlayerEntity> findClanAssignedPlayersByClanTagAndSeasonDate(String clanTag, String seasonDate);
 
     @Query("select cap from ClanAssignedPlayerEntity cap where cap.id.seasonDate = :seasonDate")
     List<ClanAssignedPlayerEntity> findBySeasonDate(String seasonDate);

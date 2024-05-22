@@ -123,7 +123,7 @@ public class ClansController {
     }
 
     @PostMapping("/assigned/members")
-    public ResponseEntity<?> getClanAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
+    public ResponseEntity<?> postClanAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
 
         ClanAssignedPlayerBulk clanAssignedPlayerBulk = ClanAssignedPlayerBulk.create(request);
 
@@ -151,6 +151,48 @@ public class ClansController {
 
         return ResponseEntity.ok().build();
     }
+
+
+
+
+    @GetMapping("/{clanTag}/league/assigned/members")
+    public ResponseEntity<ClanAssignedMemberListResponse> getClanLeagueAssignedMembers(@PathVariable String clanTag) {
+        ClanAssignedMemberListResponse assignedMembers = clansService.findClanLeagueAssignedMembers(clanTag);
+        return ResponseEntity.ok().body(assignedMembers);
+    }
+
+    @PostMapping("/{clanTag}/league/assigned/{seasonDate}/{playerTag}")
+    public ResponseEntity<?> postLeagueAssignedMember(@PathVariable String clanTag,
+                                                    @PathVariable String seasonDate,
+                                                    @PathVariable String playerTag) {
+
+        clansService.postLeagueAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{clanTag}/league/assigned/{seasonDate}/{playerTag}")
+    public ResponseEntity<?> deleteClanLeagueAssignedMember(@PathVariable String clanTag,
+                                                      @PathVariable String seasonDate,
+                                                      @PathVariable String playerTag) {
+
+        clansService.deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/league/assigned/members")
+    public ResponseEntity<?> postClanLeagueAssignedMembers(@RequestBody ClanAssignedPlayerBulkRequest request) {
+
+        ClanAssignedPlayerBulk clanAssignedPlayerBulk = ClanAssignedPlayerBulk.create(request);
+
+        clansService.registerClanLeagueAssignedMembers(clanAssignedPlayerBulk);
+
+        return ResponseEntity.ok().build();
+    }
+
+
+
 
     @GetMapping("/{clanTag}/current/war")
     public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {

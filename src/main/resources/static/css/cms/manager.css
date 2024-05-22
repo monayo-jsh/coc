@@ -32,13 +32,13 @@
   transform-style: preserve-3d;
 }
 
-.card-assigned-player-wrapper {
+.card-assigned-player-wrapper, .card-league-assigned-player-wrapper {
   padding: 10px 0;
   position: relative;
   min-height: 300px;
 }
 
-.card-assigned-player {
+.card-assigned-player, .card-league-assigned-player {
 
   .caption {
     display: flex;
@@ -200,6 +200,10 @@
   border-top: 1px solid #ddd;
 }
 
+.card-footer.support {
+  justify-content: flex-start;
+}
+
 /*Text*/
 .text-title {
   display: flex;
@@ -224,7 +228,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: .3em;
   cursor: pointer;
   transition: .3s ease-in-out;
 
@@ -232,6 +235,10 @@
     font-size: 10px;
     background-color: #a6ffe1;
   }
+}
+
+.card-button:not(:first-child) {
+  margin-left: 2px;
 }
 
 .btn-add, .btn-remove {
@@ -339,10 +346,24 @@
   display: flex;
   justify-content: right;
   padding-right: .8em;
+
+  .button-chip:not(:first-child) {
+    margin-left: 3px;
+  }
+}
+
+.form-upload-area {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: right;
+}
+
+.assigned-player-upload:not(:first-child) {
+  margin-left: 5px;
 }
 
 .assigned-player-upload {
-  width: 100%;
   margin-top: 10px;
 
   .assigned-player-upload-form {
@@ -376,11 +397,25 @@
 }
 
 .description {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
 }
 
 .button-wrapper {
   display: flex;
   justify-content: center;
+}
+
+.table-caption.league {
+  border: 1px solid red;
+  border-left: 3px solid red;
+  background-color: red;
+}
+
+.table {
+  border-color: green;
+}
+
+.table.league {
+  border-color: red;
 }

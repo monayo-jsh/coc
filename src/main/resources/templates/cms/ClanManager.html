@@ -503,16 +503,16 @@
       return isWarPreferenceIn(warPreference) ? '참가' : '불참';
     }
 
-    function renderWarPreference(warPreference, playerInfo) {
-      const warPreferenceElement = playerInfo.querySelector('.war-preference');
+    function renderAdditionalLabel(infoAdditionalElement, tag) {
+      const playerInfoAdditionalTemplate = document.querySelector('#player-info-additional-template');
+      const playerInfoAdditional = document.importNode(playerInfoAdditionalTemplate.content, true);
+      const chip = playerInfoAdditional.querySelector('.chip');
+      chip.innerHTML = chip.innerHTML.replace(/{NAME}/, tag);
 
-      warPreferenceElement.innerHTML = warPreferenceElement.innerHTML
-                                                           .replace(/{WAR_PREFERENCE}/, convWarPreferenceName(warPreference));
+      infoAdditionalElement.appendChild(chip);
 
-      const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
-      warPreferenceElement.classList.add(bgColor)
+      return chip;
     }
-
 
     function renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
 
@@ -520,7 +520,8 @@
 
       const playerInfoTemplate = document.querySelector('#clan-player-info-template');
 
-      const playerList = cardElement.querySelector('.card-assigned-player .player-list');
+      const cardAssignedPlayer = cardElement.querySelector('.card-assigned-player');
+      const playerList = cardAssignedPlayer.querySelector('.player-list');
       playerList.innerHTML = ""; // clear
 
       const sortedPlayers = sortByHeroTotalLevel(players);
@@ -547,12 +548,15 @@
         playerInfo.innerHTML = playerInfo.innerHTML
                                          .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
                                          .replace(/{NAME}/, name)
-                                         .replace(/{TAG}/, tag)
                                          .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
                                          .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음')
                                          .replace(/{JOINED}/, joinedStatusName);
 
-        renderWarPreference(warPreference, playerInfo);
+        const infoAdditionalElement = playerInfo.querySelector('.info.additional');
+        renderAdditionalLabel(infoAdditionalElement, tag);
+        const warPreferenceLabel = renderAdditionalLabel(infoAdditionalElement, convWarPreferenceName(warPreference));
+        const bgColor = isWarPreferenceIn(warPreference) ? 'bg-green' : 'bg-crimson';
+        warPreferenceLabel.classList.add(bgColor)
 
         if (!joinedClan) {
           playerInfo.classList.add('not-joined');
@@ -567,9 +571,9 @@
         playerList.appendChild(playerInfoElement);
       }
 
-      cardElement.querySelector('#total_size').innerHTML = players.length;
-      cardElement.querySelector('#joined_size').innerHTML = joinedSize;
-      cardElement.querySelector('#war_preference_size').innerHTML = warPreferenceSize;
+      cardAssignedPlayer.querySelector('.total-size').innerHTML = players.length;
+      cardAssignedPlayer.querySelector('.joined-size').innerHTML = joinedSize;
+      cardAssignedPlayer.querySelector('.war-preference-size').innerHTML = warPreferenceSize;
     }
 
     function formatDate(date) {
@@ -744,18 +748,18 @@
       const cardLeagueAssignedPlayerWrapper = cardElement.querySelector('.card-league-assigned-player-wrapper');
       cardLeagueAssignedPlayerWrapper.classList.remove('display-none');
 
-      // const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
-      //
-      // const clanMembers = await fetchClanMembers([{tag: clanTag}]);
-      // const clanMembersMap = makeMapByTag(clanMembers);
-      //
-      // const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
-      // seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
-      //
-      // // dataset
-      // cardElement.dataset.seasonDate = clanAssignedPlayers.seasonDate;
-      //
-      // renderAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement);
+      const clanAssignedPlayers = await fetchClanLeagueAssignedMembers(clanTag);
+
+      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembersMap = makeMapByTag(clanMembers);
+
+      const seasonDate = cardLeagueAssignedPlayerWrapper.querySelector('.season-date');
+      seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
+
+      // dataset
+      cardElement.dataset.seasonDate = clanAssignedPlayers.seasonDate;
+
+      renderLeagueAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement);
 
       // 로딩바 숨김
       const loaderElement = cardLeagueAssignedPlayerWrapper.querySelector('.loader-circle');
@@ -765,6 +769,58 @@
       const cardLeagueAssignedPlayer = cardElement.querySelector('.card-league-assigned-player .body');
       cardLeagueAssignedPlayer.classList.remove('display-none');
 
+    }
+
+    function renderLeagueAssignedPlayer(clanAssignedPlayers, clanMembersMap, cardElement) {
+
+      const { clanTag, seasonDate, players } = clanAssignedPlayers;
+
+      const playerInfoTemplate = document.querySelector('#clan-player-info-template');
+
+      const cardLeagueAssignedPlayer = cardElement.querySelector('.card-league-assigned-player');
+      const playerList =  cardLeagueAssignedPlayer.querySelector('.player-list');
+      playerList.innerHTML = ""; // clear
+
+      const sortedPlayers = sortByHeroTotalLevel(players);
+      let joinedSize = 0;
+      for (const player of sortedPlayers) {
+        const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
+        const playerInfo = playerInfoElement.querySelector('.player-info');
+
+        const { townHallLevel, name, tag, heroTotalLevel, warPreference, clan } = player;
+
+        const joinedClan = clanMembersMap[player.tag];
+        const joinedStatusName = joinedClan ? '이동 완료' : '이동 필요';
+
+        // dataset
+        playerInfo.dataset.clanTag = clanTag;
+        playerInfo.dataset.seasonDate = seasonDate;
+        playerInfo.dataset.name = name;
+        playerInfo.dataset.playerTag = tag;
+        playerInfo.dataset.joinedStatus = !!joinedClan;
+
+        // render
+        playerInfo.innerHTML = playerInfo.innerHTML
+                                         .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{HERO_TOTAL_LEVEL}/, heroTotalLevel)
+                                         .replace(/{CURRENT_CLAN}/, clan ? clan.name : '클랜 없음')
+                                         .replace(/{JOINED}/, joinedStatusName);
+
+        const infoAdditionalElement = playerInfo.querySelector('.info.additional');
+        renderAdditionalLabel(infoAdditionalElement, tag);
+
+        if (!joinedClan) {
+          playerInfo.classList.add('not-joined');
+        } else {
+          joinedSize++;
+        }
+
+        playerList.appendChild(playerInfoElement);
+      }
+
+      cardLeagueAssignedPlayer.querySelector('.total-size').innerHTML = players.length;
+      cardLeagueAssignedPlayer.querySelector('.joined-size').innerHTML = joinedSize;
     }
 
     function initMonthPicker() {
@@ -1010,9 +1066,9 @@
 
           <div class="support-area">
             <div class="info">
-              <span class="regular-text">배정 인원 : <span id="total_size"></span> 명</span>
-              <span class="regular-text">이동 인원 : <span id="joined_size"></span> 명</span>
-              <span class="regular-text">전쟁 선호 : <span id="war_preference_size"></span> 명 <span class="small-text">(이동 계정 기준)</span></span>
+              <span class="regular-text">배정 인원 : <span class="total-size"></span> 명</span>
+              <span class="regular-text">이동 인원 : <span class="joined-size"></span> 명</span>
+              <span class="regular-text">전쟁 선호 : <span class="war-preference-size"></span> 명 <span class="small-text">(이동 계정 기준)</span></span>
             </div>
             <div class="button-area">
               <div class="toggle-button-simple filter">
@@ -1084,8 +1140,8 @@
 
           <div class="support-area">
             <div class="info">
-              <span class="regular-text">배정 인원 : <span id="league-total_size"></span> 명</span>
-              <span class="regular-text">이동 인원 : <span id="league-joined_size"></span> 명</span>
+              <span class="regular-text">배정 인원 : <span class="total-size"></span> 명</span>
+              <span class="regular-text">이동 인원 : <span class="joined-size"></span> 명</span>
             </div>
             <div class="button-area">
               <div class="toggle-button-simple filter">
@@ -1148,10 +1204,7 @@
           <div class="big-text">{NAME}</div>
           <i class="fa-regular fa-square-minus color-red btn-remove-member cursor-pointer" onclick="removeAssignedMember(this); return false;"></i>
         </div>
-        <div class="info additional">
-          <div class="chip small-text">{TAG}</div>
-          <div class="chip small-text war-preference">{WAR_PREFERENCE}</div>
-        </div>
+        <div class="info additional"></div>
       </div>
     </div>
     <div class="layout-right">
@@ -1163,5 +1216,8 @@
       </div>
     </div>
   </div>
+</template>
+<template id="player-info-additional-template">
+  <div class="chip small-text">{NAME}</div>
 </template>
 </html>

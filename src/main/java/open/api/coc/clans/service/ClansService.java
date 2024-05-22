@@ -22,6 +22,7 @@ import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
@@ -263,10 +264,10 @@ public class ClansService {
             latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         }
 
-        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findByClanTagAndSeasonDate(clanTag, latestSeasonDate);
+        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findClanAssignedPlayersByClanTagAndSeasonDate(clanTag, latestSeasonDate);
 
         List<String> playerTags = clanAssignedPlayers.stream()
-                                                      .map(clanAssignedPlayerEntity -> clanAssignedPlayerEntity.getId().getPlayerTag())
+                                                      .map(ClanAssignedPlayerEntity::getPlayerTag)
                                                       .toList();
         List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
 
@@ -367,5 +368,21 @@ public class ClansService {
                                                                      .build())
                                        .clan(clan)
                                        .build();
+    }
+
+    public ClanAssignedMemberListResponse findClanLeagueAssignedMembers(String clanTag) {
+        String latestLeagueSeasonDate = clanAssignedPlayerRepository.findLatestLeagueSeasonDate();
+        if (ObjectUtils.isEmpty(latestLeagueSeasonDate)) {
+            latestLeagueSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        }
+
+        List<ClanLeagueAssignedPlayerEntity> clanLeagueAssignedPlayers = clanAssignedPlayerRepository.findClanLeagueAssignedPlayersByClanTagAndSeasonDate(clanTag, latestLeagueSeasonDate);
+
+        List<String> playerTags = clanLeagueAssignedPlayers.stream()
+                                                           .map(ClanLeagueAssignedPlayerEntity::getPlayerTag)
+                                                           .toList();
+        List<PlayerResponse> players = playersService.findPlayerBy(playerTags);
+
+        return ClanAssignedMemberListResponse.create(clanTag, latestLeagueSeasonDate, players);
     }
 }

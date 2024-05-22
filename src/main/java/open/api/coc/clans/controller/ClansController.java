@@ -152,6 +152,21 @@ public class ClansController {
         return ResponseEntity.ok().build();
     }
 
+
+
+
+    @GetMapping("/{clanTag}/league/assigned/members")
+    public ResponseEntity<ClanAssignedMemberListResponse> getClanLeagueAssignedMembers(@PathVariable String clanTag) {
+        ClanAssignedMemberListResponse assignedMembers = clansService.findClanLeagueAssignedMembers(clanTag);
+        return ResponseEntity.ok().body(assignedMembers);
+    }
+
+
+
+
+
+
+
     @GetMapping("/{clanTag}/current/war")
     public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {
         ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);

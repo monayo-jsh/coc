@@ -46,6 +46,10 @@
         cardContentsElement.innerHTML = clanWarContents.innerHTML;
         loader.classList.add('display-none');
         cardContentsElement.classList.remove('opacity-01');
+      })
+      .catch((error) => {
+        loader.classList.add('display-none');
+        cardContentsElement.classList.remove('opacity-01');
       });
 
     }
@@ -199,8 +203,6 @@
       });
     }
 
-    const clanWar = {}
-
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
@@ -238,12 +240,26 @@
               })
               .catch((error) => {
                 console.error(error);
-                const { response } = error;
-                const { status } = response
-                // 서버 이용 불가로 메인 화면 이동
-                if (status >= 500) {
-                  location.href = "/";
+                const { message, response } = error;
+
+                let msg = "다음과 같은 사유로 갱신 실패";
+                msg += `\n${message}`;
+
+                if (response) {
+                  const { status, data} = response
+                  // 서버 이용 불가로 메인 화면 이동
+                  if (status >= 500) {
+                    location.href = "/";
+                  }
+
+                  if (data) {
+                    msg += data;
+                  }
                 }
+
+                alert(msg);
+
+                throw error;
               });
 
       function convWarState(state) {

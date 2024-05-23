@@ -288,6 +288,7 @@ public class PlayersService {
                 continue;
             }
 
+            dbPlayerSpellEntity.setType(realPlayerSpellEntity.getType());
             dbPlayerSpellEntity.setLevelInfo(realPlayerSpellEntity.getLevelInfo());
         }
     }

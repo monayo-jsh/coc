@@ -13,7 +13,9 @@ import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.database.entity.player.PlayerSpellEntity;
 import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
+import open.api.coc.clans.database.entity.player.common.Spell;
 import open.api.coc.clans.database.entity.player.common.Troop;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
@@ -67,6 +69,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
                                               .pets(makePets(source.getTroops()))
                                               .siegeMachines(makeSiegeMachine(source.getTroops()))
+                                              .spells(makeSpell(source.getSpells()))
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
@@ -113,6 +116,14 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return troops.stream()
                      .filter(troop -> Troop.isSiegeMachine(troop.getName()))
+                     .map(troopseResponseConverter::convert)
+                     .collect(Collectors.toList());
+    }
+
+    private List<TroopsResponse> makeSpell(List<Troops> spells) {
+        if (CollectionUtils.isEmpty(spells)) return Collections.emptyList();
+
+        return spells.stream()
                      .map(troopseResponseConverter::convert)
                      .collect(Collectors.toList());
     }
@@ -171,6 +182,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))
                                               .pets(makePetResponse(source.getTroops()))
                                               .siegeMachines(makeSiegeMachineResponse(source.getTroops()))
+                                              .spells(makeSpellResponse(source.getSpells()))
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
@@ -224,12 +236,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return troops.stream()
                      .filter(PlayerTroopsEntity::isPet)
-                     .map(playerTroopsEntity -> {
-                         TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
-                         Troop pet = Troop.findByName(troopResponse.getName());
-                         troopResponse.setKoreanName(pet.getKoreanName());
-                         return troopResponse;
-                     })
+                     .map(this::makeTroopResponse)
                      .collect(Collectors.toList());
     }
 
@@ -238,13 +245,30 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
         return troops.stream()
                      .filter(PlayerTroopsEntity::isSiegeMachine)
-                     .map(playerTroopsEntity -> {
-                         TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
-                         Troop troop = Troop.findByName(troopResponse.getName());
-                         troopResponse.setKoreanName(troop.getKoreanName());
-                         return troopResponse;
-                     })
+                     .map(this::makeTroopResponse)
                      .collect(Collectors.toList());
+    }
+
+    private List<TroopsResponse> makeSpellResponse(List<PlayerSpellEntity> troops) {
+        if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
+
+        return troops.stream()
+                     .map(this::makeTroopResponse)
+                     .collect(Collectors.toList());
+    }
+
+    private TroopsResponse makeTroopResponse(PlayerSpellEntity playerSpellEntity) {
+        TroopsResponse troopResponse = troopseResponseConverter.convert(playerSpellEntity);
+        Spell troop = Spell.findByName(troopResponse.getName());
+        troopResponse.setKoreanName(troop.getKoreanName());
+        return troopResponse;
+    }
+
+    private TroopsResponse makeTroopResponse(PlayerTroopsEntity playerTroopsEntity) {
+        TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
+        Troop troop = Troop.findByName(troopResponse.getName());
+        troopResponse.setKoreanName(troop.getKoreanName());
+        return troopResponse;
     }
 
     public PlayerResponse convert(ClanAssignedPlayerEntity source) {

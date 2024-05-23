@@ -98,4 +98,5 @@ public enum Troop {
     public static boolean isSiegeMachine(String troopName) {
         return Objects.equals(findByName(troopName).getType(), TroopType.SIEGE_MACHINE);
     }
+
 }

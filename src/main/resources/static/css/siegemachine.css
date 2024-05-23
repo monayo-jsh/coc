@@ -1,0 +1,30 @@
+.img-icon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.img-icon.wall_wrecker {
+  background-image: url(/static/images/siegemachine/Wall_Wrecker.png);
+}
+.img-icon.battle_blimp {
+  background-image: url(/static/images/siegemachine/Battle_Blimp.png);
+}
+.img-icon.stone_slammer {
+  background-image: url(/static/images/siegemachine/Stone_Slammer.png);
+}
+.img-icon.siege_barracks {
+  background-image: url(/static/images/siegemachine/Siege_Barracks.png);
+}
+.img-icon.log_launcher {
+  background-image: url(/static/images/siegemachine/Log_Launcher.png);
+}
+.img-icon.flame_flinger {
+  background-image: url(/static/images/siegemachine/Flame_Flinger.png);
+}
+.img-icon.battle_drill {
+  background-image: url(/static/images/siegemachine/Battle_Drill.png);
+}

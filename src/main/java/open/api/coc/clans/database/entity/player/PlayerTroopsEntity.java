@@ -74,4 +74,7 @@ public class PlayerTroopsEntity implements Persistable<PlayerItemPKEntity> {
     public boolean isPet() {
         return Objects.equals(type, TroopType.PET);
     }
+    public boolean isSiegeMachine() {
+        return Objects.equals(type, TroopType.SIEGE_MACHINE);
+    }
 }

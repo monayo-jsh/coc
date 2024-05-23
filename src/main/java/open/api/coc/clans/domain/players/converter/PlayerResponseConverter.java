@@ -14,6 +14,7 @@ import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
 import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
+import open.api.coc.clans.database.entity.player.common.Troop;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
@@ -27,7 +28,6 @@ import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.clan.domain.common.Label;
-import open.api.coc.external.coc.clan.domain.common.Pet;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
@@ -66,6 +66,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .heroes(makeHeroes(source.getHeroes()))
                                               .heroEquipments(makeHeroEquipments(source.getHeroEquipment()))
                                               .pets(makePets(source.getTroops()))
+                                              .siegeMachines(makeSiegeMachine(source.getTroops()))
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
@@ -102,7 +103,16 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
 
         return troops.stream()
-                     .filter(troop -> Pet.isPets(troop.getName()))
+                     .filter(troop -> Troop.isPet(troop.getName()))
+                     .map(troopseResponseConverter::convert)
+                     .collect(Collectors.toList());
+    }
+
+    private List<TroopsResponse> makeSiegeMachine(List<Troops> troops) {
+        if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
+
+        return troops.stream()
+                     .filter(troop -> Troop.isSiegeMachine(troop.getName()))
                      .map(troopseResponseConverter::convert)
                      .collect(Collectors.toList());
     }
@@ -160,6 +170,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))
                                               .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))
                                               .pets(makePetResponse(source.getTroops()))
+                                              .siegeMachines(makeSiegeMachineResponse(source.getTroops()))
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));
@@ -214,10 +225,24 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         return troops.stream()
                      .filter(PlayerTroopsEntity::isPet)
                      .map(playerTroopsEntity -> {
-                         TroopsResponse petResponse = troopseResponseConverter.convert(playerTroopsEntity);
-                         Pet pet = Pet.findByName(petResponse.getName());
-                         petResponse.setKoreanName(pet.getKoreanName());
-                         return petResponse;
+                         TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
+                         Troop pet = Troop.findByName(troopResponse.getName());
+                         troopResponse.setKoreanName(pet.getKoreanName());
+                         return troopResponse;
+                     })
+                     .collect(Collectors.toList());
+    }
+
+    private List<TroopsResponse> makeSiegeMachineResponse(List<PlayerTroopsEntity> troops) {
+        if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
+
+        return troops.stream()
+                     .filter(PlayerTroopsEntity::isSiegeMachine)
+                     .map(playerTroopsEntity -> {
+                         TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
+                         Troop troop = Troop.findByName(troopResponse.getName());
+                         troopResponse.setKoreanName(troop.getKoreanName());
+                         return troopResponse;
                      })
                      .collect(Collectors.toList());
     }

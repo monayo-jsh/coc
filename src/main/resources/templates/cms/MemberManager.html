@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/static/css/hero.css" />
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
   <link rel="stylesheet" href="/static/css/pet.css" />
+  <link rel="stylesheet" href="/static/css/siegemachine.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
@@ -279,7 +280,7 @@
     }
 
     function renderImgIcon(contentsElement, icon) {
-      const { name, level, maxLevel, village, rarity } = icon;
+      const { name, level, maxLevel, village, rarity, koreanName } = icon;
 
       // 본 마을 영웅 장비만 표기
       if (village !== 'home') return;
@@ -293,11 +294,17 @@
                                        .replace(/\./g, "");
 
       imgIconElement.classList.add(equipmentIconClassName);
-      imgIconElement.classList.add(rarity); // 장비 등급
+
+      if (rarity)
+        imgIconElement.classList.add(rarity); // 장비 등급
 
       imgIconElement.innerHTML = imgIconElement.innerHTML
                                                .replace(/{LEVEL}/, level)
                                                .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      if (koreanName) {
+        settingTooltip(imgIconElement, koreanName);
+      }
 
       contentsElement.appendChild(imgIconElement);
     }
@@ -317,6 +324,27 @@
       const contentsElement = innerSectionElement.querySelector('.contents');
       for (const pet of pets) {
         renderImgIcon(contentsElement, pet);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
+      cardBackElement.appendChild(innerSectionElement);
+    }
+
+    function renderSiegeMachines(memberHtml, player) {
+      const { siegeMachines } = player
+      if (!siegeMachines || !siegeMachines.length) return;
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '시즈머신');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const siegeMachine of siegeMachines) {
+        renderImgIcon(contentsElement, siegeMachine);
       }
 
       const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
@@ -430,6 +458,7 @@
       renderHeroes(memberHtml, player);
       renderHeroEquipments(memberHtml, player);
       renderPets(memberHtml, player);
+      renderSiegeMachines(memberHtml, player);
 
       return memberHtml;
     }

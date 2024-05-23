@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class RaidScheduler {
     private final RaidService raidService;
 
-    @Scheduled(cron = "0 0 17 ? * MON")
+    @Scheduled(cron = "0 0 12 ? * FRI")
     public void raidScheduling() {
         raidService.saveFinishedRaidInfo();
     }

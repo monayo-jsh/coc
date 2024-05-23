@@ -145,3 +145,8 @@ function sortByHeroTotalLevel(players) {
   // 영웅레벨 순 -> 이름 순
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
 }
+
+function formatYYMMDate(date) {
+  const formattedDate = dayjs(date).format('YY년 MM월');
+  return `[${formattedDate}] `;
+}

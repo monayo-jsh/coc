@@ -583,11 +583,6 @@
       cardAssignedPlayer.querySelector('.war-preference-size').innerHTML = warPreferenceSize;
     }
 
-    function formatDate(date) {
-      const formattedDate = dayjs(date).format('YY년 MM월');
-      return `[${formattedDate}] `;
-    }
-
     async function viewAssignedPlayer(element) {
 
       const cardElement = element.closest('div.card');
@@ -607,7 +602,7 @@
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
-      seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
+      seasonDate.innerHTML = formatYYMMDate(clanAssignedPlayers.seasonDate);
 
       // dataset
       cardElement.dataset.seasonDate = clanAssignedPlayers.seasonDate;
@@ -813,7 +808,7 @@
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardLeagueAssignedPlayerWrapper.querySelector('.season-date');
-      seasonDate.innerHTML = formatDate(clanAssignedPlayers.seasonDate);
+      seasonDate.innerHTML = formatYYMMDate(clanAssignedPlayers.seasonDate);
 
       // dataset
       cardElement.dataset.seasonDate = clanAssignedPlayers.seasonDate;

@@ -169,13 +169,17 @@
       drawMember(sortedMembers)
     }
 
-  function settingAssignClan(players, latestClanAssignedPlayers) {
-    const latestClanAssignedPlayerMap = convertArrayToMapByTag(latestClanAssignedPlayers);
+  function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
+      const { seasonDate, players } = latestClanAssignedPlayerObj;
+    const latestClanAssignedPlayerMap = convertArrayToMapByTag(players);
 
-    for(const player of players) {
+    for(const player of originPlayers) {
       const clanAssignedPlayer = latestClanAssignedPlayerMap[player.tag];
       if (clanAssignedPlayer && clanAssignedPlayer.clan) {
-        player.assignedClan = clanAssignedPlayer.clan;
+        player.assignedClan = {
+          seasonDate,
+          ...clanAssignedPlayer.clan
+        };
       }
     }
   }
@@ -183,8 +187,8 @@
   async function getClanMembers() {
       showWifiLoading('.clan-members');
       let players = await fetchAllClanPlayers();
-      let latestClanAssignedPlayers = await latestClanAssignedMembers();
-      settingAssignClan(players, latestClanAssignedPlayers.players);
+      let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
+      settingAssignClan(players, latestClanAssignedPlayerObj);
       members.push(...players);
       hideWifiLoading('.clan-members');
 
@@ -319,7 +323,9 @@
     playerLabels.appendChild(tagLabel);
 
     if (assignedClan) {
-      const assignedClanLabel = createPlayerLabel(assignedClan.name, '배정 클랜');
+      const { seasonDate, name } = assignedClan;
+      const formattedSeasonDate = formatYYMMDate(seasonDate);
+      const assignedClanLabel = createPlayerLabel(name, `${formattedSeasonDate} 배정 클랜`);
       assignedClanLabel.classList.add('bg-green');
       playerLabels.appendChild(assignedClanLabel);
     } else {

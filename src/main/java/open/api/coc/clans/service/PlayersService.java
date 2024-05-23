@@ -33,6 +33,7 @@ import open.api.coc.clans.database.entity.player.converter.PlayerHeroEquipmentEn
 import open.api.coc.clans.database.entity.player.converter.PlayerSpellEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerTroopEntityConverter;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
+import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
@@ -59,6 +60,7 @@ public class PlayersService {
 
     private final ClanRepository clanRepository;
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
+    private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
 
@@ -399,6 +401,7 @@ public class PlayersService {
         playerRepository.delete(player);
 
         deleteClanAssigned(player);
+        deleteClanLeague(player);
     }
 
     private void deleteClanAssigned(PlayerEntity player) {
@@ -411,5 +414,17 @@ public class PlayersService {
                                                                           .seasonDate(latestAssignedSeasonDate)
                                                                           .playerTag(player.getPlayerTag())
                                                                           .build());
+    }
+
+    private void deleteClanLeague(PlayerEntity player) {
+        String latestAssignedSeasonDate = clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
+        if (Objects.isNull(latestAssignedSeasonDate)) {
+            return;
+        }
+
+        clanLeagueAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
+                                                                                .seasonDate(latestAssignedSeasonDate)
+                                                                                .playerTag(player.getPlayerTag())
+                                                                                .build());
     }
 }

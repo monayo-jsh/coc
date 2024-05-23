@@ -17,6 +17,9 @@ public interface ClanLeagueAssignedPlayerRepository extends JpaRepository<ClanLe
     @Query("select clap from ClanLeagueAssignedPlayerEntity clap where clap.id.seasonDate = :seasonDate and clap.clan.tag = :clanTag")
     List<ClanLeagueAssignedPlayerEntity> findClanLeagueAssignedPlayersByClanTagAndSeasonDate(String clanTag, String seasonDate);
 
+    @Query("select clap from ClanLeagueAssignedPlayerEntity clap where clap.id.seasonDate = :seasonDate")
+    List<ClanLeagueAssignedPlayerEntity> findBySeasonDate(String seasonDate);
+
     @Modifying
     @Query("delete from ClanLeagueAssignedPlayerEntity clap where clap.id.seasonDate = :seasonDate")
     void deleteAllBySeasonDate(String seasonDate);

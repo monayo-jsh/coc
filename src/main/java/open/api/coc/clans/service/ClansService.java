@@ -372,6 +372,22 @@ public class ClansService {
                                        .build();
     }
 
+    public ClanAssignedMemberListResponse getLatestLeagueAssignedMembers() {
+
+        String latestSeasonDate = clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
+        if (ObjectUtils.isEmpty(latestSeasonDate)) {
+            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        }
+
+        List<ClanLeagueAssignedPlayerEntity> clanAssignedPlayers = clanLeagueAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
+
+        List<PlayerResponse> players = clanAssignedPlayers.stream()
+                                                          .map(playerResponseConverter::convert)
+                                                          .collect(Collectors.toList());
+
+        return ClanAssignedMemberListResponse.create(Strings.EMPTY, latestSeasonDate, players);
+    }
+
     public ClanAssignedMemberListResponse findClanLeagueAssignedMembers(String clanTag) {
         String latestLeagueSeasonDate = clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
         if (ObjectUtils.isEmpty(latestLeagueSeasonDate)) {

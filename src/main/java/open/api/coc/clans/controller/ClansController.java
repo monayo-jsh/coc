@@ -110,7 +110,7 @@ public class ClansController {
         return ResponseEntity.ok().body(clanMemberList);
     }
 
-    @GetMapping("/latest/assigned/members")
+    @GetMapping("/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestClanAssignedMembers() {
         ClanAssignedMemberListResponse clanAssignedMemberList = clansService.getLatestClanAssignedMembers();
         return ResponseEntity.ok().body(clanAssignedMemberList);
@@ -154,6 +154,12 @@ public class ClansController {
 
 
 
+
+    @GetMapping("/league/assigned/members/latest")
+    public ResponseEntity<ClanAssignedMemberListResponse> getLatestLeagueAssignedMembers() {
+        ClanAssignedMemberListResponse clanAssignedMemberList = clansService.getLatestLeagueAssignedMembers();
+        return ResponseEntity.ok().body(clanAssignedMemberList);
+    }
 
     @GetMapping("/{clanTag}/league/assigned/members")
     public ResponseEntity<ClanAssignedMemberListResponse> getClanLeagueAssignedMembers(@PathVariable String clanTag) {

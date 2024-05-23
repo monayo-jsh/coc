@@ -380,7 +380,7 @@ button.refresh:hover svg {
   display: flex;
   flex-wrap: wrap;
   border-radius: 0.5rem;
-  background-color: #EEE;
+  background-color: transparent;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   font-size: 12px;
 
@@ -396,7 +396,7 @@ button.refresh:hover svg {
       border-radius: 0.5rem;
       border: none;
       padding: 5px 12px;
-      color: rgba(51, 65, 85, 1);
+      color: #fff;
       transition: all .15s ease-in-out;
     }
 
@@ -405,6 +405,7 @@ button.refresh:hover svg {
     }
 
     input:checked + .name {
+      color: black;
       background-color: #fff;
       font-weight: 600;
     }

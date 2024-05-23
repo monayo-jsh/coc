@@ -366,6 +366,12 @@
   margin-left: 5px;
 }
 
+@media (max-width: 320px) {
+  .assigned-player-upload:not(:first-child) {
+    margin-left: 0;
+  }
+}
+
 .assigned-player-upload {
   margin-top: 10px;
 

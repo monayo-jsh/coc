@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -169,26 +170,43 @@
       drawMember(sortedMembers)
     }
 
-  function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
+    function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
       const { seasonDate, players } = latestClanAssignedPlayerObj;
-    const latestClanAssignedPlayerMap = convertArrayToMapByTag(players);
+      const latestClanAssignedPlayerMap = convertArrayToMapByTag(players);
 
-    for(const player of originPlayers) {
-      const clanAssignedPlayer = latestClanAssignedPlayerMap[player.tag];
-      if (clanAssignedPlayer && clanAssignedPlayer.clan) {
-        player.assignedClan = {
-          seasonDate,
-          ...clanAssignedPlayer.clan
-        };
+      for(const player of originPlayers) {
+        const clanAssignedPlayer = latestClanAssignedPlayerMap[player.tag];
+        if (clanAssignedPlayer && clanAssignedPlayer.clan) {
+          player.assignedClan = {
+            seasonDate,
+            ...clanAssignedPlayer.clan
+          };
+        }
       }
     }
-  }
 
-  async function getClanMembers() {
+    function settingAssignLeague(originPlayers, latestLeagueAssignedPlayerObj) {
+      const { seasonDate, players } = latestLeagueAssignedPlayerObj;
+      const latestLeagueAssignedPlayerMap = convertArrayToMapByTag(players);
+
+      for(const player of originPlayers) {
+        const clanAssignedPlayer = latestLeagueAssignedPlayerMap[player.tag];
+        if (clanAssignedPlayer && clanAssignedPlayer.clan) {
+          player.assignedLeague = {
+            seasonDate,
+            ...clanAssignedPlayer.clan
+          };
+        }
+      }
+    }
+
+    async function getClanMembers() {
       showWifiLoading('.clan-members');
       let players = await fetchAllClanPlayers();
       let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
       settingAssignClan(players, latestClanAssignedPlayerObj);
+      let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
+      settingAssignLeague(players, latestLeagueAssignedPlayerObj);
       members.push(...players);
       hideWifiLoading('.clan-members');
 
@@ -315,24 +333,52 @@
     return clanLabel;
   }
 
-  function renderPlayerLabels(memberHtml, player) {
-    const playerLabels = memberHtml.querySelector('.player-labels');
-    const { tag, clan, assignedClan, role } = player;
+    function renderAssignedClan(playerLabels, assignedClan) {
+      if (!assignedClan) {
+          const assignedClanLabel = createPlayerLabel('클랜 배정 필요', '배정 클랜');
+          assignedClanLabel.classList.add('bg-red');
+          playerLabels.appendChild(assignedClanLabel);
+          return;
+      }
 
-    const tagLabel = createPlayerLabel(tag, '플레이어 태그');
-    playerLabels.appendChild(tagLabel);
-
-    if (assignedClan) {
       const { seasonDate, name } = assignedClan;
       const formattedSeasonDate = formatYYMMDate(seasonDate);
       const assignedClanLabel = createPlayerLabel(name, `${formattedSeasonDate} 배정 클랜`);
       assignedClanLabel.classList.add('bg-green');
       playerLabels.appendChild(assignedClanLabel);
-    } else {
-      const assignedClanLabel = createPlayerLabel('배정 필요', '배정 클랜');
-      assignedClanLabel.classList.add('bg-crimson');
-      playerLabels.appendChild(assignedClanLabel);
     }
+
+    function renderAssignedLeague(playerLabels, assignedLeague) {
+      if (!assignedLeague) return;
+
+      const { seasonDate, name } = assignedLeague;
+
+      const now = dayjs();
+      const assignedDate = dayjs(seasonDate);
+
+      // 매달 12일까지는 당월 리그 배정 라벨 표기
+      if (now.date() < 12) {
+        if (now.month() !== assignedDate.month()) return;
+      } else {
+        // 다음달 리그 배정 라벨 표기
+        if (now.month() >= assignedDate.month()) return;
+      }
+
+      const formattedSeasonDate = formatYYMMDate(seasonDate);
+      const assignedLeagueLabel = createPlayerLabel(name, `${formattedSeasonDate} 리그 배정 클랜`);
+      assignedLeagueLabel.classList.add('bg-crimson');
+      playerLabels.appendChild(assignedLeagueLabel);
+    }
+
+  function renderPlayerLabels(memberHtml, player) {
+    const playerLabels = memberHtml.querySelector('.player-labels');
+    const { tag, clan, assignedClan, assignedLeague, role } = player;
+
+    const tagLabel = createPlayerLabel(tag, '플레이어 태그');
+    playerLabels.appendChild(tagLabel);
+
+    renderAssignedClan(playerLabels, assignedClan);
+    renderAssignedLeague(playerLabels, assignedLeague);
 
     // if (clan) {
     //   const clanLabel = createPlayerLabel(clan.name, '현재 클랜');

@@ -228,6 +228,11 @@ body::before {
   color: white;
 }
 
+.bg-red {
+  background-color: red;
+  color: white;
+}
+
 .bg-crimson {
   background-color: crimson;
   color: white;

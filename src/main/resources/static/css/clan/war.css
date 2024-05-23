@@ -6,7 +6,8 @@ body {
   margin: 0;
   display: flex;
   justify-content: center;
-  overflow-y: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
 }
 
 .clan-war {
@@ -17,6 +18,7 @@ body {
 }
 
 .summary {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 3px;
@@ -32,7 +34,7 @@ body {
     text-align: center;
   }
 
-  @media (max-width: 320px) {
+  @media (max-width: 340px) {
     .name {
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -93,6 +95,12 @@ body {
   font-weight: bolder;
   color: red;
 
+  .team-size {
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 15px;
+  }
+
   .clan-icon {
     display: flex;
     justify-content: center;
@@ -110,6 +118,10 @@ body {
   }
   .war-state {
     font-size: 0.8em;
+  }
+  .button-chip {
+    font-size: 10px;
+    margin-top: 7px;
   }
 }
 
@@ -149,8 +161,18 @@ body {
 
 }
 
+.clan-war.expand {
+
+  .sub-summary {
+    display: flex;
+  }
+  .member-attack {
+    display: block;
+  }
+}
+
 .sub-summary {
-  display: flex;
+  display: none;
   font-size: 0.9rem;
   font-weight: bold;
   margin-top: 5px;
@@ -200,6 +222,7 @@ body {
 }
 
 .member-attack {
+  display: none;
   overflow-y: auto;
   scrollbar-width: none;
   height: 625px;

@@ -22,12 +22,39 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
   <script type="text/javascript">
+
+    function refreshWarStatus(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+
+      const loader = sectionClanWar.querySelector('.loader-circle');
+      loader.classList.remove('display-none');
+
+      const cardContentsElement = sectionClanWar.querySelector('.card-contents');
+      cardContentsElement.classList.add('opacity-01');
+
+      const clanWarContent = cardContentsElement.querySelector('.clan-war');
+
+      const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+      const clanWarContents = templateClanWar.querySelector('.card-contents');
+
+      clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                 .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
+                                                 .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+
+      settingClanWar(clanWarContents, clanWarContent.dataset.clanTag)
+      .then(() => {
+        cardContentsElement.innerHTML = clanWarContents.innerHTML;
+        loader.classList.add('display-none');
+        cardContentsElement.classList.remove('opacity-01');
+      });
+
+    }
+
     function initCardSlide() {
       const cardContents = document.querySelectorAll(".card-contents");
       const buttons = document.querySelectorAll(".button");
 
       let cardIndex = 0;
-
       const showCard = () => {
         showWifiLoading('.card-container');
 
@@ -41,8 +68,8 @@
 
         clanWarContents.classList.add(`clan-${cardIndex}`)
         clanWarContents.innerHTML = clanWarContents.innerHTML
-                .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
+                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
 
         settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
           targetClanWar.innerHTML = clanWarContents.innerHTML;
@@ -205,11 +232,6 @@
                 const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
                 opponentIcon.src = opponent.badge.small
 
-                if (teamSize) {
-                  const subSummary = clanWarContentsElement.querySelector('.sub-summary');
-                  subSummary.classList.remove('display-none');
-                }
-
                 let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
                 memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
                 settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
@@ -278,18 +300,16 @@
 
                   clanWarContents.classList.add(`clan-${index}`, 'display-none');
                   clanWarContents.innerHTML = clanWarContents.innerHTML
-                          .replace(/{CLAN_TAG}/, tag)
-                          .replace(/{CLAN_NAME}/g, name);
+                                                             .replace(/{CLAN_TAG}/, tag)
+                                                             .replace(/{CLAN_NAME}/g, name);
 
-                  if (index === 0) {
-                    settingClanWar(clanWarContents, tag).then(() => hideWifiLoading('.card-container'))
-                    clanWarContents.classList.remove('display-none');
-                  }
+                  settingClanWar(clanWarContents, tag).then(() => clanWarContents.classList.remove('display-none'));
 
                   carousel.appendChild(templateClanWar);
                 }
 
-                initCardSlide();
+                //initCardSlide();
+                hideWifiLoading('.card-container');
               })
               .catch((error) => {
                 console.error(error);
@@ -311,6 +331,17 @@
           memberAttack.classList.remove('display-none');
         }
       }
+    }
+
+    function displayDetail(element) {
+        const clanWarCardElement = element.closest('.clan-war');
+
+        const { classList } = clanWarCardElement;
+        if (classList.contains('expand')) {
+          classList.remove('expand');
+        } else {
+          classList.add('expand');
+        }
     }
 
     window.onload = async () => {
@@ -341,88 +372,127 @@
     <div class="text" data-text="Searching"></div>
   </div>
 
-  <i class="fa-solid fa-arrow-left button" id="prev"></i>
   <div class="card-container">
+    <div class="card-title">클랜전 현황</div>
     <div class="carousel"></div>
   </div>
-  <i class="fa-solid fa-arrow-right button" id="next"></i>
 </section>
 </body>
 
 <template id="section-clan-war">
-  <div class="card-contents">
-    <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+  <div class="section-clan-war">
 
-      <div class="summary">
+    <div class="loader-circle display-none">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+      <div class="bar4"></div>
+      <div class="bar5"></div>
+      <div class="bar6"></div>
+      <div class="bar7"></div>
+      <div class="bar8"></div>
+      <div class="bar9"></div>
+      <div class="bar10"></div>
+      <div class="bar11"></div>
+      <div class="bar12"></div>
+    </div>
 
-        <div class="clan">
-          <div class="name">{CLAN_NAME}</div>
-          <div class="stars">
-            <i class="fa-solid fa-star"></i>
-            <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+    <div class="card-contents">
+
+      <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
+        <div class="summary">
+          <div class="button-wrapper">
+            <button class="refresh" onclick="refreshWarStatus(this); return false;">
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-arrow-repeat"
+                  viewBox="0 0 16 16"
+              >
+                <path
+                    d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+                ></path>
+                <path
+                    fill-rule="evenodd"
+                    d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+                ></path>
+              </svg>
+            </button>
           </div>
-          <div class="attacks">
-            <div class="icon-sword"></div>
-            <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+          <div class="clan">
+            <div class="name">{CLAN_NAME}</div>
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+            </div>
+            <div class="attacks">
+              <div class="icon-sword"></div>
+              <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+            </div>
+            <div class="destruction-percentage">
+              <div class="icon-damage"></div>
+              <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
+            </div>
           </div>
-          <div class="destruction-percentage">
-            <div class="icon-damage"></div>
-            <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
+
+          <div class="war-info">
+            <div class="clan-icon">
+              <img class="clan" alt="" />
+              <img class="opponent" alt="" />
+            </div>
+            <div class="team-size">
+              {TEAM_SIZE}인전
+            </div>
+            <div class="war-remaining-time">
+              {WAR_REMAIN_HOUR_MINUTE}
+            </div>
+            <div class="war-state">
+              {WAR_STATE}
+            </div>
+            <div class="button-chip" onclick="displayDetail(this); return false;">세부정보</div>
           </div>
+
+          <div class="opponent">
+
+            <div class="name">{OPPONENT_NAME}</div>
+            <div class="stars">
+
+              <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+              <i class="fa-solid fa-star"></i>
+
+            </div>
+            <div class="attacks">
+              <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
+              <div class="icon-sword"></div>
+            </div>
+
+            <div class="destruction-percentage">
+              <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+              <div class="icon-damage"></div>
+            </div>
+          </div>
+
         </div>
 
-        <div class="war-info">
-          <div class="clan-icon">
-            <img class="clan" alt="" />
-            <img class="opponent" alt="" />
-          </div>
-          <div class="war-remaining-time">
-            {WAR_REMAIN_HOUR_MINUTE}
-          </div>
-          <div class="war-state">
-            {WAR_STATE}
-          </div>
-        </div>
-
-        <div class="opponent">
-
-          <div class="name">{OPPONENT_NAME}</div>
-          <div class="stars">
-
-            <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
-            <i class="fa-solid fa-star"></i>
-
-          </div>
-          <div class="attacks">
-            <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
-            <div class="icon-sword"></div>
-          </div>
-
-          <div class="destruction-percentage">
-            <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
-            <div class="icon-damage"></div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="sub-summary display-none">
-        <div class="team-size">
-          {TEAM_SIZE}인전
-        </div>
-        <div class="support-area">
-          <div class="toggle-button-cover">
-            <div class="toggle-button">
-              <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
-              <div class="knobs" data-toggle-on="전체 공격" data-toggle-off="남은 공격"></div>
-              <div class="layer"></div>
+        <div class="sub-summary">
+          <div class="support-area">
+            <div class="toggle-button-cover">
+              <div class="toggle-button">
+                <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
+                <div class="knobs" data-toggle-on="전체 공격" data-toggle-off="남은 공격"></div>
+                <div class="layer"></div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="member-attack"></div>
+        <div class="member-attack"></div>
+      </div>
     </div>
+
   </div>
 </template>
 <template id="section-member">

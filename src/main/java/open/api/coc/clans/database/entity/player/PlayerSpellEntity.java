@@ -3,10 +3,13 @@ package open.api.coc.clans.database.entity.player;
 import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import open.api.coc.clans.database.entity.player.common.PlayerItemEntity;
 import open.api.coc.clans.database.entity.player.common.PlayerItemPKEntity;
+import open.api.coc.clans.database.entity.player.common.SpellType;
 import org.springframework.data.domain.Persistable;
 
 @Builder
@@ -34,6 +38,10 @@ public class PlayerSpellEntity implements Persistable<PlayerItemPKEntity> {
 
     @EmbeddedId
     private PlayerItemPKEntity id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private SpellType type;
 
     @Embedded
     private PlayerItemEntity levelInfo;

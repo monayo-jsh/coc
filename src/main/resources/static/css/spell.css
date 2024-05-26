@@ -1,0 +1,51 @@
+.img-icon {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.img-icon.bat_spell {
+  background-image: url(/static/images/spell/Bat_Spell.png);
+}
+.img-icon.clone_spell {
+  background-image: url(/static/images/spell/Clone_Spell.png);
+}
+.img-icon.earthquake_spell {
+  background-image: url(/static/images/spell/Earthquake_Spell.png);
+}
+.img-icon.freeze_spell {
+  background-image: url(/static/images/spell/Freeze_Spell.png);
+}
+.img-icon.haste_spell {
+  background-image: url(/static/images/spell/Haste_Spell.png);
+}
+.img-icon.healing_spell {
+  background-image: url(/static/images/spell/Healing_Spell.png);
+}
+.img-icon.invisibility_spell {
+  background-image: url(/static/images/spell/Invisibility_Spell.png);
+}
+.img-icon.jump_spell {
+  background-image: url(/static/images/spell/Jump_Spell.png);
+}
+.img-icon.lightning_spell {
+  background-image: url(/static/images/spell/Lightning_Spell.png);
+}
+.img-icon.overgrowth_spell {
+  background-image: url(/static/images/spell/Overgrowth_Spell.png);
+}
+.img-icon.poison_spell {
+  background-image: url(/static/images/spell/Poison_Spell.png);
+}
+.img-icon.rage_spell {
+  background-image: url(/static/images/spell/Rage_Spell.png);
+}
+.img-icon.recall_spell {
+  background-image: url(/static/images/spell/Recall_Spell.png);
+}
+.img-icon.skeleton_spell {
+  background-image: url(/static/images/spell/Skeleton_Spell.png);
+}

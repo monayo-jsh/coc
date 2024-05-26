@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
   <link rel="stylesheet" href="/static/css/pet.css" />
   <link rel="stylesheet" href="/static/css/siegemachine.css" />
+  <link rel="stylesheet" href="/static/css/spell.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
@@ -112,11 +113,19 @@
       return document.querySelector('.search-input');
     }
 
+    function renderingMembers(members, isShowLoading) {
+      if (isShowLoading) showWifiLoading('.clan-members');
+      setTimeout(() => {
+        drawMember(members);
+        if (isShowLoading) hideWifiLoading('.clan-members');
+      }, 500);
+    }
+
     function initDisplayName(drawMembers) {
       drawMembers.forEach((member) => member.displayName = member.name);
     }
 
-    function renderMemberSortByTrophies(drawMembers = members) {
+    function renderMemberSortByTrophies(drawMembers = members, isShowLoading = true) {
       initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
@@ -124,17 +133,18 @@
       }
 
       const sortedMembers = sortByTrophies(drawMembers);
-      drawMember(sortedMembers);
+      renderingMembers(sortedMembers, isShowLoading);
     }
 
-    function rederMemberSortByHeroLevelSum(drawMembers = members) {
+    function rederMemberSortByHeroLevelSum(drawMembers = members, isShowLoading = true) {
       initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
       }
       const sortedMembers = sortByHeroLevelSum(drawMembers);
-      drawMember(sortedMembers)
+
+      renderingMembers(sortedMembers, isShowLoading);
     }
 
     function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
@@ -175,9 +185,11 @@
       let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
       settingAssignLeague(players, latestLeagueAssignedPlayerObj);
       members.push(...players);
-      hideWifiLoading('.clan-members');
 
-      renderMemberSortByTrophies();
+      const sortedMembers = sortByTrophies(members);
+      drawMember(sortedMembers);
+
+      hideWifiLoading('.clan-members');
     }
 
     function renderEquipments(heroElement, equipments) {
@@ -275,6 +287,27 @@
       contentsElement.appendChild(imgIconElement);
     }
 
+
+    function renderSpell(memberHtml, player) {
+      const { spells } = player
+      if (!spells || !spells.length) return;
+
+      const innerSectionTemplate = document.querySelector('#inner-section');
+
+      const innerSection = document.importNode(innerSectionTemplate.content, true);
+      const innerSectionElement = innerSection.querySelector('.inner-section');
+
+      innerSectionElement.innerHTML = innerSectionElement.innerHTML
+                                                         .replace(/{LABEL}/, '마법');
+
+      const contentsElement = innerSectionElement.querySelector('.contents');
+      for (const spell of spells) {
+        renderImgIcon(contentsElement, spell);
+      }
+
+      const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
+      cardBackElement.appendChild(innerSectionElement);
+    }
 
     function renderSiegeMachines(memberHtml, player) {
       const { siegeMachines } = player
@@ -432,6 +465,7 @@
       renderHeroEquipments(memberHtml, player);
       renderPets(memberHtml, player);
       renderSiegeMachines(memberHtml, player);
+      renderSpell(memberHtml, player);
 
       return memberHtml;
     }
@@ -507,10 +541,10 @@
       const sortElement = document.querySelector('input[class=radio-button]:checked');
       switch (sortElement.id) {
         case 'hero-level-sum':
-          rederMemberSortByHeroLevelSum();
+          rederMemberSortByHeroLevelSum(members, false);
           return;
         default:
-          renderMemberSortByTrophies();
+          renderMemberSortByTrophies(members, false);
           return;
       }
     }

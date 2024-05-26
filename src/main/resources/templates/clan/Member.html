@@ -113,11 +113,11 @@
       return document.querySelector('.search-input');
     }
 
-    function renderingMembers(members) {
-      showWifiLoading('.clan-members');
+    function renderingMembers(members, isShowLoading) {
+      if (isShowLoading) showWifiLoading('.clan-members');
       setTimeout(() => {
         drawMember(members);
-        hideWifiLoading('.clan-members');
+        if (isShowLoading) hideWifiLoading('.clan-members');
       }, 500);
     }
 
@@ -125,7 +125,7 @@
       drawMembers.forEach((member) => member.displayName = member.name);
     }
 
-    function renderMemberSortByTrophies(drawMembers = members) {
+    function renderMemberSortByTrophies(drawMembers = members, isShowLoading = true) {
       initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
@@ -133,10 +133,10 @@
       }
 
       const sortedMembers = sortByTrophies(drawMembers);
-      renderingMembers(sortedMembers);
+      renderingMembers(sortedMembers, isShowLoading);
     }
 
-    function rederMemberSortByHeroLevelSum(drawMembers = members) {
+    function rederMemberSortByHeroLevelSum(drawMembers = members, isShowLoading = true) {
       initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
@@ -144,7 +144,7 @@
       }
       const sortedMembers = sortByHeroLevelSum(drawMembers);
 
-      renderingMembers(sortedMembers);
+      renderingMembers(sortedMembers, isShowLoading);
     }
 
     function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
@@ -541,10 +541,10 @@
       const sortElement = document.querySelector('input[class=radio-button]:checked');
       switch (sortElement.id) {
         case 'hero-level-sum':
-          rederMemberSortByHeroLevelSum();
+          rederMemberSortByHeroLevelSum(members, false);
           return;
         default:
-          renderMemberSortByTrophies();
+          renderMemberSortByTrophies(members, false);
           return;
       }
     }

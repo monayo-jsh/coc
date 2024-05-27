@@ -62,4 +62,5 @@ public class PlayersController {
 
         return ResponseEntity.ok().build();
     }
+
 }

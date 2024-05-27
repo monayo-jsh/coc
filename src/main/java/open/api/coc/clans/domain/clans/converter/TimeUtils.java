@@ -1,16 +1,17 @@
 package open.api.coc.clans.domain.clans.converter;
 
-import org.springframework.stereotype.Component;
-import org.thymeleaf.util.StringUtils;
-
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import org.springframework.stereotype.Component;
+import org.thymeleaf.util.StringUtils;
 
 @Component
-public class TimeUtils implements TimeConverter{
+public class TimeUtils implements TimeConverter {
 
     private static final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
@@ -22,6 +23,11 @@ public class TimeUtils implements TimeConverter{
         return ZonedDateTime.parse(time, FORMATTER)
                 .toInstant()
                 .toEpochMilli();
+    }
+
+    @Override
+    public long toEpochMilliSecond(LocalDate localDate) {
+        return localDate.toEpochSecond(LocalTime.MIN, OffsetDateTime.now().getOffset()) * 1000;
     }
 
     @Override

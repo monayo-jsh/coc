@@ -1,28 +1,36 @@
 package open.api.coc.clans.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.raid.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidRepository;
+import open.api.coc.clans.database.repository.raid.RaiderRepository;
 import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
+import open.api.coc.clans.domain.raid.RaidScoreResponse;
+import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.awt.print.Pageable;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RaidService {
+
     private final ClansService clansService;
-    private final RaidEntityConverter raidEntityConverter;
+
     private final RaidRepository raidRepository;
+    private final RaiderRepository raiderRepository;
+
+    private final RaidEntityConverter raidEntityConverter;
+
+    private final RaidScoreResponseConverter raidScoreResponseConverter;
 
     @Transactional
     public void saveFinishedRaidInfo() {
@@ -44,5 +52,20 @@ public class RaidService {
             }
         }
         return result;
+    }
+
+    public List<RaidScoreResponse> getPlayerRaidScore(String playerTag) {
+
+        List<RaiderEntity> radierEntities = raiderRepository.findByTag(playerTag);
+
+        for(RaiderEntity raiderEntity : radierEntities) {
+            ClanEntity clanEntity = clansService.findClanEntityBy(raiderEntity.getRaid().getClanTag()).orElse(null);
+            raiderEntity.getRaid().changeClan(clanEntity);
+        }
+
+        return radierEntities.stream()
+                             .map(raidScoreResponseConverter::convert)
+                             .collect(Collectors.toList());
+
     }
 }

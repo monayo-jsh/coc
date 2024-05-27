@@ -483,4 +483,8 @@ public class ClansService {
                                              .clan(clan)
                                              .build();
     }
+
+    public Optional<ClanEntity> findClanEntityBy(String clanTag) {
+        return clanRepository.findById(clanTag);
+    }
 }

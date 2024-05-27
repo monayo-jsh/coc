@@ -235,6 +235,8 @@
       if ( state === 'ended' || remainAttacks === 0 ) {
         addClassDim(capitalCardElement);
         stateElement.classList.add('bg-crimson');
+      } else {
+        stateElement.classList.add('bg-green');
       }
 
       stateElement.classList.remove('display-none');

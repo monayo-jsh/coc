@@ -10,6 +10,12 @@ body {
   scrollbar-width: none;
 }
 
+.card-container {
+  .card-title {
+    background-color: #515151;
+  }
+}
+
 .clan-war {
   width: 100%;
   display: flex;
@@ -66,6 +72,22 @@ body {
     }
   }
 
+  .hall {
+    display: flex;
+    padding: 3px;
+    color: #fff;
+
+    .town-hall {
+      width: 18px;
+      height: 16px;
+    }
+
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
+
   .destruction-percentage {
     display: flex;
     justify-content: left;
@@ -84,6 +106,13 @@ body {
   }
 }
 
+.summary.win {
+  background-color: darkgreen;
+}
+.summary.lose {
+  background-color: darkred;
+}
+
 .summary .clan {
   width: 35%;
 }
@@ -93,7 +122,7 @@ body {
   flex-direction: column;
   align-items: center;
   font-weight: bolder;
-  color: red;
+  color: #fefe46;
 
   .team-size {
     color: #fff;
@@ -112,7 +141,6 @@ body {
   }
 
   .war-remaining-time {
-    background: linear-gradient(to right, #ffffff75, 10%, transparent), linear-gradient(to left, #ffffff75, 10%, transparent);
     text-align: center;
     font-size: 0.9em;
   }
@@ -122,6 +150,7 @@ body {
   .button-chip {
     font-size: 10px;
     margin-top: 7px;
+    background-color: rgb(92 92 92 / 70%);
   }
 }
 
@@ -140,6 +169,16 @@ body {
   }
 
   .attacks {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+  .hall {
     display: flex;
     justify-content: right;
 

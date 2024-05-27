@@ -203,6 +203,47 @@
       });
     }
 
+    function settingSummaryColor(clanWarContentsElement, clanWarResult) {
+      let summaryCard = clanWarContentsElement.querySelector('.summary');
+      summaryCard.classList.add(clanWarResult);
+    }
+
+    function isClanWarResult(clan, opponent) {
+      if (clan.stars === opponent.stars) return 'tie';
+      if (clan.stars > opponent.stars) return 'win';
+      if (opponent.stars > clan.stars) return 'lose';
+      if (clan.destructionPercentage > opponent.destructionPercentage) return 'win';
+      if (opponent.destructionPercentage > clan.destructionPercentage) return 'lose';
+      return '';
+    }
+
+    function displayElementByClassName(clanWarContentsElement, className) {
+      let element = clanWarContentsElement.querySelector(`.${className}`);
+      if (element) {
+        element.classList.remove('display-none');
+      }
+    }
+
+    function getRemainHall(clan, hallCount) {
+      if (!clan) return 0;
+
+      const { members } = clan;
+      if (!members) return 0;
+      if (!members.length) return 0;
+
+
+      return hallCount - members.filter(isNotCompletelyDestroyed).length;
+      function isNotCompletelyDestroyed(member) {
+        const { bestOpponentAttack } = member;
+
+        // 공격받지 않음
+        if (!bestOpponentAttack) return true;
+
+        // 완파되지 않음
+        return bestOpponentAttack.stars < 3
+      }
+    }
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
@@ -214,19 +255,28 @@
                 const totalStarCount = teamSize * 3;
 
                 clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
-                        .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
-                        .replace(/{CLAN_STAR_COUNT}/, clan.stars)
-                        .replace(/{CLAN_ATTACK}/, clan.attacks)
-                        .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                        .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
-                        .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
-                        .replace(/{WAR_STATE}/, convWarState(state))
-                        .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
-                        .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
-                        .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                        .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                        .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
-                        .replace(/{TEAM_SIZE}/, teamSize);
+                                                                         .replace(/{TEAM_SIZE}/g, teamSize)
+                                                                         .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                                                                         .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                                                                         .replace(/{CLAN_ATTACK}/, clan.attacks)
+                                                                         .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                         .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                                                                         .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(clan, teamSize))
+                                                                         .replace(/{CLAN_TOTAL_HALL}/, teamSize)
+                                                                         .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                                         .replace(/{WAR_STATE}/, convWarState(state))
+                                                                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
+                                                                         .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                                                                         .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                                                                         .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                         .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
+                                                                         .replace(/{OPPONENT_TOTAL_HALL}/, teamSize)
+                                                                         .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2));
+
+                if (teamSize)
+                  displayElementByClassName(clanWarContentsElement, 'team-size');
+
+                settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
 
                 const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
                 clanIcon.src = clan.badge.small
@@ -439,19 +489,29 @@
             </button>
           </div>
           <div class="clan">
+
             <div class="name">{CLAN_NAME}</div>
+
+            <div class="hall">
+              <div class="town-hall th16"></div>
+              <span class="count">{CLAN_REMAIN_HALL}/{CLAN_TOTAL_HALL}</span>
+            </div>
+
             <div class="stars">
               <i class="fa-solid fa-star"></i>
               <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
             </div>
+
             <div class="attacks">
               <div class="icon-sword"></div>
               <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
             </div>
+
             <div class="destruction-percentage">
               <div class="icon-damage"></div>
               <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
             </div>
+
           </div>
 
           <div class="war-info">
@@ -459,8 +519,8 @@
               <img class="clan" alt="" />
               <img class="opponent" alt="" />
             </div>
-            <div class="team-size">
-              {TEAM_SIZE}인전
+            <div class="team-size display-none">
+              {TEAM_SIZE} vs {TEAM_SIZE}
             </div>
             <div class="war-remaining-time">
               {WAR_REMAIN_HOUR_MINUTE}
@@ -474,12 +534,19 @@
           <div class="opponent">
 
             <div class="name">{OPPONENT_NAME}</div>
+
+            <div class="hall">
+              <span class="count">{OPPONENT_REMAIN_HALL}/{OPPONENT_TOTAL_HALL}</span>
+              <div class="town-hall th16"></div>
+            </div>
+
             <div class="stars">
 
               <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
               <i class="fa-solid fa-star"></i>
 
             </div>
+
             <div class="attacks">
               <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
               <div class="icon-sword"></div>
@@ -489,6 +556,7 @@
               <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
               <div class="icon-damage"></div>
             </div>
+
           </div>
 
         </div>

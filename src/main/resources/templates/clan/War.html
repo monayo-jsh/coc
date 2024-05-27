@@ -252,6 +252,7 @@
                 const { data } = response;
                 const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
 
+                const totalTownhallCount = teamSize * 1;
                 const totalStarCount = teamSize * 3;
 
                 clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
@@ -262,15 +263,15 @@
                                                                          .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
                                                                          .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
                                                                          .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
-                                                                         .replace(/{CLAN_TOTAL_HALL}/, teamSize)
+                                                                         .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
                                                                          .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
                                                                          .replace(/{WAR_STATE}/, convWarState(state))
-                                                                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "")
+                                                                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
                                                                          .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
                                                                          .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
                                                                          .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
                                                                          .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
-                                                                         .replace(/{OPPONENT_TOTAL_HALL}/, teamSize)
+                                                                         .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
                                                                          .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2));
 
                 if (teamSize)

@@ -382,6 +382,15 @@ body::before {
 
 
 /** image icon */
+.icon-clock {
+  width: 36px;
+  height: 36px;
+  background-image: url("/static/images/etc/clock.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .icon-sword {
   width: 36px;
   height: 36px;

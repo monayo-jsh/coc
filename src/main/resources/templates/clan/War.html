@@ -21,6 +21,11 @@
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script src="/static/js/util.js"></script>
   <script type="text/javascript">
 
     function refreshWarStatus(element) {
@@ -244,6 +249,36 @@
       }
     }
 
+    function calcAverageDuration(clan) {
+      if (!clan) return formatMinuteSecond(0);
+
+      const { attacks, members } = clan;
+      const totalDuration = members.flatMap(member => member.attacks.map(attack => attack.duration)).reduce((total, duration) => total + duration, 0)
+
+      let averageDuration = Number(totalDuration / attacks);
+      if (Number.isNaN(averageDuration)) {
+        averageDuration = 0;
+      }
+
+      return formatMinuteSecond(averageDuration)
+    }
+
+    function settingTooltips(clanWarCardElement) {
+      let hallElements = clanWarCardElement.querySelectorAll('.hall .town-hall');
+      hallElements.forEach(element => settingTooltip(element, '남은 홀'));
+
+      let starsElements = clanWarCardElement.querySelectorAll('.stars i');
+      starsElements.forEach(element => settingTooltip(element, '남은 별'));
+
+      let attacksElements = clanWarCardElement.querySelectorAll('.attacks .icon-sword');
+      attacksElements.forEach(element => settingTooltip(element, '남은 공격'));
+
+      let destructionPercentageElements = clanWarCardElement.querySelectorAll('.destruction-percentage .icon-damage');
+      destructionPercentageElements.forEach(element => settingTooltip(element, '총 파괴율'));
+
+      let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .icon-clock');
+      averageDurationElements.forEach(element => settingTooltip(element, '평균 공격시간'));
+    }
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
@@ -262,6 +297,7 @@
                                                                          .replace(/{CLAN_ATTACK}/, clan.attacks)
                                                                          .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
                                                                          .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                                                                         .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
                                                                          .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
                                                                          .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
                                                                          .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
@@ -272,7 +308,8 @@
                                                                          .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
                                                                          .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
                                                                          .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
-                                                                         .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2));
+                                                                         .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                                                                         .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
 
                 if (teamSize)
                   displayElementByClassName(clanWarContentsElement, 'team-size');
@@ -288,6 +325,9 @@
                 let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
                 memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
                 settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
+
+
+                settingTooltips(clanWarContentsElement);
               })
               .catch((error) => {
                 console.error(error);
@@ -513,6 +553,11 @@
               <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
             </div>
 
+            <div class="average-duration">
+              <div class="icon-clock"></div>
+              <span class="count">{CLAN_AVERAGE_DURATION}</span>
+            </div>
+
           </div>
 
           <div class="war-info">
@@ -556,6 +601,11 @@
             <div class="destruction-percentage">
               <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
               <div class="icon-damage"></div>
+            </div>
+
+            <div class="average-duration">
+              <span class="count">{OPPONENT_AVERAGE_DURATION}</span>
+              <div class="icon-clock"></div>
             </div>
 
           </div>

@@ -104,6 +104,23 @@ body {
       font-size: .8em;
     }
   }
+
+  .average-duration {
+    display: flex;
+    justify-content: left;
+    padding: 3px;
+    color: #fff;
+
+    .icon-clock {
+      width: 18px;
+      height: 16px;
+    }
+
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
 }
 
 .summary.win {
@@ -189,6 +206,16 @@ body {
   }
 
   .destruction-percentage {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+  .average-duration {
     display: flex;
     justify-content: right;
 
@@ -373,6 +400,11 @@ body {
             }
 
             .destruction-percentage {
+              font-size: 0.8em;
+              font-weight: bold;
+            }
+
+            .average-duration {
               font-size: 0.8em;
               font-weight: bold;
             }

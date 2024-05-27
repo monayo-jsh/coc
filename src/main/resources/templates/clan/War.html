@@ -264,19 +264,19 @@
     }
 
     function settingTooltips(clanWarCardElement) {
-      let hallElements = clanWarCardElement.querySelectorAll('.hall .town-hall');
+      let hallElements = clanWarCardElement.querySelectorAll('.hall .count');
       hallElements.forEach(element => settingTooltip(element, '남은 홀'));
 
-      let starsElements = clanWarCardElement.querySelectorAll('.stars i');
+      let starsElements = clanWarCardElement.querySelectorAll('.stars .count');
       starsElements.forEach(element => settingTooltip(element, '남은 별'));
 
-      let attacksElements = clanWarCardElement.querySelectorAll('.attacks .icon-sword');
+      let attacksElements = clanWarCardElement.querySelectorAll('.attacks .count');
       attacksElements.forEach(element => settingTooltip(element, '남은 공격'));
 
-      let destructionPercentageElements = clanWarCardElement.querySelectorAll('.destruction-percentage .icon-damage');
+      let destructionPercentageElements = clanWarCardElement.querySelectorAll('.destruction-percentage .count');
       destructionPercentageElements.forEach(element => settingTooltip(element, '총 파괴율'));
 
-      let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .icon-clock');
+      let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .count');
       averageDurationElements.forEach(element => settingTooltip(element, '평균 공격시간'));
     }
     async function settingClanWar(clanWarContentsElement, clanTag) {

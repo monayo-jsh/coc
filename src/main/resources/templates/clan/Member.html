@@ -438,7 +438,7 @@
       let writeName = ""
       if (no) writeName += `${no}. `;
       if (displayName) writeName += displayName;
-      else writeName = name;
+      else writeName += name;
 
       memberHtml.innerHTML = memberHtml.innerHTML
                                        .replace(/{NAME}/g, writeName)

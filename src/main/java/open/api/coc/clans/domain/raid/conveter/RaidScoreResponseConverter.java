@@ -8,6 +8,7 @@ import open.api.coc.clans.domain.players.PlayerClanResponse;
 import open.api.coc.clans.domain.players.converter.PlayerClanResponseConverter;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
@@ -20,7 +21,7 @@ public class RaidScoreResponseConverter implements Converter<RaiderEntity, RaidS
     private final TimeConverter timeConverter;
 
     @Override
-    public RaidScoreResponse convert(RaiderEntity source) {
+    public @NonNull RaidScoreResponse convert(RaiderEntity source) {
         return RaidScoreResponse.builder()
                                 .name(source.getName())
                                 .tag(source.getTag())

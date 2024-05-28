@@ -1,6 +1,7 @@
 package open.api.coc.clans.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -114,6 +115,7 @@ public class RaidService {
 
         return radierEntities.stream()
                              .map(raidScoreResponseConverter::convert)
+                             .sorted(Comparator.comparing(RaidScoreResponse::getSeasonStartDate).reversed())
                              .collect(Collectors.toList());
 
     }

@@ -508,6 +508,10 @@ body::before {
     padding: 5px 5px 5px 10px;
   }
 
+  .table-tbody {
+    position: relative;
+  }
+
 
   .table-tr {
 

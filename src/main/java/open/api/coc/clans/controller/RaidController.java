@@ -8,6 +8,7 @@ import open.api.coc.clans.service.RaidService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RaidController {
 
     private final RaidService raidService;
+
+    @PostMapping("/collect/seasons")
+    public ResponseEntity<String> collectClanCapitalRaidSeason() {
+        raidService.collectClanCapitalRaidSeason();
+        return ResponseEntity.ok().body("OK");
+    }
 
     @GetMapping("/{clanTag}/seasons")
     public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {

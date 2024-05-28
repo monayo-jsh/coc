@@ -1,6 +1,18 @@
+const URI_RAID_CLAN_CAPITAL_SEASON_COLLECT = '/raid/collect/seasons'; //클랜 습격전 최근 시즌 데이터 수집
+
 const URI_RAID_CLAN_CAPITAL_SEASON = '/raid/{clanTag}/seasons'; //클랜 습격전 최근 시즌 조회
 const URI_RAID_SCORE = '/raid/score/{playerTag}'; //멤버 습격전 기록 조회
 
+async function collectRaidSeason() {
+  return axios.post(URI_RAID_CLAN_CAPITAL_SEASON_COLLECT)
+              .then((response) => {
+                return response;
+              })
+              .catch((error) => {
+                console.error(error);
+                return {};
+              })
+}
 async function fetchPlayerRaidScore(playerTag) {
   const uri = URI_RAID_SCORE.replace(/{playerTag}/, encodeURIComponent(playerTag));
 

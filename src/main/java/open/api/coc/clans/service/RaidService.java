@@ -47,7 +47,7 @@ public class RaidService {
     private final RaidScoreResponseConverter raidScoreResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
 
-    public void saveFinishedRaidInfo() {
+    public void collectClanCapitalRaidSeason() {
         List<ClanResponse> clanList = clansService.getClanCaptialList();
         for (ClanResponse clan : clanList) {
             ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = findClanCapitalRaidSeason(clan.getTag());

@@ -23,7 +23,12 @@
   }
 }
 
+.body {
+  position: relative;
+}
+
 .container {
+  position: relative;
   margin-top: 10px;
 
   .search-box {
@@ -35,3 +40,18 @@
 .chip {
   font-size: 0.7rem;
 }
+
+.buttons {
+  display: flex;
+  justify-content: right;
+
+  button.refresh {
+    color: white;
+
+    svg {
+      margin-left: 8px;
+    }
+  }
+
+}
+

@@ -32,6 +32,11 @@ public class ViewAdminController {
     }
 
     /** 운영 기능 습격전 관리 페이지 */
+    @GetMapping("/raid/score")
+    public String viewAdminRaidScore() {
+        return "cms/RaidScore";
+    }
+
     @GetMapping("/raid")
     public String viewAdminRaid() {
         return "cms/Raid";

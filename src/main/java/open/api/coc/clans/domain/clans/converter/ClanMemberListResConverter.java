@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -15,7 +16,7 @@ public class ClanMemberListResConverter implements Converter<ClanMemberList, Cla
     private final ClanMemberResponseConverter clanMemberResponseConverter;
 
     @Override
-    public ClanMemberListRes convert(ClanMemberList source) {
+    public @NonNull ClanMemberListRes convert(ClanMemberList source) {
         if (CollectionUtils.isEmpty(source.getItems())) {
             return ClanMemberListRes.empty();
         }

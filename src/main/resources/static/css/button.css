@@ -109,6 +109,7 @@ button.right-single-arrow:active {
   Refresh Style
 */
 button.refresh {
+  display: flex;
   background-color: transparent;
   border: none;
   cursor: pointer;

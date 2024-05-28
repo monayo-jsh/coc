@@ -36,9 +36,12 @@
   background-color: black;
 }
 
+.card.coral-1 {
+  background-color: #ff916a;
+}
+
 .card.coral {
   background-color: #ff7f50;
-
 }
 
 .card.violet {

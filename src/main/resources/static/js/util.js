@@ -150,3 +150,7 @@ function formatYYMMDate(date) {
   const formattedDate = dayjs(date).format('YY년 MM월');
   return `[${formattedDate}] `;
 }
+
+function formatYYYYMMDD(date) {
+  return dayjs(date).format('YYYY-MM-DD');
+}

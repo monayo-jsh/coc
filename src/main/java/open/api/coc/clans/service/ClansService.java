@@ -34,22 +34,18 @@ import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
-import open.api.coc.clans.domain.clans.converter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
-import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
-import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
@@ -73,7 +69,6 @@ public class ClansService {
 
     private final ClanResponseConverter clanResponseConverter;
     private final IconUrlEntityConverter iconUrlEntityConverter;
-    private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
@@ -151,20 +146,6 @@ public class ClansService {
         ClanMemberListRes clanMemberListRes = clanMemberListResConverter.convert(clanMemberList);
         clanMemberListRes.setClanTag(clanTag);
         return clanMemberListRes;
-    }
-
-    public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {
-        final int SEARCH_LIMIT = 1;
-        ClanCapitalRaidSeasons clanCapitalRaidSeasons = clanApiService.findClanCapitalRaidSeasonsByClanTagAndLimit(clanTag, SEARCH_LIMIT)
-                                                                      .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜캐피탈 조회 실패"));
-
-        if (clanCapitalRaidSeasons.isEmpty()) {
-            throw CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜캐피탈 조회 실패");
-        }
-
-        ClanCapitalRaidSeason clanCapitalRaidSeason = clanCapitalRaidSeasons.getItemWithMembers();
-
-        return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
     public List<ClanMemberListRes> findClanMembersByClanTags(List<String> clanTags) {
@@ -482,5 +463,9 @@ public class ClansService {
                                                                            .build())
                                              .clan(clan)
                                              .build();
+    }
+
+    public Optional<ClanEntity> findClanEntityBy(String clanTag) {
+        return clanRepository.findById(clanTag);
     }
 }

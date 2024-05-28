@@ -1,7 +1,7 @@
-const URI_PLAYERS = '/players' //멤버 상세 조회
-const URI_PLAYERS_ALL = '/players/all' //전체 클랜원 조회
-const URI_PLAYERS_REALTIME = '/players/{playerTag}' //멤버 상세 조회 (항시 실연동)
-const URI_PLAYERS_DETAIL = '/players/{playerTag}' //멤버 등록,삭제
+const URI_PLAYERS = '/players'; //멤버 상세 조회
+const URI_PLAYERS_ALL = '/players/all'; //전체 클랜원 조회
+const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
+const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
 
 function deviceArray(array, size) {
   const result = [];

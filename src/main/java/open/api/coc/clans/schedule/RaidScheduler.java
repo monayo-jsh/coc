@@ -14,6 +14,6 @@ public class RaidScheduler {
 
     @Scheduled(cron = "0 0 12 ? * FRI")
     public void raidScheduling() {
-        raidService.saveFinishedRaidInfo();
+        raidService.collectClanCapitalRaidSeason();
     }
 }

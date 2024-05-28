@@ -490,6 +490,7 @@ body::before {
 }
 
 .table {
+  width: 100%;
   border: 1px solid #e2e2e2;
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -508,20 +509,38 @@ body::before {
   }
 
   .table-tbody {
+    position: relative;
+  }
 
-    .table-tr {
 
-      .table-th, .table-td {
-        padding: 5px;
-      }
+  .table-tr {
 
-      .table-th {
-        width: 20%;
-      }
+    .table-th, .table-td {
+      padding: 5px;
+    }
 
-      .table-td {
-        width: 60%;
-      }
+    .table-th {
+    }
+
+    .table-td {
+      text-align: center;
+    }
+  }
+
+}
+
+.table.vertical {
+
+
+  .table-tr {
+
+    .table-th {
+      width: 20%;
+    }
+
+    .table-td {
+      width: 60%;
+      text-align: left;
     }
   }
 

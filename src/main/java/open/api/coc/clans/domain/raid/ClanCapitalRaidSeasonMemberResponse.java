@@ -1,4 +1,4 @@
-package open.api.coc.clans.domain.clans;
+package open.api.coc.clans.domain.raid;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

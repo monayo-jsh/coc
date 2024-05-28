@@ -19,6 +19,9 @@
 .card.red-3 {
   background-color: #ff2148;
 }
+.card.red-9 {
+  background-color: #970000;
+}
 
 .card.blue {
   background-color: #3b82f6;
@@ -33,9 +36,12 @@
   background-color: black;
 }
 
+.card.coral-1 {
+  background-color: #ff916a;
+}
+
 .card.coral {
   background-color: #ff7f50;
-
 }
 
 .card.violet {

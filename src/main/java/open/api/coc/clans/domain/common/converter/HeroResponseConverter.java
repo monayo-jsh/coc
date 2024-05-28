@@ -23,9 +23,11 @@ public class HeroResponseConverter implements Converter<Hero, HeroResponse> {
     private final HeroEquipmentResponseConverter heroEquipmentResponseConverter;
     @Override
     public HeroResponse convert(Hero source) {
+        HeroConfig hero = getHeroConfig(source.getName());
         return HeroResponse.builder()
-                           .code(getHeroCode(source.getName()))
+                           .code(hero.getCode())
                            .name(source.getName())
+                           .koreanName(hero.getKoreanName())
                            .village(source.getVillage())
                            .level(source.getLevel())
                            .maxLevel(source.getMaxLevel())
@@ -43,19 +45,20 @@ public class HeroResponseConverter implements Converter<Hero, HeroResponse> {
                          .collect(Collectors.toList());
     }
 
-    private Integer getHeroCode(String name) {
+    private HeroConfig getHeroConfig(String name) {
         try {
-            HeroConfig hero = HeroConfig.findByName(name);
-            return hero.getCode();
+            return HeroConfig.findByName(name);
         } catch (Exception ignored) {
-            return Integer.MAX_VALUE;
+            return HeroConfig.UNKNOWN;
         }
     }
 
     public @NonNull HeroResponse convert(PlayerHeroEntity source) {
+        HeroConfig hero = getHeroConfig(source.getId().getName());
         return HeroResponse.builder()
-                           .code(getHeroCode(source.getId().getName()))
+                           .code(hero.getCode())
                            .name(source.getId().getName())
+                           .koreanName(hero.getKoreanName())
                            .village("home")
                            .level(source.getLevelInfo().getLevel())
                            .maxLevel(source.getLevelInfo().getMaxLevel())

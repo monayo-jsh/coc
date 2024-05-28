@@ -19,13 +19,15 @@ spring:
     url: jdbc:h2:~/database/h2
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      connection-timeout: 1000
   jpa:
     show-sql: false
     properties:
       hibernate:
         format_sql: false
-#    hibernate:
-#      ddl-auto: create
+    hibernate:
+      ddl-auto: update
 
 external:
   coc:

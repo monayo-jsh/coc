@@ -10,7 +10,7 @@
 
 .card-wrapper {
   width: 100%;
-  max-width: 1080px;
+  max-width: 600px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -22,6 +22,17 @@
 .card-container {
   width: 100%;
   padding: 5px;
+}
+
+.card-title {
+  border: 1px solid gray;
+  padding: 5px 0;
+  width: 100%;
+  text-align: center;
+  border-radius: 9px;
+  background-color: #0000007a;
+  color: white;
+  font-weight: bold;
 }
 
 .card-wrapper i.button {
@@ -40,6 +51,13 @@
   z-index: 100;
   cursor: pointer;
   opacity: 0.5;
+}
+
+.button-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(-5px, 3px);
 }
 
 .card-wrapper i.button:hover {
@@ -62,12 +80,21 @@ i#next {
   width: 100%;
   max-width: 1080px;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   transition: all 0.4s ease;
+}
+
+.section-clan-war {
+  position: relative;
 }
 
 .carousel .card-contents {
   width: 100%;
   border-radius: 5px;
   overflow: hidden;
+}
+
+.card-contents:not(:first-child) {
+  margin-top: 10px;
 }

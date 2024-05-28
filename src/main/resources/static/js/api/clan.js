@@ -1,10 +1,20 @@
+const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
+
 const URI_CLANS = '/clans'; //전체 클랜 목록 조회
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+
+const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/assigned/members/latest` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
+const URI_CLAN_ASSIGNED_MEMBER_BULK = `/clans/assigned/members` //클랜 일괄 배정
+
+const URI_LATEST_LEAGUE_ASSIGNED_MEMBERS = `/clans/league/assigned/members/latest` //최신 리그 배정 멤버 목록 조회
+const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/members` //리그 배정 멤버 조회
+const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
+const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //리그 일괄 배정
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
@@ -42,7 +52,7 @@ async function registerClan(requestBody) {
                     });
 }
 
-async function findClan(clanTag) {
+async function fetchClan(clanTag) {
   const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(clanTag));
 
   return await axios.get(uri)
@@ -199,7 +209,32 @@ async function assignedClanPlayer(clanTag, seasonDate, playerTag) {
 
   return await axios.post(uri)
                     .then((response) => {
-                      alert('배정 되었습니다.');
+                      alert('클랜 배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function registerClanAssignedPlayers(seasonDate, players) {
+  const requestBody = {
+    season_date: seasonDate,
+    players: players
+  }
+
+  return await axios.post(URI_CLAN_ASSIGNED_MEMBER_BULK, requestBody)
+                    .then((response) => {
+                      alert('클랜 배정 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
@@ -223,11 +258,126 @@ async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
 
   return await axios.delete(uri)
                     .then((response) => {
-                      alert('삭제 되었습니다.');
+                      alert('배정 제외 되었습니다.');
                       return true;
                     })
                     .catch((error) => {
                       console.error(error);
                       return false;
+                    });
+}
+
+async function latestClanAssignedMembers() {
+  return await axios.get(URI_LATEST_CLAN_ASSIGNED_MEMBERS)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+
+async function fetchClanLeagueAssignedMembers(clanTag) {
+  const URI = URI_CLAN_LEAGUE_ASSIGNED_MEMBERS.replace(/{clanTag}/, encodeURIComponent(clanTag));
+  return await axios.get(URI)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function latestLeagueAssignedMembers() {
+  return await axios.get(URI_LATEST_LEAGUE_ASSIGNED_MEMBERS)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function assignedLeaguePlayer(clanTag, seasonDate, playerTag) {
+  const uri = `${URI_CLAN_LEAGUE_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
+                                                .replace(/{seasonDate}/, seasonDate)
+                                                .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+
+  return await axios.post(uri)
+                    .then((response) => {
+                      alert('리그 배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag) {
+  const uri = `${URI_CLAN_LEAGUE_ASSIGNED_MEMBER.replace(/{clanTag}/, encodeURIComponent(clanTag))
+                                                .replace(/{seasonDate}/, seasonDate)
+                                                .replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+
+  return await axios.delete(uri)
+                    .then((response) => {
+                      alert('리그 배정 제외 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return false;
+                    });
+}
+
+async function registerClanLeagueAssignedPlayers(seasonDate, players) {
+  const requestBody = {
+    season_date: seasonDate,
+    players: players
+  }
+
+  return await axios.post(URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK, requestBody)
+                    .then((response) => {
+                      alert('리그 배정 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function fetchCapitalClans() {
+  return await axios.get(URI_CAPITAL_CLANS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error)
+                      return [];
                     });
 }

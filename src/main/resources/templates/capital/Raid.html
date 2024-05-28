@@ -13,6 +13,8 @@
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/raid.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -49,42 +51,6 @@
     launchAppWithOpenClanProfile(clanTag);
   }
 
-    async function fetchCapitalClans() {
-      return await axios.get("/clans/capital")
-          .then((response) => {
-            const { data } = response
-            return data;
-          })
-          .catch((error) => {
-            console.error(error)
-            return [];
-          });
-    }
-
-    async function fetchClan(capitalClan) {
-      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}`
-      return await axios.get(uri)
-                        .then((response) => {
-                          const { data } = response
-                          return data;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-
-                          const { code } = error;
-                          if (code === 'ERR_NETWORK') {
-                            return {};
-                          }
-
-                          const { response } = error;
-                          const { status } = response
-                          // 서버 이용 불가로 메인 화면 이동
-                          if (status >= 500) {
-                            location.href = "/";
-                          }
-                        });
-    }
-
     function renderFailed(capitalCardElement) {
       const errorContentTemplate = document.querySelector("#error-content");
       const errorContent = document.importNode(errorContentTemplate.content, true);
@@ -119,7 +85,7 @@
     }
 
     async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClan(capitalClan);
+      let clan = await fetchClan(capitalClan.tag);
 
       if (!Object.keys(clan).length) {
         renderFailed(capitalCardElement);
@@ -135,39 +101,20 @@
     }
 
     async function fetchCapitalRaidSeason(capitalClan) {
-      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}/capital/raid/seasons`
-      return await axios.get(uri)
-                        .then((response) => {
-                          const { data } = response
-                          const { startTime, endTime } = data;
+      const clanCapital = await fetchClanCapitalRaidSeason(capitalClan.tag);
+      const { startTime, endTime } = clanCapital;
 
-                          if (!capitalRaidSeason) {
-                            //시즌 기간 설정
-                            capitalRaidSeason = {
-                              startTime: startTime,
-                              endTime: endTime
-                            }
+      if (!capitalRaidSeason) {
+        //시즌 기간 설정
+        capitalRaidSeason = {
+          startTime: startTime,
+          endTime: endTime
+        }
 
-                            settingSeasonPeriod()
-                          }
+        settingSeasonPeriod()
+      }
 
-                          return data;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-
-                          const { code } = error;
-                          if (code === 'ERR_NETWORK') {
-                            return {};
-                          }
-
-                          const { response } = error;
-                          const { status } = response
-                          // 서버 이용 불가로 메인 화면 이동
-                          if (status >= 500) {
-                            location.href = "/";
-                          }
-                        });
+      return clanCapital;
     }
 
     function renderCapitalMemberRecord(capitalCardElement, members) {
@@ -175,19 +122,26 @@
 
       const memberRecordTemplate = document.querySelector('#member-record');
       for(const member of members) {
-        const { name, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
+        const { name, tag, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
         const memberRecord = document.importNode(memberRecordTemplate.content, true);
         const memberRecordElement = memberRecord.querySelector('.record');
+
+
+        const mustExceedScore = 20000; // 강등 대상
+        if (capitalResourcesLooted < mustExceedScore) {
+          memberRecordElement.classList.add('demoted-attacked');
+        }
 
         // const mustUsedAttacks = attackLimit + bonusAttackLimit;
         const mustUsedAttacks = 6; // 추가 공권 미획득 시 판단할 수 없어 하드코딩으로 처리
         if (attacks < mustUsedAttacks) {
           // 미공 판단
-          memberRecordElement.classList.add('UnAttacked');
+          memberRecordElement.classList.add('un-attacked');
         }
 
         memberRecordElement.innerHTML = memberRecordElement.innerHTML
                                                            .replace(/{NAME}/, name)
+                                                           .replace(/{TAG}/, tag)
                                                            .replace(/{ATTACKS}/, attacks)
                                                            .replace(/{RESOURCES_LOOTED}/, Number(capitalResourcesLooted).toLocaleString());
 
@@ -223,11 +177,13 @@
                                                        .replace(/{COLOR}/, convColor(remainAttacks))
                                                        .replace(/{REMAIN_ATTACKS}/, remainAttacks);
 
-      const stateElement = document.querySelector('.state');
+      const stateElement = capitalCardElement.querySelector('.state');
 
       if ( state === 'ended' || remainAttacks === 0 ) {
         addClassDim(capitalCardElement);
         stateElement.classList.add('bg-crimson');
+      } else {
+        stateElement.classList.add('bg-green');
       }
 
       stateElement.classList.remove('display-none');
@@ -276,7 +232,8 @@
       capitalCardElement.dataset.clanTag = capitalClan.tag;
 
       capitalCardElement.innerHTML = capitalCardElement.innerHTML
-                                                       .replace(/{CLAN_NAME}/, capitalClan.name);
+                                                       .replace(/{CLAN_NAME}/g, capitalClan.name)
+                                                       .replace(/{CLAN_TAG}/g, capitalClan.tag);
 
       capitalRaidElement.appendChild(capitalCardElement);
 
@@ -300,34 +257,44 @@
       }
     }
 
-    function switchAttacks(element) {
-      const footerSectionElement = element.closest('.footer-section');
-      const memberAttackElements = footerSectionElement.querySelector('.members:not(.empty-un-attacked)');
+    function displayFilterAttacks(memberAttackElements, filterClassName) {
+      let filterCount = 0;
+      for (const memberAttack of memberAttackElements) {
+        //reset
+        memberAttack.classList.remove('display-none');
 
-      // 미공 필터링
-      for (const memberAttack of memberAttackElements.children) {
-        if (element.checked) {
-          if (!memberAttack.classList.contains('UnAttacked')) {
-            memberAttack.classList.add('display-none');
-          }
+        if (filterClassName === 'all') continue;
+        if (memberAttack.classList.contains(filterClassName)) {
+          filterCount++;
           continue;
         }
 
-        memberAttack.classList.remove('display-none');
+        memberAttack.classList.add('display-none');
       }
+      return filterCount;
+    }
 
-      // 미공 없음 표기
+    function switchAttacks(element, type) {
+      const footerSectionElement = element.closest('.footer-section');
+
+      const memberAttackElements = footerSectionElement.querySelectorAll('.members .record:not(.empty)');
+
+      const filterCount = displayFilterAttacks(memberAttackElements, type);
+
+      // 없음 표기
       const membersElement = footerSectionElement.querySelector('.members');
-      const unAttackers = membersElement.querySelectorAll('.UnAttacked');
-      const emptyUnAttackedElement = footerSectionElement.querySelector('.empty-un-attacked');
-      if (element.checked) {
-        if (unAttackers.length === 0) {
-          emptyUnAttackedElement.classList.remove('display-none');
-          membersElement.classList.add('justify-content-center');
-        }
-      } else {
-        emptyUnAttackedElement.classList.add('display-none');
-        membersElement.classList.remove('justify-content-center');
+      const emptyElement = membersElement.querySelector('.members .record.empty');
+
+      // reset
+      emptyElement.classList.add('display-none');
+      membersElement.classList.remove('align-items-center');
+      membersElement.classList.remove('justify-content-center');
+
+      if (type === 'all') return;
+      if (filterCount === 0) {
+        emptyElement.classList.remove('display-none');
+        membersElement.classList.add('align-items-center');
+        membersElement.classList.add('justify-content-center');
       }
     }
 
@@ -408,17 +375,26 @@
         <i class="fa-solid fa-caret-up"></i>
       </div>
       <div class="row support-area">
-        <div class="toggle-button-simple filter display-none">
-          <div class="toggle-button-simple-cover">
-            <input type="checkbox" class="tgl tgl-skewed" onchange="switchAttacks(this); return false;">
-            <label data-tg-on="미공" data-tg-off="전체" class="tgl-btn"></label>
-          </div>
+        <div class="radio-inputs filter display-none">
+          <label class="radio">
+            <input type="radio" name="radio-{CLAN_TAG}" checked onchange="switchAttacks(this, 'all'); return false;">
+            <span class="name">전체</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="radio-{CLAN_TAG}" onchange="switchAttacks(this, 'un-attacked'); return false;">
+            <span class="name">미공</span>
+          </label>
+
+          <label class="radio">
+            <input type="radio" name="radio-{CLAN_TAG}" onchange="switchAttacks(this, 'demoted-attacked'); return false;">
+            <span class="name">미달</span>
+          </label>
         </div>
       </div>
       <div class="row content">
         <div class="item members">
-          <div class="record empty-un-attacked display-none">
-            <span class="regular-text">미공 없음</span>
+          <div class="record empty display-none">
+            <span class="regular-text">없음</span>
           </div>
         </div>
       </div>
@@ -437,6 +413,8 @@
 
     <div class="item">
       <span class="regular-text">{NAME}</span>
+      <br>
+      <span class="small-text chip color-black">{TAG}</span>
     </div>
 
     <div class="item">

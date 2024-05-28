@@ -32,13 +32,13 @@
   transform-style: preserve-3d;
 }
 
-.card-assigned-player-wrapper {
+.card-assigned-player-wrapper, .card-league-assigned-player-wrapper {
   padding: 10px 0;
   position: relative;
   min-height: 300px;
 }
 
-.card-assigned-player {
+.card-assigned-player, .card-league-assigned-player {
 
   .caption {
     display: flex;
@@ -200,6 +200,10 @@
   border-top: 1px solid #ddd;
 }
 
+.card-footer.support {
+  justify-content: flex-start;
+}
+
 /*Text*/
 .text-title {
   display: flex;
@@ -224,7 +228,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: .3em;
   cursor: pointer;
   transition: .3s ease-in-out;
 
@@ -232,6 +235,10 @@
     font-size: 10px;
     background-color: #a6ffe1;
   }
+}
+
+.card-button:not(:first-child) {
+  margin-left: 2px;
 }
 
 .btn-add, .btn-remove {
@@ -326,4 +333,102 @@
     opacity: 1;
   }
 
+}
+
+.form-button-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+  .button-chip:not(:first-child) {
+    margin-left: 3px;
+  }
+}
+
+@media (max-width: 400px) {
+  .form-button-area {
+    padding-right: 0;
+
+    .button-chip {
+      font-size: 11px;
+    }
+  }
+}
+
+.form-upload-area {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.assigned-player-upload:not(:first-child) {
+  margin-left: 5px;
+}
+
+@media (max-width: 320px) {
+  .assigned-player-upload:not(:first-child) {
+    margin-left: 0;
+  }
+}
+
+.assigned-player-upload {
+  margin-top: 10px;
+
+  .assigned-player-upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}
+
+.input-month {
+  border: 1px solid gray;
+  border-radius: 5px;
+  width: 110px;
+  padding: 5px;
+  background-position: top 45% right 5px;
+}
+
+.button-chip {
+  i {
+    margin-left: 3px;
+    transition: 0.3s;
+  }
+  i:before {
+    line-height: 1.5;
+  }
+}
+
+.button-chip.expand i {
+  transition: 0.3s;
+  transform: rotate(180deg);
+}
+
+.description {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.assigned-league .button-chip {
+  background-color: red;
+}
+
+.table-caption.league {
+  border: 1px solid red;
+  border-left: 3px solid red;
+  background-color: red;
+}
+
+.table {
+  border-color: green;
+}
+
+.table.league {
+  border-color: red;
 }

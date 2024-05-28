@@ -6,7 +6,14 @@ body {
   margin: 0;
   display: flex;
   justify-content: center;
-  overflow-y: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.card-container {
+  .card-title {
+    background-color: #515151;
+  }
 }
 
 .clan-war {
@@ -17,6 +24,7 @@ body {
 }
 
 .summary {
+  position: relative;
   display: flex;
   align-items: center;
   padding: 3px;
@@ -32,7 +40,7 @@ body {
     text-align: center;
   }
 
-  @media (max-width: 320px) {
+  @media (max-width: 340px) {
     .name {
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -42,7 +50,7 @@ body {
   }
 
   .stars {
-    padding: 3px;
+    padding: 0 3px 3px;
     color: #fff;
     .count {
       font-size: .8em;
@@ -58,6 +66,22 @@ body {
       width: 18px;
       height: 16px;
     }
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
+
+  .hall {
+    display: flex;
+    padding: 3px;
+    color: #fff;
+
+    .town-hall {
+      width: 18px;
+      height: 16px;
+    }
+
     .count {
       margin-left: 3px;
       font-size: .8em;
@@ -80,6 +104,30 @@ body {
       font-size: .8em;
     }
   }
+
+  .average-duration {
+    display: flex;
+    justify-content: left;
+    padding: 3px;
+    color: #fff;
+
+    .icon-clock {
+      width: 18px;
+      height: 16px;
+    }
+
+    .count {
+      margin-left: 3px;
+      font-size: .8em;
+    }
+  }
+}
+
+.summary.win {
+  background-color: darkgreen;
+}
+.summary.lose {
+  background-color: darkred;
 }
 
 .summary .clan {
@@ -91,7 +139,13 @@ body {
   flex-direction: column;
   align-items: center;
   font-weight: bolder;
-  color: red;
+  color: #fefe46;
+
+  .team-size {
+    color: #fff;
+    font-size: 12px;
+    padding: 2px 15px;
+  }
 
   .clan-icon {
     display: flex;
@@ -104,12 +158,16 @@ body {
   }
 
   .war-remaining-time {
-    background: linear-gradient(to right, #ffffff75, 10%, transparent), linear-gradient(to left, #ffffff75, 10%, transparent);
     text-align: center;
     font-size: 0.9em;
   }
   .war-state {
     font-size: 0.8em;
+  }
+  .button-chip {
+    font-size: 10px;
+    margin-top: 7px;
+    background-color: rgb(92 92 92 / 70%);
   }
 }
 
@@ -137,7 +195,27 @@ body {
     }
   }
 
+  .hall {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
   .destruction-percentage {
+    display: flex;
+    justify-content: right;
+
+    .count {
+      margin-left: 0;
+      margin-right: 3px;
+    }
+  }
+
+  .average-duration {
     display: flex;
     justify-content: right;
 
@@ -149,8 +227,18 @@ body {
 
 }
 
+.clan-war.expand {
+
+  .sub-summary {
+    display: flex;
+  }
+  .member-attack {
+    display: block;
+  }
+}
+
 .sub-summary {
-  display: flex;
+  display: none;
   font-size: 0.9rem;
   font-weight: bold;
   margin-top: 5px;
@@ -200,6 +288,7 @@ body {
 }
 
 .member-attack {
+  display: none;
   overflow-y: auto;
   scrollbar-width: none;
   height: 625px;
@@ -311,6 +400,11 @@ body {
             }
 
             .destruction-percentage {
+              font-size: 0.8em;
+              font-weight: bold;
+            }
+
+            .average-duration {
               font-size: 0.8em;
               font-weight: bold;
             }

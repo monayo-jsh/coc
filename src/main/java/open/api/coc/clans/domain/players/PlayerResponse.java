@@ -43,6 +43,8 @@ public class PlayerResponse {
     private List<HeroEquipmentResponse> heroEquipments;
 
     private List<TroopsResponse> pets;
+    private List<TroopsResponse> siegeMachines;
+    private List<TroopsResponse> spells;
 
     @Setter
     private Integer heroTotalLevel;

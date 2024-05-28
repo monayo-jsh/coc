@@ -1,19 +1,18 @@
-package open.api.coc.clans.domain.clans.converter;
+package open.api.coc.clans.domain.raid.conveter;
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonMemberResponse;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonMemberResponse;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasonMember;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.thymeleaf.util.StringUtils;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class ClanCapitalRaidSeasonResponseConverter implements Converter<ClanCap
     private final TimeConverter timeConverter;
 
     @Override
-    public ClanCapitalRaidSeasonResponse convert(ClanCapitalRaidSeason source) {
+    public @NonNull ClanCapitalRaidSeasonResponse convert(ClanCapitalRaidSeason source) {
         return ClanCapitalRaidSeasonResponse.builder()
                                             .state(source.getState())
                                             .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))

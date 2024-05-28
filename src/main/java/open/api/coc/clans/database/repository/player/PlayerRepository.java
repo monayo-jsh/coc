@@ -15,6 +15,6 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
         + " left join fetch ClanEntity c on c.tag = p.clan.tag"
         + " left join fetch ClanBadgeEntity cb on cb.tag = c.tag"
     )
-    List<PlayerEntity> findAll(String seasonDate);
+    List<PlayerEntity> findAll();
 
 }

@@ -12,6 +12,7 @@ public class HeroEquipmentResponse {
     private Integer code;
 
     private String name;
+    private String koreanName;
     private String village;
 
     private Integer level;

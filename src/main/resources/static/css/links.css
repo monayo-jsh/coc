@@ -5,14 +5,15 @@
 }
 
 .description {
-  text-align: center;
+  width: 290px;
   font-weight: bold;
   margin-bottom: 10px;
   border: 1px solid #e9e7e7;
-  padding: 5px;
+  padding: 10px;
   border-radius: 10px;
   background-color: #ffffd6;
   color: #4c4c4c;
+  font-size: 14px;
 }
 
 .contents {

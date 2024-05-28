@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/raid.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>습격전 위반 현황</title>
+
+  <script>
+    // 시즌 설정 변수
+    let capitalRaidSeason;
+
+    // 강등 / 승격 기준 클랜
+    const legendClanTags = ['#2QJUL08V9', '#2QG0G20RR', '#2LPP8PUCG'];
+    // 지난 주 경고 멤버
+    let lastWeekWarningMembers;
+
+    function onToggleRecord(element, event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      const footerSectionElement = element.closest('.footer-section');
+      const filterCheckbox = footerSectionElement.querySelector('.filter');
+      if (footerSectionElement.classList.contains('expand')) {
+        footerSectionElement.classList.remove('expand');
+        filterCheckbox.classList.add('display-none');
+      } else {
+        footerSectionElement.classList.add('expand');
+        filterCheckbox.classList.remove('display-none');
+      }
+
+      // 위반 없음 표기
+      const membersElement = footerSectionElement.querySelector('.members');
+      const violation = membersElement.querySelectorAll('.Warning');
+      const emptyViolationElement = footerSectionElement.querySelector('.empty-violation');
+      if (violation.length === 0) {
+        emptyViolationElement.classList.remove('display-none');
+        membersElement.classList.add('justify-content-center');
+      } else {
+        emptyViolationElement.classList.add('display-none');
+        membersElement.classList.remove('justify-content-center');
+      }
+    }
+
+  function callApp(element) {
+      const card = element.closest('div.card');
+
+      const { dataset } = card;
+      const { clanTag } = dataset;
+
+    launchAppWithOpenClanProfile(clanTag);
+  }
+
+    async function fetchCapitalClans() {
+      return await axios.get("/clan/cms/capital")
+          .then((response) => {
+            const { data } = response
+            return data;
+          })
+          .catch((error) => {
+            console.error(error)
+            return [];
+          });
+    }
+
+    function renderFailed(capitalCardElement) {
+      const errorContentTemplate = document.querySelector("#error-content");
+      const errorContent = document.importNode(errorContentTemplate.content, true);
+
+      const errorContentElement = errorContent.querySelector('.row');
+      const rowContentElement = capitalCardElement.querySelector('.row.content');
+
+      capitalCardElement.querySelector('.state').remove();
+
+      rowContentElement.replaceWith(errorContentElement);
+    }
+
+    function renderCapitalLeagueIcon(capitalLeague, capitalCardElement) {
+      const { name } = capitalLeague;
+      const leagueLabel = leagueMap[name];
+      if (leagueLabel) {
+        const { iconUrls } = leagueLabel;
+        const { small } = iconUrls;
+        const leagueIcon = capitalCardElement.querySelector('.league-icon');
+        leagueIcon.src = small;
+        leagueIcon.classList.remove('display-none');
+
+        leagueIcon.dataset.league = name;
+      }
+    }
+
+    function renderCapitalHallLevel(clanCapital, capitalCardElement) {
+      const { capitalHallLevel } = clanCapital;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{CAPITAL_HALL_LEVEL}/, capitalHallLevel);
+    }
+
+    async function renderCapital(capitalCardElement, capitalClan) {
+      let clan = await fetchClan(capitalClan.tag);
+
+      if (!Object.keys(clan).length) {
+        renderFailed(capitalCardElement);
+        return;
+      }
+
+      const { capitalLeague, clanCapital, clanCapitalPoints } = clan;
+
+      renderCapitalLeagueIcon(capitalLeague, capitalCardElement);
+      renderCapitalHallLevel(clanCapital, capitalCardElement);
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML.replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
+    }
+
+    async function fetchCapitalRaidSeason(capitalClan) {
+      const clanCapital = await fetchClanCapitalRaidSeason(capitalClan.tag);
+      const { startTime, endTime } = clanCapital;
+
+      if (!capitalRaidSeason) {
+        //시즌 기간 설정
+        capitalRaidSeason = {
+          startTime: startTime,
+          endTime: endTime
+        }
+
+        settingSeasonPeriod()
+      }
+
+      return clanCapital;
+    }
+
+    function renderCapitalMemberRecord(capitalCardElement, members) {
+
+      const membersElement = capitalCardElement.querySelector('.footer-section .members');
+
+      const memberRecordTemplate = document.querySelector('#member-record');
+      for(const member of members) {
+        const { tag, name, attacks, attackLimit, bonusAttackLimit, capitalResourcesLooted } = member;
+        const memberRecord = document.importNode(memberRecordTemplate.content, true);
+        const memberRecordElement = memberRecord.querySelector('.record');
+
+        // 경고인원
+        memberRecordElement.classList.add('Warning');
+
+        memberRecordElement.innerHTML = memberRecordElement.innerHTML
+                                                           .replace(/{NAME}/, name)
+                                                           .replace(/{TAG}/, tag)
+                                                           .replace(/{ATTACKS}/, attacks)
+                                                           .replace(/{RESOURCES_LOOTED}/, Number(capitalResourcesLooted).toLocaleString());
+
+        membersElement.appendChild(memberRecord);
+      }
+    }
+
+    function filterViolationMember(members) {
+      return members.filter(member =>
+              lastWeekWarningMembers.some(warningMember => warningMember.tag === member.tag)
+      );
+    }
+    function convStateName(state) {
+      if (state === 'ended') return '종료';
+      return '진행중';
+    }
+
+    async function renderCapitalSeason(capitalCardElement, capitalClan) {
+      const capitalRaidSeason = await fetchCapitalRaidSeason(capitalClan);
+
+      if (!Object.keys(capitalRaidSeason).length) {
+        renderFailed(capitalCardElement);
+        capitalCardElement.querySelector('.footer-section').remove();
+        return;
+      }
+
+      const { state, totalAttackLimit, members } = capitalRaidSeason;
+
+      const remainAttacks = totalAttackLimit - members.length;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{STATE}/, convStateName(state))
+                                                       .replace(/{ATTACK_LIMIT}/, totalAttackLimit)
+                                                       .replace(/{COLOR}/, convColor(remainAttacks))
+                                                       .replace(/{REMAIN_ATTACKS}/, remainAttacks);
+
+      const stateElement = capitalCardElement.querySelector('.state');
+
+      if ( state === 'ended' || remainAttacks === 0 ) {
+        addClassDim(capitalCardElement);
+        stateElement.classList.add('bg-crimson');
+      }
+
+      stateElement.classList.remove('display-none');
+      renderCapitalMemberRecord(capitalCardElement, filterViolationMember(members));
+      function convColor(remainAttacks) {
+        if (remainAttacks > 20) return "green";
+        if (remainAttacks < 10) return "red";
+        return "yellow";
+      }
+    }
+
+    function formatDate(time) {
+      return dayjs(time).format("M월 D일");
+    }
+
+    function formatPeriod(startTime, endTime) {
+      const formattedStartTime = formatDate(startTime);
+      const formattedEndTime = formatDate(endTime);
+      return `${formattedStartTime} ~ ${formattedEndTime}`;
+    }
+
+    function settingSeasonPeriod() {
+      const captionCardSubTitleElement = document.querySelector('.card.caption .sub-title');
+      const { startTime, endTime } = capitalRaidSeason;
+      captionCardSubTitleElement.innerHTML = captionCardSubTitleElement.innerHTML
+                                                                       .replace(/{PERIOD}/, formatPeriod(startTime, endTime));
+
+      captionCardSubTitleElement.classList.remove('display-none');
+    }
+
+    function settingLeagueIconTooltip(capitalCardElement) {
+      const leagueIcon = capitalCardElement.querySelector('.league-icon');
+      const { league } = leagueIcon.dataset;
+      if (league) {
+        settingTooltip(leagueIcon, convLeagueName(league));
+      }
+    }
+
+    async function renderCapitalCard(capitalRaidElement, capitalClan) {
+      const capitalCardTemplate = document.querySelector('#capital-card');
+      const capitalCard = document.importNode(capitalCardTemplate.content, true);
+      const capitalCardElement = capitalCard.querySelector('.card');
+
+      capitalCardElement.dataset.clanTag = capitalClan.tag;
+
+      capitalCardElement.innerHTML = capitalCardElement.innerHTML
+                                                       .replace(/{CLAN_NAME}/, capitalClan.name);
+
+      capitalRaidElement.appendChild(capitalCardElement);
+
+      await renderCapital(capitalCardElement, capitalClan);
+      await renderCapitalSeason(capitalCardElement, capitalClan);
+
+      capitalCardElement.querySelector('.row.loader').classList.add('display-none');
+      capitalCardElement.querySelector('.row.content').classList.remove('display-none');
+      const footerSection = capitalCardElement.querySelector('.footer-section');
+      if (footerSection) footerSection.classList.remove('display-none');
+
+      settingLeagueIconTooltip(capitalCardElement);
+    }
+
+    async function writeCapitalClans() {
+      const data = await fetchCapitalClans();
+      const capitalClans = data.clanResponses;
+      lastWeekWarningMembers = data.raiderResponse;
+
+      const capitalRaidElement = document.querySelector('.capital-raid');
+      for (const capitalClan of capitalClans) {
+        if(legendClanTags.indexOf(capitalClan.tag) !== -1) {
+          renderCapitalCard(capitalRaidElement, capitalClan);
+        }
+      }
+    }
+
+    function switchAttacks(element) {
+      const footerSectionElement = element.closest('.footer-section');
+      const memberAttackElements = footerSectionElement.querySelector('.members:not(.empty-un-attacked)');
+
+      // 미공 필터링
+      for (const memberAttack of memberAttackElements.children) {
+        if (element.checked) {
+          if (!memberAttack.classList.contains('UnAttacked')) {
+            memberAttack.classList.add('display-none');
+          }
+          continue;
+        }
+
+        memberAttack.classList.remove('display-none');
+      }
+
+      // 미공 없음 표기
+      const membersElement = footerSectionElement.querySelector('.members');
+      const unAttackers = membersElement.querySelectorAll('.UnAttacked');
+      const emptyUnAttackedElement = footerSectionElement.querySelector('.empty-un-attacked');
+      if (element.checked) {
+        if (unAttackers.length === 0) {
+          emptyUnAttackedElement.classList.remove('display-none');
+          membersElement.classList.add('justify-content-center');
+        }
+      } else {
+        emptyUnAttackedElement.classList.add('display-none');
+        membersElement.classList.remove('justify-content-center');
+      }
+    }
+
+    let leagueMap = {}
+    async function loadLeagues() {
+      // 리그 목록 조회
+      const leagues = await fetchLeagues();
+      leagues.map(league => {
+        leagueMap[league.name] = league;
+      });
+    }
+
+    async function initPage() {
+      await loadLeagues();
+      await writeCapitalClans();
+    }
+  </script>
+</head>
+<body onload="initPage()">
+  <div class="capital-raid">
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">습격전 위반 현황</span>
+        <span class="sub-title display-none">{PERIOD}</span>
+      </div>
+    </div>
+  </div>
+</body>
+<template id="capital-card">
+  <div class="card">
+
+    <div class="bottom-section">
+      <div class="row header">
+        <span class="title">{CLAN_NAME}</span>
+        <div class="layout-right">
+          <span class="button-chip state display-none">{STATE}</span>
+          <span class="button-chip cursor-pointer" onclick="callApp(this); return false;">visit</span>
+        </div>
+      </div>
+      <div class="row loader">
+        <div class="loader-circle">
+          <div class="bar1"></div>
+          <div class="bar2"></div>
+          <div class="bar3"></div>
+          <div class="bar4"></div>
+          <div class="bar5"></div>
+          <div class="bar6"></div>
+          <div class="bar7"></div>
+          <div class="bar8"></div>
+          <div class="bar9"></div>
+          <div class="bar10"></div>
+          <div class="bar11"></div>
+          <div class="bar12"></div>
+        </div>
+      </div>
+      <div class="row content display-none">
+        <div class="item">
+          <img class="league-icon display-none" src="" alt="">
+        </div>
+        <div class="item">
+          <span class="big-text color">{CLAN_CAPITAL_POINTS}</span>
+          <span class="regular-text">트로피</span>
+        </div>
+        <div class="item">
+          <span class="big-text color">{ATTACK_LIMIT}</span>
+          <span class="regular-text">공격 가능</span>
+        </div>
+        <div class="item">
+          <span class="big-text color-{COLOR}">{REMAIN_ATTACKS}</span>
+          <span class="regular-text">남은 공격</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-section expand display-none">
+      <div class="sub-title">
+        <span class="cursor-pointer" onclick="onToggleRecord(this, event); return false;">위반 인원</span>
+        <i class="fa-solid fa-caret-up"></i>
+      </div>
+      <div class="row content">
+        <div class="item members">
+          <div class="record empty-violation display-none">
+            <span class="regular-text">위반 인원 없음</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="error-content">
+  <div class="row error">
+    <span class="sub-title color-red">조회 실패</span>
+  </div>
+</template>
+<template id="member-record">
+  <div class="record">
+
+    <div class="item">
+      <span class="regular-text">{NAME}</span>
+      <br>
+      <span class="small-text chip color-black">{TAG}</span>
+    </div>
+
+    <div class="item">
+      <span class="regular-text">{ATTACKS}</span>
+    </div>
+
+    <div class="item">
+      <span class="regular-text">{RESOURCES_LOOTED}</span>
+    </div>
+
+  </div>
+</template>
+</html>

@@ -1,6 +1,6 @@
-package open.api.coc.clans.domain.clans.converter;
+package open.api.coc.clans.domain.raid.conveter;
 
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonMemberResponse;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonMemberResponse;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasonMember;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;

@@ -38,63 +38,71 @@ body::before {
 
   /* load images */
   content:
-      url(/static/images/hero/Barbarian_King.png)
-      url(/static/images/hero/Archer_Queen.png)
-      url(/static/images/hero/Grand_Warden.png)
-      url(/static/images/hero/Royal_Champion.png)
+      url(/static/images/hero/Barbarian_King.png);
+      url(/static/images/hero/Archer_Queen.png);
+      url(/static/images/hero/Grand_Warden.png);
+      url(/static/images/hero/Royal_Champion.png);
 
-      url(/static/images/hero/equipment/Archer_Puppet.png)
-      url(/static/images/hero/equipment/Barbarian_Puppet.png)
-      url(/static/images/hero/equipment/Earthquake_Boots.png)
-      url(/static/images/hero/equipment/Eternal_Tome.png)
-      url(/static/images/hero/equipment/Fireball.png)
-      url(/static/images/hero/equipment/Frozen_Arrow.png)
-      url(/static/images/hero/equipment/Giant_Arrow.png)
-      url(/static/images/hero/equipment/Giant_Gauntlet.png)
-      url(/static/images/hero/equipment/Haste_Vial.png)
-      url(/static/images/hero/equipment/Healer_Puppet.png)
-      url(/static/images/hero/equipment/Healing_Tome.png)
-      url(/static/images/hero/equipment/Hog_Rider_Puppet.png)
-      url(/static/images/hero/equipment/Invisibility_Vial.png)
-      url(/static/images/hero/equipment/Life_Gem.png)
-      url(/static/images/hero/equipment/Rage_Gem.png)
-      url(/static/images/hero/equipment/Rage_Vial.png)
-      url(/static/images/hero/equipment/Royal_Gem.png)
-      url(/static/images/hero/equipment/Seeking_Shield.png)
-      url(/static/images/hero/equipment/Vampstache.png)
-      url(/static/images/hero/equipment/Spiky_Ball.png)
+      url(/static/images/hero/equipment/Archer_Puppet.png);
+      url(/static/images/hero/equipment/Barbarian_Puppet.png);
+      url(/static/images/hero/equipment/Earthquake_Boots.png);
+      url(/static/images/hero/equipment/Eternal_Tome.png);
+      url(/static/images/hero/equipment/Fireball.png);
+      url(/static/images/hero/equipment/Frozen_Arrow.png);
+      url(/static/images/hero/equipment/Giant_Arrow.png);
+      url(/static/images/hero/equipment/Giant_Gauntlet.png);
+      url(/static/images/hero/equipment/Haste_Vial.png);
+      url(/static/images/hero/equipment/Healer_Puppet.png);
+      url(/static/images/hero/equipment/Healing_Tome.png);
+      url(/static/images/hero/equipment/Hog_Rider_Puppet.png);
+      url(/static/images/hero/equipment/Invisibility_Vial.png);
+      url(/static/images/hero/equipment/Life_Gem.png);
+      url(/static/images/hero/equipment/Rage_Gem.png);
+      url(/static/images/hero/equipment/Rage_Vial.png);
+      url(/static/images/hero/equipment/Royal_Gem.png);
+      url(/static/images/hero/equipment/Seeking_Shield.png);
+      url(/static/images/hero/equipment/Vampstache.png);
+      url(/static/images/hero/equipment/Spiky_Ball.png);
 
-      url(/static/images/etc/trophies.png)
-      url(/static/images/etc/max_level.png)
-      url(/static/images/etc/xp.png)
+      url(/static/images/etc/trophies.png);
+      url(/static/images/etc/max_level.png);
+      url(/static/images/etc/xp.png);
 
-      url(/static/images/pets/Lassi.png)
-      url(/static/images/pets/Mighty_Yak.png)
-      url(/static/images/pets/Electro_Owl.png)
-      url(/static/images/pets/Phoenix.png)
-      url(/static/images/pets/Unicorn.png)
-      url(/static/images/pets/Frosty.png)
-      url(/static/images/pets/Poison_Lizard.png)
-      url(/static/images/pets/Diggy.png)
-      url(/static/images/pets/Spirit_Fox.png)
-      url(/static/images/pets/Angry_Jelly.png)
+      url(/static/images/pets/Lassi.png);
+      url(/static/images/pets/Mighty_Yak.png);
+      url(/static/images/pets/Electro_Owl.png);
+      url(/static/images/pets/Phoenix.png);
+      url(/static/images/pets/Unicorn.png);
+      url(/static/images/pets/Frosty.png);
+      url(/static/images/pets/Poison_Lizard.png);
+      url(/static/images/pets/Diggy.png);
+      url(/static/images/pets/Spirit_Fox.png);
+      url(/static/images/pets/Angry_Jelly.png);
 
-      url(/static/images/townhall/16.png)
-      url(/static/images/townhall/15.png)
-      url(/static/images/townhall/14.png)
-      url(/static/images/townhall/13.png)
-      url(/static/images/townhall/12.png)
-      url(/static/images/townhall/11.png)
-      url(/static/images/townhall/10.png)
-      url(/static/images/townhall/9.png)
-      url(/static/images/townhall/8.png)
-      url(/static/images/townhall/7.png)
-      url(/static/images/townhall/6.png)
-      url(/static/images/townhall/5.png)
-      url(/static/images/townhall/4.png)
-      url(/static/images/townhall/3.png)
-      url(/static/images/townhall/2.png)
-      url(/static/images/townhall/1.png);
+      url(/static/images/townhall/16.png);
+      url(/static/images/townhall/15.png);
+      url(/static/images/townhall/14.png);
+      url(/static/images/townhall/13.png);
+      url(/static/images/townhall/12.png);
+      url(/static/images/townhall/11.png);
+      url(/static/images/townhall/10.png);
+      url(/static/images/townhall/9.png);
+      url(/static/images/townhall/8.png);
+      url(/static/images/townhall/7.png);
+      url(/static/images/townhall/6.png);
+      url(/static/images/townhall/5.png);
+      url(/static/images/townhall/4.png);
+      url(/static/images/townhall/3.png);
+      url(/static/images/townhall/2.png);
+      url(/static/images/townhall/1.png);;
+
+      url(/static/images/siegemachine/Wall_Wrecker.png);
+      url(/static/images/siegemachine/Battle_Blimp.png);
+      url(/static/images/siegemachine/Stone_Slammer.png);
+      url(/static/images/siegemachine/Siege_Barracks.png);
+      url(/static/images/siegemachine/Log_Launcher.png);
+      url(/static/images/siegemachine/Flame_Flinger.png);
+      url(/static/images/siegemachine/Battle_Drill.png);
 }
 
 .logo {
@@ -150,6 +158,10 @@ body::before {
   opacity: 0.5;
 }
 
+.color-black {
+  color: black !important;
+}
+
 .color-white {
   color: white !important;
 }
@@ -168,6 +180,10 @@ body::before {
   cursor: pointer !important;
 }
 
+.align-items-center {
+  align-items: center !important;
+}
+
 .justify-content-center {
   justify-content: center !important;
 }
@@ -180,7 +196,7 @@ body::before {
   width: fit-content;
   font-size: 0.5rem;
   font-weight: bold;
-  word-break: break-all;
+  word-break: keep-all;
   border: var(--default-border);
   padding: 3px 5px;
   border-radius: 15px;
@@ -217,6 +233,11 @@ body::before {
 
 .bg-forestgreen {
   background-color: forestgreen;
+  color: white;
+}
+
+.bg-red {
+  background-color: red;
   color: white;
 }
 
@@ -361,6 +382,15 @@ body::before {
 
 
 /** image icon */
+.icon-clock {
+  width: 36px;
+  height: 36px;
+  background-image: url("/static/images/etc/clock.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .icon-sword {
   width: 36px;
   height: 36px;
@@ -413,4 +443,105 @@ body::before {
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
+}
+
+
+
+.file-upload-form {
+  width: 185px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #cacaca;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 48px 35px -48px rgba(0, 0, 0, 0.1);
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    svg {
+      height: 30px;
+      fill: rgba(75, 85, 99, 1);
+    }
+  }
+
+  .text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(75, 85, 99, 1);
+    }
+  }
+
+  input {
+    display: none;
+  }
+}
+
+.table {
+  width: 100%;
+  border: 1px solid #e2e2e2;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+
+  .table-caption {
+    border: 1px solid green;
+    border-left: 3px solid green;
+    background-color: green;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+    text-align: left;
+    color: white;
+    padding: 5px 5px 5px 10px;
+  }
+
+  .table-tbody {
+    position: relative;
+  }
+
+
+  .table-tr {
+
+    .table-th, .table-td {
+      padding: 5px;
+    }
+
+    .table-th {
+    }
+
+    .table-td {
+      text-align: center;
+    }
+  }
+
+}
+
+.table.vertical {
+
+
+  .table-tr {
+
+    .table-th {
+      width: 20%;
+    }
+
+    .table-td {
+      width: 60%;
+      text-align: left;
+    }
+  }
+
 }

@@ -35,6 +35,10 @@ public class RaidEntity {
         this.endDate = endDate;
         this.clanTag = clanTag;
         this.raiderEntityList = radierEntityList;
+
+        for(RaiderEntity radierEntity : radierEntityList) {
+            radierEntity.changeRaid(this);
+        }
     }
 
     public void changeClan(ClanEntity clan) {

@@ -1,3 +1,5 @@
+const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
+
 const URI_CLANS = '/clans'; //전체 클랜 목록 조회
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
@@ -50,7 +52,7 @@ async function registerClan(requestBody) {
                     });
 }
 
-async function findClan(clanTag) {
+async function fetchClan(clanTag) {
   const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(clanTag));
 
   return await axios.get(uri)
@@ -365,5 +367,17 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
 
                       alert(message);
                       return false;
+                    });
+}
+
+async function fetchCapitalClans() {
+  return await axios.get(URI_CAPITAL_CLANS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error)
+                      return [];
                     });
 }

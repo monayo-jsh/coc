@@ -2,6 +2,7 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.service.RaidService;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RaidController {
 
     private final RaidService raidService;
+
+    @GetMapping("/{clanTag}/seasons")
+    public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {
+        ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = raidService.getClanCapitalRaidSeason(clanTag);
+        return ResponseEntity.ok().body(clanCapitalRaidAttacker);
+    }
 
     @GetMapping("/score/{playerTag}")
     public ResponseEntity<List<RaidScoreResponse>> getPlayerRaidScore(@PathVariable String playerTag) {

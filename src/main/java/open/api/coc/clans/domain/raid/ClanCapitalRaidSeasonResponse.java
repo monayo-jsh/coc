@@ -1,4 +1,4 @@
-package open.api.coc.clans.domain.clans;
+package open.api.coc.clans.domain.raid;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

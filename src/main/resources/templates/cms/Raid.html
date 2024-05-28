@@ -13,6 +13,8 @@
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/raid.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -78,30 +80,6 @@
           });
     }
 
-    async function fetchClan(capitalClan) {
-      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}`
-      return await axios.get(uri)
-                        .then((response) => {
-                          const { data } = response
-                          return data;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-
-                          const { code } = error;
-                          if (code === 'ERR_NETWORK') {
-                            return {};
-                          }
-
-                          const { response } = error;
-                          const { status } = response
-                          // 서버 이용 불가로 메인 화면 이동
-                          if (status >= 500) {
-                            location.href = "/";
-                          }
-                        });
-    }
-
     function renderFailed(capitalCardElement) {
       const errorContentTemplate = document.querySelector("#error-content");
       const errorContent = document.importNode(errorContentTemplate.content, true);
@@ -136,7 +114,7 @@
     }
 
     async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClan(capitalClan);
+      let clan = await fetchClan(capitalClan.tag);
 
       if (!Object.keys(clan).length) {
         renderFailed(capitalCardElement);
@@ -152,39 +130,20 @@
     }
 
     async function fetchCapitalRaidSeason(capitalClan) {
-      const uri = `/clans/${encodeURIComponent(capitalClan.tag)}/capital/raid/seasons`
-      return await axios.get(uri)
-                        .then((response) => {
-                          const { data } = response
-                          const { startTime, endTime } = data;
+      const clanCapital = await fetchClanCapitalRaidSeason(capitalClan.tag);
+      const { startTime, endTime } = clanCapital;
 
-                          if (!capitalRaidSeason) {
-                            //시즌 기간 설정
-                            capitalRaidSeason = {
-                              startTime: startTime,
-                              endTime: endTime
-                            }
+      if (!capitalRaidSeason) {
+        //시즌 기간 설정
+        capitalRaidSeason = {
+          startTime: startTime,
+          endTime: endTime
+        }
 
-                            settingSeasonPeriod()
-                          }
+        settingSeasonPeriod()
+      }
 
-                          return data;
-                        })
-                        .catch((error) => {
-                          console.error(error);
-
-                          const { code } = error;
-                          if (code === 'ERR_NETWORK') {
-                            return {};
-                          }
-
-                          const { response } = error;
-                          const { status } = response
-                          // 서버 이용 불가로 메인 화면 이동
-                          if (status >= 500) {
-                            location.href = "/";
-                          }
-                        });
+      return clanCapital;
     }
 
     function renderCapitalMemberRecord(capitalCardElement, members) {

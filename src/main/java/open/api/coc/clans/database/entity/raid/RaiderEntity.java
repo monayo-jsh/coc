@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "TB_RAIDER")
@@ -19,7 +20,10 @@ public class RaiderEntity {
     private Long id;
     private String tag;
     private String name;
+
+    @Setter
     private Integer attacks;
+    @Setter
     private Integer resourceLooted;
 
     @ManyToOne(fetch = LAZY)
@@ -27,11 +31,14 @@ public class RaiderEntity {
     private RaidEntity raid;
 
     @Builder
-    public RaiderEntity(String tag, String name, Integer attacks, Integer resourceLooted, RaidEntity raid) {
+    public RaiderEntity(String tag, String name, Integer attacks, Integer resourceLooted) {
         this.tag = tag;
         this.name = name;
         this.attacks = attacks;
         this.resourceLooted = resourceLooted;
+    }
+
+    public void changeRaid(RaidEntity raid) {
         this.raid = raid;
     }
 }

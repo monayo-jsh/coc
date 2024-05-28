@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
-import open.api.coc.clans.domain.clans.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
@@ -205,13 +204,6 @@ public class ClansController {
         ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);
         return ResponseEntity.ok().body(clanCurrentWar);
     }
-
-    @GetMapping("/{clanTag}/capital/raid/seasons")
-    public ResponseEntity<ClanCapitalRaidSeasonResponse> getClanCapitalRaidSeasons(@PathVariable String clanTag) {
-        ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = clansService.getClanCapitalRaidSeason(clanTag);
-        return ResponseEntity.ok().body(clanCapitalRaidAttacker);
-    }
-
 
     @GetMapping("/league-war")
     public ResponseEntity<ClanCurrentWarRes> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {

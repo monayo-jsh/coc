@@ -110,20 +110,29 @@ public class RaidService {
         return result;
     }
 
-    public List<RaidScoreResponse> getPlayerRaidScore(String playerTag) {
+    public List<RaidScoreResponse> getPlayerRaidScoreWithTag(String playerTag) {
 
-        List<RaiderEntity> radierEntities = raiderRepository.findByTag(playerTag);
+        List<RaiderEntity> raiderEntities = raiderRepository.findByTag(playerTag);
 
-        for(RaiderEntity raiderEntity : radierEntities) {
+        return getRaidScoreResponses(raiderEntities);
+    }
+
+    public List<RaidScoreResponse> getPlayerRaidScoreWithName(String playerName) {
+        List<RaiderEntity> raiderEntities = raiderRepository.findByName(playerName);
+
+        return getRaidScoreResponses(raiderEntities);
+    }
+
+    private List<RaidScoreResponse> getRaidScoreResponses(List<RaiderEntity> raiderEntities) {
+        for(RaiderEntity raiderEntity : raiderEntities) {
             ClanEntity clanEntity = clansService.findClanEntityBy(raiderEntity.getRaid().getClanTag()).orElse(null);
             raiderEntity.getRaid().changeClan(clanEntity);
         }
 
-        return radierEntities.stream()
-                             .map(raidScoreResponseConverter::convert)
-                             .sorted(Comparator.comparing(RaidScoreResponse::getSeasonStartDate).reversed())
-                             .collect(Collectors.toList());
-
+        return raiderEntities.stream()
+                .map(raidScoreResponseConverter::convert)
+                .sorted(Comparator.comparing(RaidScoreResponse::getSeasonStartDate).reversed())
+                .collect(Collectors.toList());
     }
 
     public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {

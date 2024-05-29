@@ -43,7 +43,43 @@
 
 .buttons {
   display: flex;
-  justify-content: right;
+  justify-content: space-between;
+  .radio-container {
+    display: flex;
+    gap: 10px;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    background-color: #fff;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+
+  .radio-label input[type="radio"] {
+    display: none;
+  }
+
+  .radio-label span {
+    pointer-events: none;
+  }
+
+  .radio-label input[type="radio"]:checked + span {
+    font-weight: bold;
+    color: #007BFF;
+  }
+
+  .radio-label:hover {
+    background-color: #f9f9f9;
+    border-color: #bbb;
+  }
+
 
   button.refresh {
     color: white;

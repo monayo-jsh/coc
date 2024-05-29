@@ -185,7 +185,7 @@
       const latestClanAssignedPlayerMap = convertArrayToMapByKey(players);
 
       for(const player of originPlayers) {
-        const clanAssignedPlayer = latestClanAssignedPlayerMap.get([player.tag]);
+        const clanAssignedPlayer = latestClanAssignedPlayerMap.get(player.tag);
         if (clanAssignedPlayer && clanAssignedPlayer.clan) {
           player.assignedClan = {
             seasonDate,
@@ -200,7 +200,7 @@
       const latestLeagueAssignedPlayerMap = convertArrayToMapByKey(players);
 
       for(const player of originPlayers) {
-        const clanAssignedPlayer = latestLeagueAssignedPlayerMap.get([player.tag]);
+        const clanAssignedPlayer = latestLeagueAssignedPlayerMap.get(player.tag);
         if (clanAssignedPlayer && clanAssignedPlayer.clan) {
           player.assignedLeague = {
             seasonDate,

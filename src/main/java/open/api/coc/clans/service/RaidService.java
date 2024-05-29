@@ -131,7 +131,8 @@ public class RaidService {
 
         return raiderEntities.stream()
                 .map(raidScoreResponseConverter::convert)
-                .sorted(Comparator.comparing(RaidScoreResponse::getSeasonStartDate).reversed())
+                .sorted(Comparator.comparing(RaidScoreResponse::getTag)
+                                  .thenComparing(RaidScoreResponse::getSeasonStartDate).reversed())
                 .collect(Collectors.toList());
     }
 

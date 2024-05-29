@@ -422,6 +422,8 @@
       const { tag, clan, assignedClan, assignedLeague, role } = player;
 
       const tagLabel = createPlayerLabel(tag, '플레이어 태그');
+      tagLabel.classList.add("cursor-pointer");
+      tagLabel.onclick = () => copyClipboard(tag);
       playerLabels.appendChild(tagLabel);
 
       renderAssignedClan(playerLabels, assignedClan);

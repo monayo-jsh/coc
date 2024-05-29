@@ -176,3 +176,29 @@ function formatYYMMDate(date) {
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
 }
+
+function copyClipboard(value) {
+  if (window.isSecureContext && navigator.clipboard) {
+    window.navigator.clipboard.writeText(value).then(() => {
+
+    })
+  } else {
+    unsecuredCopyToClipboard(value);
+  }
+
+  function unsecuredCopyToClipboard(value) {
+    //아래와 같은 document.execCommand 방식은 Deprecated 처리 되어
+    //clipboard API로 대체 되었으나 해당 방식은 https 상태에서만 동작
+    //http 상태에서 동작 할 수 있도록 해당 로직 사용
+    const textArea = document.createElement("textarea");
+    textArea.value = value;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Unable to copy to clipboard', err);
+    }
+    document.body.removeChild(textArea);
+  }
+}

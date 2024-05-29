@@ -12,7 +12,7 @@ public interface RaiderRepository extends JpaRepository<RaiderEntity, Long> {
     @Query("select raider from RaiderEntity raider where raider.tag = :playerTag")
     List<RaiderEntity> findByTag(String playerTag);
 
-    @Query("SELECT raider from RaiderEntity  raider where raider.name like CONCAT(:playerName, '%')")
+    @Query("SELECT raider from RaiderEntity raider where raider.name like CONCAT(:playerName, '%')")
     List<RaiderEntity> findByName(String playerName);
 
 }

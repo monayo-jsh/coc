@@ -116,6 +116,16 @@ CREATE TABLE TB_RAIDER (
     FOREIGN KEY (RAID_ID) REFERENCES TB_RAID(RAID_ID) ON DELETE CASCADE
 );
 
+create table PERSISTENT_LOGINS (
+    USERNAME varchar(64) not null,
+
+    SERIES varchar(64) primary key,
+
+    TOKEN varchar(64) not null,
+
+    LAST_USED timestamp not null
+);
+
 insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QJUL08V9', '아카데미', 2, CURRENT_TIMESTAMP(6), 'Y');
 insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2QG0G20RR', '아카데미 2.0', 2, CURRENT_TIMESTAMP(6), 'Y');
 insert into tb_clan (TAG, NAME, ORDERS, REG_DATE, VISIBLE_YN) values ('#2LPP8PUCG', '아카데미 3.0', 3, CURRENT_TIMESTAMP(6), 'Y');

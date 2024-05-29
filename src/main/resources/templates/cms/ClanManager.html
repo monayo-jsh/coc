@@ -41,6 +41,48 @@
 
 
   <script>
+    function switchFilterNotJoined(type) {
+      console.log(type);
+
+      const btnCloses = document.querySelectorAll('.btn-close');
+      btnCloses.forEach(ele => ele.click());
+
+      if (type === 'clan') {
+        const btnViewClanAssignedPlayers = document.querySelectorAll('.btn-view-clan-assigned-player');
+        btnViewClanAssignedPlayers.forEach(viewAssignedPlayerAndFilterNotJoined);
+        return;
+      }
+
+      if (type === 'league') {
+        const btnViewLeagueAssignedPlayers = document.querySelectorAll('.btn-view-league-assigned-player');
+        btnViewLeagueAssignedPlayers.forEach(viewLeagueAssignedPlayerAndFilterNotJoined);
+        return;
+      }
+    }
+    async function viewAssignedPlayerAndFilterNotJoined(element) {
+      const card = element.closest('.card');
+      const clanContent = JSON.parse(card.dataset.clanContent);
+
+      // 클랜전 컨텐츠 이용 클랜이 아닌 경우
+      if (clanContent.clanWarYn !== 'Y') return;
+
+      await viewAssignedPlayer(element);
+      const btnFilterNotJoined = card.querySelector('.card-assigned-player-wrapper .btn-filter-not-joined');
+      btnFilterNotJoined.click();
+    }
+
+    async function viewLeagueAssignedPlayerAndFilterNotJoined(element) {
+      const card = element.closest('.card');
+      const clanContent = JSON.parse(card.dataset.clanContent);
+
+      // 리그전 컨텐츠 이용 클랜이 아닌 경우
+      if (clanContent.clanWarLeagueYn !== 'Y') return;
+
+      await viewLeagueAssignedPlayer(element);
+      const btnFilterNotJoined = card.querySelector('.card-league-assigned-player-wrapper .btn-filter-not-joined');
+      btnFilterNotJoined.click();
+    }
+
     function displayUploadForm(element, type) {
       const assignedPlayerUpload = document.querySelector(`.${type}.assigned-player-upload`);
       if (assignedPlayerUpload.classList.contains('display-none')) {
@@ -396,6 +438,7 @@
       card.dataset.clanTag = tag;
       card.dataset.clanName = name;
       card.dataset.badgeUrls = JSON.stringify(badgeUrls);
+      card.dataset.clanContent = JSON.stringify(clanContent);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
@@ -1044,6 +1087,24 @@
     </div>
   </div>
 
+  <div class="support-filter">
+    <div class="radio-inputs filter">
+      <label class="radio">
+        <input type="radio" name="all-filter-not-joined" onclick="switchFilterNotJoined('close');" checked>
+        <span class="name">이동 확인 닫기</span>
+      </label>
+      <label class="radio">
+        <input type="radio" name="all-filter-not-joined" onclick="switchFilterNotJoined('clan');">
+        <span class="name">클랜 이동 확인</span>
+      </label>
+
+      <label class="radio">
+        <input type="radio" name="all-filter-not-joined" onclick="switchFilterNotJoined('league');">
+        <span class="name">리그 이동 확인</span>
+      </label>
+    </div>
+  </div>
+
   <div class="clan-list"></div>
 </div>
 </body>
@@ -1109,10 +1170,10 @@
       </div>
 
       <div class="card-footer support">
-        <div class="card-button" onclick="viewAssignedPlayer(this);">
+        <div class="card-button btn-view-clan-assigned-player" onclick="viewAssignedPlayer(this);">
           <span class="button-chip bg-green">배정 관리</span>
         </div>
-        <div class="card-button" onclick="viewLeagueAssignedPlayer(this);">
+        <div class="card-button btn-view-league-assigned-player" onclick="viewLeagueAssignedPlayer(this);">
           <span class="button-chip bg-crimson">리그배정 관리</span>
         </div>
       </div>
@@ -1141,7 +1202,7 @@
             <span class="season-date"></span>배정클랜원
           </div>
           <div class="layout-right">
-            <div class="button-chip" onclick="closeAssignedPlayer(this);">닫기</div>
+            <div class="button-chip btn-close" onclick="closeAssignedPlayer(this);">닫기</div>
           </div>
         </div>
 
@@ -1180,7 +1241,7 @@
             <div class="button-area">
               <div class="toggle-button-simple filter">
                 <div class="toggle-button-simple-cover">
-                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterNotJoined(this); return false;">
+                  <input type="checkbox" class="tgl tgl-skewed btn-filter-not-joined" onchange="filterNotJoined(this); return false;">
                   <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
                 </div>
               </div>
@@ -1215,7 +1276,7 @@
             <span class="season-date"></span>리그배정 클랜원
           </div>
           <div class="layout-right">
-            <div class="button-chip" onclick="closeLeagueAssignedPlayer(this);">닫기</div>
+            <div class="button-chip btn-close" onclick="closeLeagueAssignedPlayer(this);">닫기</div>
           </div>
         </div>
 
@@ -1253,7 +1314,7 @@
             <div class="button-area">
               <div class="toggle-button-simple filter">
                 <div class="toggle-button-simple-cover">
-                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterNotJoined(this); return false;">
+                  <input type="checkbox" class="tgl tgl-skewed btn-filter-not-joined" onchange="filterNotJoined(this); return false;">
                   <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
                 </div>
               </div>

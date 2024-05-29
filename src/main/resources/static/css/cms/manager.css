@@ -432,3 +432,9 @@
 .table.league {
   border-color: red;
 }
+
+.support-filter {
+  background-color: coral;
+  margin-top: 5px;
+  border-radius: 0.5rem;
+}

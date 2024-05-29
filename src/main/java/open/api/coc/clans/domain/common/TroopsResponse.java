@@ -19,4 +19,7 @@ public class TroopsResponse {
     private Integer maxLevel;
     private String village;
 
+    private String type;
+    private Integer order;
+
 }

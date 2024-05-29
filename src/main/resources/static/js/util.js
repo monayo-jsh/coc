@@ -10,11 +10,22 @@ function convertArrayToLevelMapByKoreanName(array) {
   }, {});
 }
 
-function convertArrayToMapByTag(array) {
+function convertArrayToMapByKey(array, key = 'tag', isList = false) {
   return array.reduce((map, row) => {
-    map[row.tag] = row;
-    return map
-  }, {});
+    if (!isList) {
+      // 객체
+      map.set(row[key], row);
+      return map;
+    }
+
+    // 배열
+    if (!map.get(row[key])) {
+      map.set(row[key], []);
+    }
+
+    map.get(row[key]).push(row);
+    return map;
+  }, new Map());
 }
 
 function formattedPlayers(players) {
@@ -117,6 +128,12 @@ function convLeagueName(leagueName) {
   return leagueName;
 }
 
+function convertNameByType(type) {
+  if (type === 'ELIXIR') return '일반';
+  if (type === 'DARK_ELIXIR') return '암흑';
+  return type;
+}
+
 function convClanJoinTypeName(type) {
   switch (type.toLowerCase()) {
     case 'open': return '공개';
@@ -144,6 +161,11 @@ function calcHeroLevelSum(heroes) {
 function sortByHeroTotalLevel(players) {
   // 영웅레벨 순 -> 이름 순
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
+}
+
+function sortedByOrder(arrays) {
+  // order 필드에 따른 정렬
+  return arrays.sort((a, b) => a.order - b.order);
 }
 
 function formatYYMMDate(date) {

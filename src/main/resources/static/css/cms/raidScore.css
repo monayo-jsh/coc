@@ -91,3 +91,7 @@
 
 }
 
+.button-chip {
+  display: flex;
+  align-items: center;
+}

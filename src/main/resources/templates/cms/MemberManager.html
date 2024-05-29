@@ -182,10 +182,10 @@
 
     function settingAssignClan(originPlayers, latestClanAssignedPlayerObj) {
       const { seasonDate, players } = latestClanAssignedPlayerObj;
-      const latestClanAssignedPlayerMap = convertArrayToMapByTag(players);
+      const latestClanAssignedPlayerMap = convertArrayToMapByKey(players);
 
       for(const player of originPlayers) {
-        const clanAssignedPlayer = latestClanAssignedPlayerMap[player.tag];
+        const clanAssignedPlayer = latestClanAssignedPlayerMap.get([player.tag]);
         if (clanAssignedPlayer && clanAssignedPlayer.clan) {
           player.assignedClan = {
             seasonDate,
@@ -197,10 +197,10 @@
 
     function settingAssignLeague(originPlayers, latestLeagueAssignedPlayerObj) {
       const { seasonDate, players } = latestLeagueAssignedPlayerObj;
-      const latestLeagueAssignedPlayerMap = convertArrayToMapByTag(players);
+      const latestLeagueAssignedPlayerMap = convertArrayToMapByKey(players);
 
       for(const player of originPlayers) {
-        const clanAssignedPlayer = latestLeagueAssignedPlayerMap[player.tag];
+        const clanAssignedPlayer = latestLeagueAssignedPlayerMap.get([player.tag]);
         if (clanAssignedPlayer && clanAssignedPlayer.clan) {
           player.assignedLeague = {
             seasonDate,

@@ -53,4 +53,6 @@ public class PlayerResponse {
 
     @Setter
     private ClanResponse assignedClan;
+
+    private String supportYn;
 }

@@ -27,6 +27,12 @@ public class PlayersController {
                              .body(playersService.findAllPlayers());
     }
 
+    @GetMapping("/all/tags")
+    public ResponseEntity<List<String>> getAllPlayerTags() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllPlayerTags());
+    }
+
     @GetMapping("/support/all")
     public ResponseEntity<List<PlayerResponse>> getAllSupportPlayer() {
         return ResponseEntity.ok()

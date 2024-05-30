@@ -366,7 +366,7 @@ button.refresh:hover svg {
 .radio-inputs {
   display: flex;
   flex-wrap: wrap;
-  border-radius: 0.5rem;
+  border-radius: 10px;
   background-color: transparent;
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
   font-size: 12px;

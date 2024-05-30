@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.BaseEntity;
+import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.database.entity.player.common.WarPreferenceType;
 import org.springframework.data.domain.Persistable;
@@ -47,6 +48,11 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
 
     @Column(name = "name", nullable = false, length = 255)
     private String name;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "support_yn", nullable = false)
+    private YnType supportYn = YnType.N;
 
     @Column(name = "exp_level", nullable = false)
     private Integer expLevel;

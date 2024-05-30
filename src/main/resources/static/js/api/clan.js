@@ -18,7 +18,7 @@ const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //
 
 const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
 
-function deviceArray(array, size) {
+function divideClanArray(array, size) {
   if (array.length === 1) return [array];
 
   const result = [];
@@ -130,7 +130,7 @@ function makeClanDetailRequest(clans) {
 }
 
 async function fetchClansFromExternal(clans) {
-  const requests = deviceArray(clans, clans.length/2).map(makeClanDetailRequest);
+  const requests = divideClanArray(clans, clans.length/2).map(makeClanDetailRequest);
 
   let results = [];
   // 클랜 상세 조회
@@ -158,7 +158,7 @@ function makeClanMemberRequest(clans) {
 }
 
 async function fetchClanMembers(clans) {
-  const requests = deviceArray(clans, clans.length/2).map(makeClanMemberRequest);
+  const requests = divideClanArray(clans, clans.length/2).map(makeClanMemberRequest);
 
   let allClanMembers = [];
   await axios.all(requests)

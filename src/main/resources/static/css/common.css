@@ -221,6 +221,15 @@ body::before {
   padding: 0 2px;
 }
 
+.bg-lightgray {
+  background-color: lightgray;
+}
+
+.bg-black {
+  background-color: black;
+  color: white;
+}
+
 .bg-pink {
   background-color: #e87186;
   color: white;

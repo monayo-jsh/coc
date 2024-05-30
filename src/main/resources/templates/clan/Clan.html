@@ -16,6 +16,7 @@
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/league.js"></script>
   <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/player.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
@@ -31,13 +32,29 @@
   <title>클랜 관리</title>
 
   <script>
-    function filterNotJoined(element) {
-      const cardAssignedPlayerElement = element.closest('.card-assigned-player');
-      const playerListElement = cardAssignedPlayerElement.querySelector('.player-list');
+    function closeCurrentPlayer(element) {
+      const cardElement = element.closest('div.card');
+
+      const cardBasic = cardElement.querySelector('.card-basic');
+      cardBasic.classList.remove('display-none');
+
+      const cardCurrentPlayerWrapper = cardElement.querySelector('.card-current-player-wrapper');
+      cardCurrentPlayerWrapper.classList.add('display-none');
+
+      const loaderElement = cardCurrentPlayerWrapper.querySelector('.loader-circle');
+      loaderElement.classList.remove('display-none');
+
+      // 필터 초기화
+      cardCurrentPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
+    }
+
+    function changeDisplay(element, className) {
+      const assignedCard = element.closest('.player-card');
+      const playerListElement = assignedCard.querySelector('.player-list');
 
       for (const playerInfo of playerListElement.children) {
         if (element.checked) {
-          if (!playerInfo.classList.contains('not-joined')) {
+          if (!playerInfo.classList.contains(className)) {
             playerInfo.classList.add('display-none');
           }
           continue;
@@ -45,6 +62,14 @@
 
         playerInfo.classList.remove('display-none');
       }
+    }
+
+    function filterSupportPlayer(element) {
+      changeDisplay(element, 'support-player');
+    }
+
+    function filterNotJoined(element) {
+      changeDisplay(element, 'not-joined');
     }
 
   function closeAssignedPlayer(element) {
@@ -135,6 +160,121 @@
     function formatDate(date) {
       const formattedDate = dayjs(date).format('YY년 MM월');
       return `[${formattedDate}] `;
+    }
+
+
+    async function viewCurrentClanPlayers(element) {
+
+      const cardElement = element.closest('div.card');
+      const { clanTag } = cardElement.dataset;
+
+      // 기본 카드 숨김
+      const cardBasic = cardElement.querySelector('.card-basic');
+      cardBasic.classList.add('display-none');
+
+      // 로딩바 노출
+      const cardCurrentPlayerWrapper = cardElement.querySelector('.card-current-player-wrapper');
+      cardCurrentPlayerWrapper.classList.remove('display-none');
+
+      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const supportPlayers = await fetchSupportPlayers();
+      const supportPlayerMap = convertArrayToMapByKey(supportPlayers);
+
+      renderCurrentPlayer(clanMembers, supportPlayerMap, cardElement);
+
+      // 로딩바 숨김
+      const loaderElement = cardCurrentPlayerWrapper.querySelector('.loader-circle');
+      loaderElement.classList.add('display-none');
+
+      // 현재클랜원 노출
+      const cardAssignedPlayer = cardElement.querySelector('.card-current-player .body');
+      cardAssignedPlayer.classList.remove('display-none');
+
+    }
+
+    function makeLabelChip(tag) {
+      const playerInfoAdditionalTemplate = document.querySelector('#player-info-additional-template');
+      const playerInfoAdditional = document.importNode(playerInfoAdditionalTemplate.content, true);
+      const chip = playerInfoAdditional.querySelector('.chip');
+      chip.innerHTML = chip.innerHTML.replace(/{NAME}/, tag);
+      return chip;
+    }
+
+    function renderCurrentPlayer(currentClanMembers, supportPlayerMap, cardElement) {
+
+      const playerInfoTemplate = document.querySelector('#clan-player-info-template');
+
+      const cardCurrentPlayer = cardElement.querySelector('.card-current-player');
+      const playerList = cardCurrentPlayer.querySelector('.player-list');
+      playerList.innerHTML = ""; // clear
+
+      const sortedPlayers = sortByTrophies(currentClanMembers);
+      let supportPlayers = 0;
+
+      for (const player of sortedPlayers) {
+        const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
+        const playerInfo = playerInfoElement.querySelector('.player-info');
+
+        const { townHallLevel, name, tag, trophies, role, clanRank, previousClanRank } = player;
+
+        const isSupportPlayer = !!supportPlayerMap.get(tag);
+        const changeRank = previousClanRank - clanRank;
+
+        // render
+        playerInfo.innerHTML = playerInfo.innerHTML
+                                         .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{HERO_TOTAL_LEVEL}/, trophies)
+                                         .replace(/{CURRENT_CLAN}/, "")
+                                         .replace(/{JOINED}/, isSupportPlayer ? '지원 계정' : '');
+
+        const infoAdditionalElement = playerInfo.querySelector('.info.additional');
+        renderAdditionalLabel(infoAdditionalElement, tag);
+        renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
+
+        //랭킹 변화 라벨 추가
+        if (previousClanRank !== 0) {
+          const displayLank = changeRank === 0 ? '=' : Math.abs(changeRank)
+          const changeRankLabel = makeLabelChip(displayLank);
+          changeRankLabel.classList.add('label-change-rank');
+          if (changeRank === 0) {
+            changeRankLabel.classList.add('bg-lightgray');
+          } else if (changeRank > 0) {
+            changeRankLabel.classList.add('bg-green');
+
+            const iconArrowUpTemplate = document.querySelector('#icon-arrow-up');
+            const iconArrowUp = document.importNode(iconArrowUpTemplate.content, true);
+            changeRankLabel.prepend(iconArrowUp);
+          } else {
+            const iconArrowDownTemplate = document.querySelector('#icon-arrow-down');
+            const iconArrowDown = document.importNode(iconArrowDownTemplate.content, true);
+            changeRankLabel.classList.add('bg-crimson');
+            changeRankLabel.prepend(iconArrowDown);
+          }
+
+          const tagHeroLevel = playerInfo.querySelector('.tag-hero-level');
+          tagHeroLevel.insertAdjacentElement("afterEnd", changeRankLabel);
+        }
+
+        // 현재 클랜원 표기 설정
+        const tagHeroLevel = playerInfo.querySelector('.tag-hero-level');
+        tagHeroLevel.classList.remove('bg-crimson');
+        tagHeroLevel.classList.add('bg-gold');
+
+        const iconTrophiesTemplate = document.querySelector('#icon-trophies');
+        const iconTrophies = document.importNode(iconTrophiesTemplate.content, true);
+        tagHeroLevel.prepend(iconTrophies);
+
+        if (isSupportPlayer) {
+          supportPlayers++;
+          playerInfo.classList.add('support-player');
+        }
+
+        playerList.appendChild(playerInfoElement);
+      }
+
+      cardCurrentPlayer.querySelector('.total-size').innerHTML = currentClanMembers.length;
+      cardCurrentPlayer.querySelector('.support-size').innerHTML = supportPlayers;
     }
 
     async function viewAssignedPlayer(element) {
@@ -538,9 +678,12 @@
         </div>
       </div>
 
-      <div class="card-footer">
+      <div class="card-footer support">
+        <div class="card-button" onclick="viewCurrentClanPlayers(this);">
+          <span class="button-chip bg-black">현재 클랜원</span>
+        </div>
         <div class="card-button cursor-pointer btn-view-assigned-player" onclick="viewAssignedPlayer(this);">
-          <span class="button-chip">배정클랜원</span>
+          <span class="button-chip bg-green">배정클랜원</span>
         </div>
       </div>
 
@@ -552,7 +695,7 @@
 
     </div>
 
-    <div class="card-assigned-player-wrapper display-none">
+    <div class="player-wrapper card-current-player-wrapper display-none">
       <div class="loader-circle">
         <div class="bar1"></div>
         <div class="bar2"></div>
@@ -568,7 +711,59 @@
         <div class="bar12"></div>
       </div>
 
-      <div class="card-assigned-player">
+      <div class="player-card card-current-player">
+        <div class="caption">
+          <div class="layout-left">현재 클랜원</div>
+          <div class="layout-right">
+            <div class="button-chip btn-close" onclick="closeCurrentPlayer(this);">닫기</div>
+          </div>
+        </div>
+
+        <div class="manager-button-area">
+          <!--            <div class="button-chip bg-orange">일괄 배정</div>-->
+          <!--            <div class="button-chip bg-crimson">일괄 삭제</div>-->
+        </div>
+
+        <div class="body display-none">
+
+          <div class="support-area">
+            <div class="info">
+              <span class="regular-text">가입 인원 : <span class="total-size"></span> 명</span>
+              <span class="regular-text">지원 계정 : <span class="support-size"></span> 명</span>
+            </div>
+            <div class="button-area">
+              <div class="toggle-button-simple filter">
+                <div class="toggle-button-simple-cover">
+                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterSupportPlayer(this); return false;">
+                  <label data-tg-on="지원계정" data-tg-off="전체" class="tgl-btn"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="player-list"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="player-wrapper card-assigned-player-wrapper display-none">
+      <div class="loader-circle">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+      </div>
+
+      <div class="player-card card-assigned-player">
         <div class="caption">
           <div class="layout-left">
             <span class="season-date"></span>배정클랜원
@@ -616,8 +811,8 @@
       </div>
       <div class="player-info-item">
         <div class="info">
-          <div class="chip bg-crimson small-text">{HERO_TOTAL_LEVEL}</div>
-          <div class="big-text">{NAME}</div>
+          <div class="chip bg-crimson small-text tag-hero-level">{HERO_TOTAL_LEVEL}</div>
+          <div class="big-text name">{NAME}</div>
         </div>
         <div class="info additional">
         </div>
@@ -635,5 +830,14 @@
 </template>
 <template id="player-info-additional-template">
   <div class="chip small-text">{NAME}</div>
+</template>
+<template id="icon-arrow-up">
+  <i class="fa-solid fa-sort-up"></i>
+</template>
+<template id="icon-arrow-down">
+  <i class="fa-solid fa-sort-down"></i>
+</template>
+<template id="icon-trophies">
+  <div class="icon trophies"></div>
 </template>
 </html>

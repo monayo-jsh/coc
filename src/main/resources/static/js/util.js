@@ -158,6 +158,12 @@ function calcHeroLevelSum(heroes) {
   }, 0)
 }
 
+function sortByTrophies(members) {
+  // 트로피 순 > 이름 순
+  return members.map(member => member)
+                .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
+}
+
 function sortByHeroTotalLevel(players) {
   // 영웅레벨 순 -> 이름 순
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));

@@ -405,6 +405,18 @@
   transform: rotate(180deg);
 }
 
+.label-change-rank {
+  i {
+    margin-right: 3px;
+  }
+  i.fa-sort-up {
+    margin-top: 3px;
+  }
+  i.fa-sort-down {
+    margin-bottom: 3px;
+  }
+}
+
 .description {
   font-size: 13px;
   font-weight: bold;

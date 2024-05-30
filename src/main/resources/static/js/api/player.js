@@ -1,5 +1,6 @@
 const URI_PLAYERS = '/players'; //멤버 상세 조회
 const URI_PLAYERS_ALL = '/players/all'; //전체 클랜원 조회
+const URI_PLAYERS_ALL_TAGS = '/players/all/tags'; //전체 클랜원 태그 조회
 const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
 const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
 const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
@@ -14,6 +15,18 @@ async function findPlayer(playerTag) {
                     .catch((error) => {
                       console.error(error);
                       throw error;
+                    });
+}
+
+async function fetchAllPlayerTags() {
+  return await axios.get(URI_PLAYERS_ALL_TAGS)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
                     });
 }
 

@@ -437,4 +437,7 @@ public class PlayersService {
                                                                                 .build());
     }
 
+    public List<String> findAllPlayerTags() {
+        return playerRepository.findAllPlayerTag();
+    }
 }

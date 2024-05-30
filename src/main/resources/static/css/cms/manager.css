@@ -94,6 +94,7 @@
   border-top: 1px solid gray;
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
 
   .info {
     display: flex;
@@ -455,4 +456,14 @@
   .icon.trophies {
     margin-right: 3px;
   }
+}
+
+.player-filter-wrapper {
+  height: fit-content;
+  background-color: yellowgreen;
+  border-radius: 10px;
+}
+
+.player-filter {
+  font-size: 8px;
 }

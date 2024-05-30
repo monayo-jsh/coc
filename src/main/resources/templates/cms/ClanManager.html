@@ -441,7 +441,7 @@
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
-                           .replace(/{CLAN_TAG}/, tag)
+                           .replace(/{CLAN_TAG}/g, tag)
                            .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
                            .replace(/{CLAN_LEADER}/, leader.name)
                            .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
@@ -524,7 +524,7 @@
       loaderElement.classList.remove('display-none');
 
       // 필터 초기화
-      cardCurrentPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
+      cardCurrentPlayerWrapper.querySelector('.btn-filter-all').click();
     }
 
     function closeAssignedPlayer(element) {
@@ -540,7 +540,7 @@
       loaderElement.classList.remove('display-none');
 
       // 필터 초기화
-      cardAssignedPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
+      cardAssignedPlayerWrapper.querySelector('.btn-filter-all').click();
     }
 
     function closeLeagueAssignedPlayer(element) {
@@ -556,7 +556,7 @@
       loaderElement.classList.remove('display-none');
 
       // 필터 초기화
-      cardAssignedPlayerWrapper.querySelector('.toggle-button-simple-cover input[type=checkbox]').checked = false;
+      cardAssignedPlayerWrapper.querySelector('.btn-filter-all').click();
     }
 
     function isWarPreferenceIn(warPreference) {
@@ -658,10 +658,16 @@
       cardCurrentPlayerWrapper.classList.remove('display-none');
 
       const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+
+      //전체 클랜원 태그 조회
+      const allPlayerTags = await fetchAllPlayerTags();
+      const allPlayerTagSet =  new Set(allPlayerTags);
+
+      //지원계정 목록 조회
       const supportPlayers = await fetchSupportPlayers();
       const supportPlayerMap = convertArrayToMapByKey(supportPlayers);
 
-      renderCurrentPlayer(clanMembers, supportPlayerMap, cardElement);
+      renderCurrentPlayer(clanMembers, allPlayerTagSet, supportPlayerMap, cardElement);
 
       // 로딩바 숨김
       const loaderElement = cardCurrentPlayerWrapper.querySelector('.loader-circle');
@@ -673,7 +679,13 @@
 
     }
 
-    function renderCurrentPlayer(currentClanMembers, supportPlayerMap, cardElement) {
+    function convertJoinedLabel(isClanPlayer, isSupportPlayer) {
+      if (!isClanPlayer) return '미등록계정'
+      if (isSupportPlayer) return '지원계정'
+      return '';
+    }
+
+    function renderCurrentPlayer(currentClanMembers, allPlayerTagSet, supportPlayerMap, cardElement) {
 
       const playerInfoTemplate = document.querySelector('#clan-player-info-template');
 
@@ -682,14 +694,16 @@
       playerList.innerHTML = ""; // clear
 
       const sortedPlayers = sortByTrophies(currentClanMembers);
-      let supportPlayers = 0;
 
+      let unknownPlayers = 0;
+      let supportPlayers = 0;
       for (const player of sortedPlayers) {
         const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
         const playerInfo = playerInfoElement.querySelector('.player-info');
 
         const { townHallLevel, name, tag, trophies, role, clanRank, previousClanRank } = player;
 
+        const isClanPlayer = allPlayerTagSet.has(tag);
         const isSupportPlayer = !!supportPlayerMap.get(tag);
         const changeRank = previousClanRank - clanRank;
 
@@ -699,7 +713,7 @@
                                          .replace(/{NAME}/, name)
                                          .replace(/{HERO_TOTAL_LEVEL}/, trophies)
                                          .replace(/{CURRENT_CLAN}/, "")
-                                         .replace(/{JOINED}/, isSupportPlayer ? '지원 계정' : '');
+                                         .replace(/{JOINED}/, convertJoinedLabel(isClanPlayer, isSupportPlayer));
 
         const infoAdditionalElement = playerInfo.querySelector('.info.additional');
         renderAdditionalLabel(infoAdditionalElement, tag);
@@ -740,15 +754,21 @@
         const iconTrophies = document.importNode(iconTrophiesTemplate.content, true);
         tagHeroLevel.prepend(iconTrophies);
 
-        if (isSupportPlayer) {
-          supportPlayers++;
-          playerInfo.classList.add('support-player');
+        if (!isClanPlayer) {
+          unknownPlayers++;
+          playerInfo.classList.add('unknown-player');
+        } else {
+          if (isSupportPlayer) {
+            supportPlayers++;
+            playerInfo.classList.add('support-player');
+          }
         }
 
         playerList.appendChild(playerInfoElement);
       }
 
       cardCurrentPlayer.querySelector('.total-size').innerHTML = currentClanMembers.length;
+      cardCurrentPlayer.querySelector('.unknown-size').innerHTML = unknownPlayers;
       cardCurrentPlayer.querySelector('.support-size').innerHTML = supportPlayers;
     }
 
@@ -765,6 +785,7 @@
       const cardAssignedPlayerWrapper = cardElement.querySelector('.card-assigned-player-wrapper');
       cardAssignedPlayerWrapper.classList.remove('display-none');
 
+      // 배정 클랜원 목록
       const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
 
       const clanMembers = await fetchClanMembers([{tag: clanTag}]);
@@ -788,8 +809,8 @@
 
     }
 
-    function filterSupportPlayer(element) {
-      changeDisplay(element, 'support-player');
+    function filterSupportPlayer(element, type) {
+      changeDisplay(element, `${type}-player`);
     }
 
     function changeDisplay(element, className) {
@@ -797,19 +818,21 @@
       const playerListElement = assignedCard.querySelector('.player-list');
 
       for (const playerInfo of playerListElement.children) {
-        if (element.checked) {
-          if (!playerInfo.classList.contains(className)) {
-            playerInfo.classList.add('display-none');
-          }
+        if (className.startsWith('all')) {
+          playerInfo.classList.remove('display-none');
           continue;
         }
 
-        playerInfo.classList.remove('display-none');
+        playerInfo.classList.add('display-none');
+        if (playerInfo.classList.contains(className)) {
+          playerInfo.classList.remove('display-none');
+        }
+
       }
     }
 
-    function filterNotJoined(element) {
-      changeDisplay(element, 'not-joined');
+    function filterNotJoined(element, type) {
+      changeDisplay(element, type);
     }
 
     async function assignedMember(element) {
@@ -1351,14 +1374,24 @@
           <div class="support-area">
             <div class="info">
               <span class="regular-text">가입 인원 : <span class="total-size"></span> 명</span>
+              <span class="regular-text">미등록 계정 : <span class="unknown-size"></span> 명</span>
               <span class="regular-text">지원 계정 : <span class="support-size"></span> 명</span>
             </div>
-            <div class="button-area">
-              <div class="toggle-button-simple filter">
-                <div class="toggle-button-simple-cover">
-                  <input type="checkbox" class="tgl tgl-skewed" onchange="filterSupportPlayer(this); return false;">
-                  <label data-tg-on="지원계정" data-tg-off="전체" class="tgl-btn"></label>
-                </div>
+            <div class="button-area player-filter-wrapper">
+              <div class="radio-inputs player-filter">
+                <label class="radio">
+                  <input type="radio" name="player-filter-{CLAN_TAG}" onclick="filterSupportPlayer(this, 'all');" class="btn-filter-all" checked>
+                  <span class="name">전체</span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="player-filter-{CLAN_TAG}" onclick="filterSupportPlayer(this, 'unknown');">
+                  <span class="name">미등록계정</span>
+                </label>
+
+                <label class="radio">
+                  <input type="radio" name="player-filter-{CLAN_TAG}" onclick="filterSupportPlayer(this, 'support');" class="btn-filter-not-joined">
+                  <span class="name">지원계정</span>
+                </label>
               </div>
             </div>
           </div>
@@ -1388,7 +1421,7 @@
       <div class="player-card card-assigned-player assigned-card">
         <div class="caption">
           <div class="layout-left">
-            <span class="season-date"></span>배정클랜원
+            <span class="season-date"></span>배정 클랜원
           </div>
           <div class="layout-right">
             <div class="button-chip btn-close" onclick="closeAssignedPlayer(this);">닫기</div>
@@ -1427,12 +1460,16 @@
               <span class="regular-text">이동 인원 : <span class="joined-size"></span> 명</span>
               <span class="regular-text">전쟁 선호 : <span class="war-preference-size"></span> 명 <span class="small-text">(이동 계정 기준)</span></span>
             </div>
-            <div class="button-area">
-              <div class="toggle-button-simple filter">
-                <div class="toggle-button-simple-cover">
-                  <input type="checkbox" class="tgl tgl-skewed btn-filter-not-joined" onchange="filterNotJoined(this); return false;">
-                  <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
-                </div>
+            <div class="button-area player-filter-wrapper">
+              <div class="radio-inputs player-filter">
+                <label class="radio">
+                  <input type="radio" name="assigned-filter-{CLAN_TAG}" onclick="filterNotJoined(this, 'all');" class="btn-filter-all" checked>
+                  <span class="name">전체</span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="assigned-filter-{CLAN_TAG}" onclick="filterNotJoined(this, 'not-joined');" class="btn-filter-not-joined">
+                  <span class="name">이동 필요</span>
+                </label>
               </div>
             </div>
           </div>
@@ -1500,13 +1537,19 @@
               <span class="regular-text">배정 인원 : <span class="total-size"></span> 명</span>
               <span class="regular-text">이동 인원 : <span class="joined-size"></span> 명</span>
             </div>
-            <div class="button-area">
-              <div class="toggle-button-simple filter">
-                <div class="toggle-button-simple-cover">
-                  <input type="checkbox" class="tgl tgl-skewed btn-filter-not-joined" onchange="filterNotJoined(this); return false;">
-                  <label data-tg-on="이동 필요" data-tg-off="전체" class="tgl-btn"></label>
-                </div>
+            <div class="button-area player-filter-wrapper">
+
+              <div class="radio-inputs player-filter">
+                <label class="radio">
+                  <input type="radio" name="league-assigned-filter-{CLAN_TAG}" onclick="filterNotJoined(this, 'all');" class="btn-filter-all" checked>
+                  <span class="name">전체</span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="league-assigned-filter-{CLAN_TAG}" onclick="filterNotJoined(this, 'not-joined');" class="btn-filter-not-joined">
+                  <span class="name">이동 필요</span>
+                </label>
               </div>
+
             </div>
           </div>
 

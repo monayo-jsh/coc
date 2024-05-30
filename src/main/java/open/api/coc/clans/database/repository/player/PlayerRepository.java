@@ -26,4 +26,7 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
         + " where p.supportYn = :supportYn"
     )
     List<PlayerEntity> findAllBySupportYn(YnType supportYn);
+
+    @Query("select p.playerTag from PlayerEntity p")
+    List<String> findAllPlayerTag();
 }

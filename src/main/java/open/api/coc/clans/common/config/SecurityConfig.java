@@ -69,7 +69,12 @@ public class SecurityConfig {
     private List<UserDetails> getUsers() {
         return List.of(
             makeUserDetails(username, password, "ADMIN"),
-            makeUserDetails("coc-developer", "1", "ADMIN")
+            makeUserDetails(username+"2", password, "ADMIN"),
+            makeUserDetails(username+"3", password, "ADMIN"),
+            makeUserDetails(username+"4", password, "ADMIN"),
+            makeUserDetails(username+"5", password, "ADMIN"),
+            makeUserDetails("coc-developer-1", password, "ADMIN"),
+            makeUserDetails("coc-developer-2", password, "ADMIN")
         );
     }
 

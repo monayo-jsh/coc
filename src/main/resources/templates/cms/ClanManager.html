@@ -712,7 +712,7 @@
           changeRankLabel.classList.add('label-change-rank');
           if (changeRank === 0) {
             changeRankLabel.classList.add('bg-lightgray');
-          } else if (changeRank > 1) {
+          } else if (changeRank > 0) {
             changeRankLabel.classList.add('bg-green');
 
             const iconArrowUpTemplate = document.querySelector('#icon-arrow-up');
@@ -725,8 +725,8 @@
             changeRankLabel.prepend(iconArrowDown);
           }
 
-          const playerInfoBasic = playerInfo.querySelector('.info.basic');
-          playerInfoBasic.prepend(changeRankLabel);
+          const tagHeroLevel = playerInfo.querySelector('.tag-hero-level');
+          tagHeroLevel.insertAdjacentElement("afterEnd", changeRankLabel);
         }
 
         // 현재 클랜원 표기 설정
@@ -735,6 +735,10 @@
         const tagHeroLevel = playerInfo.querySelector('.tag-hero-level');
         tagHeroLevel.classList.remove('bg-crimson');
         tagHeroLevel.classList.add('bg-gold');
+
+        const iconTrophiesTemplate = document.querySelector('#icon-trophies');
+        const iconTrophies = document.importNode(iconTrophiesTemplate.content, true);
+        tagHeroLevel.prepend(iconTrophies);
 
         if (isSupportPlayer) {
           supportPlayers++;
@@ -1554,7 +1558,7 @@
       <div class="player-info-item">
         <div class="info basic">
           <div class="chip bg-crimson small-text tag-hero-level">{HERO_TOTAL_LEVEL}</div>
-          <div class="big-text">{NAME}</div>
+          <div class="big-text name">{NAME}</div>
           <i class="fa-regular fa-square-minus color-red btn-remove-member cursor-pointer" onclick="removeAssignedMember(this); return false;"></i>
         </div>
         <div class="info additional"></div>
@@ -1571,12 +1575,15 @@
   </div>
 </template>
 <template id="player-info-additional-template">
-  <div class="chip small-text">{NAME}</div>
+  <div class="chip regular-text">{NAME}</div>
 </template>
 <template id="icon-arrow-up">
   <i class="fa-solid fa-sort-up"></i>
 </template>
 <template id="icon-arrow-down">
   <i class="fa-solid fa-sort-down"></i>
+</template>
+<template id="icon-trophies">
+  <div class="icon trophies"></div>
 </template>
 </html>

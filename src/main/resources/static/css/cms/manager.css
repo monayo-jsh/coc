@@ -450,3 +450,9 @@
   margin-top: 5px;
   border-radius: 0.5rem;
 }
+
+.tag-hero-level {
+  .icon.trophies {
+    margin-right: 3px;
+  }
+}

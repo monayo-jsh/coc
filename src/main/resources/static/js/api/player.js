@@ -1,9 +1,13 @@
 const URI_PLAYERS = '/players'; //멤버 상세 조회
+
 const URI_PLAYERS_ALL = '/players/all'; //전체 클랜원 조회
 const URI_PLAYERS_ALL_TAGS = '/players/all/tags'; //전체 클랜원 태그 조회
-const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
+
 const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
 const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
+
+const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
+const URI_PLAYERS_SUPPORT = '/players/{playerTag}/support'; //지원 등록/해제
 
 async function findPlayer(playerTag) {
   const uri = URI_PLAYERS_REALTIME.replace(/{playerTag}/, encodeURIComponent(playerTag));
@@ -89,4 +93,23 @@ async function fetchSupportPlayers() {
                       console.error(error);
                       return [];
                     });
+}
+
+async function updatePlayerSupportYn(playerTag, supportYn) {
+  const requestBody = {
+    support_yn: supportYn
+  }
+
+  const uri = `${URI_PLAYERS_SUPPORT.replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+  return axios.put(uri, requestBody)
+              .then(response => {
+                const { data } = response
+                let message = `지원계정 ${supportYn === 'Y' ? '등록' : '해제'} 되었습니다.`
+                alert(message);
+                return true;
+              })
+              .catch((error) => {
+                console.error(error);
+                return false;
+              });
 }

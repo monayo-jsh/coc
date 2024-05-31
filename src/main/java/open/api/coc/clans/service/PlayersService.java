@@ -1,6 +1,7 @@
 package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createBadRequestException;
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
-import open.api.coc.clans.common.exception.handler.ExceptionHandler;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
@@ -37,6 +37,7 @@ import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepos
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
+import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -122,7 +123,7 @@ public class PlayersService {
         }
 
         Player player = clanApiService.fetchPlayerBy(playerTag)
-                                      .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+                                      .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         PlayerEntity playerEntity = playerEntityConverter.convert(player);
 
@@ -242,10 +243,10 @@ public class PlayersService {
     @Transactional
     public boolean updatePlayer(String playerTag) {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
-                                                    .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+                                                    .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         Player player = clanApiService.fetchPlayerBy(playerTag)
-                                      .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+                                      .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         modifyPlayer(playerEntity, player);
         modifyPlayerHero(playerEntity, player.getHeroes());
@@ -440,4 +441,15 @@ public class PlayersService {
     public List<String> findAllPlayerTags() {
         return playerRepository.findAllPlayerTag();
     }
+
+    @Transactional
+    public void changePlayerSupport(PlayerModify playerModify) {
+
+        PlayerEntity player = playerRepository.findById(playerModify.getPlayerTag())
+                                              .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerModify.getPlayerTag())));
+
+        player.changeSupportYn(playerModify.getSupportYn());
+        playerRepository.save(player);
+    }
+
 }

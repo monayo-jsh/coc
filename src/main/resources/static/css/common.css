@@ -94,7 +94,7 @@ body::before {
       url(/static/images/townhall/4.png);
       url(/static/images/townhall/3.png);
       url(/static/images/townhall/2.png);
-      url(/static/images/townhall/1.png);;
+      url(/static/images/townhall/1.png);
 
       url(/static/images/siegemachine/Wall_Wrecker.png);
       url(/static/images/siegemachine/Battle_Blimp.png);
@@ -103,6 +103,21 @@ body::before {
       url(/static/images/siegemachine/Log_Launcher.png);
       url(/static/images/siegemachine/Flame_Flinger.png);
       url(/static/images/siegemachine/Battle_Drill.png);
+
+      url(/static/images/spell/Bat_Spell.png);
+      url(/static/images/spell/Clone_Spell.png);
+      url(/static/images/spell/Earthquake_Spell.png);
+      url(/static/images/spell/Freeze_Spell.png);
+      url(/static/images/spell/Haste_Spell.png);
+      url(/static/images/spell/Healing_Spell.png);
+      url(/static/images/spell/Invisibility_Spell.png);
+      url(/static/images/spell/Jump_Spell.png);
+      url(/static/images/spell/Lightning_Spell.png);
+      url(/static/images/spell/Overgrowth_Spell.png);
+      url(/static/images/spell/Poison_Spell.png);
+      url(/static/images/spell/Rage_Spell.png);
+      url(/static/images/spell/Recall_Spell.png);
+      url(/static/images/spell/Skeleton_Spell.png);
 }
 
 .logo {

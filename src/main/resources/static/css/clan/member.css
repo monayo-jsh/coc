@@ -474,3 +474,7 @@
 .label.chip {
   background-color: #bbe18d;
 }
+
+.button-wrapper {
+  margin-top: 5px;
+}

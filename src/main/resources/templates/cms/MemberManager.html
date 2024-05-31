@@ -163,7 +163,7 @@
     }
 
     function renderMemberSortByTrophies(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -174,7 +174,7 @@
     }
 
     function rederMemberSortByHeroLevelSum(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -583,22 +583,23 @@
       const regexp = createFuzzyMatcher(searchKeyword);
       return members.filter((member) => {
                       return regexp.test(member.name);
-                    }).map((member) => {
-                      const displayName = member.name;
-                      member.displayName = displayName.replace(regexp, (match, ...groups) => {
-                        const letters = groups.slice(0, match.length);
-                        let lastIndex = 0;
-                        let highlighted = [];
-                        for(let i=0,l=letters.length; i < l; i++) {
-                          const idx = match.indexOf(letters[i], lastIndex);
-                          highlighted.push(match.substring(lastIndex, idx));
-                          highlighted.push(`<mark>${letters[i]}</mark>`);
-                          lastIndex = idx + 1;
-                        }
-                        return highlighted.join('');
-                      })
-                      return member;
                     })
+                    // .map((member) => {
+                    //   const displayName = member.name;
+                    //   member.displayName = displayName.replace(regexp, (match, ...groups) => {
+                    //     const letters = groups.slice(0, match.length);
+                    //     let lastIndex = 0;
+                    //     let highlighted = [];
+                    //     for(let i=0,l=letters.length; i < l; i++) {
+                    //       const idx = match.indexOf(letters[i], lastIndex);
+                    //       highlighted.push(match.substring(lastIndex, idx));
+                    //       highlighted.push(`<mark>${letters[i]}</mark>`);
+                    //       lastIndex = idx + 1;
+                    //     }
+                    //     return highlighted.join('');
+                    //   })
+                    //   return member;
+                    // })
     }
 
     function refreshRenderingMembers() {

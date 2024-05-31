@@ -1,5 +1,8 @@
 package open.api.coc.clans.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -92,7 +95,10 @@ public class RaidService {
     }
 
     public List<RaiderEntity> getRaiderWithLessThanPoints(int capitalClanCount, int point) {
-        List<RaidEntity> raidEntityList = raidRepository.getLastWeekRaidStatistics(PageRequest.of(0,capitalClanCount));
+        List<RaidEntity> raidEntityList =
+                raidRepository.getLastWeekRaidStatistics(
+                        LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)).with(TemporalAdjusters.previous(DayOfWeek.FRIDAY)),
+                        PageRequest.of(0,capitalClanCount));
         List<RaiderEntity> result = new ArrayList<>();
         for (RaidEntity raid : raidEntityList) {
             for (RaiderEntity raider : raid.getRaiderEntityList()) {
@@ -104,20 +110,30 @@ public class RaidService {
         return result;
     }
 
-    public List<RaidScoreResponse> getPlayerRaidScore(String playerTag) {
+    public List<RaidScoreResponse> getPlayerRaidScoreWithTag(String playerTag) {
 
-        List<RaiderEntity> radierEntities = raiderRepository.findByTag(playerTag);
+        List<RaiderEntity> raiderEntities = raiderRepository.findByTag(playerTag);
 
-        for(RaiderEntity raiderEntity : radierEntities) {
+        return getRaidScoreResponses(raiderEntities);
+    }
+
+    public List<RaidScoreResponse> getPlayerRaidScoreWithName(String playerName) {
+        List<RaiderEntity> raiderEntities = raiderRepository.findByName(playerName);
+
+        return getRaidScoreResponses(raiderEntities);
+    }
+
+    private List<RaidScoreResponse> getRaidScoreResponses(List<RaiderEntity> raiderEntities) {
+        for(RaiderEntity raiderEntity : raiderEntities) {
             ClanEntity clanEntity = clansService.findClanEntityBy(raiderEntity.getRaid().getClanTag()).orElse(null);
             raiderEntity.getRaid().changeClan(clanEntity);
         }
 
-        return radierEntities.stream()
-                             .map(raidScoreResponseConverter::convert)
-                             .sorted(Comparator.comparing(RaidScoreResponse::getSeasonStartDate).reversed())
-                             .collect(Collectors.toList());
-
+        return raiderEntities.stream()
+                .map(raidScoreResponseConverter::convert)
+                .sorted(Comparator.comparing(RaidScoreResponse::getTag)
+                                  .thenComparing(RaidScoreResponse::getSeasonStartDate).reversed())
+                .collect(Collectors.toList());
     }
 
     public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {

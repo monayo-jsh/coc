@@ -145,6 +145,11 @@
                                                            .replace(/{ATTACKS}/, attacks)
                                                            .replace(/{RESOURCES_LOOTED}/, Number(capitalResourcesLooted).toLocaleString());
 
+        // 태그 클립보드 복사 기능
+        const playerTag = memberRecordElement.querySelector('.player-tag');
+        playerTag.classList.add('cursor-pointer');
+        playerTag.onclick = () => copyClipboard(tag);
+
         membersElement.appendChild(memberRecord);
       }
     }
@@ -307,13 +312,13 @@
       });
     }
 
-    async function initPage() {
+    window.onload = async () => {
       await loadLeagues();
       await writeCapitalClans();
     }
   </script>
 </head>
-<body onload="initPage()">
+<body>
   <div class="capital-raid">
     <div class="card caption">
       <div class="bottom-section">
@@ -414,7 +419,7 @@
     <div class="item">
       <span class="regular-text">{NAME}</span>
       <br>
-      <span class="small-text chip color-black">{TAG}</span>
+      <span class="small-text chip color-black player-tag">{TAG}</span>
     </div>
 
     <div class="item">

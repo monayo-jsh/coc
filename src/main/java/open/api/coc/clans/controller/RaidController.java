@@ -6,11 +6,7 @@ import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.service.RaidService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,11 +28,17 @@ public class RaidController {
     }
 
     @GetMapping("/score/{playerTag}")
-    public ResponseEntity<List<RaidScoreResponse>> getPlayerRaidScore(@PathVariable String playerTag) {
+    public ResponseEntity<List<RaidScoreResponse>> getPlayerRaidScoreWithTag(@PathVariable String playerTag) {
 
-        List<RaidScoreResponse> playerRaidScores = raidService.getPlayerRaidScore(playerTag);
+        List<RaidScoreResponse> playerRaidScores = raidService.getPlayerRaidScoreWithTag(playerTag);
 
         return ResponseEntity.ok().body(playerRaidScores);
+    }
+
+    @GetMapping("/score/playerName")
+    public ResponseEntity<List<RaidScoreResponse>> getPlayerRaidScoreWithName(@RequestParam String playerName) {
+        List<RaidScoreResponse> playerRaidScores = raidService.getPlayerRaidScoreWithName(playerName);
+        return ResponseEntity.ok(playerRaidScores);
     }
 
 }

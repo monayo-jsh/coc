@@ -177,6 +177,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .warStars(source.getWarStars())
                                               .role(source.getRole())
                                               .warPreference(source.getWarPreference().name())
+                                              .supportYn(source.getSupportYn().name())
                                               .clan(makePlayerClanResponse(source.getClan()))
                                               .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))
                                               .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))

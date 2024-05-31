@@ -105,6 +105,14 @@ public class PlayersService {
                       .collect(Collectors.toList());
     }
 
+    public List<PlayerResponse> findAllSupportPlayers() {
+        List<PlayerEntity> players = playerRepository.findAllBySupportYn(YnType.Y);
+
+        return players.stream()
+                      .map(playerResponseConverter::convert)
+                      .collect(Collectors.toList());
+    }
+
     @Transactional
     public PlayerResponse registerPlayer(String playerTag) {
 
@@ -429,4 +437,7 @@ public class PlayersService {
                                                                                 .build());
     }
 
+    public List<String> findAllPlayerTags() {
+        return playerRepository.findAllPlayerTag();
+    }
 }

@@ -1,5 +1,8 @@
 package open.api.coc.clans.common.config;
 
+import java.util.List;
+import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -15,16 +18,21 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
     @Value("${cms.admin-id}")
     private String username;
 
     @Value("${cms.admin-password}")
     private String password;
+
+    private final DataSource dataSource;
 
     private static final String[] BLACK_LIST = {"/clan/cms/**"};
 
@@ -37,6 +45,7 @@ public class SecurityConfig {
                         .key("AcademyCMS")
                         .rememberMeParameter("academy-cms-remember-me")
                         .rememberMeCookieName("academy-cms-remember-me")
+                        .tokenRepository(tokenRepository())
                         .userDetailsService(users()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize ->
@@ -53,11 +62,34 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService users() {
-        UserDetails admin = User.builder()
-                .username(username)
-                .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
-                .roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(admin);
+        List<UserDetails> users = getUsers();
+        return new InMemoryUserDetailsManager(users.stream().toList());
+    }
+
+    private List<UserDetails> getUsers() {
+        return List.of(
+            makeUserDetails(username, password, "ADMIN"),
+            makeUserDetails(username+"2", password, "ADMIN"),
+            makeUserDetails(username+"3", password, "ADMIN"),
+            makeUserDetails(username+"4", password, "ADMIN"),
+            makeUserDetails(username+"5", password, "ADMIN"),
+            makeUserDetails("coc-developer-1", password, "ADMIN"),
+            makeUserDetails("coc-developer-2", password, "ADMIN")
+        );
+    }
+
+    private UserDetails makeUserDetails(String username, String password, String role) {
+        return User.builder()
+                   .username(username)
+                   .password(PasswordEncoderFactories.createDelegatingPasswordEncoder().encode(password))
+                   .roles(role)
+                   .build();
+    }
+
+    @Bean
+    public PersistentTokenRepository tokenRepository() {
+        JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
+        tokenRepository.setDataSource(dataSource);
+        return tokenRepository;
     }
 }

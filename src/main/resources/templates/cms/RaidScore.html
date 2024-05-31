@@ -20,7 +20,19 @@
   <script src="https://unpkg.com/tippy.js@6"></script>
 
   <title>습격전 기록 조회</title>
-
+  <style>
+    .input {
+      width: calc(100% - 29px);
+      height: 100%;
+      border: 0;
+      border-color: transparent;
+      font-size: 12px;
+      padding-right: 0px;
+      color: var(--input-line);
+      background: var(--input-bg-color);
+      outline: none;
+    }
+  </style>
   <script>
     function clearPlayerRiadScoreList() {
       let tableTbody = document.querySelector('.table-tbody');
@@ -104,7 +116,23 @@
       }
 
       showLoading('.table-tbody');
-      const playerRaidScores = await fetchPlayerRaidScore(playerTag);
+      const playerRaidScores = await fetchPlayerRaidScoreWithPlayerTag(playerTag);
+      hideLoading('.table-tbody');
+
+      renderPlayerRaidScores(playerRaidScores);
+    }
+
+    async function searchPlayerRaidScoreWithTag(element) {
+      showLoading('.table-tbody');
+      const playerRaidScores = await fetchPlayerRaidScoreWithPlayerTag(element);
+      hideLoading('.table-tbody');
+
+      renderPlayerRaidScores(playerRaidScores);
+    }
+
+    async function searchPlayerRaidScoreWithName(element) {
+      showLoading('.table-tbody');
+      const playerRaidScores = await fetchPlayerRaidScoreWithPlayerName(element);
       hideLoading('.table-tbody');
 
       renderPlayerRaidScores(playerRaidScores);
@@ -115,6 +143,88 @@
       await collectRaidSeason();
       hideWifiLoading('.body');
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const radioButtons = document.querySelectorAll('input[name="options"]');
+      radioButtons.forEach(radio => radio.addEventListener('change', updatePlaceholder));
+      updatePlaceholder();
+    });
+    function updatePlaceholder() {
+      const selectedOption = document.querySelector('input[name="options"]:checked').value;
+      const searchInput = document.querySelector('.player-search-input');
+      const text = document.querySelector('.player-search-input').value;
+      searchInput.placeholder = selectedOption === '이름' ? '플레이어 이름 입력' : '플레이어 태그 입력';
+      if (text.length > 0) {
+        if (selectedOption === '이름') {
+          if (validateString(text)) {
+            searchPlayerRaidScoreWithName(text);
+          }
+        } else {
+          if (text.startsWith('#') && text.length >= 6) {
+            searchPlayerRaidScoreWithTag(text);
+          }
+        }
+      }
+    }
+    function isKoreanComplete(char) {
+      const charCode = char.charCodeAt(0);
+      return charCode >= 0xAC00 && charCode <= 0xD7A3; // 한글 완성된 글자
+    }
+
+    function isHangulIncomplete(char) {
+      const charCode = char.charCodeAt(0);
+      return (charCode >= 0x1100 && charCode <= 0x11FF) || // 한글 자모 (초성, 중성, 종성)
+              (charCode >= 0x3130 && charCode <= 0x318F) || // 한글 호환 자모
+              (charCode >= 0xA960 && charCode <= 0xA97F) || // 한글 자모 확장-A
+              (charCode >= 0xD7B0 && charCode <= 0xD7FF);   // 한글 자모 확장-B
+    }
+
+    function isEnglish(char) {
+      const charCode = char.charCodeAt(0);
+      return (charCode >= 0x0041 && charCode <= 0x005A) || // 영어 대문자
+              (charCode >= 0x0061 && charCode <= 0x007A);   // 영어 소문자
+    }
+
+    function isDigit(char) {
+      const charCode = char.charCodeAt(0);
+      return charCode >= 0x0030 && charCode <= 0x0039; // 숫자
+    }
+
+    function isValidChar(char) {
+      return isKoreanComplete(char) || isEnglish(char) || isDigit(char);
+    }
+
+    function validateString(str) {
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charAt(i);
+        if (isHangulIncomplete(char)) {
+          return false;
+        }
+        if (!isValidChar(char)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('.player-search-input').addEventListener('input', function(event) {
+        const text = event.target.value.trim();
+        const selectedOption = document.querySelector('input[name="options"]:checked').value;
+        if (text.length > 0) {
+          if (selectedOption === '이름') {
+            if (validateString(text)) {
+              searchPlayerRaidScoreWithName(text);
+            }
+          } else {
+            if (text.startsWith('#') && text.length >= 6) {
+              searchPlayerRaidScoreWithTag(text);
+            }
+          }
+        }
+      });
+    });
   </script>
 </head>
 <body>
@@ -127,6 +237,16 @@
 
     <div class="container">
       <div class="buttons">
+        <div class="radio-container">
+          <label class="radio-label">
+            <input type="radio" name="options" value="이름" checked>
+            <span>이름</span>
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="options" value="태그">
+            <span>태그</span>
+          </label>
+        </div>
         <div class="button-chip">
           <button class="refresh" onclick="refreshClanRaidSeason(); return false;">
             최근 습격전 기록 업데이트
@@ -173,14 +293,14 @@
         <div class="search">
           <div class="search-box">
             <div class="search-field">
-              <input placeholder="플레이어 태그 입력" class="input player-search-input" type="text">
-              <div class="search-box-icon">
-                <button class="btn-icon-content" onclick="searchPlayerRaidScore(this); return false;">
-                  <i class="search-icon">
-                    <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
-                  </i>
-                </button>
-              </div>
+              <input placeholder="입력" class="input player-search-input" type="text">
+<!--              <div class="search-box-icon">-->
+<!--                <button class="btn-icon-content" onclick="searchPlayerRaidScore(this); return false;">-->
+<!--                  <i class="search-icon">-->
+<!--                    <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>-->
+<!--                  </i>-->
+<!--                </button>-->
+<!--              </div>-->
             </div>
           </div>
         </div>

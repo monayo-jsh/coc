@@ -10,11 +10,22 @@ function convertArrayToLevelMapByKoreanName(array) {
   }, {});
 }
 
-function convertArrayToMapByTag(array) {
+function convertArrayToMapByKey(array, key = 'tag', isList = false) {
   return array.reduce((map, row) => {
-    map[row.tag] = row;
-    return map
-  }, {});
+    if (!isList) {
+      // 객체
+      map.set(row[key], row);
+      return map;
+    }
+
+    // 배열
+    if (!map.get(row[key])) {
+      map.set(row[key], []);
+    }
+
+    map.get(row[key]).push(row);
+    return map;
+  }, new Map());
 }
 
 function formattedPlayers(players) {
@@ -117,6 +128,12 @@ function convLeagueName(leagueName) {
   return leagueName;
 }
 
+function convertNameByType(type) {
+  if (type === 'ELIXIR') return '일반';
+  if (type === 'DARK_ELIXIR') return '암흑';
+  return type;
+}
+
 function convClanJoinTypeName(type) {
   switch (type.toLowerCase()) {
     case 'open': return '공개';
@@ -141,9 +158,20 @@ function calcHeroLevelSum(heroes) {
   }, 0)
 }
 
+function sortByTrophies(members) {
+  // 트로피 순 > 이름 순
+  return members.map(member => member)
+                .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
+}
+
 function sortByHeroTotalLevel(players) {
   // 영웅레벨 순 -> 이름 순
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
+}
+
+function sortedByOrder(arrays) {
+  // order 필드에 따른 정렬
+  return arrays.sort((a, b) => a.order - b.order);
 }
 
 function formatYYMMDate(date) {
@@ -153,4 +181,30 @@ function formatYYMMDate(date) {
 
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
+}
+
+function copyClipboard(value) {
+  if (window.isSecureContext && navigator.clipboard) {
+    window.navigator.clipboard.writeText(value).then(() => {
+
+    })
+  } else {
+    unsecuredCopyToClipboard(value);
+  }
+
+  function unsecuredCopyToClipboard(value) {
+    //아래와 같은 document.execCommand 방식은 Deprecated 처리 되어
+    //clipboard API로 대체 되었으나 해당 방식은 https 상태에서만 동작
+    //http 상태에서 동작 할 수 있도록 해당 로직 사용
+    const textArea = document.createElement("textarea");
+    textArea.value = value;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('Unable to copy to clipboard', err);
+    }
+    document.body.removeChild(textArea);
+  }
 }

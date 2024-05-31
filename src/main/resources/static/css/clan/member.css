@@ -146,6 +146,7 @@
   flex-wrap: wrap;
   justify-content: center;
   align-content: flex-start;
+  align-items: center;
 }
 
 .member.row:not(:first-child) {
@@ -155,15 +156,14 @@
 .member.row {
   width: 100%;
   min-width: 250px;
-  max-width: 300px;
+  max-width: 310px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: linear-gradient(to left, #f0f0f0, transparent), linear-gradient(to right, #c3c3c3, transparent);
-  border: var(--default-border);
   border-radius: 0 0 10px 0;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
-  margin: 5px;
+  margin: 0 2px;
   transition: transform 0.8s;
   transform-style: preserve-3d;
 
@@ -173,6 +173,9 @@
     font-weight: bold;
   }
 
+  .user.chip {
+    background-color: aliceblue;
+  }
   .user {
     font-size: 1em;
     font-weight: bold;
@@ -279,7 +282,6 @@
 .inner-section {
   display: flex;
   justify-content: space-between;
-  padding: 5px;
 }
 
 .inner-section.hero-wrapper {
@@ -302,6 +304,7 @@
 
 .button-chip {
   background-color: #8a8a8a;
+  font-size: 0.7rem;
 }
 
 .layout-badge,
@@ -309,7 +312,6 @@
   width: 100%;
   display: flex;
   align-items: center;
-  padding: 5px;
 }
 
 .layout-title {
@@ -344,6 +346,7 @@
 
 .card-front {
   width: 100%;
+  padding: 5px;
 }
 
 .card-back:not(:first-child) {
@@ -369,6 +372,10 @@
     }
   }
 
+  .inner-section:not(:first-child) {
+    margin-top: 5px;
+  }
+
   .inner-section {
     margin-bottom: 5px;
     flex-direction: column;
@@ -376,19 +383,19 @@
     border-radius: 5px;
 
     .label {
-      padding-left: 3px;
+      padding-left: 5px;
       font-size: 0.5em;
       font-weight: bold;
     }
 
     .contents {
-      margin-top: 5px;
+      margin-top: 2px;
       display: flex;
       flex-wrap: wrap;
 
       .img-icon {
         width: 35px;
-        margin: 3px;
+        margin: 1px;
         border: var(--default-border);
         border-radius: 10px;
       }
@@ -452,4 +459,18 @@
     width: 270px;
   }
 
+}
+
+.inner-section-group {
+  display: flex;
+  align-items: baseline;
+
+  .inner-section {
+    flex: 25%;
+  }
+
+}
+
+.label.chip {
+  background-color: #bbe18d;
 }

@@ -106,7 +106,8 @@ public class PlayerScheduler {
                            try {
                                return playersService.updatePlayer(player.getPlayerTag());
                            } catch (Exception e) {
-                               log.error("{} is player update failed...", player.getName(), e);
+                               log.error("player {} is update failed...", player.getName());
+                               log.error("player {} is fail message", e.getMessage());
                                return false;
                            }
                        })

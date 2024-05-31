@@ -22,6 +22,9 @@ public interface ClanRepository extends JpaRepository<ClanEntity, String> {
     @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanCapitalYn = 'Y' order by c.order")
     List<ClanEntity> findClanCapitalList();
 
+    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.warLeagueYn = 'Y' order by c.order")
+    List<ClanEntity> findClanLeagueList();
+
     @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarParallelYn = 'Y' order by c.order")
     List<ClanEntity> findClanWarParallelList();
 

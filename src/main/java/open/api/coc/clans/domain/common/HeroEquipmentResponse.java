@@ -20,4 +20,6 @@ public class HeroEquipmentResponse {
 
     private String rarity;
 
+    private String heroName;
+    private String heroShortName;
 }

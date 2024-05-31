@@ -49,6 +49,7 @@ import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -194,7 +195,7 @@ public class PlayersService {
         Map<String, PlayerHeroEquipmentEntity> playerHeroEquipmentEntityMap = playerHeroEquipmentEntitiesToMap(playerHeroEquipmentEntities);
         for (Hero hero : heroes) {
             if (hero.isNotVillageHome()) continue;
-
+            if (CollectionUtils.isEmpty(hero.getEquipment())) continue;
 
             for (HeroEquipment heroEquipment : hero.getEquipment()) {
                 PlayerHeroEquipmentEntity findPlayerHeroEquipmentEntity = playerHeroEquipmentEntityMap.get(heroEquipment.getName());

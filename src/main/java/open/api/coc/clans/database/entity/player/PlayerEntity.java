@@ -187,4 +187,8 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
             spell.changePlayer(this);
         }
     }
+
+    public void changeSupportYn(YnType supportYn) {
+        this.supportYn = supportYn;
+    }
 }

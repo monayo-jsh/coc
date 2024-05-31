@@ -238,6 +238,7 @@ body::before {
 
 .bg-lightgray {
   background-color: lightgray;
+  color: white;
 }
 
 .bg-black {

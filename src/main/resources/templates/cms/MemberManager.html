@@ -109,12 +109,42 @@
       }
     }
 
-    function renderSupportLabel(playerLabels, supportYn) {
-      if (!supportYn) return;
-      if (supportYn !== 'Y') return;
+    function changeSupportYn(labelElement) {
+      const { supportYn } = labelElement.dataset;
 
-      const label = createPlayerLabel('지원계정', '계정 유형');
-      label.classList.add('bg-pink');
+      const memberCard = labelElement.closest('.member');
+      const { tag } = memberCard.dataset;
+
+      const toSupportYn = supportYn === 'Y' ? 'N' : 'Y';
+
+      updatePlayerSupportYn(tag, toSupportYn)
+      .then((result) => {
+        if (result) {
+          // 데이터 수정
+          const memberIndex = members.findIndex(member => member.tag === tag);
+          members[memberIndex].supportYn = toSupportYn;
+
+          // 라벨 수정
+          settingSupportLabel(labelElement, toSupportYn);
+        }
+      });
+    }
+
+    function settingSupportLabel(label, supportYn) {
+      const supportClassName = 'bg-pink'
+      const notSupportClassName = 'bg-lightgray'
+      const backgroundColor = supportYn === 'Y' ? supportClassName : notSupportClassName;
+      label.classList.remove(supportClassName, notSupportClassName);
+      label.classList.add(backgroundColor);
+      label.classList.add('cursor-pointer');
+
+      label.dataset.supportYn = supportYn;
+    }
+
+    function renderSupportLabel(playerLabels, supportYn) {
+      const label = createPlayerLabel('지원계정', '지원계정 설정하기');
+      settingSupportLabel(label, supportYn);
+      label.onclick = () => changeSupportYn(label);
       playerLabels.appendChild(label);
     }
 
@@ -708,6 +738,7 @@
     </div>
 
     <div class="support-area">
+
       <div class="container player-form">
         <div class="search">
           <div class="search-box">
@@ -763,6 +794,7 @@
         </div>
       </div>
     </div>
+
     <div class="clan-members"></div>
   </div>
 </body>

@@ -475,6 +475,10 @@
   background-color: #bbe18d;
 }
 
+.player-search-result {
+  margin-top: 5px;
+}
+
 .button-wrapper {
   margin-top: 5px;
 }

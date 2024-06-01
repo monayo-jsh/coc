@@ -717,7 +717,9 @@
 
         const infoAdditionalElement = playerInfo.querySelector('.info.additional');
         renderAdditionalLabel(infoAdditionalElement, tag);
-        renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
+
+        const roleLabel = renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
+        roleLabel.classList.add(role);
 
         //랭킹 변화 라벨 추가
         if (previousClanRank !== 0) {

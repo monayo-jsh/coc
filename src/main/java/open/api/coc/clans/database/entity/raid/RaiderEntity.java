@@ -7,11 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 
+@Getter
+@DynamicUpdate
 @Entity
 @Table(name = "TB_RAIDER")
 @NoArgsConstructor
-@Getter
 public class RaiderEntity {
 
     @Id

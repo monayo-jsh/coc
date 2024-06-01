@@ -50,6 +50,7 @@ public class RaidService {
     private final RaidScoreResponseConverter raidScoreResponseConverter;
     private final ClanCapitalRaidSeasonResponseConverter clanCapitalRaidSeasonResponseConverter;
 
+    @Transactional
     public void collectClanCapitalRaidSeason() {
         List<ClanResponse> clanList = clansService.getClanCaptialList();
         for (ClanResponse clan : clanList) {
@@ -58,7 +59,6 @@ public class RaidService {
         }
     }
 
-    @Transactional
     public void mergeRaidResult(String clanTag, ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker) {
         Optional<RaidEntity> findRaidEntity = raidRepository.findByClanTagAndStartDate(clanTag, timeConverter.toLocalDate(clanCapitalRaidAttacker.getStartTime()));
 
@@ -69,10 +69,9 @@ public class RaidService {
         }
 
         RaidEntity raidEntity = findRaidEntity.get();
-        List<RaiderEntity> raiderEntities = raidEntity.getRaiderEntityList();
 
         // DB 데이터
-        Map<String, RaiderEntity> dbRaiderMap = makeRadierListToMap(raiderEntities);
+        Map<String, RaiderEntity> dbRaiderMap = makeRadierListToMap(raidEntity.getRaiderEntityList());
         // API 응답 데이터
         Map<String, RaiderEntity> realRaiderMap = makeRadierListToMap(realRaidEntity.getRaiderEntityList());
 
@@ -88,8 +87,6 @@ public class RaidService {
             dbRaiderEntity.setAttacks(realRaiderEntity.getAttacks());
             dbRaiderEntity.setResourceLooted(realRaiderEntity.getResourceLooted());
         }
-
-        raidRepository.save(raidEntity);
     }
 
     private Map<String, RaiderEntity> makeRadierListToMap(List<RaiderEntity> raiderEntities) {
@@ -138,6 +135,7 @@ public class RaidService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public ClanCapitalRaidSeasonResponse getClanCapitalRaidSeason(String clanTag) {
         ClanCapitalRaidSeasonResponse clanCapitalRaidSeason = findClanCapitalRaidSeason(clanTag);
         mergeRaidResult(clanTag, clanCapitalRaidSeason);

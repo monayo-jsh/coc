@@ -81,13 +81,15 @@ public class RaidService {
             RaiderEntity realRaiderEntity = realRaiderMap.get(playerTag);
             if (Objects.isNull(dbRaiderEntity)) {
                 // 저장되지 않은 기록은 추가
-                raiderEntities.add(realRaiderEntity);
+                raidEntity.addRaider(realRaiderEntity);
                 continue;
             }
 
             dbRaiderEntity.setAttacks(realRaiderEntity.getAttacks());
             dbRaiderEntity.setResourceLooted(realRaiderEntity.getResourceLooted());
         }
+
+        raidRepository.save(raidEntity);
     }
 
     private Map<String, RaiderEntity> makeRadierListToMap(List<RaiderEntity> raiderEntities) {

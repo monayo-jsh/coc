@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
+  <link rel="stylesheet" href="/static/css/warLeague.css" />
   <link rel="stylesheet" href="/static/css/clan/war.css" />
   <link rel="stylesheet" href="/static/css/clan/leagueWar.css" />
 
@@ -30,76 +31,6 @@
   <script src="https://unpkg.com/tippy.js@6"></script>
 
   <script type="text/javascript">
-
-    function refreshWarStatus(element) {
-      const sectionClanWar = element.closest('.section-clan-war');
-
-      const loader = sectionClanWar.querySelector('.loader-circle');
-      loader.classList.remove('display-none');
-
-      const cardContentsElement = sectionClanWar.querySelector('.card-contents');
-      cardContentsElement.classList.add('opacity-01');
-
-      const clanWarContent = cardContentsElement.querySelector('.clan-war');
-
-      const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-      const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-      clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                 .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                 .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
-
-      settingClanWar(clanWarContents, clanWarContent.dataset.clanTag)
-      .then(() => {
-        cardContentsElement.innerHTML = clanWarContents.innerHTML;
-        loader.classList.add('display-none');
-        cardContentsElement.classList.remove('opacity-01');
-      })
-      .catch((error) => {
-        loader.classList.add('display-none');
-        cardContentsElement.classList.remove('opacity-01');
-      });
-
-    }
-
-    function initCardSlide() {
-      const cardContents = document.querySelectorAll(".card-contents");
-      const buttons = document.querySelectorAll(".button");
-
-      let cardIndex = 0;
-      const showCard = () => {
-        showWifiLoading('.card-container');
-
-        cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
-
-        const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
-        const clanWarContent = targetClanWar.querySelector('.clan-war');
-
-        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-        const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-        clanWarContents.classList.add(`clan-${cardIndex}`)
-        clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
-
-        settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
-          targetClanWar.innerHTML = clanWarContents.innerHTML;
-
-          cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
-          cardContents[cardIndex].classList.remove('display-none');
-
-          hideWifiLoading('.card-container');
-        })
-      };
-
-      const updateClick = (e) => {
-        cardIndex += e.target.id === "next" ? 1 : -1;
-        showCard()
-      }
-
-      buttons.forEach(button => button.addEventListener("click", updateClick))
-    }
 
     function makeMemberMapByTag(clanMembers) {
       return clanMembers.reduce((memberMap, member) => {
@@ -665,6 +596,13 @@
       }
     }
 
+    function renderWarLeagueBadge(leagueWarClanContents, warLeague) {
+      const { name } = warLeague;
+      let warLeagueIconClassName = name.replace(/\s/g, "");
+
+      const warLeagueElement = leagueWarClanContents.querySelector('.war-league .img-icon');
+      warLeagueElement.classList.add(warLeagueIconClassName);
+    }
     async function drawLeagueClanCards(warLeagueClans) {
       if (!warLeagueClans || !warLeagueClans.length) {
         emptyWarLeagueClans();
@@ -673,7 +611,7 @@
 
       const carousel = document.querySelector(".carousel");
       for (let index = 0; index<warLeagueClans.length; index++) {
-        const { tag, name } = warLeagueClans[index];
+        const { tag, name, warLeague } = warLeagueClans[index];
 
         const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
         const leagueWarClanContents = templateClanWar.querySelector('.card-contents');
@@ -683,6 +621,8 @@
         leagueWarClanContents.innerHTML = leagueWarClanContents.innerHTML
                                                    .replace(/{CLAN_TAG}/, tag)
                                                    .replace(/{CLAN_NAME}/g, name);
+
+        renderWarLeagueBadge(leagueWarClanContents, warLeague);
 
         const leagueClanMap = new Map();
 
@@ -709,7 +649,16 @@
       showWifiLoading('.card-container');
 
       const warLeagueClans = await fetchWarLeagueClans();
-      await drawLeagueClanCards(warLeagueClans);
+      let clanDetailMap = makeMapByTag(await fetchClansFromExternal(warLeagueClans));
+
+      const leagueWarClans = [];
+      warLeagueClans.forEach(clan => {
+        // 객체 병합
+        const clanDetail = clanDetailMap[clan.tag];
+        clanDetail.order = clan.order;
+        leagueWarClans.push(clanDetail);
+      });
+      await drawLeagueClanCards(leagueWarClans);
 
       hideWifiLoading('.card-container');
     }
@@ -824,6 +773,9 @@
           </div>
 
           <div class="war-info">
+            <div class="war-league">
+              <div class="img-icon"></div>
+            </div>
             <div class="clan-icon">
               <img class="clan" alt="" />
               <img class="opponent" alt="" />

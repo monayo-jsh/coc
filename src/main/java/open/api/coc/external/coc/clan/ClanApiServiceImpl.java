@@ -115,4 +115,12 @@ public class ClanApiServiceImpl implements ClanApiService {
                                              .body(ClanCurrentWarLeagueGroup.class));
     }
 
+    @Override
+    public Optional<ClanWar> findWarLeagueByWarTag(String warTag) {
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getClanWarLeagueUri(), warTag)
+                                             .retrieve()
+                                             .body(ClanWar.class));
+    }
+
 }

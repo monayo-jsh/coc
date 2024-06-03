@@ -36,7 +36,7 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -89,7 +89,7 @@ public class ClansService {
         return clanResponseConverter.convert(clan);
     }
 
-    public ClanCurrentWarRes getClanCurrentWar(String clanTag) {
+    public ClanCurrentWarResponse getClanCurrentWar(String clanTag) {
         ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
 
@@ -97,7 +97,7 @@ public class ClansService {
     }
 
 
-    public ClanCurrentWarRes getLeagueWar(String clanTag, String roundTag) {
+    public ClanCurrentWarResponse getLeagueWar(String clanTag, String roundTag) {
         ClanWar leagueWar = clanApiService.findLeagueWarByRoundTag(roundTag)
                                           .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "리그전 조회 실패"));
 
@@ -488,5 +488,12 @@ public class ClansService {
                                                                             .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
         return clanCurrentWarLeagueGroupResponseConverter.convert(clanCurrentWarLeagueGroup);
+    }
+
+    public ClanCurrentWarResponse getClanWarLeagueRound(String warTag) {
+        ClanWar clanWar = clanApiService.findWarLeagueByWarTag(warTag)
+                                        .orElseThrow(() -> createNotFoundException("리그전 전쟁 정보 조회 실패".formatted(warTag)));
+
+        return clanCurrentWarResConverter.convert(clanWar);
     }
 }

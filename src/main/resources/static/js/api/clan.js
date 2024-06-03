@@ -3,6 +3,7 @@ const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
 
 const URL_WAR_LEAGUE_CLANS = "/clans/war/league"; //리그전 진행 클랜 목록 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
+const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
 const URI_CLANS = '/clans'; //전체 클랜 목록 조회
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
@@ -409,5 +410,29 @@ async function fetchClanWarLeague(clanTag) {
               .catch((error) => {
                 console.error(error)
                 return {};
+              });
+}
+
+function makeCurrentWarLeagueRoundRequest(warTag) {
+  const uri = URL_CLAN_CURRENT_WAR_LEAGUE_ROUND.replace(/{warTag}/, encodeURIComponent(warTag));
+  return axios.get(uri);
+}
+async function fetchCurrentWarLeagueRound(warTags) {
+  const requests = divideClanArray(warTags, 1).map(makeCurrentWarLeagueRoundRequest)
+
+  let results = [];
+  return axios.all(requests)
+              .then((responses) => {
+
+                responses.forEach((response) => {
+                  const { data } = response;
+                  results = results.concat(data);
+                })
+
+                return results;
+              })
+              .catch((error) => {
+                console.error(error)
+                return [];
               });
 }

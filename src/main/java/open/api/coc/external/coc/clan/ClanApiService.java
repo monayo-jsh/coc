@@ -31,5 +31,6 @@ public interface ClanApiService {
     Optional<ClanWar> findLeagueWarByRoundTag(String roundTag);
 
     Optional<ClanCurrentWarLeagueGroup> findClanCurrentWarLeagueGroupBy(String clanTag);
+    Optional<ClanWar> findWarLeagueByWarTag(String warTag);
 
 }

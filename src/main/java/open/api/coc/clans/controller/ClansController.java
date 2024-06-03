@@ -10,7 +10,7 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -211,13 +211,13 @@ public class ClansController {
 
 
     @GetMapping("/{clanTag}/current/war")
-    public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {
-        ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);
+    public ResponseEntity<ClanCurrentWarResponse> getClanCurrentWar(@PathVariable String clanTag) {
+        ClanCurrentWarResponse clanCurrentWar = clansService.getClanCurrentWar(clanTag);
         return ResponseEntity.ok().body(clanCurrentWar);
     }
 
     @GetMapping("/league-war")
-    public ResponseEntity<ClanCurrentWarRes> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
+    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
         return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));
     }
 
@@ -240,6 +240,12 @@ public class ClansController {
     public ResponseEntity<ClanCurrentWarLeagueGroupResponse> getClanCurrentWarLeagueGroup(@PathVariable String clanTag) {
         ClanCurrentWarLeagueGroupResponse clanCurrentWarLeagueGroupResponse = clansService.getClanCurrentWarLeagueGroup(clanTag);
         return ResponseEntity.ok().body(clanCurrentWarLeagueGroupResponse);
+    }
+
+    @GetMapping("/war/league/{warTag}")
+    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeague(@PathVariable String warTag) {
+        ClanCurrentWarResponse ClanCurrentWarRes = clansService.getClanWarLeagueRound(warTag);
+        return ResponseEntity.ok().body(ClanCurrentWarRes);
     }
 
 }

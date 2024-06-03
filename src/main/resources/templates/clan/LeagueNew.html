@@ -148,11 +148,11 @@
     }
 
     function isClanWarResult(clan, opponent) {
-      if (clan.stars === opponent.stars) return 'tie';
       if (clan.stars > opponent.stars) return 'win';
       if (opponent.stars > clan.stars) return 'lose';
       if (clan.destructionPercentage > opponent.destructionPercentage) return 'win';
       if (opponent.destructionPercentage > clan.destructionPercentage) return 'lose';
+      if (clan.stars === opponent.stars) return 'tie';
       return '';
     }
 
@@ -415,19 +415,21 @@
       return;
     }
 
-    function showClanWarCardLoader(sectionClanWarElement) {
-      const loader = sectionClanWarElement.querySelector('.loader-circle');
+    function showClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
       loader.classList.remove('display-none');
 
-      const cardContents = sectionClanWarElement.querySelector('.card-contents');
+      const cardContents = sectionClanWar.querySelector('.card-contents');
       cardContents.classList.add('opacity-0');
     }
 
-    function hideClanWarCardLoader(sectionClanWarElement) {
-      const loader = sectionClanWarElement.querySelector('.loader-circle');
+    function hideClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
       loader.classList.add('display-none');
 
-      const cardContents = sectionClanWarElement.querySelector('.card-contents');
+      const cardContents = sectionClanWar.querySelector('.card-contents');
       cardContents.classList.remove('opacity-0');
     }
 
@@ -617,7 +619,9 @@
         const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
         const leagueWarClanContents = templateClanWar.querySelector('.card-contents');
 
-        showClanWarCardLoader(templateClanWar);
+        showClanWarCardLoader(leagueWarClanContents);
+
+        carousel.appendChild(templateClanWar);
 
         leagueWarClanContents.innerHTML = leagueWarClanContents.innerHTML
                                                    .replace(/{CLAN_TAG}/, tag)
@@ -640,19 +644,17 @@
 
         drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
 
-        hideClanWarCardLoader(templateClanWar);
-
-        carousel.appendChild(templateClanWar);
+        hideClanWarCardLoader(leagueWarClanContents);
       }
     }
 
     async function getClansForLeague() {
       showWifiLoading('.card-container');
-
       const warLeagueClans = await fetchWarLeagueClans();
+      hideWifiLoading('.card-container');
+
       await drawLeagueClanCards(warLeagueClans);
 
-      hideWifiLoading('.card-container');
     }
 
     window.onload = async () => {

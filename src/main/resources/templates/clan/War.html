@@ -214,11 +214,11 @@
     }
 
     function isClanWarResult(clan, opponent) {
-      if (clan.stars === opponent.stars) return 'tie';
       if (clan.stars > opponent.stars) return 'win';
       if (opponent.stars > clan.stars) return 'lose';
       if (clan.destructionPercentage > opponent.destructionPercentage) return 'win';
       if (opponent.destructionPercentage > clan.destructionPercentage) return 'lose';
+      if (clan.stars === opponent.stars) return 'tie';
       return '';
     }
 

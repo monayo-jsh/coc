@@ -177,7 +177,6 @@ public class ClansService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void mergeClan(Clan clan) {
-        log.info("clan: {}", clan.getTag());
         Optional<ClanEntity> findClan = clanRepository.findById(clan.getTag());
         findClan.ifPresent(clanEntity -> clanEntity.setWarLeague(clan.getWarLeagueName()));
     }

@@ -1,0 +1,67 @@
+.league-dashboard {
+  display: none;
+  flex-direction: column;
+  margin-top: 5px;
+
+  .row:not(:first-child) {
+    margin-top: 3px;
+  }
+  .row.selected {
+    background-color: #d55a5b;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background-color: #583535;
+    font-weight: bold;
+    font-size: 0.9rem;
+
+    .rank {
+      flex: 1%;
+    }
+
+    .badge {
+      display: flex;
+
+      .clan {
+        flex: 10%;
+        width: 35px;
+      }
+    }
+
+    .clan-name {
+      flex: 55%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .stars {
+      width: 60px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border: 1px solid black;
+      background-color: black;
+      padding: 3px;
+
+      i {
+        color: yellow;
+        margin-top: -3px;
+        margin-left: 3px;
+      }
+    }
+
+    .destruction-percentage {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 80px;
+    }
+  }
+}

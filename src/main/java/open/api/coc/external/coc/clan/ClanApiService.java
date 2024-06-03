@@ -30,4 +30,6 @@ public interface ClanApiService {
     List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException;
     Optional<ClanWar> findLeagueWarByRoundTag(String roundTag);
 
+    Optional<ClanCurrentWarLeagueGroup> findClanCurrentWarLeagueGroupBy(String clanTag);
+
 }

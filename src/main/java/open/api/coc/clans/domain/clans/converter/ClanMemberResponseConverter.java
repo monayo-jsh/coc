@@ -1,8 +1,11 @@
 package open.api.coc.clans.domain.clans.converter;
 
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanMemberResponse;
+import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.external.coc.clan.domain.clan.ClanMember;
+import open.api.coc.external.coc.clan.domain.common.Label;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
@@ -25,8 +28,13 @@ public class ClanMemberResponseConverter implements Converter<ClanMember, ClanMe
                                  .previousClanRank(source.getPreviousClanRank())
                                  .donations(source.getDonations())
                                  .donationsReceived(source.getDonationsReceived())
-                                 .league(labelResponseConverter.convert(source.getLeague()))
+                                 .league(makeLeague(source.getLeague()))
                                  .build();
+    }
+
+    private LabelResponse makeLeague(Label league) {
+        if (Objects.isNull(league)) return null;
+        return labelResponseConverter.convert(league);
     }
 
 }

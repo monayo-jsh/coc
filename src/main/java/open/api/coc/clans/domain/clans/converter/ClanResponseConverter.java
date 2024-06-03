@@ -2,6 +2,7 @@ package open.api.coc.clans.domain.clans.converter;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -60,9 +61,17 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
         return ClanResponse.builder()
                            .tag(clanEntity.getTag())
                            .name(clanEntity.getName())
+                           .warLeague(makeWarLeagueResponse(clanEntity.getWarLeague()))
                            .order(clanEntity.getOrder())
                            .clanContent(clanContentResponseConverter.convert(clanEntity.getClanContent()))
                            .build();
+    }
+
+    private LabelResponse makeWarLeagueResponse(String warLeague) {
+        if (Objects.isNull(warLeague)) return null;
+        return LabelResponse.builder()
+                            .name(warLeague)
+                            .build();
     }
 
     private List<ClanMemberResponse> makeMemberList(List<ClanMember> clanMembers) {

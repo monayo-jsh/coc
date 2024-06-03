@@ -54,6 +54,7 @@ import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -161,13 +162,24 @@ public class ClansService {
                        .collect(Collectors.toList());
     }
 
+    @Transactional
     public List<ClanResponse> findClanByClanTags(List<String> clanTags) {
         return clanTags.stream()
-                       .parallel()
                        .map(clanApiService::findClanByClanTag)
                        .filter(Optional::isPresent)
-                       .map(clan -> clanResponseConverter.convert(clan.get()))
+                       .map(findClan -> {
+                           Clan clan =findClan.get();
+                           mergeClan(clan);
+                           return clanResponseConverter.convert(clan);
+                       })
                        .collect(Collectors.toList());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void mergeClan(Clan clan) {
+        log.info("clan: {}", clan.getTag());
+        Optional<ClanEntity> findClan = clanRepository.findById(clan.getTag());
+        findClan.ifPresent(clanEntity -> clanEntity.setWarLeague(clan.getWarLeagueName()));
     }
 
     @Transactional
@@ -213,9 +225,13 @@ public class ClansService {
     public ClanResponse registerClan(ClanRequest clanRequest) {
         clanRequest.validate();
 
+        Clan clan = clanApiService.findClanByClanTag(clanRequest.getTag())
+                                  .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanRequest.getTag())));
+
         Optional<ClanEntity> clanEntity = clanRepository.findById(clanRequest.getTag());
         if (clanEntity.isPresent()) {
             ClanEntity updateClanEntity = clanEntity.get();
+            updateClanEntity.setWarLeague(clan.getWarLeagueName());
             updateClanEntity.setVisibleYn(YnType.Y);
             ClanEntity resultClan = clanRepository.save(updateClanEntity);
             return clanResponseConverter.convert(resultClan);
@@ -226,7 +242,7 @@ public class ClansService {
             clanMaxOrders = 0;
         }
 
-        ClanEntity createClan = createClanEntity(clanRequest, clanMaxOrders);
+        ClanEntity createClan = createClanEntity(clan, clanMaxOrders);
         createClan.changeClanContent(ClanContentEntity.empty(clanRequest.getTag()));
         createClan.changeBadgeUrl(ClanBadgeEntity.builder()
                                                  .tag(clanRequest.getTag())
@@ -237,10 +253,11 @@ public class ClansService {
         return clanResponseConverter.convert(createClan);
     }
 
-    private ClanEntity createClanEntity(ClanRequest clanRequest, Integer clanMaxOrders) {
+    private ClanEntity createClanEntity(Clan clan, Integer clanMaxOrders) {
         return ClanEntity.builder()
-                         .tag(clanRequest.getTag())
-                         .name(clanRequest.getName())
+                         .tag(clan.getTag())
+                         .name(clan.getName())
+                         .warLeague(clan.getWarLeagueName())
                          .order(clanMaxOrders + 1)
                          .visibleYn(YnType.Y)
                          .regDate(LocalDateTime.now())

@@ -1,6 +1,7 @@
 package open.api.coc.external.coc.clan.domain.clan;
 
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,4 +41,9 @@ public class Clan {
 
     private Integer members;
     private List<ClanMember> memberList;
+
+    public String getWarLeagueName() {
+        if (Objects.isNull(warLeague)) return null;
+        return warLeague.getName();
+    }
 }

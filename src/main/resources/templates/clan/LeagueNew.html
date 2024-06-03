@@ -597,6 +597,7 @@
     }
 
     function renderWarLeagueBadge(leagueWarClanContents, warLeague) {
+      if (!warLeague) return;
       const { name } = warLeague;
       let warLeagueIconClassName = name.replace(/\s/g, "");
 
@@ -649,16 +650,7 @@
       showWifiLoading('.card-container');
 
       const warLeagueClans = await fetchWarLeagueClans();
-      let clanDetailMap = makeMapByTag(await fetchClansFromExternal(warLeagueClans));
-
-      const leagueWarClans = [];
-      warLeagueClans.forEach(clan => {
-        // 객체 병합
-        const clanDetail = clanDetailMap[clan.tag];
-        clanDetail.order = clan.order;
-        leagueWarClans.push(clanDetail);
-      });
-      await drawLeagueClanCards(leagueWarClans);
+      await drawLeagueClanCards(warLeagueClans);
 
       hideWifiLoading('.card-container');
     }

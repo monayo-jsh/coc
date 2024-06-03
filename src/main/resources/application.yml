@@ -50,6 +50,7 @@ external:
       clanwarleagues:
         prefix: /v1/clanwarleagues/wars
         round-tag: /{roundTag}
+        war-tag: /{warTag}
 
 cms:
   admin-id: ${ADMIN_ID}

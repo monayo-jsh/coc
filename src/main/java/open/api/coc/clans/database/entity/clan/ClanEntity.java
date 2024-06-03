@@ -40,6 +40,9 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @Column(name = "war_league", nullable = true, length = 100)
+    private String warLeague;
+
     @Column(name = "orders", nullable = false)
     private Integer order;
 

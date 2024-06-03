@@ -35,8 +35,13 @@ public class ViewNormalController {
     }
 
     @GetMapping("/clan/league")
-    public String viewAdmin() {
+    public String viewClanLeague() {
         return "clan/League";
+    }
+
+    @GetMapping("/clan/league/new")
+    public String viewClanLeagueNew() {
+        return "clan/LeagueNew";
     }
 
     @GetMapping("/capital/raid")

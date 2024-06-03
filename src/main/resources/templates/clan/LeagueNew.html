@@ -10,8 +10,11 @@
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/card.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
+  <link rel="stylesheet" href="/static/css/warLeague.css" />
   <link rel="stylesheet" href="/static/css/clan/war.css" />
+  <link rel="stylesheet" href="/static/css/clan/leagueWar.css" />
 
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -21,82 +24,13 @@
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/util.js"></script>
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
-  <script src="/static/js/util.js"></script>
   <script type="text/javascript">
-
-    function refreshWarStatus(element) {
-      const sectionClanWar = element.closest('.section-clan-war');
-
-      const loader = sectionClanWar.querySelector('.loader-circle');
-      loader.classList.remove('display-none');
-
-      const cardContentsElement = sectionClanWar.querySelector('.card-contents');
-      cardContentsElement.classList.add('opacity-01');
-
-      const clanWarContent = cardContentsElement.querySelector('.clan-war');
-
-      const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-      const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-      clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                 .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                 .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
-
-      settingClanWar(clanWarContents, clanWarContent.dataset.clanTag)
-      .then(() => {
-        cardContentsElement.innerHTML = clanWarContents.innerHTML;
-        loader.classList.add('display-none');
-        cardContentsElement.classList.remove('opacity-01');
-      })
-      .catch((error) => {
-        loader.classList.add('display-none');
-        cardContentsElement.classList.remove('opacity-01');
-      });
-
-    }
-
-    function initCardSlide() {
-      const cardContents = document.querySelectorAll(".card-contents");
-      const buttons = document.querySelectorAll(".button");
-
-      let cardIndex = 0;
-      const showCard = () => {
-        showWifiLoading('.card-container');
-
-        cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
-
-        const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
-        const clanWarContent = targetClanWar.querySelector('.clan-war');
-
-        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-        const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-        clanWarContents.classList.add(`clan-${cardIndex}`)
-        clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
-
-        settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
-          targetClanWar.innerHTML = clanWarContents.innerHTML;
-
-          cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
-          cardContents[cardIndex].classList.remove('display-none');
-
-          hideWifiLoading('.card-container');
-        })
-      };
-
-      const updateClick = (e) => {
-        cardIndex += e.target.id === "next" ? 1 : -1;
-        showCard()
-      }
-
-      buttons.forEach(button => button.addEventListener("click", updateClick))
-    }
 
     function makeMemberMapByTag(clanMembers) {
       return clanMembers.reduce((memberMap, member) => {
@@ -279,148 +213,26 @@
       let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .count');
       averageDurationElements.forEach(element => settingTooltip(element, '평균 공격시간'));
     }
-    async function settingClanWar(clanWarContentsElement, clanTag) {
-      const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
-      await axios.get(uri)
-              .then((response) => {
-                const { data } = response;
-                const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
-
-                const totalTownhallCount = teamSize * 1;
-                const totalStarCount = teamSize * 3;
-
-                clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
-                                                                         .replace(/{TEAM_SIZE}/g, teamSize)
-                                                                         .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
-                                                                         .replace(/{CLAN_STAR_COUNT}/, clan.stars)
-                                                                         .replace(/{CLAN_ATTACK}/, clan.attacks)
-                                                                         .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                                                                         .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
-                                                                         .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
-                                                                         .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
-                                                                         .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
-                                                                         .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
-                                                                         .replace(/{WAR_STATE}/, convWarState(state))
-                                                                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
-                                                                         .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
-                                                                         .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                                                                         .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                                                                         .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
-                                                                         .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
-                                                                         .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
-                                                                         .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
-
-                if (teamSize)
-                  displayElementByClassName(clanWarContentsElement, 'team-size');
-
-                settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
-
-                const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
-                clanIcon.src = clan.badge.small
-
-                const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
-                opponentIcon.src = opponent.badge.small
-
-                let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
-                settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
-
-
-                settingTooltips(clanWarContentsElement);
-              })
-              .catch((error) => {
-                console.error(error);
-                const { message, response } = error;
-
-                let msg = "다음과 같은 사유로 갱신 실패";
-                msg += `\n${message}`;
-
-                if (response) {
-                  const { status, data} = response
-                  // 서버 이용 불가로 메인 화면 이동
-                  if (status >= 500) {
-                    location.href = "/";
-                  }
-
-                  if (data) {
-                    msg += data;
-                  }
-                }
-
-                alert(msg);
-
-                throw error;
-              });
-
-      function convWarState(state) {
-        switch(state) {
-          case 'preparation': return '준비일';
-          case 'inWar': return '전쟁중';
-          case 'notInWar': return "전쟁중이 아님";
-          case 'warEnded': return '전쟁 종료';
-        }
-        return state;
+    function convWarState(state) {
+      switch(state) {
+        case 'preparation': return '준비일';
+        case 'inWar': return '전쟁중';
+        case 'notInWar': return "전쟁중이 아님";
+        case 'warEnded': return '전쟁 종료';
       }
-
-      function formatWarRemainHourMinute(endTime) {
-        const now = dayjs();
-        const endDateTime = dayjs(endTime);
-
-        if (now > endDateTime) {
-          return "";
-        }
-
-        return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
-      }
+      return state;
     }
 
-    function getUriForClanWarViewType() {
-      const urlSearchParams = new URLSearchParams(location.search);
-      const viewType = urlSearchParams.get('type');
-      return `/clans/war?view=${viewType}`;
-    }
+    function formatWarRemainHourMinute(endTime) {
+      const now = dayjs();
+      const endDateTime = dayjs(endTime);
 
-    function getClans() {
-      showWifiLoading('.card-container');
+      if (now > endDateTime) {
+        return "";
+      }
 
-      const uri = getUriForClanWarViewType();
-      axios.get(uri)
-              .then((response) => {
-                const { data } = response;
-
-                if (!data || !data.length) {
-                  hideWifiLoading('.card-container');
-                  const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
-                  clanWarCard.classList.add('display-none');
-                  const clanWarEmptyCard = document.querySelector('.empty-clan');
-                  clanWarEmptyCard.classList.remove('display-none');
-                  return;
-                }
-
-                const carousel = document.querySelector(".carousel");
-                for (let index = 0; index<data.length; index++) {
-                  const { tag, name } = data[index];
-
-                  const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-                  const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-                  clanWarContents.classList.add(`clan-${index}`, 'display-none');
-                  clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                             .replace(/{CLAN_TAG}/, tag)
-                                                             .replace(/{CLAN_NAME}/g, name);
-
-                  settingClanWar(clanWarContents, tag).then(() => clanWarContents.classList.remove('display-none'));
-
-                  carousel.appendChild(templateClanWar);
-                }
-
-                //initCardSlide();
-                hideWifiLoading('.card-container');
-              })
-              .catch((error) => {
-                console.error(error);
-              });
+      return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
     }
 
     function switchAttacks(element) {
@@ -451,11 +263,264 @@
         }
     }
 
+    function emptyWarLeagueClans() {
+      hideWifiLoading('.card-container');
+      const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+      clanWarCard.classList.add('display-none');
+      const clanWarEmptyCard = document.querySelector('.empty-clan');
+      clanWarEmptyCard.classList.remove('display-none');
+      return;
+    }
+
+    function showClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
+      loader.classList.remove('display-none');
+
+      const cardContents = sectionClanWar.querySelector('.card-contents');
+      cardContents.classList.add('opacity-0');
+    }
+
+    function hideClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
+      loader.classList.add('display-none');
+
+      const cardContents = sectionClanWar.querySelector('.card-contents');
+      cardContents.classList.remove('opacity-0');
+    }
+
+    function initLeagueClan(leagueClanMap, clans) {
+      for(const clan of clans) {
+        // 라운드 별 dataset
+        clan.rounds = [];
+        leagueClanMap.set(clan.tag, clan);
+      }
+    }
+
+    function swipeClanAndOpponent(opponentClanRoundWarInfo) {
+      const clan = opponentClanRoundWarInfo.clan;
+
+      opponentClanRoundWarInfo.clan = opponentClanRoundWarInfo.opponent;
+      opponentClanRoundWarInfo.opponent = clan;
+    }
+
+    async function fetchLeagueClanRoundInfo(leagueClanMap, rounds) {
+      for (const round of rounds) {
+        const { warTags } = round;
+
+          // 전쟁태그 없는 경우
+        if (warTags.filter(warTag => warTag === '#0').length > 0) continue;
+
+        const currentWarLeagueRounds = await fetchCurrentWarLeagueRound(warTags)
+
+        for (const currentWarLeagueRound of currentWarLeagueRounds) {
+          const { clan, opponent } = currentWarLeagueRound;
+          const targetClan = leagueClanMap.get(clan.tag);
+          const clanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
+          targetClan.rounds.push(clanRoundWarInfo);
+
+          const opponentClanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
+          swipeClanAndOpponent(opponentClanRoundWarInfo);
+          const opponentClan = leagueClanMap.get(opponent.tag);
+          opponentClan.rounds.push(opponentClanRoundWarInfo);
+        }
+      }
+
+    }
+
+    function drawLeagueWarRound(clanWarContentsElement, drawClan) {
+      const { roundNo, clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = drawClan
+
+      const totalTownhallCount = teamSize * 1;
+      const totalStarCount = teamSize * 3;
+
+      clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                               .replace(/{LEAGUE_ROUND}/g, `${roundNo}회차`)
+                                                               .replace(/{TEAM_SIZE}/g, teamSize)
+                                                               .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                                                               .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                                                               .replace(/{CLAN_ATTACK}/, clan.attacks)
+                                                               .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                               .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                                                               .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
+                                                               .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
+                                                               .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
+                                                               .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                               .replace(/{WAR_STATE}/, convWarState(state))
+                                                               .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
+                                                               .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                                                               .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                                                               .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                               .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
+                                                               .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
+                                                               .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                                                               .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
+
+      if (teamSize)
+        displayElementByClassName(clanWarContentsElement, 'team-size');
+
+      settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
+
+      const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+      clanIcon.src = clan.badge.small
+
+      const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+      opponentIcon.src = opponent.badge.small
+
+      let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+      memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
+      settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
+
+
+      settingTooltips(clanWarContentsElement);
+    }
+
+    function isInWar(round) {
+      const { state } = round;
+      return state === 'inWar';
+    }
+
+    function findDrawRound(clanWarLeagueInfo) {
+      const { rounds } = clanWarLeagueInfo;
+
+      for(let i = 0; i<rounds.length; i++) {
+        const round = rounds[i];
+        if (isInWar(round)) {
+          round.roundNo = i+1;
+          return round;
+        }
+      }
+
+      // 모든 라운드 종료 시 마지막 라운드 그리도록 설정
+      let round = rounds.length;
+      let drawRound = rounds.pop();
+      // 데이터 원복
+      rounds.push(drawRound);
+
+      drawRound.roundNo = round;
+      return drawRound;
+    }
+
+    function calcLeagueWarResult(leagueClan) {
+      const { rounds } = leagueClan;
+
+      leagueClan.totalStars = 0;
+      leagueClan.totalDestructionPercentage = 0;
+
+      rounds.forEach(round => {
+        const { clan } = round;
+        const { stars, members } = clan;
+
+        leagueClan.totalStars += stars;
+        for (const member of members) {
+          const [attack] = member.attacks;
+          if (!attack) continue;
+          leagueClan.totalDestructionPercentage += attack.destructionPercentage;
+        }
+      });
+    }
+
+    function sortedByRank(leagueClanMap) {
+      return Array.from(leagueClanMap).sort((a, b) => b[1].totalStars - a[1].totalStars || b[1].totalDestructionPercentage - a[1].totalDestructionPercentage);
+    }
+
+    function drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, clanTag) {
+      const sortedRankMap = new Map(sortedByRank(leagueClanMap));
+
+      const leagueDashboard = leagueWarClanContents.querySelector('.league-dashboard');
+      const leagueDashboardRowTemplate = document.querySelector('#league-dashboard-row');
+
+      let rank = 0;
+      for(const [key, value] of sortedRankMap) {
+        const leagueDashboardRow = document.importNode(leagueDashboardRowTemplate.content, true);
+        const row = leagueDashboardRow.querySelector('.row');
+
+        const { badgeUrls, name, totalStars, totalDestructionPercentage, tag } = value;
+        row.innerHTML = row.innerHTML
+                           .replace(/{RANK}/, ++rank)
+                           .replace(/{CLAN_NAME}/, name)
+                           .replace(/{STARS}/,totalStars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage);
+
+        const { small } = badgeUrls;
+        const icon = row.querySelector('.badge .clan');
+        icon.src = small;
+
+        if (tag === clanTag) {
+          row.classList.add("selected");
+        }
+
+        leagueDashboard.appendChild(row);
+      }
+    }
+
+    function renderWarLeagueBadge(leagueWarClanContents, warLeague) {
+      if (!warLeague) return;
+      const { name } = warLeague;
+      let warLeagueIconClassName = name.replace(/\s/g, "");
+
+      const warLeagueElement = leagueWarClanContents.querySelector('.war-league .img-icon');
+      warLeagueElement.classList.add(warLeagueIconClassName);
+    }
+
+    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag) {
+      const leagueClanMap = new Map();
+      const clanWarLeague = await fetchClanWarLeague(tag);
+      const { state, season, clans, rounds } = clanWarLeague;
+      initLeagueClan(leagueClanMap, clans);
+      await fetchLeagueClanRoundInfo(leagueClanMap, rounds);
+
+      leagueClanMap.forEach(calcLeagueWarResult)
+
+      const clanWarLeagueInfo = leagueClanMap.get(tag);
+      let drawRound = findDrawRound(clanWarLeagueInfo);
+      drawLeagueWarRound(leagueWarClanContents, drawRound);
+
+      drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
+    }
+
+    async function drawLeagueClanCards(warLeagueClans) {
+      if (!warLeagueClans || !warLeagueClans.length) {
+        emptyWarLeagueClans();
+        return;
+      }
+
+      const carousel = document.querySelector(".carousel");
+      for (let index = 0; index<warLeagueClans.length; index++) {
+        const { tag, name, warLeague } = warLeagueClans[index];
+
+        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+        const leagueWarClanContents = templateClanWar.querySelector('.card-contents');
+
+        showClanWarCardLoader(leagueWarClanContents);
+
+        carousel.appendChild(templateClanWar);
+
+        leagueWarClanContents.innerHTML = leagueWarClanContents.innerHTML
+                                                   .replace(/{CLAN_TAG}/, tag)
+                                                   .replace(/{CLAN_NAME}/g, name);
+
+        renderWarLeagueBadge(leagueWarClanContents, warLeague);
+
+        renderingLeagueWarClanDetail(leagueWarClanContents, tag)
+        .then(() => hideClanWarCardLoader(leagueWarClanContents));
+      }
+    }
+
+    async function getClansForLeague() {
+      showWifiLoading('.card-container');
+      const warLeagueClans = await fetchWarLeagueClans();
+      hideWifiLoading('.card-container');
+
+      await drawLeagueClanCards(warLeagueClans);
+    }
+
     window.onload = async () => {
-      await getClans();
+      await getClansForLeague();
     }
   </script>
-  <title>클랜전 현황</title>
+  <title>리그전 현황</title>
 </head>
 <body>
 <section class="card-wrapper empty-clan display-none">
@@ -480,7 +545,7 @@
   </div>
 
   <div class="card-container">
-    <div class="card-title">클랜전 현황</div>
+    <div class="card-title bg-crimson">리그전 현황</div>
     <div class="carousel"></div>
   </div>
 </section>
@@ -509,7 +574,7 @@
       <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
 
         <div class="summary">
-          <div class="button-wrapper">
+          <div class="button-wrapper display-none">
             <button class="refresh" onclick="refreshWarStatus(this); return false;">
               <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -561,9 +626,15 @@
           </div>
 
           <div class="war-info">
+            <div class="war-league">
+              <div class="img-icon"></div>
+            </div>
             <div class="clan-icon">
               <img class="clan" alt="" />
               <img class="opponent" alt="" />
+            </div>
+            <div class="war-state">
+              {LEAGUE_ROUND}
             </div>
             <div class="team-size display-none">
               {TEAM_SIZE} vs {TEAM_SIZE}
@@ -612,6 +683,8 @@
 
         </div>
 
+        <div class="league-dashboard"></div>
+
         <div class="sub-summary">
           <div class="support-area">
             <div class="toggle-button-cover">
@@ -623,7 +696,6 @@
             </div>
           </div>
         </div>
-
         <div class="member-attack"></div>
       </div>
     </div>
@@ -676,6 +748,23 @@
   <div class="attack-info not">
     <div class="name">{ATTACK_NO}</div>
     <div class="message">사용 안함</div>
+  </div>
+</template>
+
+
+<template id="league-dashboard-row">
+  <div class="row">
+    <div class="rank">{RANK}.</div>
+    <div class="badge">
+      <img class="clan" alt=""/>
+    </div>
+    <div class="clan-name">{CLAN_NAME}</div>
+    <div class="stars">
+      <span class="count">{STARS}</span>
+      <i class="fa-solid fa-star"></i>
+      <img>
+    </div>
+    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
   </div>
 </template>
 </html>

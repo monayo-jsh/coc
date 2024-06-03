@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ClanCurrentWarRes {
+public class ClanCurrentWarResponse {
 
     private String state;
     private Integer teamSize;

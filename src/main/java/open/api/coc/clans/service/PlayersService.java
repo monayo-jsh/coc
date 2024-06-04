@@ -80,7 +80,7 @@ public class PlayersService {
     private final PlayerSpellEntityConverter playerSpellEntityConverter;
 
     public PlayerResponse findPlayerBy(String playerTag) {
-        Player player = clanApiService.fetchPlayerBy(playerTag)
+        Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "플레이어 조회 실패"));
 
         return playerResponseConverter.convert(player);
@@ -131,7 +131,7 @@ public class PlayersService {
             throw createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "이미 등록된 클랜원");
         }
 
-        Player player = clanApiService.fetchPlayerBy(playerTag)
+        Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         PlayerEntity playerEntity = playerEntityConverter.convert(player);
@@ -254,7 +254,7 @@ public class PlayersService {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
                                                     .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
-        Player player = clanApiService.fetchPlayerBy(playerTag)
+        Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         modifyPlayer(playerEntity, player);

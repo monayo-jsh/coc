@@ -63,14 +63,10 @@ public class ClanApiServiceImpl implements ClanApiService {
 
     @Override
     public Optional<Player> findPlayerBy(String playTag) {
-        // 캐시된 데이터 응답 & 캐시 데이터 없을 경우 실연동
-        return findPlayer(playTag);
-    }
-
-    @Override
-    public Optional<Player> fetchPlayerBy(String playTag) {
-        // 사용자 정보 캐싱 등록 & 스케줄러 동작
-        return findPlayer(playTag);
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
+                                             .retrieve()
+                                             .body(Player.class));
     }
 
     @Override
@@ -87,14 +83,6 @@ public class ClanApiServiceImpl implements ClanApiService {
                 .uri(clashOfClanConfig.getClanWarLeagueUri(), roundTag)
                 .retrieve()
                 .body(ClanWar.class));
-    }
-
-    private Optional<Player> findPlayer(String playTag) {
-        log.debug("{} [{}]", clashOfClanConfig.getPlayerUri(), playTag);
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
-                                             .retrieve()
-                                             .body(Player.class));
     }
 
     @Override

@@ -24,7 +24,6 @@ public interface ClanApiService {
 
     Optional<Player> findPlayerBy(String playerTag);
 
-    Optional<Player> fetchPlayerBy(String playerTag);
     Optional<LabelList> findLeagues();
 
     List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException;

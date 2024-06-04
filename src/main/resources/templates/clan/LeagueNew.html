@@ -411,10 +411,20 @@
       leagueClan.totalDestructionPercentage = 0;
 
       rounds.forEach(round => {
-        const { clan } = round;
+        const { state, clan, opponent } = round;
         const { stars, members } = clan;
 
         leagueClan.totalStars += stars;
+
+        if (state === 'warEnded') {
+          //종료된 라운드 기준
+          const isWarResult = isClanWarResult(clan, opponent);
+          if (isWarResult === 'win') {
+            //승리했다면 10개 보너스
+            leagueClan.totalStars += 10;
+          }
+        }
+
         for (const member of members) {
           const [attack] = member.attacks;
           if (!attack) continue;

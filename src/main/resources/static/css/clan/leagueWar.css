@@ -3,6 +3,45 @@
   width: 35px;
 }
 
+.clan-war.expand {
+
+  .detail-filter-wrapper {
+    display: block;
+  }
+  .league-dashboard.expand {
+    display: flex;
+  }
+  .league-clan-record.expand {
+    display: flex;
+  }
+  .league-member-record.expand {
+    display: flex;
+  }
+  .member-attack-wrapper.expand {
+    display: block;
+  }
+
+}
+
+.detail-filter-wrapper {
+  display: none;
+  background-color: #7d7d7d;
+  border-radius: 10px;
+  margin-top: 5px;
+
+  .radio-inputs {
+
+    input:checked + .name {
+      color: white;
+      background-color: #6a0000;
+    }
+  }
+}
+
+.member-attack-wrapper {
+  display: none;
+}
+
 .league-dashboard {
   display: none;
   flex-direction: column;
@@ -39,7 +78,7 @@
       }
     }
 
-    .clan-name {
+    .name {
       flex: 55%;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -67,6 +106,79 @@
       margin-left: 5px;
       padding: 4px 8px;
       width: 80px;
+    }
+  }
+}
+
+.league-member-record {
+  display: none;
+  flex-direction: column;
+  margin-top: 5px;
+
+  .row:not(:first-child) {
+    margin-top: 3px;
+  }
+  .row.selected {
+    background-color: #d55a5b;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background-color: #583535;
+    font-weight: bold;
+    font-size: 0.8rem;
+
+    .rank {
+      flex: 1%;
+    }
+
+    .town-hall {
+      flex: 10%;
+      margin: 0 5px;
+    }
+
+    .name {
+      flex: 55%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .stars {
+      width: 60px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border: 1px solid black;
+      background-color: black;
+      padding: 3px;
+
+      i {
+        color: yellow;
+        margin-top: -3px;
+        margin-left: 3px;
+      }
+    }
+
+    .destruction-percentage {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 60px;
+    }
+
+    .attacks {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 50px;
+      display: flex;
+      justify-content: center;
     }
   }
 }

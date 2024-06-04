@@ -261,6 +261,7 @@
           classList.remove('expand');
         } else {
           classList.add('expand');
+          showLeagueDashboard(element);
         }
     }
 
@@ -440,7 +441,7 @@
         const { badgeUrls, name, totalStars, totalDestructionPercentage, tag } = value;
         row.innerHTML = row.innerHTML
                            .replace(/{RANK}/, ++rank)
-                           .replace(/{CLAN_NAME}/, name)
+                           .replace(/{NAME}/, name)
                            .replace(/{STARS}/,totalStars)
                            .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage);
 
@@ -453,6 +454,76 @@
         }
 
         leagueDashboard.appendChild(row);
+      }
+    }
+
+    function initRecord(leagueMemberMap) {
+      for(const [key, value] of leagueMemberMap) {
+        value.totalStars = 0;
+        value.totalDestructionPercentage = 0;
+        value.useAttacks = 0;
+        value.totalAttacks = 0;
+      }
+    }
+
+    function calcMemberRecord(leagueMemberMap, rounds) {
+      initRecord(leagueMemberMap);
+      for (const round of rounds) {
+        const { state, clan } = round;
+
+        //준비중인 라운드는 제외
+        if (state === 'preparation') continue;
+
+        const { members } = clan;
+        for(const member of members) {
+          const { tag, attacks } = member;
+            const memberRecord = leagueMemberMap.get(tag);
+            memberRecord.totalAttacks += 1;
+            const [attack]= attacks;
+            if (attack) {
+              memberRecord.useAttacks += 1;
+              memberRecord.totalStars += attack.stars;
+              memberRecord.totalDestructionPercentage += attack.destructionPercentage;
+            }
+        }
+      }
+    }
+
+    function drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, clanTag) {
+      const leagueClan = leagueClanMap.get(clanTag);
+
+      const leagueMemberMap = convertArrayToMapByKey(leagueClan.memberList);
+      calcMemberRecord(leagueMemberMap, leagueClan.rounds);
+
+      const sortedRankMap = sortedByRank(leagueMemberMap);
+      const leagueMemberRecord = leagueWarClanContents.querySelector('.league-member-record');
+      const leagueMemberRecordRowTemplate = document.querySelector('#league-member-record-row');
+
+      let rank = 0;
+      let beforeTotalStars = 0
+      let beforeTotalDestructionPercentage = 0;
+      for(const [key, value] of sortedRankMap) {
+        const leagueMemberRecordRow = document.importNode(leagueMemberRecordRowTemplate.content, true);
+        const row = leagueMemberRecordRow.querySelector('.row');
+
+        const { tag, name, townHallLevel, totalStars, totalDestructionPercentage, useAttacks, totalAttacks } = value;
+        if (beforeTotalStars !== totalStars || beforeTotalDestructionPercentage !== totalDestructionPercentage) {
+          rank += 1;
+        }
+
+        row.innerHTML = row.innerHTML
+                           .replace(/{RANK}/, rank)
+                           .replace(/{NAME}/, name)
+                           .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
+                           .replace(/{STARS}/,totalStars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage)
+                           .replace(/{USE_ATTACKS}/,useAttacks)
+                           .replace(/{TOTAL_ATTACKS}/,totalAttacks);
+
+        leagueMemberRecord.appendChild(row);
+
+        beforeTotalStars = totalStars;
+        beforeTotalDestructionPercentage = totalDestructionPercentage;
       }
     }
 
@@ -479,6 +550,62 @@
       drawLeagueWarRound(leagueWarClanContents, drawRound);
 
       drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
+      drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, tag);
+    }
+
+    function showElement(element) {
+      element.classList.add('expand');
+    }
+    function hideElement(element) {
+      element.classList.remove('expand');
+    }
+    function showLeagueDashboard(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
+      showElement(leagueDashboard);
+      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
+      hideElement(leagueClanRecord);
+      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
+      hideElement(leagueMemberRecord);
+      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
+      hideElement(memberAttackWrapper);
+    }
+    function showClanRecord(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
+      hideElement(leagueDashboard);
+      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
+      showElement(leagueClanRecord);
+      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
+      hideElement(leagueMemberRecord);
+      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
+      hideElement(memberAttackWrapper);
+    }
+    function showMemberRecord(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
+      hideElement(leagueDashboard);
+      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
+      hideElement(leagueClanRecord);
+      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
+      showElement(leagueMemberRecord);
+      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
+      hideElement(memberAttackWrapper);
+    }
+    function showMemberAttacks(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
+      hideElement(leagueDashboard);
+      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
+      hideElement(leagueClanRecord);
+      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
+      hideElement(leagueMemberRecord);
+      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
+      showElement(memberAttackWrapper);
     }
 
     async function drawLeagueClanCards(warLeagueClans) {
@@ -499,7 +626,7 @@
         carousel.appendChild(templateClanWar);
 
         leagueWarClanContents.innerHTML = leagueWarClanContents.innerHTML
-                                                   .replace(/{CLAN_TAG}/, tag)
+                                                   .replace(/{CLAN_TAG}/g, tag)
                                                    .replace(/{CLAN_NAME}/g, name);
 
         renderWarLeagueBadge(leagueWarClanContents, warLeague);
@@ -713,20 +840,47 @@
 
         </div>
 
-        <div class="league-dashboard"></div>
+        <div class="detail-filter-wrapper">
+          <div class="radio-inputs filter">
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" checked onchange="showLeagueDashboard(this); return false;">
+              <span class="name">조 순위</span>
+            </label>
 
-        <div class="sub-summary">
-          <div class="support-area">
-            <div class="toggle-button-cover">
-              <div class="toggle-button">
-                <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
-                <div class="knobs" data-toggle-on="전체 공격" data-toggle-off="남은 공격"></div>
-                <div class="layer"></div>
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showClanRecord(this); return false;">
+              <span class="name">라운드 기록</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberRecord(this); return false;">
+              <span class="name">클랜원 순위</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberAttacks(this); return false;">
+              <span class="name">공권</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="league-dashboard"></div>
+        <div class="league-clan-record"></div>
+        <div class="league-member-record"></div>
+        <div class="member-attack-wrapper">
+          <div class="sub-summary">
+            <div class="support-area">
+              <div class="toggle-button-cover">
+                <div class="toggle-button">
+                  <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
+                  <div class="knobs" data-toggle-on="전체" data-toggle-off="잔여"></div>
+                  <div class="layer"></div>
+                </div>
               </div>
             </div>
           </div>
+          <div class="member-attack"></div>
         </div>
-        <div class="member-attack"></div>
       </div>
     </div>
 
@@ -788,13 +942,28 @@
     <div class="badge">
       <img class="clan" alt=""/>
     </div>
-    <div class="clan-name">{CLAN_NAME}</div>
+    <div class="name">{NAME}</div>
     <div class="stars">
       <span class="count">{STARS}</span>
       <i class="fa-solid fa-star"></i>
       <img>
     </div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+  </div>
+</template>
+
+<template id="league-member-record-row">
+  <div class="row">
+    <div class="rank">{RANK}.</div>
+    <div class="town-hall th{TOWN_HALL_LEVEL}"></div>
+    <div class="name">{NAME}</div>
+    <div class="stars">
+      <span class="count">{STARS}</span>
+      <i class="fa-solid fa-star"></i>
+      <img>
+    </div>
+    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+    <div class="attacks">{USE_ATTACKS}/{TOTAL_ATTACKS}</div>
   </div>
 </template>
 </html>

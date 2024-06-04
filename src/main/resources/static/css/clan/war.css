@@ -232,9 +232,6 @@ body {
   .sub-summary {
     display: flex;
   }
-  .league-dashboard {
-    display: flex;
-  }
   .member-attack {
     display: block;
   }

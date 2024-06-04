@@ -180,7 +180,7 @@
 
     async function getClanMembers() {
       showWifiLoading('.clan-members');
-      let players = await fetchAllClanPlayers();
+      let players = await fetchAllClanPlayersSummary();
       let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
       settingAssignClan(players, latestClanAssignedPlayerObj);
       let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();

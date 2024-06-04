@@ -30,6 +30,12 @@ public class PlayersController {
                              .body(playersService.findAllPlayers());
     }
 
+    @GetMapping("/all/summary")
+    public ResponseEntity<List<PlayerResponse>> getAllPlayerSummary() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllPlayersSummary());
+    }
+
     @GetMapping("/all/tags")
     public ResponseEntity<List<String>> getAllPlayerTags() {
         return ResponseEntity.ok()

@@ -103,6 +103,14 @@ public class PlayersService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
+                      .map(playerResponseConverter::convertAll)
+                      .collect(Collectors.toList());
+    }
+
+    public List<PlayerResponse> findAllPlayersSummary() {
+        List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
                       .map(playerResponseConverter::convert)
                       .collect(Collectors.toList());
     }

@@ -457,6 +457,69 @@
       }
     }
 
+    function calcStars(members) {
+      const stars = [0, 0, 0, 0];
+      for(const member of members) {
+        const { attacks } = member;
+        const [ attack ] = attacks;
+        if (attack) {
+          stars[attack.stars]++;
+        }
+      }
+      return {
+        three: stars[3],
+        two: stars[2],
+        one: stars[1],
+        zero: stars[0]
+      };
+    }
+
+    function makeClanRecordCell(clan) {
+      const leagueClanRecordCellTemplate = document.querySelector('#league-clan-record-cell');
+      const leagueClanRecordCell = document.importNode(leagueClanRecordCellTemplate.content, true);
+      const cell = leagueClanRecordCell.querySelector('.cell');
+
+      const { name, badge, stars, attacks, members } = clan;
+      const { three, two, one, zero } = calcStars(members);
+      cell.innerHTML = cell.innerHTML
+                         .replace(/{NAME}/, name)
+                         .replace(/{STARS}/,stars)
+                         .replace(/{ATTACKS}/, attacks)
+                         .replace(/{THREE}/, three)
+                         .replace(/{TWO}/, two)
+                         .replace(/{ONE}/, one)
+                         .replace(/{ZERO}/, zero);
+
+      const { small } = badge;
+      const icon = cell.querySelector('.badge .clan');
+      icon.src = small;
+
+      return cell;
+    }
+
+    function drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo) {
+      const { rounds } = clanWarLeagueInfo;
+      const leagueClanRecord = leagueWarClanContents.querySelector('.league-clan-record');
+
+      for(const round of rounds) {
+        const { state, clan, opponent } = round;
+
+        //준비중인 라운드는 제외
+        if (state === 'preparation') continue;
+
+        const clanCell = makeClanRecordCell(clan);
+        const opponentCell = makeClanRecordCell(opponent);
+        opponentCell.classList.add('opponent');
+
+        const row = document.createElement('div');
+        row.classList.add('row', isClanWarResult(clan, opponent));
+        row.appendChild(clanCell);
+        row.appendChild(opponentCell)
+
+        leagueClanRecord.appendChild(row);
+      }
+    }
+
     function initRecord(leagueMemberMap) {
       for(const [key, value] of leagueMemberMap) {
         value.totalStars = 0;
@@ -550,6 +613,7 @@
       drawLeagueWarRound(leagueWarClanContents, drawRound);
 
       drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
+      drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo);
       drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, tag);
     }
 
@@ -559,53 +623,41 @@
     function hideElement(element) {
       element.classList.remove('expand');
     }
-    function showLeagueDashboard(element) {
-      const clanWarCard = element.closest('.clan-war');
 
+    function hideDetailContents(clanWarCard) {
       const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
-      showElement(leagueDashboard);
+      hideElement(leagueDashboard);
       const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
       hideElement(leagueClanRecord);
       const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
       hideElement(leagueMemberRecord);
       const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
       hideElement(memberAttackWrapper);
+    }
+
+    function showLeagueDashboard(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-dashboard'));
     }
     function showClanRecord(element) {
       const clanWarCard = element.closest('.clan-war');
 
-      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
-      hideElement(leagueDashboard);
-      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
-      showElement(leagueClanRecord);
-      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
-      hideElement(leagueMemberRecord);
-      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
-      hideElement(memberAttackWrapper);
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-clan-record'));
     }
     function showMemberRecord(element) {
       const clanWarCard = element.closest('.clan-war');
 
-      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
-      hideElement(leagueDashboard);
-      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
-      hideElement(leagueClanRecord);
-      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
-      showElement(leagueMemberRecord);
-      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
-      hideElement(memberAttackWrapper);
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-member-record'));
     }
     function showMemberAttacks(element) {
       const clanWarCard = element.closest('.clan-war');
 
-      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
-      hideElement(leagueDashboard);
-      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
-      hideElement(leagueClanRecord);
-      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
-      hideElement(leagueMemberRecord);
-      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
-      showElement(memberAttackWrapper);
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.member-attack-wrapper'));
     }
 
     async function drawLeagueClanCards(warLeagueClans) {
@@ -949,6 +1001,44 @@
       <img>
     </div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+  </div>
+</template>
+
+<template id="league-clan-record-cell">
+  <div class="cell">
+    <div class="basic">
+      <div class="name">{NAME}</div>
+      <div class="badge clan">
+        <img class="clan" alt=""/>
+      </div>
+      <div class="icon-sword"></div>
+      <div class="attacks">{ATTACKS}</div>
+      <div class="stars">
+        <span class="count">{STARS}</span>
+        <i class="fa-solid fa-star"></i>
+        <img>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="stars">
+        <div class="star">
+          <div class="label">3별:</div>
+          <div class="count">{THREE} 개</div>
+        </div>
+        <div class="star">
+          <div class="label">2별:</div>
+          <div class="count">{TWO}개</div>
+        </div>
+        <div class="star">
+          <div class="label">1별:</div>
+          <div class="count">{ONE}개</div>
+        </div>
+        <div class="star">
+          <div class="label">0별:</div>
+          <div class="count">{ZERO}개</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

@@ -24,6 +24,7 @@
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/league.js"></script>
   <script src="/static/js/api/clan.js"></script>
   <script src="/static/js/util.js"></script>
 
@@ -504,16 +505,45 @@
         renderWarLeagueBadge(leagueWarClanContents, warLeague);
 
         renderingLeagueWarClanDetail(leagueWarClanContents, tag)
-        .then(() => hideClanWarCardLoader(leagueWarClanContents));
+        .then(() => {
+          hideClanWarCardLoader(leagueWarClanContents);
+          settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));
+        });
       }
+    }
+
+    let leagueMap = new Map();
+    async function loadLeagues() {
+      // 리그맵 생성
+      const leagues = await fetchLeagues();
+      for (const league of leagues) {
+        leagueMap.set(league.name, league);
+      }
+    }
+
+    function sortByLeague(warLeagueClans) {
+      for (const clan of warLeagueClans) {
+        const { warLeague } = clan;
+        if (!warLeague) {
+          const league = leagueMap.get("Unranked");
+          clan.warLeague = _.cloneDeep(league);
+          continue;
+        }
+
+        const league = leagueMap.get(warLeague.name)
+        clan.warLeague = _.cloneDeep(league);
+      }
+
+      return warLeagueClans.sort((a, b) => b.warLeague.id - a.warLeague.id || a.order - b.order);
     }
 
     async function getClansForLeague() {
       showWifiLoading('.card-container');
+      await loadLeagues();
       const warLeagueClans = await fetchWarLeagueClans();
       hideWifiLoading('.card-container');
 
-      await drawLeagueClanCards(warLeagueClans);
+      await drawLeagueClanCards(sortByLeague(warLeagueClans));
     }
 
     window.onload = async () => {

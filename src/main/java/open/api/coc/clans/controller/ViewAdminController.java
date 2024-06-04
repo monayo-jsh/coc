@@ -8,37 +8,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/clan/cms")
 public class ViewAdminController {
 
-    /** 운영 기능 페이지 */
-
-    @GetMapping("")
-    public String viewAdminHome() {
-        return "cms/Admin";
-    }
-
-    @GetMapping("/member/manager")
-    public String viewAdminMemberManager() {
-        return "cms/MemberManager";
-    }
-
-    @GetMapping("/clan/manager")
-    public String viewAdminClanManager() {
-        return "cms/ClanManager";
-    }
-
     /** 운영 기능 로그인 페이지 */
     @GetMapping("/login")
-    public String viewAdminLoginForm() {
+    public String loginForm() {
         return "cms/Login";
     }
 
-    /** 운영 기능 습격전 관리 페이지 */
+    /** 홈 */
+    @GetMapping("")
+    public String adminHome() {
+        return "cms/Admin";
+    }
+
+    /** 클랜원 관리 */
+    @GetMapping("/member/manager")
+    public String memberManager() {
+        return "cms/MemberManager";
+    }
+
+    /** 클랜 관리 */
+    @GetMapping("/clan/manager")
+    public String clanManager() {
+        return "cms/ClanManager";
+    }
+
+    /** 습격전 기록 조회 */
     @GetMapping("/raid/score")
-    public String viewAdminRaidScore() {
+    public String raidScore() {
         return "cms/RaidScore";
     }
 
+    /** 습격전 위반 현황 */
     @GetMapping("/raid")
-    public String viewAdminRaid() {
+    public String raid() {
         return "cms/Raid";
     }
 

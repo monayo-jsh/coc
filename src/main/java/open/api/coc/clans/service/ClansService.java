@@ -356,6 +356,8 @@ public class ClansService {
     public void registerClanAssignedMembers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
         // 배정 클랜원 클랜원 데이터 자동 입력 처리
         processRegistrationBatchUnRegisteredPlayers(clanAssignedPlayerBulk);
+        // 지원계정 해제 처리
+        excludeSupportPlayers(clanAssignedPlayerBulk);
 
         List<ClanAssignedPlayerEntity> clanAssignedPlayers = makeClanAssignedPlayerEntities(clanAssignedPlayerBulk);
 
@@ -366,13 +368,26 @@ public class ClansService {
         clanAssignedPlayerRepository.saveAll(clanAssignedPlayers);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processRegistrationBatchUnRegisteredPlayers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        // 자동 등록
         List<String> playerTags = clanAssignedPlayerBulk.getPlayers()
                                                         .stream()
                                                         .map(ClanAssignedPlayer::getPlayerTag)
                                                         .toList();
         registerPlayers(playerTags);
+    }
+
+    private void excludeSupportPlayers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        List<String> playerTags = clanAssignedPlayerBulk.getPlayers()
+                                                        .stream()
+                                                        .map(ClanAssignedPlayer::getPlayerTag)
+                                                        .toList();
+
+        List<PlayerEntity> playerEntities = playersService.findAllPlayersBy(playerTags);
+        for(PlayerEntity player : playerEntities) {
+            // 지원계정 해제
+            player.setSupportYn(YnType.N);
+        }
     }
 
     private List<ClanAssignedPlayerEntity> makeClanAssignedPlayerEntities(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
@@ -639,8 +654,7 @@ public class ClansService {
         return resource;
     }
 
-
-    private void registerPlayers(List<String> requestPlayerTags) {
+    public void registerPlayers(List<String> requestPlayerTags) {
         List<String> playerTags = playersService.findAllPlayerTags();
         Set<String> allPlayerTagSet = new HashSet<>(playerTags);
 

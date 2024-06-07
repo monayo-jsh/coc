@@ -50,6 +50,7 @@ import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -125,7 +126,7 @@ public class PlayersService {
                       .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PlayerResponse registerPlayer(String playerTag) {
 
         Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
@@ -471,4 +472,7 @@ public class PlayersService {
         }
     }
 
+    public List<PlayerEntity> findAllPlayersBy(List<String> playerTags) {
+        return playerRepository.findAllById(playerTags);
+    }
 }

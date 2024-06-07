@@ -509,6 +509,7 @@ public class ClansService {
         ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup = clanApiService.findClanCurrentWarLeagueGroupBy(clanTag)
                                                                             .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
+        
         if (clanCurrentWarLeagueGroup.isWarEnded()) {
             writeClanWarLeagueSeasonGroup(clanTag, clanCurrentWarLeagueGroup);
         }

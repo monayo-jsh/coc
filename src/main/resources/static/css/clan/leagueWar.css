@@ -66,7 +66,7 @@
     font-size: 0.8rem;
 
     .rank {
-      flex: 1%;
+      flex: 10%;
     }
 
     .badge {
@@ -264,7 +264,7 @@
     font-size: 0.8rem;
 
     .rank {
-      flex: 1%;
+      flex: 10%;
     }
 
     .town-hall {

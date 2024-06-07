@@ -35,4 +35,8 @@ public class PlayerModify {
             throwBadRequestException(ExceptionCode.INVALID_PARAMETER, "지원계정 여부 미입력");
         }
     }
+
+    public boolean isSupport() {
+        return YnType.Y.equals(supportYn);
+    }
 }

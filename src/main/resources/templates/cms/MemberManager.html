@@ -117,6 +117,11 @@
 
       const toSupportYn = supportYn === 'Y' ? 'N' : 'Y';
 
+      if (toSupportYn === 'Y') {
+        if (!confirm("지원계정 전환 시 배정된 클랜에서 제외됩니다.\n지원계정 전환하시겠습니까?")) {
+          return;
+        }
+      }
       updatePlayerSupportYn(tag, toSupportYn)
       .then((result) => {
         if (result) {

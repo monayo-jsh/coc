@@ -3,6 +3,8 @@ package open.api.coc.clans.service;
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createBadRequestException;
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -459,6 +461,14 @@ public class PlayersService {
 
         player.changeSupportYn(playerModify.getSupportYn());
         playerRepository.save(player);
+
+        // 지원계정 전환 시 배정된 클랜 제거
+        if (playerModify.isSupport()) {
+            clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
+                                                                              .seasonDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM")))
+                                                                              .playerTag(player.getPlayerTag())
+                                                                              .build());
+        }
     }
 
 }

@@ -11,9 +11,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -352,6 +354,9 @@ public class ClansService {
 
     @Transactional
     public void registerClanAssignedMembers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        // 배정 클랜원 클랜원 데이터 자동 입력 처리
+        processRegistrationBatchUnRegisteredPlayers(clanAssignedPlayerBulk);
+
         List<ClanAssignedPlayerEntity> clanAssignedPlayers = makeClanAssignedPlayerEntities(clanAssignedPlayerBulk);
 
         // 배정 일괄 삭제
@@ -359,6 +364,15 @@ public class ClansService {
 
         // 배정 일괄 등록
         clanAssignedPlayerRepository.saveAll(clanAssignedPlayers);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processRegistrationBatchUnRegisteredPlayers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        List<String> playerTags = clanAssignedPlayerBulk.getPlayers()
+                                                        .stream()
+                                                        .map(ClanAssignedPlayer::getPlayerTag)
+                                                        .toList();
+        registerPlayers(playerTags);
     }
 
     private List<ClanAssignedPlayerEntity> makeClanAssignedPlayerEntities(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
@@ -464,6 +478,9 @@ public class ClansService {
 
     @Transactional
     public void registerClanLeagueAssignedMembers(ClanAssignedPlayerBulk clanAssignedPlayerBulk) {
+        // 배정 클랜원 클랜원 데이터 자동 입력 처리
+        processRegistrationBatchUnRegisteredPlayers(clanAssignedPlayerBulk);
+
         List<ClanLeagueAssignedPlayerEntity> clanAssignedPlayers = makeClanLeagueAssignedPlayerEntities(clanAssignedPlayerBulk);
 
         // 배정 일괄 삭제
@@ -509,7 +526,7 @@ public class ClansService {
         ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup = clanApiService.findClanCurrentWarLeagueGroupBy(clanTag)
                                                                             .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
-        
+
         if (clanCurrentWarLeagueGroup.isWarEnded()) {
             writeClanWarLeagueSeasonGroup(clanTag, clanCurrentWarLeagueGroup);
         }
@@ -622,4 +639,19 @@ public class ClansService {
         return resource;
     }
 
+
+    private void registerPlayers(List<String> requestPlayerTags) {
+        List<String> playerTags = playersService.findAllPlayerTags();
+        Set<String> allPlayerTagSet = new HashSet<>(playerTags);
+
+        for (String playerTag : requestPlayerTags) {
+            if (allPlayerTagSet.contains(playerTag)) continue;
+
+            try {
+                playersService.registerPlayer(playerTag);
+            } catch (Exception e) {
+                log.error("클랜원 자동 등록 실패 : {}", e.getMessage());
+            }
+        }
+    }
 }

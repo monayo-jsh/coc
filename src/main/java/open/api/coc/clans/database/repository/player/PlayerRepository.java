@@ -29,4 +29,7 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
 
     @Query("select p.playerTag from PlayerEntity p")
     List<String> findAllPlayerTag();
+
+    @Query("select p.playerTag from PlayerEntity p")
+    List<String> findAllPlayersNotIn(List<String> playerTags);
 }

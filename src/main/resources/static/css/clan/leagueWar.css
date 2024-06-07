@@ -86,7 +86,7 @@
     }
 
     .stars {
-      width: 60px;
+      width: 65px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -189,7 +189,7 @@
         }
 
         .stars {
-          width: 60px;
+          width: 65px;
           display: flex;
           justify-content: flex-end;
           align-items: center;
@@ -280,7 +280,7 @@
     }
 
     .stars {
-      width: 60px;
+      width: 65px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -305,7 +305,7 @@
       background-color: black;
       margin-left: 5px;
       padding: 4px 8px;
-      width: 50px;
+      width: 55px;
       display: flex;
       justify-content: center;
     }

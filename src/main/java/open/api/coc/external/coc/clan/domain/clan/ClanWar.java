@@ -1,5 +1,6 @@
 package open.api.coc.external.coc.clan.domain.clan;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,11 @@ public class ClanWar {
             opponent = clan;
             clan = temp;
         }
+    }
+
+    @JsonIgnore
+    public boolean isWarEnded() {
+        return "warEnded".equals(state);
     }
 
 }

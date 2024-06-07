@@ -243,8 +243,10 @@ public class ClansController {
     }
 
     @GetMapping("/war/league/{warTag}")
-    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeague(@PathVariable String warTag) {
-        ClanCurrentWarResponse ClanCurrentWarRes = clansService.getClanWarLeagueRound(warTag);
+    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeague(@PathVariable String warTag,
+                                                                   @RequestParam("clanTag") String clanTag,
+                                                                   @RequestParam("season") String season) {
+        ClanCurrentWarResponse ClanCurrentWarRes = clansService.getClanWarLeagueRound(clanTag, season, warTag);
         return ResponseEntity.ok().body(ClanCurrentWarRes);
     }
 

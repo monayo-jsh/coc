@@ -1,5 +1,6 @@
 package open.api.coc.external.coc.clan.domain.clan;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +16,8 @@ public class ClanCurrentWarLeagueGroup {
     private List<ClanWarLeague> clans;
     private List<ClanCurrentWarLeagueRound> rounds;
 
+    @JsonIgnore
+    public boolean isWarEnded() {
+        return "warEnded".equals(state);
+    }
 }

@@ -307,14 +307,14 @@
       opponentClanRoundWarInfo.opponent = clan;
     }
 
-    async function fetchLeagueClanRoundInfo(leagueClanMap, rounds) {
+    async function fetchLeagueClanRoundInfo(leagueClanMap, clanTag, season, rounds) {
       for (const round of rounds) {
         const { warTags } = round;
 
           // 전쟁태그 없는 경우
         if (warTags.filter(warTag => warTag === '#0').length > 0) continue;
 
-        const currentWarLeagueRounds = await fetchCurrentWarLeagueRound(warTags)
+        const currentWarLeagueRounds = await fetchCurrentWarLeagueRound(warTags, clanTag, season)
 
         for (const currentWarLeagueRound of currentWarLeagueRounds) {
           const { clan, opponent } = currentWarLeagueRound;
@@ -614,7 +614,7 @@
       const clanWarLeague = await fetchClanWarLeague(tag);
       const { state, season, clans, rounds } = clanWarLeague;
       initLeagueClan(leagueClanMap, clans);
-      await fetchLeagueClanRoundInfo(leagueClanMap, rounds);
+      await fetchLeagueClanRoundInfo(leagueClanMap, tag, season, rounds);
 
       leagueClanMap.forEach(calcLeagueWarResult)
 

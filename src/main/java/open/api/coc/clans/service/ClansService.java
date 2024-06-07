@@ -2,6 +2,10 @@ package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -53,6 +57,7 @@ import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -83,6 +88,7 @@ public class ClansService {
 
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     public ClanResponse findClanByClanTag(String clanTag) {
         Clan clan = clanApiService.findClanByClanTag(clanTag)
                                   .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 조회 실패"));
@@ -503,13 +509,116 @@ public class ClansService {
         ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup = clanApiService.findClanCurrentWarLeagueGroupBy(clanTag)
                                                                             .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
+        if (clanCurrentWarLeagueGroup.isWarEnded()) {
+            writeClanWarLeagueSeasonGroup(clanTag, clanCurrentWarLeagueGroup);
+        }
+
         return clanCurrentWarLeagueGroupResponseConverter.convert(clanCurrentWarLeagueGroup);
     }
 
-    public ClanCurrentWarResponse getClanWarLeagueRound(String warTag) {
-        ClanWar clanWar = clanApiService.findWarLeagueByWarTag(warTag)
-                                        .orElseThrow(() -> createNotFoundException("리그전 전쟁 정보 조회 실패".formatted(warTag)));
+    public ClanCurrentWarResponse getClanWarLeagueRound(String clanTag, String season, String warTag) {
+        ClanWar clanWar = findClanWarFromFile(clanTag, season, warTag);
+
+        if (ObjectUtils.isEmpty(clanWar)) {
+            clanWar = clanApiService.findWarLeagueByWarTag(warTag)
+                                    .orElseThrow(() -> createNotFoundException("리그전 전쟁 정보 조회 실패 (%s)".formatted(warTag)));
+
+            if (clanWar.isWarEnded()) {
+                writeClanWarLeagueResult(clanTag, season, warTag, clanWar);
+            }
+        }
 
         return clanCurrentWarResConverter.convert(clanWar);
     }
+
+    final String LEAGUE_WAR_ROOT_DIR = "./war-league";
+    final String LEAGUE_WAR_SEASON_DIR = "/{season}/{clanTag}";
+    final String LEAGUE_WAR_INFO_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR;
+    final String LEAGUE_WAR_ROUND_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR + "/round";
+    final String LEAGUE_WAR_TAG_JSON_FILE_NAME = "%s.json";
+
+    private void writeClanWarLeagueSeasonGroup(String clanTag, ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup) {
+        try {
+            // directory: ./war-league/{season}/{clanTag}
+            final String path = LEAGUE_WAR_INFO_DIR.replace("{season}", clanCurrentWarLeagueGroup.getSeason())
+                                                   .replace("{clanTag}", clanTag);
+
+            ClassPathResource resource = checkAndMakeDirectory(path);
+
+            // 이하 클랜태그별 폴더
+            String fileName = getLeagueWarTagJsonFileName("league-info");
+
+            File file = new File(resource.getPath(), fileName);
+            makeEmptyFile(file);
+
+            writeFile(file, clanCurrentWarLeagueGroup);
+        } catch (IOException e) {
+            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    private <T> void writeFile(File file, T data) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        writer.append(objectMapper.writeValueAsString(data));
+        writer.newLine();
+        writer.close();
+    }
+
+    private ClanWar findClanWarFromFile(String clanTag, String season, String warTag) {
+        final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
+                                                .replace("{clanTag}", clanTag);
+
+        // directory: ./war-league/{season}/{clanTag}/round/{warTag}.json
+        File file = new File(path, getLeagueWarTagJsonFileName(warTag));
+
+        // Not Found.
+        if (!file.exists()) return null;
+
+        try {
+            return objectMapper.readValue(file, ClanWar.class);
+        } catch (Exception e) {
+            log.error("파일({}) 파싱 오류, {}", warTag, e.getMessage(), e);
+            return null;
+        }
+    }
+
+    private void writeClanWarLeagueResult(String clanTag, String season, String warTag, ClanWar clanWar) {
+        try {
+            // directory: ./war-league/{season}/{clanTag}/round
+            final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
+                                                    .replace("{clanTag}", clanTag);
+
+            ClassPathResource resource = checkAndMakeDirectory(path);
+
+            File file = new File(resource.getPath(), getLeagueWarTagJsonFileName(warTag));
+            makeEmptyFile(file);
+
+            writeFile(file, clanWar);
+        } catch (IOException e) {
+            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    private void makeEmptyFile(File file) throws IOException {
+        if (file.exists()) return;
+
+        boolean result = file.createNewFile();
+        if (!result) {
+            throw new IOException("파일 생성 실패: " + file.getAbsolutePath());
+        }
+    }
+
+    private String getLeagueWarTagJsonFileName(String warTag) {
+        return LEAGUE_WAR_TAG_JSON_FILE_NAME.formatted(warTag);
+    }
+
+    private ClassPathResource checkAndMakeDirectory(String path) {
+        ClassPathResource resource = new ClassPathResource(path);
+        if (!resource.exists()) {
+            File directory = new File(resource.getPath());
+            directory.mkdirs();
+        }
+        return resource;
+    }
+
 }

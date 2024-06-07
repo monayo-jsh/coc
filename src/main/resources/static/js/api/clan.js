@@ -413,12 +413,13 @@ async function fetchClanWarLeague(clanTag) {
               });
 }
 
-function makeCurrentWarLeagueRoundRequest(warTag) {
-  const uri = URL_CLAN_CURRENT_WAR_LEAGUE_ROUND.replace(/{warTag}/, encodeURIComponent(warTag));
+function makeCurrentWarLeagueRoundRequest(warTag, clanTag, season) {
+  let uri = URL_CLAN_CURRENT_WAR_LEAGUE_ROUND.replace(/{warTag}/, encodeURIComponent(warTag));
+  uri += `?clanTag=${encodeURIComponent(clanTag)}&season=${season}`;
   return axios.get(uri);
 }
-async function fetchCurrentWarLeagueRound(warTags) {
-  const requests = divideClanArray(warTags, 1).map(makeCurrentWarLeagueRoundRequest)
+async function fetchCurrentWarLeagueRound(warTags, clanTag, season) {
+  const requests = divideClanArray(warTags, 1).map(warTag => makeCurrentWarLeagueRoundRequest(warTag, clanTag, season))
 
   let results = [];
   return axios.all(requests)

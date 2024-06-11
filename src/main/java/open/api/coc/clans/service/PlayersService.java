@@ -344,6 +344,7 @@ public class PlayersService {
             }
 
             dbPlayerHeroEntity.setLevelInfo(playerHeroEntity.getLevelInfo());
+            dbPlayerHeroEntity.setTargetHeroName(playerHeroEntity.getTargetHeroName());
         }
 
         convertHeroEquipmentWearYn(player.getHeroes(), playerHeroEquipmentEntities);

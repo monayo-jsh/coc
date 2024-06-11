@@ -463,6 +463,7 @@
 
 .inner-section-group {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
 
   .inner-section {

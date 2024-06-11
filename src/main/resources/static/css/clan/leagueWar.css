@@ -1,3 +1,20 @@
+.fail {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 15px;
+  padding: 10px;
+  background-color: gray;
+
+  .name {
+    color: yellow;
+  }
+
+  .reason {
+    margin-left: 5px;
+  }
+}
+
 .clan-icon {
   margin-top: 3px;
   width: 35px;

@@ -20,4 +20,9 @@ public class ClanCurrentWarLeagueGroup {
     public boolean isWarEnded() {
         return "ended".equals(state);
     }
+
+    @JsonIgnore
+    public boolean isWarNotEnded() {
+        return !isWarEnded();
+    }
 }

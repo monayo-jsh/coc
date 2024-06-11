@@ -609,10 +609,16 @@
       warLeagueElement.classList.add(warLeagueIconClassName);
     }
 
-    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag) {
+    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name) {
       const leagueClanMap = new Map();
       const clanWarLeague = await fetchClanWarLeague(tag);
       const { state, season, clans, rounds } = clanWarLeague;
+      if (!state) {
+        //조회 실패
+        leagueWarClanContents.innerHTML = `<div class="fail"><div class="name">${name}</div><div class="reason">조회 실패</div></div>`;
+        return;
+      }
+
       initLeagueClan(leagueClanMap, clans);
       await fetchLeagueClanRoundInfo(leagueClanMap, tag, season, rounds);
 
@@ -693,7 +699,7 @@
 
         renderWarLeagueBadge(leagueWarClanContents, warLeague);
 
-        renderingLeagueWarClanDetail(leagueWarClanContents, tag)
+        renderingLeagueWarClanDetail(leagueWarClanContents, tag, name)
         .then(() => {
           hideClanWarCardLoader(leagueWarClanContents);
           settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));

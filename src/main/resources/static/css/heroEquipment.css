@@ -111,3 +111,7 @@
   background-image: url("/static/images/hero/equipment/Hog_Rider_Puppet.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.rocket_spear {
+  background-image: url("/static/images/hero/equipment/Rocket_Spear.png");
+  color: rgba(0, 0, 0, 0);
+}

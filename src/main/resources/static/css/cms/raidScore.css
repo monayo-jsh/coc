@@ -95,3 +95,15 @@
   display: flex;
   align-items: center;
 }
+
+.table-tr {
+  .name, .tag {
+    vertical-align: baseline;
+  }
+}
+
+.table-tr.start {
+  .table-td {
+    border-top: 1px solid #b7b3b3;
+  }
+}

@@ -520,8 +520,11 @@ body::before {
 }
 
 .table {
+  position: relative;
   width: 100%;
   border: 1px solid #e2e2e2;
+  border-spacing: 0;
+  border-collapse: collapse;
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
   font-size: 14px;
@@ -539,7 +542,6 @@ body::before {
   }
 
   .table-tbody {
-    position: relative;
   }
 
 

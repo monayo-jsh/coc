@@ -135,7 +135,7 @@ function makeClanDetailRequest(clans) {
 }
 
 async function fetchClansFromExternal(clans) {
-  const requests = divideClanArray(clans, clans.length/2).map(makeClanDetailRequest);
+  const requests = divideClanArray(clans, clans.length/3).map(makeClanDetailRequest);
 
   let results = [];
   // 클랜 상세 조회

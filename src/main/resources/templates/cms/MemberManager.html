@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/css/button.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
+  <link rel="stylesheet" href="/static/css/cms/member.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/hero.css" />
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
@@ -131,6 +132,12 @@
 
           // 라벨 수정
           settingSupportLabel(labelElement, toSupportYn);
+
+          if (toSupportYn === 'Y') {
+            memberCard.classList.add('support-account');
+          } else {
+            memberCard.classList.remove('support-account');
+          }
         }
       });
     }
@@ -513,6 +520,13 @@
     //   const clanRoleLabel = createPlayerLabel(convRoleName(role), '클랜 권한');
     //   playerLabels.appendChild(clanRoleLabel);
     // }
+
+    if (!assignedClan) {
+      memberHtml.classList.add('need-assigned');
+    }
+    if (supportYn === 'Y') {
+      memberHtml.classList.add('support-account')
+    }
   }
 
     function renderMember(no, player) {
@@ -717,6 +731,19 @@
       })
     }
 
+    function filterMember(type) {
+      const memberCards = document.querySelectorAll('.clan-members .member.row');
+      for (const memberCard of memberCards) {
+        memberCard.classList.remove('display-none');
+
+        if (type === 'all') continue;
+
+        if (!memberCard.classList.contains(type)) {
+          memberCard.classList.add('display-none');
+        }
+      }
+    }
+
     window.onload = async () => {
       await loadLeagues();
       await getClanMembers();
@@ -800,7 +827,28 @@
           </div>
         </div>
       </div>
+
+      <div class="container">
+        <div class="radio-group-wrapper">
+          <div class="radio-inputs filter">
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" checked onchange="filterMember('all'); return false;">
+              <span class="name">전체</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" onchange="filterMember('need-assigned'); return false;">
+              <span class="name">배정필요</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" onchange="filterMember('support-account'); return false;">
+              <span class="name">지원계정</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
+
 
     <div class="clan-members"></div>
   </div>

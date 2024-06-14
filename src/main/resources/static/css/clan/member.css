@@ -483,3 +483,23 @@
 .button-wrapper {
   margin-top: 5px;
 }
+
+.clan-members-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .additional-area {
+    width: 320px;
+    padding: 10px;
+    display: flex;
+    font-size: 12px;
+    font-weight: bold;
+    justify-content: space-between;
+    background-color: azure;
+
+    .label:not(:first-child) {
+      margin-left: 2px;
+    }
+  }
+}

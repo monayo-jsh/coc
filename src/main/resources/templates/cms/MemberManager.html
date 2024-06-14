@@ -577,12 +577,23 @@
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
+      let totalCount = 0, supportCount = 0, clanAssignedCount = 0;
       let no = clanMembersElement.children.length + 1;
       for(const player of members) {
         const memberHtml = renderMember(no, player);
         clanMembersElement.appendChild(memberHtml);
         no++;
+
+        const { assignedClan, supportYn } = player;
+
+        totalCount++;
+        if (supportYn === 'Y') supportCount++;
+        if (assignedClan) clanAssignedCount++;
       }
+
+      document.querySelector('.label.total .count').innerHTML = Number(totalCount).toLocaleString();
+      document.querySelector('.label.support-account .count').innerHTML = Number(supportCount).toLocaleString();
+      document.querySelector('.label.clan-assigned .count').innerHTML = Number(clanAssignedCount).toLocaleString();
     }
 
     function ch2pattern(ch) {
@@ -849,8 +860,23 @@
       </div>
     </div>
 
-
-    <div class="clan-members"></div>
+    <div class="clan-members-wrapper">
+      <div class="additional-area">
+        <div class="label total">
+          <span class="name">총 계정:</span>
+          <span class="count">0</span>
+        </div>
+        <div class="label support-account">
+          <span class="name">지원 계정:</span>
+          <span class="count">0</span>
+        </div>
+        <div class="label clan-assigned">
+          <span class="name">클랜 배정:</span>
+          <span class="count">0</span>
+        </div>
+      </div>
+      <div class="clan-members"></div>
+    </div>
   </div>
 </body>
 <template id="member">

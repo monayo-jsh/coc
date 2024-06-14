@@ -60,13 +60,6 @@ async function fetchClanCapitalRaidSeason(clanTag) {
                         return {};
                       }
 
-                      const { response } = error;
-                      const { status } = response
-                      // 서버 이용 불가로 메인 화면 이동
-                      if (status >= 500) {
-                        location.href = "/";
-                      }
-
                       return {};
                     });
 }

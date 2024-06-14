@@ -51,51 +51,8 @@
         cardContentsElement.innerHTML = clanWarContents.innerHTML;
         loader.classList.add('display-none');
         cardContentsElement.classList.remove('opacity-01');
-      })
-      .catch((error) => {
-        loader.classList.add('display-none');
-        cardContentsElement.classList.remove('opacity-01');
       });
 
-    }
-
-    function initCardSlide() {
-      const cardContents = document.querySelectorAll(".card-contents");
-      const buttons = document.querySelectorAll(".button");
-
-      let cardIndex = 0;
-      const showCard = () => {
-        showWifiLoading('.card-container');
-
-        cardIndex = cardIndex === cardContents.length ? 0 : cardIndex < 0 ? cardContents.length - 1 : cardIndex;
-
-        const targetClanWar = document.querySelector(`.clan-${cardIndex}`);
-        const clanWarContent = targetClanWar.querySelector('.clan-war');
-
-        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-        const clanWarContents = templateClanWar.querySelector('.card-contents');
-
-        clanWarContents.classList.add(`clan-${cardIndex}`)
-        clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                   .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                   .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
-
-        settingClanWar(clanWarContents, clanWarContent.dataset.clanTag).then(() => {
-          targetClanWar.innerHTML = clanWarContents.innerHTML;
-
-          cardContents.forEach(cardContent => cardContent.classList.add('display-none'));
-          cardContents[cardIndex].classList.remove('display-none');
-
-          hideWifiLoading('.card-container');
-        })
-      };
-
-      const updateClick = (e) => {
-        cardIndex += e.target.id === "next" ? 1 : -1;
-        showCard()
-      }
-
-      buttons.forEach(button => button.addEventListener("click", updateClick))
     }
 
     function makeMemberMapByTag(clanMembers) {
@@ -279,79 +236,84 @@
       let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .count');
       averageDurationElements.forEach(element => settingTooltip(element, '평균 공격시간'));
     }
+
+    function fetchFailed(clanWarContentsElement) {
+      clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                               .replace(/{TEAM_SIZE}/g, 0)
+                                                               .replace(/{TOTAL_STAR_COUNT}/g, 0)
+                                                               .replace(/{CLAN_STAR_COUNT}/, 0)
+                                                               .replace(/{CLAN_ATTACK}/, 0)
+                                                               .replace(/{CLAN_TOTAL_ATTACK}/, 0)
+                                                               .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(0).toFixed(2))
+                                                               .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(null))
+                                                               .replace(/{CLAN_REMAIN_HALL}/, 0)
+                                                               .replace(/{CLAN_TOTAL_HALL}/, 0)
+                                                               .replace(/{WAR_REMAIN_HOUR_MINUTE}/, "조회 실패")
+                                                               .replace(/{WAR_STATE}/, "다시 시도해주세요.")
+                                                               .replace(/{OPPONENT_NAME}/, "정보 없음")
+                                                               .replace(/{OPPONENT_STAR_COUNT}/, 0)
+                                                               .replace(/{OPPONENT_ATTACK}/, 0)
+                                                               .replace(/{OPPONENT_TOTAL_ATTACK}/, 0)
+                                                               .replace(/{OPPONENT_REMAIN_HALL}/, 0)
+                                                               .replace(/{OPPONENT_TOTAL_HALL}/, 0)
+                                                               .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(0).toFixed(2))
+                                                               .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
+    }
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
       await axios.get(uri)
-              .then((response) => {
-                const { data } = response;
-                const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+                 .then((response) => {
+                   const { data } = response;
+                   const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
 
-                const totalTownhallCount = teamSize * 1;
-                const totalStarCount = teamSize * 3;
+                   const totalTownhallCount = teamSize * 1;
+                   const totalStarCount = teamSize * 3;
 
-                clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
-                                                                         .replace(/{TEAM_SIZE}/g, teamSize)
-                                                                         .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
-                                                                         .replace(/{CLAN_STAR_COUNT}/, clan.stars)
-                                                                         .replace(/{CLAN_ATTACK}/, clan.attacks)
-                                                                         .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                                                                         .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
-                                                                         .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
-                                                                         .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
-                                                                         .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
-                                                                         .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
-                                                                         .replace(/{WAR_STATE}/, convWarState(state))
-                                                                         .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
-                                                                         .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
-                                                                         .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
-                                                                         .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
-                                                                         .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
-                                                                         .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
-                                                                         .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
-                                                                         .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
+                   clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                                            .replace(/{TEAM_SIZE}/g, teamSize)
+                                                                            .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                                                                            .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                                                                            .replace(/{CLAN_ATTACK}/, clan.attacks)
+                                                                            .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                            .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                                                                            .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
+                                                                            .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
+                                                                            .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
+                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                                            .replace(/{WAR_STATE}/, convWarState(state))
+                                                                            .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
+                                                                            .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                                                                            .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                                                                            .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                                            .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
+                                                                            .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
+                                                                            .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                                                                            .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
 
-                if (teamSize)
-                  displayElementByClassName(clanWarContentsElement, 'team-size');
+                   if (teamSize)
+                     displayElementByClassName(clanWarContentsElement, 'team-size');
 
-                settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
+                   settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
 
-                const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
-                clanIcon.src = clan.badge.small
+                   const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+                   clanIcon.src = clan.badge.small
 
-                const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
-                opponentIcon.src = opponent.badge.small
+                   const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+                   opponentIcon.src = opponent.badge.small
 
-                let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
-                memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
-                settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
+                   let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+                   memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
+                   settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
 
 
-                settingTooltips(clanWarContentsElement);
-              })
-              .catch((error) => {
-                console.error(error);
-                const { message, response } = error;
-
-                let msg = "다음과 같은 사유로 갱신 실패";
-                msg += `\n${message}`;
-
-                if (response) {
-                  const { status, data} = response
-                  // 서버 이용 불가로 메인 화면 이동
-                  if (status >= 500) {
-                    location.href = "/";
-                  }
-
-                  if (data) {
-                    msg += data;
-                  }
-                }
-
-                alert(msg);
-
-                throw error;
-              });
+                   settingTooltips(clanWarContentsElement);
+                 })
+                 .catch((error) => {
+                   console.error(error);
+                   fetchFailed(clanWarContentsElement);
+                 });
 
       function convWarState(state) {
         switch(state) {
@@ -386,41 +348,42 @@
 
       const uri = getUriForClanWarViewType();
       axios.get(uri)
-              .then((response) => {
-                const { data } = response;
+           .then((response) => {
+             const { data } = response;
 
-                if (!data || !data.length) {
-                  hideWifiLoading('.card-container');
-                  const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
-                  clanWarCard.classList.add('display-none');
-                  const clanWarEmptyCard = document.querySelector('.empty-clan');
-                  clanWarEmptyCard.classList.remove('display-none');
-                  return;
-                }
+             if (!data || !data.length) {
+               hideWifiLoading('.card-container');
+               const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+               clanWarCard.classList.add('display-none');
+               const clanWarEmptyCard = document.querySelector('.empty-clan');
+               clanWarEmptyCard.classList.remove('display-none');
+               return;
+             }
 
-                const carousel = document.querySelector(".carousel");
-                for (let index = 0; index<data.length; index++) {
-                  const { tag, name } = data[index];
+             const carousel = document.querySelector(".carousel");
+             for (let index = 0; index<data.length; index++) {
+               const { tag, name } = data[index];
 
-                  const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-                  const clanWarContents = templateClanWar.querySelector('.card-contents');
+               const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+               const clanWarContents = templateClanWar.querySelector('.card-contents');
 
-                  clanWarContents.classList.add(`clan-${index}`, 'display-none');
-                  clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                             .replace(/{CLAN_TAG}/, tag)
-                                                             .replace(/{CLAN_NAME}/g, name);
+               clanWarContents.classList.add('display-none');
+               clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                          .replace(/{CLAN_TAG}/, tag)
+                                                          .replace(/{CLAN_NAME}/g, name);
 
-                  settingClanWar(clanWarContents, tag).then(() => clanWarContents.classList.remove('display-none'));
+               settingClanWar(clanWarContents, tag)
+               .then(() => clanWarContents.classList.remove('display-none'));
 
-                  carousel.appendChild(templateClanWar);
-                }
+               carousel.appendChild(templateClanWar);
+             }
 
-                //initCardSlide();
-                hideWifiLoading('.card-container');
-              })
-              .catch((error) => {
-                console.error(error);
-              });
+             //initCardSlide();
+             hideWifiLoading('.card-container');
+           })
+           .catch((error) => {
+             console.error(error);
+           });
     }
 
     function switchAttacks(element) {

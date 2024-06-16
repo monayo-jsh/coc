@@ -348,6 +348,7 @@ public class PlayersService {
         }
 
         convertHeroEquipmentWearYn(player.getHeroes(), playerHeroEquipmentEntities);
+        playerEntity.changeHeroEquipments(playerHeroEquipmentEntities);
     }
 
     private void modifyPlayerHero(PlayerEntity playerEntity, List<Hero> heroes) {

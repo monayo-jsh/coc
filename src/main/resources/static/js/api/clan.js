@@ -1,4 +1,4 @@
-const URL_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
+const URI_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
 const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
 
 const URL_WAR_LEAGUE_CLANS = "/clans/war/league"; //리그전 진행 클랜 목록 조회
@@ -366,6 +366,18 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
 
                       alert(message);
                       return false;
+                    });
+}
+
+async function fetchWarClans() {
+  return await axios.get(URI_WAR_CLANS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error)
+                      return [];
                     });
 }
 

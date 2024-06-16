@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
@@ -482,10 +483,25 @@ public class PlayersService {
         return playerRepository.findAllById(playerTags);
     }
 
-    public List<RankingHeroEquipmentResponse> getRankingHeroEquipments() {
-        return playerRepository.selectRankingHeroEquipments()
+    public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
+        List<String> playerTags = getClanAssignedPlayerTags(clanTag);
+
+        return playerRepository.selectRankingHeroEquipments(playerTags)
                                .stream()
                                .map(rankingHeroEquipmentResponseConverter::convert)
                                .collect(Collectors.toList());
+    }
+
+    private List<String> getClanAssignedPlayerTags(String clanTag) {
+        if ("all".equals(clanTag)) {
+            // 전체 처리
+            return playerRepository.findAllPlayerTag();
+        }
+
+        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
+        List<ClanAssignedPlayerEntity> clanAssignedPlayerEntities = clanAssignedPlayerRepository.findClanAssignedPlayersByClanTagAndSeasonDate(clanTag, latestSeasonDate);
+        return clanAssignedPlayerEntities.stream()
+                                         .map(ClanAssignedPlayerEntity::getPlayerTag)
+                                         .toList();
     }
 }

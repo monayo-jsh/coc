@@ -15,6 +15,13 @@
   color: #fff;
 }
 
+.clans-wrapper {
+  margin-top: 5px;
+  background-color: coral;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
 .heroes-wrapper {
   width: 270px;
   display: flex;

@@ -46,7 +46,8 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
             + "   from ("
             + "    select player_tag, target_hero_name, name"
             + "    from tb_player_hero_equipment"
-            + "    where wear_yn = 'Y'"
+            + "    where player_tag in (:playerTags)"
+            + "    and wear_yn = 'Y'"
             + "    order by player_tag, target_hero_name, name"
             + "   )"
             + "   group by player_tag, target_hero_name) x"
@@ -54,5 +55,5 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
             + "   order by x.target_hero_name, count desc"
             + " ) m"
     )
-    List<RankingHeroEquipment> selectRankingHeroEquipments();
+    List<RankingHeroEquipment> selectRankingHeroEquipments(List<String> playerTags);
 }

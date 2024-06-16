@@ -98,8 +98,8 @@ public class PlayersController {
     }
 
     @GetMapping("/ranking/hero/equipments")
-    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments() {
+    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments(@RequestParam String clanTag) {
         return ResponseEntity.ok()
-                             .body(playersService.getRankingHeroEquipments());
+                             .body(playersService.getRankingHeroEquipments(clanTag));
     }
 }

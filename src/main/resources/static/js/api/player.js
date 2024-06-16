@@ -129,8 +129,9 @@ async function updatePlayerSupportYn(playerTag, supportYn) {
               });
 }
 
-async function fetchRankingHeroEquipments() {
-  return await axios.get(URI_PLAYERS_RANKING_HERO_EQUIPMENTS)
+async function fetchRankingHeroEquipments(clanTag) {
+  const uri = URI_PLAYERS_RANKING_HERO_EQUIPMENTS + `?clanTag=${encodeURIComponent(clanTag)}`;
+  return await axios.get(uri)
                     .then(response => {
                       const { data } = response
                       return data;

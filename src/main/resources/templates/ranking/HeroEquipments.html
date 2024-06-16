@@ -60,7 +60,9 @@
       }
 
       const ratio = count / totalCount * 100;
-      row.innerHTML = row.innerHTML.replace(/{COUNT}/, ratio.toFixed(2));
+      row.innerHTML = row.innerHTML
+                         .replace(/{COUNT}/, count)
+                         .replace(/{RATIO}/, ratio.toFixed(2));
 
       heroRankings.appendChild(rowRanking);
     }
@@ -158,7 +160,8 @@
     <div class="equipments">
     </div>
     <div class="count">
-      {COUNT} %
+      <div>{COUNT}</div>
+      <div>({RATIO} %)</div>
     </div>
   </div>
 </template>

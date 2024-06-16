@@ -10,6 +10,8 @@ const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
 const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
 const URI_PLAYERS_SUPPORT = '/players/{playerTag}/support'; //지원 등록/해제
 
+const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
+
 async function findPlayer(playerTag) {
   const uri = URI_PLAYERS_REALTIME.replace(/{playerTag}/, encodeURIComponent(playerTag));
   return await axios.get(uri)
@@ -125,4 +127,16 @@ async function updatePlayerSupportYn(playerTag, supportYn) {
                 console.error(error);
                 return false;
               });
+}
+
+async function fetchRankingHeroEquipments() {
+  return await axios.get(URI_PLAYERS_RANKING_HERO_EQUIPMENTS)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
 }

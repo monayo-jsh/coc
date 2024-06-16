@@ -2,9 +2,11 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayersController {
 
     private final PlayersService playersService;
+    private final PlayerRepository playerRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<PlayerResponse>> getAllPlayer() {
@@ -92,5 +95,11 @@ public class PlayersController {
         playersService.changePlayerSupport(playerModify);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/ranking/hero/equipments")
+    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments() {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingHeroEquipments());
     }
 }

@@ -32,6 +32,12 @@ public class ViewNormalController {
         return "lab/Links";
     }
 
+    /** 영웅 장비 랭킹 */
+    @GetMapping("/hero/equipments")
+    public String rankingHeroEquipments() {
+        return "ranking/HeroEquipments";
+    }
+
     /** 습격전 현황 */
     @GetMapping("/capital/raid")
     public String capitalRaid() {

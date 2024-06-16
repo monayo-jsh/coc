@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/ranking/heroEquipments.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/hero.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/heroEquipment.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/player.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script>
+    function renderImgIcon(heroEquipment) {
+      const { name, rarity, koreanName } = heroEquipment;
+
+      const iconsTemplate = document.querySelector('#icons');
+      const icons = document.importNode(iconsTemplate.content, true);
+      const imgIconElement = icons.querySelector('.img-icon');
+
+      let equipmentIconClassName = name.toLowerCase()
+                                       .replace(/\s/g, "_")
+                                       .replace(/\./g, "");
+
+      imgIconElement.classList.add(equipmentIconClassName);
+
+      if (rarity)
+        imgIconElement.classList.add(rarity); // 장비 등급
+
+      if (koreanName) {
+        settingTooltip(imgIconElement, koreanName);
+      }
+
+      return imgIconElement;
+    }
+    function renderHeroEquipment(heroEquipment) {
+      const { heroName, heroEquipments, count, totalCount } = heroEquipment;
+
+      const heroClassName = heroName.toLowerCase().replace(/\s/g, "_")
+      const heroRankings = document.querySelector(`.${heroClassName} .rankings`);
+
+      const rowRankingTemplate = document.querySelector('#row-ranking-template');
+      const rowRanking = document.importNode(rowRankingTemplate.content, true);
+      const row = rowRanking.querySelector('.row');
+
+      const equipments = row.querySelector('.equipments');
+      for (const heroEquipment of heroEquipments) {
+        const imgIconElement = renderImgIcon(heroEquipment);
+        equipments.appendChild(imgIconElement);
+      }
+
+      const ratio = count / totalCount * 100;
+      row.innerHTML = row.innerHTML.replace(/{COUNT}/, ratio.toFixed(2));
+
+      heroRankings.appendChild(rowRanking);
+    }
+    function drawRankingHeroEquipments(heroEquipments) {
+      for(const heroEquipment of heroEquipments) {
+        renderHeroEquipment(heroEquipment);
+      }
+    }
+
+    async function getHeroEquipments() {
+      const heroEquipments = await fetchRankingHeroEquipments();
+      drawRankingHeroEquipments(heroEquipments);
+    }
+
+    window.onload = async () => {
+      await getHeroEquipments();
+    }
+  </script>
+
+  <title>아카데미 영웅 장비 랭킹</title>
+</head>
+<body>
+  <div class="content-wrapper">
+    <div class="title">
+      영웅 장비 사용 현황
+    </div>
+    <div class="heroes-wrapper">
+      <div class="hero-wrapper barbarian_king">
+        <div class="hero barbarian_king"></div>
+        <div class="rankings"></div>
+      </div>
+      <div class="hero-wrapper archer_queen">
+        <div class="hero archer_queen"></div>
+        <div class="rankings"></div>
+      </div>
+    </div>
+    <div class="heroes-wrapper">
+      <div class="hero-wrapper grand_warden">
+        <div class="hero grand_warden"></div>
+        <div class="rankings"></div>
+      </div>
+      <div class="hero-wrapper royal_champion">
+        <div class="hero royal_champion"></div>
+        <div class="rankings"></div>
+      </div>
+    </div>
+  </div>
+</body>
+<template id="row-ranking-template">
+  <div class="row">
+    <div class="equipments">
+    </div>
+    <div class="count">
+      {COUNT} %
+    </div>
+  </div>
+</template>
+<template id="icons">
+  <div class="img-icon"></div>
+</template>
+</html>

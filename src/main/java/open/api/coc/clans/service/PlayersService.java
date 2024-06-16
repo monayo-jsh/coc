@@ -41,7 +41,9 @@ import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
+import open.api.coc.clans.domain.players.converter.RankingHeroEquipmentResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -81,6 +83,8 @@ public class PlayersService {
     private final PlayerHeroEquipmentEntityConverter playerHeroEquipmentEntityConverter;
     private final PlayerTroopEntityConverter playerTroopEntityConverter;
     private final PlayerSpellEntityConverter playerSpellEntityConverter;
+
+    private final RankingHeroEquipmentResponseConverter rankingHeroEquipmentResponseConverter;
 
     public PlayerResponse findPlayerBy(String playerTag) {
         Player player = clanApiService.findPlayerBy(playerTag)
@@ -476,5 +480,12 @@ public class PlayersService {
 
     public List<PlayerEntity> findAllPlayersBy(List<String> playerTags) {
         return playerRepository.findAllById(playerTags);
+    }
+
+    public List<RankingHeroEquipmentResponse> getRankingHeroEquipments() {
+        return playerRepository.selectRankingHeroEquipments()
+                               .stream()
+                               .map(rankingHeroEquipmentResponseConverter::convert)
+                               .collect(Collectors.toList());
     }
 }

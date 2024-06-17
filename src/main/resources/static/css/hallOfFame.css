@@ -1,4 +1,11 @@
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .hall-of-fame {
+  margin-top: 10px;
   color: black;
   padding: 5px 10px;
   background-color: #ffffff;
@@ -9,4 +16,65 @@
   i {
     color: gold;
   }
+}
+
+.section-wrapper {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .section-title {
+    font-weight: bold;
+  }
+
+  .section-contents {
+    display: flex;
+    width: 320px;
+    justify-content: space-around;
+
+    .section {
+      margin: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .sub-title {
+        font-size: .9em;
+        font-weight: bold;
+      }
+
+      .rankings {
+        margin-top: 3px;
+
+        .table-tr.rank-1 .table-td {
+          font-size: 14px;
+          font-weight: 700;
+        }
+        .table-tr.rank-2 .table-td {
+          font-size: 13px;
+          font-weight: 600;
+        }
+        .table-tr.rank-3 .table-td {
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .table-td {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+
+}
+
+i.first-place {
+  color: #ffd700;
+}
+i.second-place {
+  color: #c0c0c0;
+}
+i.third-place {
+  color: #CD7F32;
 }

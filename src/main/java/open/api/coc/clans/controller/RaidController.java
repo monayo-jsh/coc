@@ -38,7 +38,12 @@ public class RaidController {
     @GetMapping("/score/playerName")
     public ResponseEntity<List<RaidScoreResponse>> getPlayerRaidScoreWithName(@RequestParam String playerName) {
         List<RaidScoreResponse> playerRaidScores = raidService.getPlayerRaidScoreWithName(playerName);
-        return ResponseEntity.ok(playerRaidScores);
+        return ResponseEntity.ok().body(playerRaidScores);
     }
 
+    @GetMapping("/ranking/current/season")
+    public ResponseEntity<List<RaidScoreResponse>> rankingCurrentSeason() {
+        List<RaidScoreResponse> rankingCurrentSeasons = raidService.getRankingCurrentSeason();
+        return ResponseEntity.ok().body(rankingCurrentSeasons);
+    }
 }

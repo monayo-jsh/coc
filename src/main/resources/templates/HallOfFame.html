@@ -11,17 +11,120 @@
   <link rel="stylesheet" type="text/css" href="/static/css/hallOfFame.css" />
 
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/raid.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script type="text/javascript">
+
+
+    function getMedalIcon(rank) {
+      let templateId = "";
+      if (rank === 1) templateId = "ranking-first-place-template";
+      if (rank === 2) templateId = "ranking-second-place-template";
+      if (rank === 3) templateId = "ranking-third-place-template";
+
+      const medalTemplate = document.querySelector(`#${templateId}`);
+      return document.importNode(medalTemplate.content, true);
+    }
+
+    function makeRankRow(rowData) {
+      const rankingRowTemplate = document.querySelector('#ranking-row-template');
+      const rankingRow = document.importNode(rankingRowTemplate.content, true);
+      const row = rankingRow.querySelector('.table-tr');
+
+      const { rank, name, score } = rowData;
+
+      row.innerHTML = row.innerHTML
+                         .replace(/{RANK}/, rank)
+                         .replace(/{NAME}/, name)
+                         .replace(/{SCORE}/, score);
+
+      row.classList.add(`rank-${rank}`);
+
+      if (rank < 4) {
+        //순위권 메달 표기
+        const medalIcon = getMedalIcon(rank);
+        const rankTd = row.querySelector('.table-td.rank');
+        rankTd.innerHTML = "";
+        rankTd.appendChild(medalIcon);
+      }
+
+      return row;
+    }
+
+    function convHallOfFameRankingItem(rank, name, score) {
+      return {
+        rank: rank,
+        name: name,
+        score: score
+      };
+    }
+
+    function renderRaidCurrentSeason(players) {
+      const rankingTbody = document.querySelector('.raid-current-season .table-tbody');
+      let rank = 1;
+      for(const player of players) {
+        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.resourceLooted).toLocaleString());
+        const row = makeRankRow(rowData);
+        rankingTbody.appendChild(row);
+        rank++;
+      }
+    }
+
+    async function fetchRaidCurrentSeason() {
+      const raidCurrentSeasonRankings = await fetchRankingRaidCurrentSeason();
+      renderRaidCurrentSeason(raidCurrentSeasonRankings);
+    }
+
+    window.onload = async () => {
+      fetchRaidCurrentSeason();
+    }
+  </script>
 
   <title>아카데미 명예의전당</title>
 </head>
 <body>
-  <div class="card-group align-items-center">
     <div class="title hall-of-fame" onclick="renderPage('/hall-of-fame'); return false;">
       <i class="fa-solid fa-trophy"></i>
       명예의전당
       <i class="fa-solid fa-medal"></i>
     </div>
-  </div>
+
+    <div class="section-wrapper">
+      <div class="section-title">습격전 부분</div>
+      <div class="section-contents">
+        <div class="section raid-current-season">
+          <div class="sub-title">현재 시즌 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
+<template id="ranking-row-template">
+  <tr class="table-tr">
+    <td class="table-td rank">{RANK}</td>
+    <td class="table-td">{NAME}</td>
+    <td class="table-td">{SCORE}</td>
+  </tr>
+</template>
+<template id="ranking-first-place-template">
+  <i class="fa-solid fa-medal first-place"></i>
+</template>
+<template id="ranking-second-place-template">
+  <i class="fa-solid fa-medal second-place"></i>
+</template>
+<template id="ranking-third-place-template">
+  <i class="fa-solid fa-medal third-place"></i>
+</template>
 </html>

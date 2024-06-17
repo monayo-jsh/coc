@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -19,15 +20,16 @@ import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidRepository;
 import open.api.coc.clans.database.repository.raid.RaiderRepository;
-import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
-import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
+import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RaidService {
+
+    @Value("${hall-of-fame.ranking.limit}")
+    private Integer rankingLimit;
 
     private final ClanApiService clanApiService;
     private final ClansService clansService;
@@ -156,5 +161,16 @@ public class RaidService {
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
+    public List<RaidScoreResponse> getRankingCurrentSeason() {
+        LocalDate currentSeason = raidRepository.getCurrentSeason();
+        if (Objects.isNull(currentSeason)) {
+            return Collections.emptyList();
+        }
 
+        List<RaiderEntity> raiderEntities = raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, rankingLimit));
+
+        return raiderEntities.stream()
+                             .map(raidScoreResponseConverter::convert)
+                             .toList();
+    }
 }

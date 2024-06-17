@@ -14,4 +14,7 @@ public interface RaidRepository extends JpaRepository<RaidEntity, Long> {
 
     @Query("select raidEntity from RaidEntity raidEntity join fetch raidEntity.raiderEntityList where raidEntity.clanTag = :clanTag and raidEntity.startDate = :startDate")
     Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
+
+    @Query("SELECT max(raid.startDate) FROM RaidEntity raid")
+    LocalDate getCurrentSeason();
 }

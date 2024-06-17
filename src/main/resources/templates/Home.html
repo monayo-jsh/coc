@@ -5,6 +5,8 @@
   <meta http-equiv="refresh" CONTENT="no-cache">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
@@ -76,6 +78,14 @@
 
     <div class="contents">
 
+      <div class="card-group align-items-center">
+        <div class="title hall-of-fame" onclick="renderPage('/hall-of-fame'); return false;">
+          <i class="fa-solid fa-trophy"></i>
+          명예의전당
+          <i class="fa-solid fa-medal"></i>
+        </div>
+      </div>
+
       <div class="card-group">
         <div class="title">아카데미 정보</div>
         <div class="cards">
@@ -92,8 +102,6 @@
             <p class="tip">연구소</p>
             <p class="second-text"></p>
           </div>
-        </div>
-        <div class="cards">
           <div class="card green-1" onclick="renderPage('/hero/equipments'); return false;">
             <p class="tip">영웅 장비 랭킹</p>
             <p class="second-text"></p>

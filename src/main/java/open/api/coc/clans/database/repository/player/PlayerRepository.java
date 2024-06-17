@@ -4,6 +4,9 @@ import java.util.List;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.RankingHeroEquipment;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -56,4 +59,10 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
             + " ) m"
     )
     List<RankingHeroEquipment> selectRankingHeroEquipments(List<String> playerTags);
+
+    @Query("select player.name as name, player.playerTag as tag, player.trophies as score from PlayerEntity player order by player.trophies desc")
+    List<RankingHallOfFame> selectRankingTrophiesCurrent(Pageable pageable);
+
+    @Query("select player.name as name, player.playerTag as tag, player.attackWins as score from PlayerEntity player order by player.attackWins desc")
+    List<RankingHallOfFame> selectRankingAttackWins(PageRequest pageable);
 }

@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.raid.RaidEntity;
@@ -19,23 +21,27 @@ import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidRepository;
 import open.api.coc.clans.database.repository.raid.RaiderRepository;
-import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
-import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
+import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class RaidService {
+
+    private final HallOfFameConfig hallOfFameConfig;
 
     private final ClanApiService clanApiService;
     private final ClansService clansService;
@@ -156,5 +162,21 @@ public class RaidService {
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
+    public List<RankingHallOfFame> getRankingCurrentSeason() {
+        LocalDate currentSeason = raidRepository.getCurrentSeason();
+        if (Objects.isNull(currentSeason)) {
+            return Collections.emptyList();
+        }
 
+        return raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
+
+    public List<RankingHallOfFame> getRankingAverageSeason() {
+        List<LocalDate> averageSeasonStartDates = raidRepository.getAverageSeasonByLimit(PageRequest.of(0, hallOfFameConfig.getAverage()));
+        if (CollectionUtils.isEmpty(averageSeasonStartDates)) {
+            return Collections.emptyList();
+        }
+
+        return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, hallOfFameConfig.getAverage(), PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
 }

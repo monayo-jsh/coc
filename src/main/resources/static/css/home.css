@@ -67,6 +67,18 @@
   font-weight: bold;
 }
 
+.hall-of-fame {
+  color: black;
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-bottom: 2px double;
+  cursor: pointer;
+
+  i {
+    color: gold;
+  }
+}
+
 .description {
   text-align: center;
   font-weight: bold;

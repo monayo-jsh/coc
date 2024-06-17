@@ -93,10 +93,10 @@
     }
 
     window.onload = async () => {
-      fetchRaidCurrentSeason();
-      fetchRaidAverageSeason();
       fetchCurrentTrophies();
       fetchCurrentAttackWins();
+      fetchRaidCurrentSeason();
+      fetchRaidAverageSeason();
     }
   </script>
 
@@ -110,44 +110,6 @@
     </div>
 
     <div class="section-wrapper">
-      <div class="section-title">습격전 부문</div>
-
-      <div class="section-contents">
-
-        <div class="section raid-current-season">
-          <div class="sub-title">현재 시즌 순위</div>
-          <div class="rankings">
-            <table class="table">
-              <thead>
-              <tr class="table-tr">
-                <th class="table-th">순위</th>
-                <th class="table-th">이름</th>
-                <th class="table-th">점수</th>
-              </tr>
-              </thead>
-              <tbody class="table-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-
-
-        <div class="section raid-average-season">
-          <div class="sub-title">3주 평균 순위</div>
-          <div class="rankings">
-            <table class="table">
-              <thead>
-              <tr class="table-tr">
-                <th class="table-th">순위</th>
-                <th class="table-th">이름</th>
-                <th class="table-th">점수</th>
-              </tr>
-              </thead>
-              <tbody class="table-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
 
       <div class="section-wrapper">
         <div class="section-title">개인 기록 부문</div>
@@ -187,6 +149,49 @@
           </div>
 
         </div>
+      </div>
+
+    </div>
+
+    <div class="section-wrapper">
+      <div class="section-title">습격전 부문</div>
+
+      <div class="section-contents">
+
+        <div class="section raid-current-season">
+          <div class="sub-title">현재 시즌 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div class="section raid-average-season">
+          <div class="sub-title">최근 3주 평균 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
     </div>
 
 </body>

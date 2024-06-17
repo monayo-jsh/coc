@@ -45,6 +45,8 @@ body {
   }
 
   .section-contents {
+    min-width: 300px;
+    min-height: 300px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;

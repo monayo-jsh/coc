@@ -39,6 +39,9 @@ body {
 
   .section-title {
     font-weight: bold;
+    border-radius: 10px;
+    background-color: cornsilk;
+    padding: 5px 60px;
   }
 
   .section-contents {

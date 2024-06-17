@@ -60,11 +60,11 @@
       };
     }
 
-    function renderRaidCurrentSeason(players) {
-      const rankingTbody = document.querySelector('.raid-current-season .table-tbody');
+    function renderRaidCurrentSeason(sectionClassName, players) {
+      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
       let rank = 1;
       for(const player of players) {
-        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.resourceLooted).toLocaleString());
+        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString());
         const row = makeRankRow(rowData);
         rankingTbody.appendChild(row);
         rank++;
@@ -72,12 +72,18 @@
     }
 
     async function fetchRaidCurrentSeason() {
-      const raidCurrentSeasonRankings = await fetchRankingRaidCurrentSeason();
-      renderRaidCurrentSeason(raidCurrentSeasonRankings);
+      const rankings = await fetchRankingRaidCurrentSeason();
+      renderRaidCurrentSeason('raid-current-season', rankings);
+    }
+
+    async function fetchRaidAverageSeason() {
+      const rankings = await fetchRankingRaidAverageSeason();
+      renderRaidCurrentSeason('raid-average-season', rankings);
     }
 
     window.onload = async () => {
       fetchRaidCurrentSeason();
+      fetchRaidAverageSeason();
     }
   </script>
 
@@ -91,8 +97,10 @@
     </div>
 
     <div class="section-wrapper">
-      <div class="section-title">습격전 부분</div>
+      <div class="section-title">습격전 부문</div>
+
       <div class="section-contents">
+
         <div class="section raid-current-season">
           <div class="sub-title">현재 시즌 순위</div>
           <div class="rankings">
@@ -108,8 +116,28 @@
             </table>
           </div>
         </div>
+
+
+        <div class="section raid-average-season">
+          <div class="sub-title">3주 평균 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
+
     </div>
+
 </body>
 <template id="ranking-row-template">
   <tr class="table-tr">

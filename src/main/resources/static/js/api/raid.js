@@ -5,6 +5,7 @@ const URI_RAID_SCORE_WITH_TAG = '/raid/score/{playerTag}'; //멤버 습격전 �
 const URI_RAID_SCORE_WITH_NAME = '/raid/score/playerName'; // 멤버 습격전 기록 조회(이름)
 
 const URI_RAID_RANKING_CURRENT_SEASON = '/raid/ranking/current/season'; // 습격전 현재 시즌 랭킹
+const URI_RAID_RANKING_AVERAGE_SEASON = '/raid/ranking/average/season'; // 습격전 시즌 평균 랭킹
 
 async function collectRaidSeason() {
   return axios.post(URI_RAID_CLAN_CAPITAL_SEASON_COLLECT)
@@ -68,6 +69,18 @@ async function fetchClanCapitalRaidSeason(clanTag) {
 
 async function fetchRankingRaidCurrentSeason() {
   return await axios.get(URI_RAID_RANKING_CURRENT_SEASON)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingRaidAverageSeason() {
+  return await axios.get(URI_RAID_RANKING_AVERAGE_SEASON)
                     .then((response) => {
                       const { data } = response
                       return data;

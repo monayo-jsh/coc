@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
+import open.api.coc.clans.domain.raid.RankingRaidScore;
 import open.api.coc.clans.service.RaidService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -42,8 +43,14 @@ public class RaidController {
     }
 
     @GetMapping("/ranking/current/season")
-    public ResponseEntity<List<RaidScoreResponse>> rankingCurrentSeason() {
-        List<RaidScoreResponse> rankingCurrentSeasons = raidService.getRankingCurrentSeason();
+    public ResponseEntity<List<RankingRaidScore>> rankingCurrentSeason() {
+        List<RankingRaidScore> rankingCurrentSeasons = raidService.getRankingCurrentSeason();
+        return ResponseEntity.ok().body(rankingCurrentSeasons);
+    }
+
+    @GetMapping("/ranking/average/season")
+    public ResponseEntity<List<RankingRaidScore>> rankingAverageSeason() {
+        List<RankingRaidScore> rankingCurrentSeasons = raidService.getRankingAverageSeason();
         return ResponseEntity.ok().body(rankingCurrentSeasons);
     }
 }

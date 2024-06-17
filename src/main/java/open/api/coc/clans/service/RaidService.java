@@ -24,6 +24,7 @@ import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
+import open.api.coc.clans.domain.raid.RankingRaidScore;
 import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +43,9 @@ public class RaidService {
 
     @Value("${hall-of-fame.ranking.limit}")
     private Integer rankingLimit;
+
+    @Value("${hall-of-fame.ranking.average}")
+    private Integer averageLimit;
 
     private final ClanApiService clanApiService;
     private final ClansService clansService;
@@ -161,16 +166,21 @@ public class RaidService {
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
-    public List<RaidScoreResponse> getRankingCurrentSeason() {
+    public List<RankingRaidScore> getRankingCurrentSeason() {
         LocalDate currentSeason = raidRepository.getCurrentSeason();
         if (Objects.isNull(currentSeason)) {
             return Collections.emptyList();
         }
 
-        List<RaiderEntity> raiderEntities = raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, rankingLimit));
+        return raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, rankingLimit));
+    }
 
-        return raiderEntities.stream()
-                             .map(raidScoreResponseConverter::convert)
-                             .toList();
+    public List<RankingRaidScore> getRankingAverageSeason() {
+        List<LocalDate> averageSeasonStartDates = raidRepository.getAverageSeasonByLimit(PageRequest.of(0, averageLimit));
+        if (CollectionUtils.isEmpty(averageSeasonStartDates)) {
+            return Collections.emptyList();
+        }
+
+        return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, averageLimit, PageRequest.of(0, rankingLimit));
     }
 }

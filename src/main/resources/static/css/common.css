@@ -122,8 +122,8 @@ body::before {
 }
 
 .logo {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background-image: url("/static/images/logo.png");
   background-size: contain;
   background-repeat: no-repeat;

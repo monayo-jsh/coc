@@ -1,0 +1,12 @@
+.hall-of-fame {
+  color: black;
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  i {
+    color: gold;
+  }
+}

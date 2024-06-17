@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="/static/css/common.css" />
+  <link rel="stylesheet" href="/static/css/button.css" />
+  <link rel="stylesheet" href="/static/css/townhall.css" />
+  <link rel="stylesheet" href="/static/css/card.css" />
+  <link rel="stylesheet" href="/static/css/loader.css" />
+  <link rel="stylesheet" href="/static/css/warLeague.css" />
+  <link rel="stylesheet" href="/static/css/clan/war.css" />
+  <link rel="stylesheet" href="/static/css/clan/leagueWar.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+  </script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/util.js"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script type="text/javascript">
+
+    function makeMemberMapByTag(clanMembers) {
+      return clanMembers.reduce((memberMap, member) => {
+        memberMap[member.tag] = member
+        return memberMap
+      }, {});
+    }
+
+    function getSumByStars(attacks) {
+      return attacks.reduce((starsSum, attack) => {
+        starsSum += attack.stars
+        return starsSum
+      }, 0)
+    }
+
+    function appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember) {
+      const templateMember = document.getElementById('section-member-attack');
+      for (const attack of attacks) {
+
+        const cloneTemplateMemberAttack = document.importNode(templateMember.content, true);
+        const attackInfoElement = cloneTemplateMemberAttack.querySelector('.attack-info');
+
+        const { attackerTag, defenderTag, destructionPercentage, duration, stars} = attack;
+
+        const opponentMember = opponentMemberMap[defenderTag]
+
+        const { name, townHallLevel, mapPosition } = opponentMember
+
+        attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                .replace(/{OPPONENT_NAME}/, `${mapPosition}. ${name}`)
+                .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
+                .replace(/{DESTRUCTION_DURATION}/, formatMinuteSecond(duration))
+
+        const starElements = attackInfoElement.querySelectorAll('.fa-star');
+        for (let i=0; i<stars; i++) {
+          starElements[i].classList.add('fill');
+        }
+
+        attackListElement.appendChild(attackInfoElement);
+      }
+
+      appendNotAttackRows(attackListElement, attacksPerMember, attacks.length)
+    }
+
+    function formatMinuteSecond(sec) {
+      return dayjs.duration(sec * 1000).format('m분 ss초');
+    }
+
+    function appendNotAttackRows(attackListElement, attacksPerMember, attackLength) {
+      let no = getStartNo();
+
+      const templateMemberNotAttack = document.getElementById('section-member-not-attack');
+
+      const rowCount = getDrawRowCount();
+      for (let i=0; i<rowCount; i++) {
+        const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
+        const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
+        attackInfoElement.innerHTML = attackInfoElement.innerHTML
+                .replace(/{ATTACK_NO}/, `공격${no++}`);
+
+        attackListElement.appendChild(attackInfoElement);
+      }
+
+      function getStartNo() {
+        if (attackLength === 0) return 1;
+        return getDrawRowCount() + 1;
+      }
+
+      function getDrawRowCount() {
+        return attacksPerMember - attackLength;
+      }
+    }
+
+    function settingMemberAttack(memberAttackHtml, clanMembers, opponentMembers, attacksPerMember) {
+      const opponentMemberMap = makeMemberMapByTag(opponentMembers);
+
+      const templateMember = document.getElementById('section-member');
+
+      for(const member of clanMembers) {
+
+        const cloneTemplateMember = document.importNode(templateMember.content, true);
+        const memberElement = cloneTemplateMember.querySelector('.member');
+
+        const { name, tag, townHallLevel, mapPosition, attacks } = member;
+        const totalStars = getSumByStars(attacks);
+        memberElement.innerHTML = memberElement.innerHTML
+                .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                .replace(/{USER_NAME}/, `${mapPosition}. ${name}`)
+                .replace(/{USER_STARS}/, totalStars)
+
+        const attackListElement = cloneTemplateMember.querySelector('.attack-list');
+        appendAttackList(attackListElement, attacks, opponentMemberMap, attacksPerMember);
+
+        memberAttackHtml.appendChild(memberElement)
+      }
+    }
+
+    function sortByMapPosition(members) {
+      return members.sort(function (a, b) {
+        if (a.mapPosition > b.mapPosition) {
+          return 1;
+        }
+        if (a.mapPosition < b.mapPosition) {
+          return -1;
+        }
+        // a must be equal to b
+        return 0;
+      });
+    }
+
+    function settingSummaryColor(clanWarContentsElement, clanWarResult) {
+      let summaryCard = clanWarContentsElement.querySelector('.summary');
+      summaryCard.classList.add(clanWarResult);
+    }
+
+    function isClanWarResult(clan, opponent) {
+      if (clan.stars > opponent.stars) return 'win';
+      if (opponent.stars > clan.stars) return 'lose';
+      if (clan.destructionPercentage > opponent.destructionPercentage) return 'win';
+      if (opponent.destructionPercentage > clan.destructionPercentage) return 'lose';
+      if (clan.stars === opponent.stars) return 'tie';
+      return '';
+    }
+
+    function displayElementByClassName(clanWarContentsElement, className) {
+      let element = clanWarContentsElement.querySelector(`.${className}`);
+      if (element) {
+        element.classList.remove('display-none');
+      }
+    }
+
+    function getRemainHall(clan, hallCount) {
+      if (!clan) return 0;
+
+      const { members } = clan;
+      if (!members) return 0;
+      if (!members.length) return 0;
+
+
+      return hallCount - members.filter(isNotCompletelyDestroyed).length;
+      function isNotCompletelyDestroyed(member) {
+        const { bestOpponentAttack } = member;
+
+        // 공격받지 않음
+        if (!bestOpponentAttack) return true;
+
+        // 완파되지 않음
+        return bestOpponentAttack.stars < 3
+      }
+    }
+
+    function calcAverageDuration(clan) {
+      if (!clan) return formatMinuteSecond(0);
+
+      const { attacks, members } = clan;
+      const totalDuration = members.flatMap(member => member.attacks.map(attack => attack.duration)).reduce((total, duration) => total + duration, 0)
+
+      let averageDuration = Number(totalDuration / attacks);
+      if (Number.isNaN(averageDuration)) {
+        averageDuration = 0;
+      }
+
+      return formatMinuteSecond(averageDuration)
+    }
+
+    function settingTooltips(clanWarCardElement) {
+      let hallElements = clanWarCardElement.querySelectorAll('.hall .count');
+      hallElements.forEach(element => settingTooltip(element, '남은 홀'));
+
+      let starsElements = clanWarCardElement.querySelectorAll('.stars .count');
+      starsElements.forEach(element => settingTooltip(element, '남은 별'));
+
+      let attacksElements = clanWarCardElement.querySelectorAll('.attacks .count');
+      attacksElements.forEach(element => settingTooltip(element, '남은 공격'));
+
+      let destructionPercentageElements = clanWarCardElement.querySelectorAll('.destruction-percentage .count');
+      destructionPercentageElements.forEach(element => settingTooltip(element, '총 파괴율'));
+
+      let averageDurationElements = clanWarCardElement.querySelectorAll('.average-duration .count');
+      averageDurationElements.forEach(element => settingTooltip(element, '평균 공격시간'));
+    }
+
+    function convWarState(state) {
+      switch(state) {
+        case 'preparation': return '준비일';
+        case 'inWar': return '전쟁중';
+        case 'notInWar': return "전쟁중이 아님";
+        case 'warEnded': return '전쟁 종료';
+      }
+      return state;
+    }
+
+    function formatWarRemainHourMinute(endTime) {
+      const now = dayjs();
+      const endDateTime = dayjs(endTime);
+
+      if (now > endDateTime) {
+        return "";
+      }
+
+      return dayjs.duration(endDateTime.diff(dayjs())).format("H시 mm분");
+    }
+
+    function switchAttacks(element) {
+      const memberAttackElements = element.closest('.clan-war').querySelector('.member-attack');
+
+      const { dataset } = memberAttackElements;
+      const { attacksPerMember } = dataset;
+
+      for (const memberAttack of memberAttackElements.children) {
+        if (element.checked) {
+          if (memberAttack.querySelectorAll('.attack-info:not(.not)').length === Number(attacksPerMember)) {
+            memberAttack.classList.add('display-none');
+          }
+        } else {
+          memberAttack.classList.remove('display-none');
+        }
+      }
+    }
+
+    function displayDetail(element) {
+        const clanWarCardElement = element.closest('.clan-war');
+
+        const { classList } = clanWarCardElement;
+        if (classList.contains('expand')) {
+          classList.remove('expand');
+        } else {
+          classList.add('expand');
+          showLeagueDashboard(element);
+        }
+    }
+
+    function emptyWarLeagueClans() {
+      hideWifiLoading('.card-container');
+      const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+      clanWarCard.classList.add('display-none');
+      const clanWarEmptyCard = document.querySelector('.empty-clan');
+      clanWarEmptyCard.classList.remove('display-none');
+      return;
+    }
+
+    function showClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
+      loader.classList.remove('display-none');
+
+      const cardContents = sectionClanWar.querySelector('.card-contents');
+      cardContents.classList.add('opacity-0');
+    }
+
+    function hideClanWarCardLoader(element) {
+      const sectionClanWar = element.closest('.section-clan-war');
+      const loader = sectionClanWar.querySelector('.loader-circle');
+      loader.classList.add('display-none');
+
+      const cardContents = sectionClanWar.querySelector('.card-contents');
+      cardContents.classList.remove('opacity-0');
+    }
+
+    function initLeagueClan(leagueClanMap, clans) {
+      for(const clan of clans) {
+        // 라운드 별 dataset
+        clan.rounds = [];
+        leagueClanMap.set(clan.tag, clan);
+      }
+    }
+
+    function swipeClanAndOpponent(opponentClanRoundWarInfo) {
+      const clan = opponentClanRoundWarInfo.clan;
+
+      opponentClanRoundWarInfo.clan = opponentClanRoundWarInfo.opponent;
+      opponentClanRoundWarInfo.opponent = clan;
+    }
+
+    async function fetchLeagueClanRoundInfo(leagueClanMap, clanTag, season, rounds) {
+      for (const round of rounds) {
+        const { warTags } = round;
+
+          // 전쟁태그 없는 경우
+        if (warTags.filter(warTag => warTag === '#0').length > 0) continue;
+
+        const currentWarLeagueRounds = await fetchCurrentWarLeagueRound(warTags, clanTag, season)
+
+        for (const currentWarLeagueRound of currentWarLeagueRounds) {
+          const { clan, opponent } = currentWarLeagueRound;
+          const targetClan = leagueClanMap.get(clan.tag);
+          const clanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
+          targetClan.rounds.push(clanRoundWarInfo);
+
+          const opponentClanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
+          swipeClanAndOpponent(opponentClanRoundWarInfo);
+          const opponentClan = leagueClanMap.get(opponent.tag);
+          opponentClan.rounds.push(opponentClanRoundWarInfo);
+        }
+      }
+
+    }
+
+    function drawLeagueWarRound(clanWarContentsElement, drawClan) {
+      const { roundNo, clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = drawClan
+
+      const totalTownhallCount = teamSize * 1;
+      const totalStarCount = teamSize * 3;
+
+      clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                               .replace(/{LEAGUE_ROUND}/g, `${roundNo}회차`)
+                                                               .replace(/{TEAM_SIZE}/g, teamSize)
+                                                               .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
+                                                               .replace(/{CLAN_STAR_COUNT}/, clan.stars)
+                                                               .replace(/{CLAN_ATTACK}/, clan.attacks)
+                                                               .replace(/{CLAN_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                               .replace(/{CLAN_DESTRUCTION_PERCENTAGE}/, Number(clan.destructionPercentage).toFixed(2))
+                                                               .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
+                                                               .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
+                                                               .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
+                                                               .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                               .replace(/{WAR_STATE}/, convWarState(state))
+                                                               .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
+                                                               .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
+                                                               .replace(/{OPPONENT_ATTACK}/, opponent.attacks)
+                                                               .replace(/{OPPONENT_TOTAL_ATTACK}/, teamSize * attacksPerMember)
+                                                               .replace(/{OPPONENT_REMAIN_HALL}/, getRemainHall(clan, teamSize))
+                                                               .replace(/{OPPONENT_TOTAL_HALL}/, totalTownhallCount)
+                                                               .replace(/{OPPONENT_DESTRUCTION_PERCENTAGE}/, Number(opponent.destructionPercentage).toFixed(2))
+                                                               .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(opponent));
+
+      if (teamSize)
+        displayElementByClassName(clanWarContentsElement, 'team-size');
+
+      settingSummaryColor(clanWarContentsElement, isClanWarResult(clan, opponent));
+
+      const clanIcon = clanWarContentsElement.querySelector('.clan-icon .clan');
+      clanIcon.src = clan.badge.small
+
+      const opponentIcon = clanWarContentsElement.querySelector('.clan-icon .opponent');
+      opponentIcon.src = opponent.badge.small
+
+      let memberAttackHtml = clanWarContentsElement.querySelector('.member-attack');
+      memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
+      settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
+
+
+      settingTooltips(clanWarContentsElement);
+    }
+
+    function isInWar(round) {
+      const { state } = round;
+      return state === 'inWar';
+    }
+
+    function findDrawRound(clanWarLeagueInfo) {
+      const { rounds } = clanWarLeagueInfo;
+
+      for(let i = 0; i<rounds.length; i++) {
+        const round = rounds[i];
+        if (isInWar(round)) {
+          round.roundNo = i+1;
+          return round;
+        }
+      }
+
+      // 모든 라운드 종료 시 마지막 라운드 그리도록 설정
+      let round = rounds.length;
+      let drawRound = rounds.pop();
+      // 데이터 원복
+      rounds.push(drawRound);
+
+      drawRound.roundNo = round;
+      return drawRound;
+    }
+
+    function calcLeagueWarResult(leagueClan) {
+      const { rounds } = leagueClan;
+
+      leagueClan.totalStars = 0;
+      leagueClan.totalDestructionPercentage = 0;
+
+      rounds.forEach(round => {
+        const { state, clan, opponent } = round;
+        const { stars, members } = clan;
+
+        leagueClan.totalStars += stars;
+
+        if (state === 'warEnded') {
+          //종료된 라운드 기준
+          const isWarResult = isClanWarResult(clan, opponent);
+          if (isWarResult === 'win') {
+            //승리했다면 10개 보너스
+            leagueClan.totalStars += 10;
+          }
+        }
+
+        for (const member of members) {
+          const [attack] = member.attacks;
+          if (!attack) continue;
+          leagueClan.totalDestructionPercentage += attack.destructionPercentage;
+        }
+      });
+    }
+
+    function sortedByRank(leagueClanMap) {
+      return Array.from(leagueClanMap).sort((a, b) => b[1].totalStars - a[1].totalStars || b[1].totalDestructionPercentage - a[1].totalDestructionPercentage);
+    }
+
+    function drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, clanTag) {
+      const sortedRankMap = new Map(sortedByRank(leagueClanMap));
+
+      const leagueDashboard = leagueWarClanContents.querySelector('.league-dashboard');
+      const leagueDashboardRowTemplate = document.querySelector('#league-dashboard-row');
+
+      let rank = 0;
+      for(const [key, value] of sortedRankMap) {
+        const leagueDashboardRow = document.importNode(leagueDashboardRowTemplate.content, true);
+        const row = leagueDashboardRow.querySelector('.row');
+
+        const { badgeUrls, name, totalStars, totalDestructionPercentage, tag } = value;
+        row.innerHTML = row.innerHTML
+                           .replace(/{RANK}/, ++rank)
+                           .replace(/{NAME}/, name)
+                           .replace(/{STARS}/,totalStars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage);
+
+        const { small } = badgeUrls;
+        const icon = row.querySelector('.badge .clan');
+        icon.src = small;
+
+        if (tag === clanTag) {
+          row.classList.add("selected");
+        }
+
+        leagueDashboard.appendChild(row);
+      }
+    }
+
+    function calcStars(members) {
+      const stars = [0, 0, 0, 0];
+      for(const member of members) {
+        const { attacks } = member;
+        const [ attack ] = attacks;
+        if (attack) {
+          stars[attack.stars]++;
+        }
+      }
+      return {
+        three: stars[3],
+        two: stars[2],
+        one: stars[1],
+        zero: stars[0]
+      };
+    }
+
+    function makeClanRecordCell(clan) {
+      const leagueClanRecordCellTemplate = document.querySelector('#league-clan-record-cell');
+      const leagueClanRecordCell = document.importNode(leagueClanRecordCellTemplate.content, true);
+      const cell = leagueClanRecordCell.querySelector('.cell');
+
+      const { name, badge, stars, attacks, members } = clan;
+      const { three, two, one, zero } = calcStars(members);
+      cell.innerHTML = cell.innerHTML
+                         .replace(/{NAME}/, name)
+                         .replace(/{STARS}/,stars)
+                         .replace(/{ATTACKS}/, attacks)
+                         .replace(/{THREE}/, three)
+                         .replace(/{TWO}/, two)
+                         .replace(/{ONE}/, one)
+                         .replace(/{ZERO}/, zero);
+
+      const { small } = badge;
+      const icon = cell.querySelector('.badge .clan');
+      icon.src = small;
+
+      return cell;
+    }
+
+    function drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo) {
+      const { rounds } = clanWarLeagueInfo;
+      const leagueClanRecord = leagueWarClanContents.querySelector('.league-clan-record');
+
+      for(const round of rounds) {
+        const { state, clan, opponent } = round;
+
+        //준비중인 라운드는 제외
+        if (state === 'preparation') continue;
+
+        const clanCell = makeClanRecordCell(clan);
+        const opponentCell = makeClanRecordCell(opponent);
+        opponentCell.classList.add('opponent');
+
+        const row = document.createElement('div');
+        row.classList.add('row', isClanWarResult(clan, opponent));
+        row.appendChild(clanCell);
+        row.appendChild(opponentCell)
+
+        leagueClanRecord.appendChild(row);
+      }
+    }
+
+    function initRecord(leagueMemberMap) {
+      for(const [key, value] of leagueMemberMap) {
+        value.totalStars = 0;
+        value.totalDestructionPercentage = 0;
+        value.useAttacks = 0;
+        value.totalAttacks = 0;
+      }
+    }
+
+    function calcMemberRecord(leagueMemberMap, rounds) {
+      initRecord(leagueMemberMap);
+      for (const round of rounds) {
+        const { state, clan } = round;
+
+        //준비중인 라운드는 제외
+        if (state === 'preparation') continue;
+
+        const { members } = clan;
+        for(const member of members) {
+          const { tag, attacks } = member;
+            const memberRecord = leagueMemberMap.get(tag);
+            memberRecord.totalAttacks += 1;
+            const [attack]= attacks;
+            if (attack) {
+              memberRecord.useAttacks += 1;
+              memberRecord.totalStars += attack.stars;
+              memberRecord.totalDestructionPercentage += attack.destructionPercentage;
+            }
+        }
+      }
+    }
+
+    function drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, clanTag) {
+      const leagueClan = leagueClanMap.get(clanTag);
+
+      const leagueMemberMap = convertArrayToMapByKey(leagueClan.memberList);
+      calcMemberRecord(leagueMemberMap, leagueClan.rounds);
+
+      const sortedRankMap = sortedByRank(leagueMemberMap);
+      const leagueMemberRecord = leagueWarClanContents.querySelector('.league-member-record');
+      const leagueMemberRecordRowTemplate = document.querySelector('#league-member-record-row');
+
+      let rank = 0;
+      let beforeTotalStars = 0
+      let beforeTotalDestructionPercentage = 0;
+      for(const [key, value] of sortedRankMap) {
+        const leagueMemberRecordRow = document.importNode(leagueMemberRecordRowTemplate.content, true);
+        const row = leagueMemberRecordRow.querySelector('.row');
+
+        const { tag, name, townHallLevel, totalStars, totalDestructionPercentage, useAttacks, totalAttacks } = value;
+        if (beforeTotalStars !== totalStars || beforeTotalDestructionPercentage !== totalDestructionPercentage) {
+          rank += 1;
+        }
+
+        row.innerHTML = row.innerHTML
+                           .replace(/{RANK}/, rank)
+                           .replace(/{NAME}/, name)
+                           .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
+                           .replace(/{STARS}/,totalStars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage)
+                           .replace(/{USE_ATTACKS}/,useAttacks)
+                           .replace(/{TOTAL_ATTACKS}/,totalAttacks);
+
+        leagueMemberRecord.appendChild(row);
+
+        beforeTotalStars = totalStars;
+        beforeTotalDestructionPercentage = totalDestructionPercentage;
+      }
+    }
+
+    function renderWarLeagueBadge(leagueWarClanContents, warLeague) {
+      if (!warLeague) return;
+      const { name } = warLeague;
+      let warLeagueIconClassName = name.replace(/\s/g, "");
+
+      const warLeagueElement = leagueWarClanContents.querySelector('.war-league .img-icon');
+      warLeagueElement.classList.add(warLeagueIconClassName);
+    }
+
+    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name) {
+      const leagueClanMap = new Map();
+      const clanWarLeague = await fetchClanWarLeague(tag);
+      const { state, season, clans, rounds } = clanWarLeague;
+      if (!state) {
+        //조회 실패
+        leagueWarClanContents.innerHTML = `<div class="fail"><div class="name">${name}</div><div class="reason">조회 실패</div></div>`;
+        return;
+      }
+
+      initLeagueClan(leagueClanMap, clans);
+      await fetchLeagueClanRoundInfo(leagueClanMap, tag, season, rounds);
+
+      leagueClanMap.forEach(calcLeagueWarResult)
+
+      const clanWarLeagueInfo = leagueClanMap.get(tag);
+      let drawRound = findDrawRound(clanWarLeagueInfo);
+      drawLeagueWarRound(leagueWarClanContents, drawRound);
+
+      drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
+      drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo);
+      drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, tag);
+    }
+
+    function showElement(element) {
+      element.classList.add('expand');
+    }
+    function hideElement(element) {
+      element.classList.remove('expand');
+    }
+
+    function hideDetailContents(clanWarCard) {
+      const leagueDashboard = clanWarCard.querySelector('.league-dashboard');
+      hideElement(leagueDashboard);
+      const leagueClanRecord = clanWarCard.querySelector('.league-clan-record');
+      hideElement(leagueClanRecord);
+      const leagueMemberRecord = clanWarCard.querySelector('.league-member-record');
+      hideElement(leagueMemberRecord);
+      const memberAttackWrapper = clanWarCard.querySelector('.member-attack-wrapper');
+      hideElement(memberAttackWrapper);
+    }
+
+    function showLeagueDashboard(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-dashboard'));
+    }
+    function showClanRecord(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-clan-record'));
+    }
+    function showMemberRecord(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.league-member-record'));
+    }
+    function showMemberAttacks(element) {
+      const clanWarCard = element.closest('.clan-war');
+
+      hideDetailContents(clanWarCard);
+      showElement(clanWarCard.querySelector('.member-attack-wrapper'));
+    }
+
+    async function drawLeagueClanCards(warLeagueClans) {
+      if (!warLeagueClans || !warLeagueClans.length) {
+        emptyWarLeagueClans();
+        return;
+      }
+
+      const carousel = document.querySelector(".carousel");
+      for (let index = 0; index<warLeagueClans.length; index++) {
+        const { tag, name, warLeague } = warLeagueClans[index];
+
+        const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+        const leagueWarClanContents = templateClanWar.querySelector('.card-contents');
+
+        showClanWarCardLoader(leagueWarClanContents);
+
+        carousel.appendChild(templateClanWar);
+
+        leagueWarClanContents.innerHTML = leagueWarClanContents.innerHTML
+                                                   .replace(/{CLAN_TAG}/g, tag)
+                                                   .replace(/{CLAN_NAME}/g, name);
+
+        renderWarLeagueBadge(leagueWarClanContents, warLeague);
+
+        renderingLeagueWarClanDetail(leagueWarClanContents, tag, name)
+        .then(() => {
+          hideClanWarCardLoader(leagueWarClanContents);
+          settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));
+        });
+      }
+    }
+
+    let leagueMap = new Map();
+    async function loadLeagues() {
+      // 리그맵 생성
+      const leagues = await fetchLeagues();
+      for (const league of leagues) {
+        leagueMap.set(league.name, league);
+      }
+    }
+
+    function sortByLeague(warLeagueClans) {
+      for (const clan of warLeagueClans) {
+        const { warLeague } = clan;
+        if (!warLeague) {
+          const league = leagueMap.get("Unranked");
+          clan.warLeague = _.cloneDeep(league);
+          continue;
+        }
+
+        const league = leagueMap.get(warLeague.name)
+        clan.warLeague = _.cloneDeep(league);
+      }
+
+      return warLeagueClans.sort((a, b) => b.warLeague.id - a.warLeague.id || a.order - b.order);
+    }
+
+    async function getClansForLeague() {
+      showWifiLoading('.card-container');
+      await loadLeagues();
+      const warLeagueClans = await fetchWarLeagueClans();
+      hideWifiLoading('.card-container');
+
+      await drawLeagueClanCards(sortByLeague(warLeagueClans));
+    }
+
+    window.onload = async () => {
+      await getClansForLeague();
+    }
+  </script>
+  <title>리그전 현황</title>
+</head>
+<body>
+<section class="card-wrapper empty-clan display-none">
+  <div>클랜 정보 없음</div>
+</section>
+<section class="card-wrapper">
+  <div id="wifi-loader" class="display-none">
+    <svg class="circle-outer" viewBox="0 0 86 86">
+      <circle class="back" cx="43" cy="43" r="40"></circle>
+      <circle class="front" cx="43" cy="43" r="40"></circle>
+      <circle class="new" cx="43" cy="43" r="40"></circle>
+    </svg>
+    <svg class="circle-middle" viewBox="0 0 60 60">
+      <circle class="back" cx="30" cy="30" r="27"></circle>
+      <circle class="front" cx="30" cy="30" r="27"></circle>
+    </svg>
+    <svg class="circle-inner" viewBox="0 0 34 34">
+      <circle class="back" cx="17" cy="17" r="14"></circle>
+      <circle class="front" cx="17" cy="17" r="14"></circle>
+    </svg>
+    <div class="text" data-text="Searching"></div>
+  </div>
+
+  <div class="card-container">
+    <div class="card-title bg-crimson">리그전 현황</div>
+    <div class="carousel"></div>
+  </div>
+</section>
+</body>
+
+<template id="section-clan-war">
+  <div class="section-clan-war">
+
+    <div class="loader-circle display-none">
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+      <div class="bar4"></div>
+      <div class="bar5"></div>
+      <div class="bar6"></div>
+      <div class="bar7"></div>
+      <div class="bar8"></div>
+      <div class="bar9"></div>
+      <div class="bar10"></div>
+      <div class="bar11"></div>
+      <div class="bar12"></div>
+    </div>
+
+    <div class="card-contents">
+
+      <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
+
+        <div class="summary">
+          <div class="button-wrapper display-none">
+            <button class="refresh" onclick="refreshWarStatus(this); return false;">
+              <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  class="bi bi-arrow-repeat"
+                  viewBox="0 0 16 16"
+              >
+                <path
+                    d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+                ></path>
+                <path
+                    fill-rule="evenodd"
+                    d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="clan">
+
+            <div class="name">{CLAN_NAME}</div>
+
+            <div class="hall">
+              <div class="town-hall th16"></div>
+              <span class="count">{CLAN_REMAIN_HALL}/{CLAN_TOTAL_HALL}</span>
+            </div>
+
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <span class="count">{CLAN_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+            </div>
+
+            <div class="attacks">
+              <div class="icon-sword"></div>
+              <span class="count">{CLAN_ATTACK}/{CLAN_TOTAL_ATTACK}</span>
+            </div>
+
+            <div class="destruction-percentage">
+              <div class="icon-damage"></div>
+              <span class="count">{CLAN_DESTRUCTION_PERCENTAGE}%</span>
+            </div>
+
+            <div class="average-duration">
+              <div class="icon-clock"></div>
+              <span class="count">{CLAN_AVERAGE_DURATION}</span>
+            </div>
+
+          </div>
+
+          <div class="war-info">
+            <div class="war-league">
+              <div class="img-icon"></div>
+            </div>
+            <div class="clan-icon">
+              <img class="clan" alt="" />
+              <img class="opponent" alt="" />
+            </div>
+            <div class="war-state">
+              {LEAGUE_ROUND}
+            </div>
+            <div class="team-size display-none">
+              {TEAM_SIZE} vs {TEAM_SIZE}
+            </div>
+            <div class="war-remaining-time">
+              {WAR_REMAIN_HOUR_MINUTE}
+            </div>
+            <div class="war-state">
+              {WAR_STATE}
+            </div>
+            <div class="button-chip" onclick="displayDetail(this); return false;">세부정보</div>
+          </div>
+
+          <div class="opponent">
+
+            <div class="name">{OPPONENT_NAME}</div>
+
+            <div class="hall">
+              <span class="count">{OPPONENT_REMAIN_HALL}/{OPPONENT_TOTAL_HALL}</span>
+              <div class="town-hall th16"></div>
+            </div>
+
+            <div class="stars">
+
+              <span class="count">{OPPONENT_STAR_COUNT}/{TOTAL_STAR_COUNT}</span>
+              <i class="fa-solid fa-star"></i>
+
+            </div>
+
+            <div class="attacks">
+              <span class="count">{OPPONENT_ATTACK}/{OPPONENT_TOTAL_ATTACK}</span>
+              <div class="icon-sword"></div>
+            </div>
+
+            <div class="destruction-percentage">
+              <span class="count">{OPPONENT_DESTRUCTION_PERCENTAGE}%</span>
+              <div class="icon-damage"></div>
+            </div>
+
+            <div class="average-duration">
+              <span class="count">{OPPONENT_AVERAGE_DURATION}</span>
+              <div class="icon-clock"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="detail-filter-wrapper">
+          <div class="radio-inputs filter">
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" checked onchange="showLeagueDashboard(this); return false;">
+              <span class="name">조 순위</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showClanRecord(this); return false;">
+              <span class="name">라운드 기록</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberRecord(this); return false;">
+              <span class="name">클랜원 순위</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberAttacks(this); return false;">
+              <span class="name">공권</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="league-dashboard"></div>
+        <div class="league-clan-record"></div>
+        <div class="league-member-record"></div>
+        <div class="member-attack-wrapper">
+          <div class="sub-summary">
+            <div class="support-area">
+              <div class="toggle-button-cover">
+                <div class="toggle-button">
+                  <input type="checkbox" class="checkbox switch-attacks" onchange="switchAttacks(this); return false;">
+                  <div class="knobs" data-toggle-on="전체" data-toggle-off="잔여"></div>
+                  <div class="layer"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="member-attack"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</template>
+<template id="section-member">
+  <div class="member">
+
+    <div class="layout-title">
+      <div class="user">
+        <div class="town-hall th{USER_HALL_LEVEL}"></div>
+        <div class="title">
+          <div class="name">{USER_NAME}</div>
+          <!--          <div class="role">{USER_ROLE}</div>-->
+        </div>
+      </div>
+      <div class="info">
+        <div class="total-stars">
+          <i class="fa-solid fa-star"></i>
+          <span class="count">{USER_STARS}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout-body">
+      <div class="attack-list"></div>
+    </div>
+  </div>
+</template>
+<template id="section-member-attack">
+  <div class="attack-info">
+    <div class="user">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+      <div class="name">{OPPONENT_NAME}</div>
+    </div>
+    <div class="result">
+      <div class="stars">
+        <i class="fa-solid fa-star fa-xs"></i>
+        <i class="fa-solid fa-star fa-xs"></i>
+        <i class="fa-solid fa-star fa-xs"></i>
+      </div>
+      <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}%</div>
+      <div class="duration">{DESTRUCTION_DURATION}</div>
+    </div>
+  </div>
+</template>
+
+<template id="section-member-not-attack">
+  <div class="attack-info not">
+    <div class="name">{ATTACK_NO}</div>
+    <div class="message">사용 안함</div>
+  </div>
+</template>
+
+
+<template id="league-dashboard-row">
+  <div class="row">
+    <div class="rank">{RANK}.</div>
+    <div class="badge">
+      <img class="clan" alt=""/>
+    </div>
+    <div class="name">{NAME}</div>
+    <div class="stars">
+      <span class="count">{STARS}</span>
+      <i class="fa-solid fa-star"></i>
+      <img>
+    </div>
+    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+  </div>
+</template>
+
+<template id="league-clan-record-cell">
+  <div class="cell">
+    <div class="basic">
+      <div class="name">{NAME}</div>
+      <div class="badge clan">
+        <img class="clan" alt=""/>
+      </div>
+      <div class="icon-sword"></div>
+      <div class="attacks">{ATTACKS}</div>
+      <div class="stars">
+        <span class="count">{STARS}</span>
+        <i class="fa-solid fa-star"></i>
+        <img>
+      </div>
+    </div>
+    <div class="summary">
+      <div class="stars">
+        <div class="star">
+          <div class="label">3별:</div>
+          <div class="count">{THREE} 개</div>
+        </div>
+        <div class="star">
+          <div class="label">2별:</div>
+          <div class="count">{TWO}개</div>
+        </div>
+        <div class="star">
+          <div class="label">1별:</div>
+          <div class="count">{ONE}개</div>
+        </div>
+        <div class="star">
+          <div class="label">0별:</div>
+          <div class="count">{ZERO}개</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="league-member-record-row">
+  <div class="row">
+    <div class="rank">{RANK}.</div>
+    <div class="town-hall th{TOWN_HALL_LEVEL}"></div>
+    <div class="name">{NAME}</div>
+    <div class="stars">
+      <span class="count">{STARS}</span>
+      <i class="fa-solid fa-star"></i>
+      <img>
+    </div>
+    <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+    <div class="attacks">{USE_ATTACKS}/{TOTAL_ATTACKS}</div>
+  </div>
+</template>
+</html>

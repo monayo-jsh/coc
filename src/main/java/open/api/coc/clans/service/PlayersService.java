@@ -1,7 +1,10 @@
 package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createBadRequestException;
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
-import open.api.coc.clans.common.exception.handler.ExceptionHandler;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
@@ -37,8 +40,11 @@ import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepos
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
+import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
+import open.api.coc.clans.domain.players.converter.RankingHeroEquipmentResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -47,7 +53,9 @@ import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Service
@@ -77,8 +85,10 @@ public class PlayersService {
     private final PlayerTroopEntityConverter playerTroopEntityConverter;
     private final PlayerSpellEntityConverter playerSpellEntityConverter;
 
+    private final RankingHeroEquipmentResponseConverter rankingHeroEquipmentResponseConverter;
+
     public PlayerResponse findPlayerBy(String playerTag) {
-        Player player = clanApiService.fetchPlayerBy(playerTag)
+        Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "플레이어 조회 실패"));
 
         return playerResponseConverter.convert(player);
@@ -101,6 +111,14 @@ public class PlayersService {
         List<PlayerEntity> players = playerRepository.findAll();
 
         return players.stream()
+                      .map(playerResponseConverter::convertAll)
+                      .collect(Collectors.toList());
+    }
+
+    public List<PlayerResponse> findAllPlayersSummary() {
+        List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
                       .map(playerResponseConverter::convert)
                       .collect(Collectors.toList());
     }
@@ -113,7 +131,7 @@ public class PlayersService {
                       .collect(Collectors.toList());
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public PlayerResponse registerPlayer(String playerTag) {
 
         Optional<PlayerEntity> findPlayer = playerRepository.findById(playerTag);
@@ -121,8 +139,8 @@ public class PlayersService {
             throw createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "이미 등록된 클랜원");
         }
 
-        Player player = clanApiService.fetchPlayerBy(playerTag)
-                                      .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+        Player player = clanApiService.findPlayerBy(playerTag)
+                                      .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         PlayerEntity playerEntity = playerEntityConverter.convert(player);
 
@@ -193,7 +211,7 @@ public class PlayersService {
         Map<String, PlayerHeroEquipmentEntity> playerHeroEquipmentEntityMap = playerHeroEquipmentEntitiesToMap(playerHeroEquipmentEntities);
         for (Hero hero : heroes) {
             if (hero.isNotVillageHome()) continue;
-
+            if (CollectionUtils.isEmpty(hero.getEquipment())) continue;
 
             for (HeroEquipment heroEquipment : hero.getEquipment()) {
                 PlayerHeroEquipmentEntity findPlayerHeroEquipmentEntity = playerHeroEquipmentEntityMap.get(heroEquipment.getName());
@@ -242,10 +260,10 @@ public class PlayersService {
     @Transactional
     public boolean updatePlayer(String playerTag) {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
-                                                    .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+                                                    .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
-        Player player = clanApiService.fetchPlayerBy(playerTag)
-                                      .orElseThrow(() -> ExceptionHandler.createNotFoundException("%s 조회 실패".formatted(playerTag)));
+        Player player = clanApiService.findPlayerBy(playerTag)
+                                      .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         modifyPlayer(playerEntity, player);
         modifyPlayerHero(playerEntity, player.getHeroes());
@@ -331,9 +349,11 @@ public class PlayersService {
             }
 
             dbPlayerHeroEntity.setLevelInfo(playerHeroEntity.getLevelInfo());
+            dbPlayerHeroEntity.setTargetHeroName(playerHeroEntity.getTargetHeroName());
         }
 
         convertHeroEquipmentWearYn(player.getHeroes(), playerHeroEquipmentEntities);
+        playerEntity.changeHeroEquipments(playerHeroEquipmentEntities);
     }
 
     private void modifyPlayerHero(PlayerEntity playerEntity, List<Hero> heroes) {
@@ -439,5 +459,49 @@ public class PlayersService {
 
     public List<String> findAllPlayerTags() {
         return playerRepository.findAllPlayerTag();
+    }
+
+    @Transactional
+    public void changePlayerSupport(PlayerModify playerModify) {
+
+        PlayerEntity player = playerRepository.findById(playerModify.getPlayerTag())
+                                              .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerModify.getPlayerTag())));
+
+        player.changeSupportYn(playerModify.getSupportYn());
+        playerRepository.save(player);
+
+        // 지원계정 전환 시 배정된 클랜 제거
+        if (playerModify.isSupport()) {
+            clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
+                                                                              .seasonDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM")))
+                                                                              .playerTag(player.getPlayerTag())
+                                                                              .build());
+        }
+    }
+
+    public List<PlayerEntity> findAllPlayersBy(List<String> playerTags) {
+        return playerRepository.findAllById(playerTags);
+    }
+
+    public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
+        List<String> playerTags = getClanAssignedPlayerTags(clanTag);
+
+        return playerRepository.selectRankingHeroEquipments(playerTags)
+                               .stream()
+                               .map(rankingHeroEquipmentResponseConverter::convert)
+                               .collect(Collectors.toList());
+    }
+
+    private List<String> getClanAssignedPlayerTags(String clanTag) {
+        if ("all".equals(clanTag)) {
+            // 전체 처리
+            return playerRepository.findAllPlayerTag();
+        }
+
+        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
+        List<ClanAssignedPlayerEntity> clanAssignedPlayerEntities = clanAssignedPlayerRepository.findClanAssignedPlayersByClanTagAndSeasonDate(clanTag, latestSeasonDate);
+        return clanAssignedPlayerEntities.stream()
+                                         .map(ClanAssignedPlayerEntity::getPlayerTag)
+                                         .toList();
     }
 }

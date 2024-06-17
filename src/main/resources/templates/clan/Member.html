@@ -127,7 +127,7 @@
     }
 
     function renderMemberSortByTrophies(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -138,7 +138,7 @@
     }
 
     function rederMemberSortByHeroLevelSum(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -180,7 +180,7 @@
 
     async function getClanMembers() {
       showWifiLoading('.clan-members');
-      let players = await fetchAllClanPlayers();
+      let players = await fetchAllClanPlayersSummary();
       let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
       settingAssignClan(players, latestClanAssignedPlayerObj);
       let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
@@ -453,12 +453,23 @@
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
+      let totalCount = 0, supportCount = 0, clanAssignedCount = 0;
       let no = clanMembersElement.children.length + 1;
       for(const player of members) {
         const memberHtml = renderMember(no, player);
         clanMembersElement.appendChild(memberHtml);
         no++;
+
+        const { assignedClan, supportYn } = player;
+
+        totalCount++;
+        if (supportYn === 'Y') supportCount++;
+        if (assignedClan) clanAssignedCount++;
       }
+
+      document.querySelector('.label.total .count').innerHTML = Number(totalCount).toLocaleString();
+      document.querySelector('.label.support-account .count').innerHTML = Number(supportCount).toLocaleString();
+      document.querySelector('.label.clan-assigned .count').innerHTML = Number(clanAssignedCount).toLocaleString();
     }
 
     function renderMember(no, player) {
@@ -555,22 +566,23 @@
       const regexp = createFuzzyMatcher(searchKeyword);
       return members.filter((member) => {
         return regexp.test(member.name);
-      }).map((member) => {
-        const displayName = member.name;
-        member.displayName = displayName.replace(regexp, (match, ...groups) => {
-          const letters = groups.slice(0, match.length);
-          let lastIndex = 0;
-          let highlighted = [];
-          for(let i=0,l=letters.length; i < l; i++) {
-            const idx = match.indexOf(letters[i], lastIndex);
-            highlighted.push(match.substring(lastIndex, idx));
-            highlighted.push(`<mark>${letters[i]}</mark>`);
-            lastIndex = idx + 1;
-          }
-          return highlighted.join('');
-        })
-        return member;
-      })
+      });
+      //               .map((member) => {
+      //   const displayName = member.name;
+      //   member.displayName = displayName.replace(regexp, (match, ...groups) => {
+      //     const letters = groups.slice(0, match.length);
+      //     let lastIndex = 0;
+      //     let highlighted = [];
+      //     for(let i=0,l=letters.length; i < l; i++) {
+      //       const idx = match.indexOf(letters[i], lastIndex);
+      //       highlighted.push(match.substring(lastIndex, idx));
+      //       highlighted.push(`<mark>${letters[i]}</mark>`);
+      //       lastIndex = idx + 1;
+      //     }
+      //     return highlighted.join('');
+      //   })
+      //   return member;
+      // })
     }
 
     function refreshRenderingMembers() {
@@ -685,13 +697,30 @@
       <div class="toggle-button-cover">
         <div class="toggle-button">
           <input type="checkbox" class="checkbox switch-card">
-          <div class="knobs" data-toggle-on="요약" data-toggle-off="상세"></div>
+          <div class="knobs" data-toggle-on="요약" data-toggle-off="장비"></div>
           <div class="layer"></div>
         </div>
       </div>
     </div>
   </div>
-  <div class="clan-members"></div>
+
+  <div class="clan-members-wrapper">
+    <div class="additional-area">
+      <div class="label total">
+        <span class="name">총 계정:</span>
+        <span class="count">0</span>
+      </div>
+      <div class="label support-account">
+        <span class="name">지원 계정:</span>
+        <span class="count">0</span>
+      </div>
+      <div class="label clan-assigned">
+        <span class="name">클랜 배정:</span>
+        <span class="count">0</span>
+      </div>
+    </div>
+    <div class="clan-members"></div>
+  </div>
 </div>
 </body>
 <template id="member">
@@ -734,7 +763,7 @@
         <div class="heroes"></div>
       </div>
       <div class="inner-section button-wrapper">
-        <div class="button-chip" onclick="cardClick(this, event); return false;">상세정보</div>
+        <div class="button-chip" onclick="cardClick(this, event); return false;">영웅장비</div>
       </div>
     </div>
 

@@ -1,4 +1,9 @@
+const URI_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
 const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
+
+const URL_WAR_LEAGUE_CLANS = "/clans/war/league"; //리그전 진행 클랜 목록 조회
+const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
+const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
 const URI_CLANS = '/clans'; //전체 클랜 목록 조회
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
@@ -130,7 +135,7 @@ function makeClanDetailRequest(clans) {
 }
 
 async function fetchClansFromExternal(clans) {
-  const requests = divideClanArray(clans, clans.length/2).map(makeClanDetailRequest);
+  const requests = divideClanArray(clans, clans.length/3).map(makeClanDetailRequest);
 
   let results = [];
   // 클랜 상세 조회
@@ -178,12 +183,6 @@ async function fetchClanMembers(clans) {
              })
              .catch((error) => {
                console.error(error);
-               const { response } = error;
-               const { status } = response
-               // 서버 이용 불가로 메인 화면 이동
-               if (status >= 500) {
-                 location.href = "/";
-               }
              })
 
   return allClanMembers;
@@ -370,6 +369,18 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
                     });
 }
 
+async function fetchWarClans() {
+  return await axios.get(URI_WAR_CLANS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error)
+                      return [];
+                    });
+}
+
 async function fetchCapitalClans() {
   return await axios.get(URI_CAPITAL_CLANS)
                     .then((response) => {
@@ -380,4 +391,55 @@ async function fetchCapitalClans() {
                       console.error(error)
                       return [];
                     });
+}
+
+async function fetchWarLeagueClans() {
+  return axios.get(URL_WAR_LEAGUE_CLANS)
+              .then((response) => {
+                const { data } = response
+                return data;
+              })
+              .catch((error) => {
+                console.error(error)
+                return [];
+              });
+}
+
+async function fetchClanWarLeague(clanTag) {
+  const URI = URL_CLAN_CURRENT_WAR_LEAGUE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+
+  return axios.get(URI)
+              .then((response) => {
+                const { data } = response
+                return data;
+              })
+              .catch((error) => {
+                console.error(error)
+                return {};
+              });
+}
+
+function makeCurrentWarLeagueRoundRequest(warTag, clanTag, season) {
+  let uri = URL_CLAN_CURRENT_WAR_LEAGUE_ROUND.replace(/{warTag}/, encodeURIComponent(warTag));
+  uri += `?clanTag=${encodeURIComponent(clanTag)}&season=${season}`;
+  return axios.get(uri);
+}
+async function fetchCurrentWarLeagueRound(warTags, clanTag, season) {
+  const requests = divideClanArray(warTags, 1).map(warTag => makeCurrentWarLeagueRoundRequest(warTag, clanTag, season))
+
+  let results = [];
+  return axios.all(requests)
+              .then((responses) => {
+
+                responses.forEach((response) => {
+                  const { data } = response;
+                  results = results.concat(data);
+                })
+
+                return results;
+              })
+              .catch((error) => {
+                console.error(error)
+                return [];
+              });
 }

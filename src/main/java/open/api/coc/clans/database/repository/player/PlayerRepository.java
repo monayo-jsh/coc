@@ -3,6 +3,7 @@ package open.api.coc.clans.database.repository.player;
 import java.util.List;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.database.entity.player.RankingHeroEquipment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -29,4 +30,30 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
 
     @Query("select p.playerTag from PlayerEntity p")
     List<String> findAllPlayerTag();
+
+    @Query("select p.playerTag from PlayerEntity p")
+    List<String> findAllPlayersNotIn(List<String> playerTags);
+
+    @Query(
+        nativeQuery = true,
+        value =
+              " select m.*,"
+            + "        sum(m.count) over(partition by m.heroName) totalCount"
+            + " from ("
+            + "  select target_hero_name as heroName, equipments, count(equipments) as count"
+            + "  from ("
+            + "   select player_tag, target_hero_name, array_agg(name) as equipments"
+            + "   from ("
+            + "    select player_tag, target_hero_name, name"
+            + "    from tb_player_hero_equipment"
+            + "    where player_tag in (:playerTags)"
+            + "    and wear_yn = 'Y'"
+            + "    order by player_tag, target_hero_name, name"
+            + "   )"
+            + "   group by player_tag, target_hero_name) x"
+            + "   group by x.target_hero_name, x.equipments"
+            + "   order by x.target_hero_name, count desc"
+            + " ) m"
+    )
+    List<RankingHeroEquipment> selectRankingHeroEquipments(List<String> playerTags);
 }

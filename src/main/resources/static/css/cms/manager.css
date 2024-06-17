@@ -467,3 +467,22 @@
 .player-filter {
   font-size: 8px;
 }
+
+.info.additional {
+  .leader {
+    background-color: #4687f0;
+    color: white;
+  }
+  .coLeader {
+    background-color: #4a74b7;
+    color: white;
+  }
+  .admin {
+    background-color: #e3773a;
+    color: white;
+  }
+  .member {
+    background-color: #a8a8a8;
+    color: white;
+  }
+}

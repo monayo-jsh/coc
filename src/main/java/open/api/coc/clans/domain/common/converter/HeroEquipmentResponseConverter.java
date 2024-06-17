@@ -29,10 +29,14 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
 
     public @NonNull HeroEquipmentResponse convert(PlayerHeroEquipmentEntity source) {
         HeroEquipmentConfig heroEquipment = HeroEquipmentConfig.findByName(source.getId().getName());
+        String koreanName = heroEquipment.getKoreanName();
+        if (heroEquipment.isUnknown()) {
+            koreanName = source.getId().getName();
+        }
         return HeroEquipmentResponse.builder()
                                     .code(heroEquipment.getCode())
                                     .name(source.getId().getName())
-                                    .koreanName(heroEquipment.getKoreanName())
+                                    .koreanName(koreanName)
                                     .village("home")
                                     .level(source.getLevelInfo().getLevel())
                                     .maxLevel(source.getLevelInfo().getMaxLevel())

@@ -14,7 +14,7 @@ import org.springframework.util.CollectionUtils;
 
 @Component
 @RequiredArgsConstructor
-public class ClanWarResConverter implements Converter<WarClan, ClanWarRes> {
+public class ClanWarResponseConverter implements Converter<WarClan, ClanWarRes> {
 
     private final IconUrlResponseConverter iconUrlResConverter;
     private final ClanWarMemberResponseConverter clanWarMemberResponseConverter;

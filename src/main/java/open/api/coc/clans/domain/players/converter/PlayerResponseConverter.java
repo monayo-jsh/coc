@@ -159,7 +159,13 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
 
 
-
+    public PlayerResponse convertAll(PlayerEntity source) {
+        PlayerResponse player = convert(source);
+        player.setPets(makePetResponse(source.getTroops()));
+        player.setSiegeMachines(makeSiegeMachineResponse(source.getTroops()));
+        player.setSpells(makeSpellResponse(source.getSpells()));
+        return player;
+    }
 
     public PlayerResponse convert(PlayerEntity source) {
         PlayerResponse player = PlayerResponse.builder()
@@ -181,9 +187,6 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .clan(makePlayerClanResponse(source.getClan()))
                                               .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))
                                               .heroEquipments(makeHeroEquipmentResponse(source.getHeroEquipments()))
-                                              .pets(makePetResponse(source.getTroops()))
-                                              .siegeMachines(makeSiegeMachineResponse(source.getTroops()))
-                                              .spells(makeSpellResponse(source.getSpells()))
                                               .build();
 
         player.setHeroTotalLevel(calcHeroTotalLevel(player.getHeroes()));

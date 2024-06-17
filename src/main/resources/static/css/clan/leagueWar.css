@@ -1,0 +1,337 @@
+.fail {
+  display: flex;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 15px;
+  padding: 10px;
+  background-color: gray;
+
+  .name {
+    color: yellow;
+  }
+
+  .reason {
+    margin-left: 5px;
+  }
+}
+
+.clan-icon {
+  margin-top: 3px;
+  width: 35px;
+}
+
+.clan-war.expand {
+
+  .detail-filter-wrapper {
+    display: block;
+  }
+  .league-dashboard.expand {
+    display: flex;
+  }
+  .league-clan-record.expand {
+    display: flex;
+  }
+  .league-member-record.expand {
+    display: flex;
+  }
+  .member-attack-wrapper.expand {
+    display: block;
+  }
+
+}
+
+.detail-filter-wrapper {
+  display: none;
+  background-color: #7d7d7d;
+  border-radius: 10px;
+  margin-top: 5px;
+
+  .radio-inputs {
+
+    input:checked + .name {
+      color: white;
+      background-color: #6a0000;
+    }
+  }
+}
+
+.member-attack-wrapper {
+  display: none;
+}
+
+.league-dashboard {
+  display: none;
+  flex-direction: column;
+  margin-top: 5px;
+
+  .row:not(:first-child) {
+    margin-top: 3px;
+  }
+  .row.selected {
+    background-color: #d55a5b;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background-color: #583535;
+    font-weight: bold;
+    font-size: 0.8rem;
+
+    .rank {
+      flex: 15px;
+    }
+
+    .badge {
+      display: flex;
+
+      .clan {
+        flex: 10%;
+        width: 35px;
+      }
+    }
+
+    .name {
+      flex: 55%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .stars {
+      width: 65px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border: 1px solid black;
+      background-color: black;
+      padding: 3px;
+
+      i {
+        color: yellow;
+        margin-top: -3px;
+        margin-left: 3px;
+      }
+    }
+
+    .destruction-percentage {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 80px;
+    }
+  }
+}
+
+.league-clan-record {
+  display: none;
+  flex-direction: column;
+  margin-top: 5px;
+
+  @media (max-width: 400px) {
+    .row {
+      flex-direction: column;
+
+      .cell.opponent {
+        margin-top: 5px;
+      }
+    }
+  }
+
+  .row:not(:first-child) {
+    margin-top: 3px;
+  }
+  .row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background-color: #583535;
+    font-weight: bold;
+    font-size: 0.8rem;
+
+    .cell.opponent {
+
+      .basic {
+        display: flex;
+        flex-direction: row-reverse;
+
+        .attacks {
+          text-align: right;
+        }
+      }
+
+    }
+    .cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .basic {
+        display: flex;
+        align-items: center;
+        padding: 5px;
+
+        .badge {
+          display: flex;
+          margin: 0 3px;
+
+          .clan {
+            width: 35px;
+          }
+        }
+
+        .name {
+          width: 100px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+
+        .icon-sword {
+          width: 25px;
+        }
+
+        .attacks {
+          width: 25px;
+          margin: 0 5px;
+        }
+
+        .stars {
+          width: 65px;
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          border: 1px solid black;
+          background-color: black;
+          padding: 3px;
+
+          i {
+            color: yellow;
+            margin-left: 3px;
+          }
+        }
+
+        .destruction-percentage {
+          background-color: black;
+          margin-left: 5px;
+          padding: 4px 8px;
+          width: 60px;
+        }
+
+      }
+
+      .summary {
+        width: 100%;
+        display: flex;
+
+        .stars {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          width: 100%;
+          padding: 5px 10px;
+
+          .star {
+            display: flex;
+            align-items: center;
+
+            .label {
+              width: 25px;
+              font-size: 1em;
+            }
+
+            .count {
+              font-size: 1em;
+            }
+          }
+        }
+      }
+
+    }
+  }
+}
+
+.league-member-record {
+  display: none;
+  flex-direction: column;
+  margin-top: 5px;
+
+  .row:not(:first-child) {
+    margin-top: 3px;
+  }
+  .row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border: 1px solid black;
+    padding: 5px;
+    border-radius: 10px;
+    color: white;
+    background-color: #583535;
+    font-weight: bold;
+    font-size: 0.8rem;
+
+    .rank {
+      flex: 30px;
+    }
+
+    .town-hall {
+      flex: 10%;
+      margin: 0 5px;
+    }
+
+    .name {
+      flex: 55%;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .stars {
+      width: 65px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border: 1px solid black;
+      background-color: black;
+      padding: 3px;
+
+      i {
+        color: yellow;
+        margin-left: 3px;
+      }
+    }
+
+    .destruction-percentage {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 60px;
+    }
+
+    .attacks {
+      background-color: black;
+      margin-left: 5px;
+      padding: 4px 8px;
+      width: 55px;
+      display: flex;
+      justify-content: center;
+    }
+  }
+}
+
+.row.win {
+  background-color: darkgreen;
+}
+.row.lose {
+  background-color: darkred;
+}

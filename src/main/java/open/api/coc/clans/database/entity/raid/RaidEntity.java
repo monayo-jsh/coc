@@ -1,6 +1,7 @@
 package open.api.coc.clans.database.entity.raid;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +25,7 @@ public class RaidEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "RAID_ID")
-    private List<RaiderEntity> raiderEntityList;
+    private List<RaiderEntity> raiderEntityList = new ArrayList<>();
 
     @Transient
     private ClanEntity clan;
@@ -43,5 +44,10 @@ public class RaidEntity {
 
     public void changeClan(ClanEntity clan) {
         this.clan = clan;
+    }
+
+    public void addRaider(RaiderEntity raider) {
+        raider.changeRaid(this);
+        this.raiderEntityList.add(raider);
     }
 }

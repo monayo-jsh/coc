@@ -43,6 +43,8 @@ public enum HeroEquipmentConfig {
     SEEKING_SHIELD(ROYAL_CHAMPION, 402, "normal", "Seeking Shield", "추적 방패"),
     HOG_RIDER_PUPPET(ROYAL_CHAMPION, 403, "normal", "Hog Rider Puppet", "호그 라이더 인형"),
 
+    ROCKET_SPEAR(ROYAL_CHAMPION, 420, "epic", "Rocket Spear", "로켓창"),
+
     UNKNOWN(HeroConfig.UNKNOWN, Integer.MAX_VALUE, "unknown", "unknown", "unknown");
 
     private final HeroConfig hero;
@@ -66,4 +68,7 @@ public enum HeroEquipmentConfig {
                      .orElse(UNKNOWN);
     }
 
+    public boolean isUnknown() {
+        return Objects.equals(UNKNOWN, this);
+    }
 }

@@ -463,6 +463,7 @@
 
 .inner-section-group {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
 
   .inner-section {
@@ -473,4 +474,33 @@
 
 .label.chip {
   background-color: #bbe18d;
+}
+
+.player-search-result {
+  margin-top: 5px;
+}
+
+.button-wrapper {
+  margin-top: 5px;
+}
+
+.clan-members-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .additional-area {
+    margin-bottom: 3px;
+    width: 310px;
+    padding: 10px;
+    display: flex;
+    font-size: 12px;
+    font-weight: bold;
+    justify-content: space-between;
+    background-color: azure;
+
+    .label:not(:first-child) {
+      margin-left: 2px;
+    }
+  }
 }

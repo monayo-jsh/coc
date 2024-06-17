@@ -42,8 +42,13 @@ public class PlayerResponse {
     private List<HeroResponse> heroes;
     private List<HeroEquipmentResponse> heroEquipments;
 
+    @Setter
     private List<TroopsResponse> pets;
+
+    @Setter
     private List<TroopsResponse> siegeMachines;
+
+    @Setter
     private List<TroopsResponse> spells;
 
     @Setter

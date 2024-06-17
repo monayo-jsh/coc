@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.player.common.PlayerItemEntity;

@@ -24,10 +24,9 @@
     .input {
       width: calc(100% - 29px);
       height: 100%;
-      border: 0;
-      border-color: transparent;
+      border: 0 transparent;
       font-size: 12px;
-      padding-right: 0px;
+      padding-right: 0;
       color: var(--input-line);
       background: var(--input-bg-color);
       outline: none;
@@ -46,6 +45,48 @@
       tableTbody.appendChild(raidRowEmptyElement);
     }
 
+    function increaseRowspan(playerTag, className) {
+      const firstDrawRow = document.querySelector(`.${playerTag.replace("#", "")}`);
+      const targetTd = firstDrawRow.querySelector(`.${className}`);
+      const rowspan = targetTd.getAttribute('rowspan');
+      if (rowspan) {
+        targetTd.setAttribute('rowspan', Number(rowspan)+1);
+      }
+    }
+
+    function removeCell(tableRow, removeCellClassName) {
+      tableRow.querySelector(`.${removeCellClassName}`).remove();
+    }
+
+    function appendClassNewPlayer(tableRow, tag) {
+      tableRow.classList.add(tag.replace("#", ""), "start");
+    }
+
+    function drawRow(tableRow, tag) {
+      const tableTbody = document.querySelector('.table-tbody');
+      const lastRow = tableTbody.children[tableTbody.children.length-1]
+      if (!lastRow) {
+        appendClassNewPlayer(tableRow, tag);
+        tableTbody.appendChild(tableRow);
+        return;
+      }
+
+      // 마지막 행이 그려야할 플레이어와 동일하면 중복 제거
+      const beforeRowPlayerTag = lastRow.dataset.tag;
+
+      if (tag === beforeRowPlayerTag) {
+        increaseRowspan(tag, 'name');
+        increaseRowspan(tag, 'tag');
+        removeCell(tableRow, 'name');
+        removeCell(tableRow, 'tag');
+      } else {
+        // 신규 플레이어
+        appendClassNewPlayer(tableRow, tag);
+      }
+
+      tableTbody.appendChild(tableRow);
+    }
+
     function renderPlayerRaidScore(playerRaidScore) {
       const { name, tag, clan, seasonStartDate, seasonEndDate, resourceLooted, attacks } = playerRaidScore;
 
@@ -55,6 +96,10 @@
 
       const displayClanName = clan ? clan.name : '정보 없음'
       const seasonPeriod = `${formatYYYYMMDD(seasonStartDate)} ~ ${formatYYYYMMDD(seasonEndDate)}`
+
+      // dataset
+      tableRow.dataset.tag = tag;
+
       tableRow.innerHTML = tableRow.innerHTML
                                    .replace(/{NAME}/, name)
                                    .replace(/{TAG}/, tag)
@@ -76,8 +121,8 @@
         span.classList.add('color-red');
       }
 
-      const tableTbody = document.querySelector('.table-tbody');
-      tableTbody.appendChild(raidRowEmptyElement);
+      // 테이블에 행 입력
+      drawRow(tableRow, tag);
     }
 
     function renderPlayerRaidScores(playerRaidScores) {
@@ -140,7 +185,8 @@
 
     async function refreshClanRaidSeason() {
       showWifiLoading('.body');
-      await collectRaidSeason();
+      await collectRaidSeason()
+      .then(updatePlaceholder);
       hideWifiLoading('.body');
     }
 
@@ -348,8 +394,8 @@
 </template>
 <template id="raid-row-template">
   <tr class="table-tr">
-    <td class="table-td">{NAME}</td>
-    <td class="table-td"><span class="chip">{TAG}</span></td>
+    <td class="table-td name" rowspan=1>{NAME}</td>
+    <td class="table-td tag" rowspan=1><span class="chip">{TAG}</span></td>
     <td class="table-td">{SEASON_PERIOD}</td>
     <td class="table-td"><span class="chip bg-green">{CLAN_NAME}</span></td>
     <td class="table-td"><span class="span-score">{SCORE}</span></td>

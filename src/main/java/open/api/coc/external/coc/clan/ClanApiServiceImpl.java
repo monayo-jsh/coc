@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
+import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.leagues.LabelList;
@@ -62,14 +63,10 @@ public class ClanApiServiceImpl implements ClanApiService {
 
     @Override
     public Optional<Player> findPlayerBy(String playTag) {
-        // 캐시된 데이터 응답 & 캐시 데이터 없을 경우 실연동
-        return findPlayer(playTag);
-    }
-
-    @Override
-    public Optional<Player> fetchPlayerBy(String playTag) {
-        // 사용자 정보 캐싱 등록 & 스케줄러 동작
-        return findPlayer(playTag);
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
+                                             .retrieve()
+                                             .body(Player.class));
     }
 
     @Override
@@ -88,14 +85,6 @@ public class ClanApiServiceImpl implements ClanApiService {
                 .body(ClanWar.class));
     }
 
-    private Optional<Player> findPlayer(String playTag) {
-        log.debug("{} [{}]", clashOfClanConfig.getPlayerUri(), playTag);
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getPlayerUri(), playTag)
-                                             .retrieve()
-                                             .body(Player.class));
-    }
-
     @Override
     public Optional<LabelList> findLeagues() {
         return Optional.ofNullable(restClient.get()
@@ -103,4 +92,23 @@ public class ClanApiServiceImpl implements ClanApiService {
                                              .retrieve()
                                              .body(LabelList.class));
     }
+
+
+
+    @Override
+    public Optional<ClanCurrentWarLeagueGroup> findClanCurrentWarLeagueGroupBy(String clanTag) {
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getClansClanTagCurrentLeagueGroupUri(), clanTag)
+                                             .retrieve()
+                                             .body(ClanCurrentWarLeagueGroup.class));
+    }
+
+    @Override
+    public Optional<ClanWar> findWarLeagueByWarTag(String warTag) {
+        return Optional.ofNullable(restClient.get()
+                                             .uri(clashOfClanConfig.getClanWarLeagueUri(), warTag)
+                                             .retrieve()
+                                             .body(ClanWar.class));
+    }
+
 }

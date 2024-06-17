@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/ranking/heroEquipments.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/hero.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/heroEquipment.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/player.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script>
+    function renderImgIcon(heroEquipment) {
+      const { name, rarity, koreanName } = heroEquipment;
+
+      const iconsTemplate = document.querySelector('#icons');
+      const icons = document.importNode(iconsTemplate.content, true);
+      const imgIconElement = icons.querySelector('.img-icon');
+
+      let equipmentIconClassName = name.toLowerCase()
+                                       .replace(/\s/g, "_")
+                                       .replace(/\./g, "");
+
+      imgIconElement.classList.add(equipmentIconClassName);
+
+      if (rarity)
+        imgIconElement.classList.add(rarity); // 장비 등급
+
+      if (koreanName) {
+        settingTooltip(imgIconElement, koreanName);
+      }
+
+      return imgIconElement;
+    }
+    function renderHeroEquipment(heroEquipment) {
+      const { heroName, heroEquipments, count, totalCount } = heroEquipment;
+
+      const heroClassName = heroName.toLowerCase().replace(/\s/g, "_")
+      const heroRankings = document.querySelector(`.${heroClassName} .rankings`);
+
+      const rowRankingTemplate = document.querySelector('#row-ranking-template');
+      const rowRanking = document.importNode(rowRankingTemplate.content, true);
+      const row = rowRanking.querySelector('.row');
+
+      const equipments = row.querySelector('.equipments');
+      for (const heroEquipment of heroEquipments) {
+        const imgIconElement = renderImgIcon(heroEquipment);
+        equipments.appendChild(imgIconElement);
+      }
+
+      const ratio = count / totalCount * 100;
+      row.innerHTML = row.innerHTML
+                         .replace(/{COUNT}/, count)
+                         .replace(/{RATIO}/, ratio.toFixed(2));
+
+      heroRankings.appendChild(rowRanking);
+    }
+    function drawRankingHeroEquipments(heroEquipments) {
+      for(const heroEquipment of heroEquipments) {
+        renderHeroEquipment(heroEquipment);
+      }
+    }
+
+    function clearHeroEquipments() {
+      const rankings = document.querySelectorAll('.rankings');
+      for (const ranking of rankings) {
+        ranking.innerHTML = '';
+      }
+    }
+
+    async function renderHeroEquipments(clanTag) {
+      clearHeroEquipments();
+      const heroEquipments = await fetchRankingHeroEquipments(clanTag);
+      drawRankingHeroEquipments(heroEquipments);
+    }
+
+    function renderClan(clan) {
+      const { tag, name } = clan;
+      const radioItemTemplate = document.querySelector('#radio-item-template');
+      const radioItem = document.importNode(radioItemTemplate.content, true);
+      const radio = radioItem.querySelector('.radio.item');
+
+      radio.innerHTML = radio.innerHTML
+                             .replace(/{CLAN_TAG}/, tag)
+                             .replace(/{CLAN_NAME}/, name);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      radioInputs.appendChild(radio);
+    }
+    function renderClans(clans) {
+      for(const clan of clans) {
+        renderClan(clan);
+      }
+    }
+
+    window.onload = async () => {
+      const warClans = await fetchWarClans();
+      await renderClans(warClans);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      const [btnFirstRadio] = radioInputs.children;
+      btnFirstRadio.click();
+    }
+  </script>
+
+  <title>아카데미 영웅 장비 랭킹</title>
+</head>
+<body>
+  <div class="content-wrapper">
+    <div class="title">영웅 장비 사용 현황</div>
+    <div class="clans-wrapper">
+      <div class="radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-clan" onchange="renderHeroEquipments('all'); return false;">
+          <span class="name">전체</span>
+        </label>
+      </div>
+    </div>
+    <div class="heroes-wrapper">
+      <div class="hero-wrapper barbarian_king">
+        <div class="hero barbarian_king"></div>
+        <div class="rankings"></div>
+      </div>
+      <div class="hero-wrapper archer_queen">
+        <div class="hero archer_queen"></div>
+        <div class="rankings"></div>
+      </div>
+    </div>
+    <div class="heroes-wrapper">
+      <div class="hero-wrapper grand_warden">
+        <div class="hero grand_warden"></div>
+        <div class="rankings"></div>
+      </div>
+      <div class="hero-wrapper royal_champion">
+        <div class="hero royal_champion"></div>
+        <div class="rankings"></div>
+      </div>
+    </div>
+  </div>
+</body>
+<template id="radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="radio-clan" onchange="renderHeroEquipments('{CLAN_TAG}'); return false;">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
+</template>
+<template id="row-ranking-template">
+  <div class="row">
+    <div class="equipments">
+    </div>
+    <div class="count">
+      <div>{COUNT}</div>
+      <div>({RATIO} %)</div>
+    </div>
+  </div>
+</template>
+<template id="icons">
+  <div class="img-icon"></div>
+</template>
+</html>

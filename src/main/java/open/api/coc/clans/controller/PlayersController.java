@@ -2,7 +2,11 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.repository.player.PlayerRepository;
+import open.api.coc.clans.domain.players.PlayerModify;
+import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerResponse;
+import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayersController {
 
     private final PlayersService playersService;
+    private final PlayerRepository playerRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<PlayerResponse>> getAllPlayer() {
@@ -27,16 +33,16 @@ public class PlayersController {
                              .body(playersService.findAllPlayers());
     }
 
+    @GetMapping("/all/summary")
+    public ResponseEntity<List<PlayerResponse>> getAllPlayerSummary() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllPlayersSummary());
+    }
+
     @GetMapping("/all/tags")
     public ResponseEntity<List<String>> getAllPlayerTags() {
         return ResponseEntity.ok()
                              .body(playersService.findAllPlayerTags());
-    }
-
-    @GetMapping("/support/all")
-    public ResponseEntity<List<PlayerResponse>> getAllSupportPlayer() {
-        return ResponseEntity.ok()
-                             .body(playersService.findAllSupportPlayers());
     }
 
     @GetMapping("")
@@ -75,4 +81,25 @@ public class PlayersController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/support/all")
+    public ResponseEntity<List<PlayerResponse>> getAllSupportPlayer() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllSupportPlayers());
+    }
+
+    @PutMapping("/{playerTag}/support")
+    public ResponseEntity<?> updatePlayerSupport(@PathVariable String playerTag,
+                                                 @RequestBody PlayerModifyRequest request) {
+
+        PlayerModify playerModify = PlayerModify.create(playerTag, request);
+        playersService.changePlayerSupport(playerModify);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/ranking/hero/equipments")
+    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments(@RequestParam String clanTag) {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingHeroEquipments(clanTag));
+    }
 }

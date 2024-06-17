@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="/static/css/button.css" />
   <link rel="stylesheet" href="/static/css/loader.css" />
   <link rel="stylesheet" href="/static/css/clan/member.css" />
+  <link rel="stylesheet" href="/static/css/cms/member.css" />
   <link rel="stylesheet" href="/static/css/townhall.css" />
   <link rel="stylesheet" href="/static/css/hero.css" />
   <link rel="stylesheet" href="/static/css/heroEquipment.css" />
@@ -109,12 +110,55 @@
       }
     }
 
+    function changeSupportYn(labelElement) {
+      const { supportYn } = labelElement.dataset;
+
+      const memberCard = labelElement.closest('.member');
+      const { tag } = memberCard.dataset;
+
+      const toSupportYn = supportYn === 'Y' ? 'N' : 'Y';
+
+      if (toSupportYn === 'Y') {
+        if (!confirm("지원계정 전환 시 배정된 클랜에서 제외됩니다.\n지원계정 전환하시겠습니까?")) {
+          return;
+        }
+      }
+      updatePlayerSupportYn(tag, toSupportYn)
+      .then((result) => {
+        if (result) {
+          // 데이터 수정
+          const memberIndex = members.findIndex(member => member.tag === tag);
+          members[memberIndex].supportYn = toSupportYn;
+
+          // 라벨 수정
+          settingSupportLabel(labelElement, toSupportYn);
+
+          if (toSupportYn === 'Y') {
+            memberCard.classList.add('support-account');
+          } else {
+            memberCard.classList.remove('support-account');
+          }
+        }
+      });
+    }
+
+    function settingSupportLabel(label, supportYn) {
+      const supportClassName = 'bg-pink'
+      const notSupportClassName = 'bg-lightgray'
+      const backgroundColor = supportYn === 'Y' ? supportClassName : notSupportClassName;
+      label.classList.remove(supportClassName, notSupportClassName);
+      label.classList.add(backgroundColor);
+      label.classList.add('cursor-pointer');
+
+      label.dataset.supportYn = supportYn;
+    }
+
     function renderSupportLabel(playerLabels, supportYn) {
       if (!supportYn) return;
-      if (supportYn !== 'Y') return;
 
-      const label = createPlayerLabel('지원계정', '계정 유형');
-      label.classList.add('bg-pink');
+      const label = createPlayerLabel('지원계정', '지원계정 설정하기');
+      settingSupportLabel(label, supportYn);
+      label.onclick = () => changeSupportYn(label);
       playerLabels.appendChild(label);
     }
 
@@ -163,7 +207,7 @@
     }
 
     function renderMemberSortByTrophies(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -174,7 +218,7 @@
     }
 
     function rederMemberSortByHeroLevelSum(drawMembers = members, isShowLoading = true) {
-      initDisplayName(drawMembers);
+      // initDisplayName(drawMembers);
       const searchKeyword = getSearchKeyword();
       if (searchKeyword.value) {
         drawMembers = filterKeywordMatchedMembers(searchKeyword.value, drawMembers);
@@ -476,6 +520,13 @@
     //   const clanRoleLabel = createPlayerLabel(convRoleName(role), '클랜 권한');
     //   playerLabels.appendChild(clanRoleLabel);
     // }
+
+    if (!assignedClan) {
+      memberHtml.classList.add('need-assigned');
+    }
+    if (supportYn === 'Y') {
+      memberHtml.classList.add('support-account')
+    }
   }
 
     function renderMember(no, player) {
@@ -526,12 +577,23 @@
     function renderMembers(members) {
       const clanMembersElement = document.querySelector('.clan-members');
 
+      let totalCount = 0, supportCount = 0, clanAssignedCount = 0;
       let no = clanMembersElement.children.length + 1;
       for(const player of members) {
         const memberHtml = renderMember(no, player);
         clanMembersElement.appendChild(memberHtml);
         no++;
+
+        const { assignedClan, supportYn } = player;
+
+        totalCount++;
+        if (supportYn === 'Y') supportCount++;
+        if (assignedClan) clanAssignedCount++;
       }
+
+      document.querySelector('.label.total .count').innerHTML = Number(totalCount).toLocaleString();
+      document.querySelector('.label.support-account .count').innerHTML = Number(supportCount).toLocaleString();
+      document.querySelector('.label.clan-assigned .count').innerHTML = Number(clanAssignedCount).toLocaleString();
     }
 
     function ch2pattern(ch) {
@@ -583,22 +645,23 @@
       const regexp = createFuzzyMatcher(searchKeyword);
       return members.filter((member) => {
                       return regexp.test(member.name);
-                    }).map((member) => {
-                      const displayName = member.name;
-                      member.displayName = displayName.replace(regexp, (match, ...groups) => {
-                        const letters = groups.slice(0, match.length);
-                        let lastIndex = 0;
-                        let highlighted = [];
-                        for(let i=0,l=letters.length; i < l; i++) {
-                          const idx = match.indexOf(letters[i], lastIndex);
-                          highlighted.push(match.substring(lastIndex, idx));
-                          highlighted.push(`<mark>${letters[i]}</mark>`);
-                          lastIndex = idx + 1;
-                        }
-                        return highlighted.join('');
-                      })
-                      return member;
                     })
+                    // .map((member) => {
+                    //   const displayName = member.name;
+                    //   member.displayName = displayName.replace(regexp, (match, ...groups) => {
+                    //     const letters = groups.slice(0, match.length);
+                    //     let lastIndex = 0;
+                    //     let highlighted = [];
+                    //     for(let i=0,l=letters.length; i < l; i++) {
+                    //       const idx = match.indexOf(letters[i], lastIndex);
+                    //       highlighted.push(match.substring(lastIndex, idx));
+                    //       highlighted.push(`<mark>${letters[i]}</mark>`);
+                    //       lastIndex = idx + 1;
+                    //     }
+                    //     return highlighted.join('');
+                    //   })
+                    //   return member;
+                    // })
     }
 
     function refreshRenderingMembers() {
@@ -679,6 +742,19 @@
       })
     }
 
+    function filterMember(type) {
+      const memberCards = document.querySelectorAll('.clan-members .member.row');
+      for (const memberCard of memberCards) {
+        memberCard.classList.remove('display-none');
+
+        if (type === 'all') continue;
+
+        if (!memberCard.classList.contains(type)) {
+          memberCard.classList.add('display-none');
+        }
+      }
+    }
+
     window.onload = async () => {
       await loadLeagues();
       await getClanMembers();
@@ -707,6 +783,7 @@
     </div>
 
     <div class="support-area">
+
       <div class="container player-form">
         <div class="search">
           <div class="search-box">
@@ -761,8 +838,45 @@
           </div>
         </div>
       </div>
+
+      <div class="container">
+        <div class="radio-group-wrapper">
+          <div class="radio-inputs filter">
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" checked onchange="filterMember('all'); return false;">
+              <span class="name">전체</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" onchange="filterMember('need-assigned'); return false;">
+              <span class="name">배정필요</span>
+            </label>
+
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" onchange="filterMember('support-account'); return false;">
+              <span class="name">지원계정</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="clan-members"></div>
+
+    <div class="clan-members-wrapper">
+      <div class="additional-area">
+        <div class="label total">
+          <span class="name">총 계정:</span>
+          <span class="count">0</span>
+        </div>
+        <div class="label support-account">
+          <span class="name">지원 계정:</span>
+          <span class="count">0</span>
+        </div>
+        <div class="label clan-assigned">
+          <span class="name">클랜 배정:</span>
+          <span class="count">0</span>
+        </div>
+      </div>
+      <div class="clan-members"></div>
+    </div>
   </div>
 </body>
 <template id="member">

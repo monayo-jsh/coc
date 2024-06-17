@@ -717,7 +717,9 @@
 
         const infoAdditionalElement = playerInfo.querySelector('.info.additional');
         renderAdditionalLabel(infoAdditionalElement, tag);
-        renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
+
+        const roleLabel = renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
+        roleLabel.classList.add(role);
 
         //랭킹 변화 라벨 추가
         if (previousClanRank !== 0) {
@@ -1079,20 +1081,43 @@
     }
 
     function initMonthPicker() {
-      const firstDayOfMonth = dayjs().date(1).format('YYYY-MM-DD');
       const monthPickers = document.querySelectorAll('input.input-month');
-      const options = {
-        type: 'year-month-picker',
-        format: 'YYYY-MM',
-        validRange: [ firstDayOfMonth ],
-        controls: false,
-        readonly: true,
-        value: firstDayOfMonth, // default
-        months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-        monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+
+      function getDefaultLeagueFirstDayOfMonth(monthPicker) {
+        const isMonthPickerLeague = monthPicker.classList.contains('league');
+        let defaultFirstDayOfMonth = dayjs().date(1);
+
+        // 클랜 배정 이번달 기본값
+        if (!isMonthPickerLeague) return formatYYYYMMDD(defaultFirstDayOfMonth);
+
+        const now = dayjs();
+
+        // 매달 12일까지는 이번달 기본값
+        if (now.date() < 12) {
+          return formatYYYYMMDD(defaultFirstDayOfMonth);
+        }
+
+        // 이후는 다음달 기본값
+        defaultFirstDayOfMonth = defaultFirstDayOfMonth.add(1, 'month');
+        return formatYYYYMMDD(defaultFirstDayOfMonth);
       }
+
       for (const monthPicker of monthPickers) {
-        jSuites.calendar(monthPicker, options);
+        const defaultFirstDayOfMonth = getDefaultLeagueFirstDayOfMonth(monthPicker);
+        jSuites.calendar(monthPicker, makeMonthPickerOption(defaultFirstDayOfMonth));
+      }
+
+      function makeMonthPickerOption(firstDayOfMonth) {
+        return {
+          type: 'year-month-picker',
+          format: 'YYYY-MM',
+          validRange: [ firstDayOfMonth ],
+          controls: false,
+          readonly: true,
+          value: firstDayOfMonth, // default
+          months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+          monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+        }
       }
     }
 
@@ -1211,7 +1236,7 @@
             <th class="table-th">배정월</th>
             <td class="table-td">
               <div class="picker">
-                <input type="text" class="input-month">
+                <input type="text" class="input-month league">
               </div>
             </td>
           </tr>

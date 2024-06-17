@@ -9,51 +9,21 @@
   <link rel="stylesheet" type="text/css" href="/static/css/links.css" />
 
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/api/lab.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
-    function initButtons() {
-       const buttons = [
-         {
-           name: '맵 공유방',
-           link: 'https://open.kakao.com/o/gJi4eiug'
-         },
-         {
-           name: 'FC(도전) & FW(친선전) & 내전방',
-           link: 'https://open.kakao.com/o/gajuborg',
-         },
-         {
-           name: '길정리 & 라인정리 연구소',
-           link: 'https://open.kakao.com/o/gF51tNpg',
-         },
-         {
-           name: '라벌방',
-           link: 'https://open.kakao.com/o/g75osURf',
-         },
-         {
-           name: '스매쉬방 - 핵연구소',
-           link: 'https://open.kakao.com/o/ggaJPkRf',
-         },
-         {
-           name: '퀸힐 연구방',
-           link: 'https://open.kakao.com/o/gmsAKLjg',
-         },
-         {
-           name: '지상스팸방 - 발트라연구소',
-           link: 'https://open.kakao.com/o/g8TeB5ng',
-         }
-
-       ]
-
-      renderButtons(buttons);
+    async function getLabLinks() {
+      const links = await fetchLabLinkAll();
+      renderLinks(links);
     }
 
-    function renderButtons(buttons) {
-      for(const button of buttons) {
-        renderButton(button);
+    function renderLinks(links) {
+      for(const link of links) {
+        renderLink(link);
       }
     }
 
-    function renderButton(button) {
+    function renderLink(button) {
       const buttonTemplate = document.querySelector('#button-template');
       const buttonElement = document.importNode(buttonTemplate.content, true);
       const createButton = buttonElement.querySelector('.button');
@@ -67,8 +37,8 @@
       linkList.appendChild(createButton);
     }
 
-    window.onload = () => {
-      initButtons();
+    window.onload = async () => {
+      await getLabLinks();
     }
   </script>
 

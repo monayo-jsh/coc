@@ -1,3 +1,4 @@
+
 package open.api.coc.clans.controller;
 
 import java.io.IOException;
@@ -8,7 +9,8 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
-import open.api.coc.clans.domain.clans.ClanCurrentWarRes;
+import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
+import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -65,15 +67,24 @@ public class ClansController {
     }
 
     @GetMapping("/war")
-    public ResponseEntity<List<ClanResponse>> getClansWar(@RequestParam(defaultValue = "normal") String view) {
+    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "normal") String view) {
 
-        List<ClanResponse> clanWarList = clansService.getClanWarResList();
+        List<ClanResponse> clanWarList = clansService.getWarClanResList();
         if ("parallel".equals(view)) {
-            clanWarList = clansService.getClanWarParallelResList();
+            clanWarList = clansService.getWarParallelClanResList();
         }
         return ResponseEntity.ok()
                              .body(clanWarList);
     }
+
+    @GetMapping("/war/league")
+    public ResponseEntity<List<ClanResponse>> getWarLeagueClans() {
+
+        List<ClanResponse> clanWarLeagueList = clansService.getWarLeagueClanResList();
+        return ResponseEntity.ok()
+                             .body(clanWarLeagueList);
+    }
+
     @GetMapping("/league/{clanTag}")
     public ResponseEntity<LeagueClanRes> getClansLeagueWar(@PathVariable String clanTag) throws IOException {
         return ResponseEntity.ok(clansService.getLeagueClan(clanTag));
@@ -200,19 +211,43 @@ public class ClansController {
 
 
     @GetMapping("/{clanTag}/current/war")
-    public ResponseEntity<ClanCurrentWarRes> getClanCurrentWar(@PathVariable String clanTag) {
-        ClanCurrentWarRes clanCurrentWar = clansService.getClanCurrentWar(clanTag);
+    public ResponseEntity<ClanCurrentWarResponse> getClanCurrentWar(@PathVariable String clanTag) {
+        ClanCurrentWarResponse clanCurrentWar = clansService.getClanCurrentWar(clanTag);
         return ResponseEntity.ok().body(clanCurrentWar);
     }
 
     @GetMapping("/league-war")
-    public ResponseEntity<ClanCurrentWarRes> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
+    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
         return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));
     }
 
     @GetMapping("/league-data-scheduling")
     public void leagueDataScheduling() throws IOException {
         scheduler.createWarRoundFile();
+    }
+
+
+
+
+
+
+
+
+
+
+
+    @GetMapping("/{clanTag}/current/war/league")
+    public ResponseEntity<ClanCurrentWarLeagueGroupResponse> getClanCurrentWarLeagueGroup(@PathVariable String clanTag) {
+        ClanCurrentWarLeagueGroupResponse clanCurrentWarLeagueGroupResponse = clansService.getClanCurrentWarLeagueGroup(clanTag);
+        return ResponseEntity.ok().body(clanCurrentWarLeagueGroupResponse);
+    }
+
+    @GetMapping("/war/league/{warTag}")
+    public ResponseEntity<ClanCurrentWarResponse> getClanWarLeague(@PathVariable String warTag,
+                                                                   @RequestParam("clanTag") String clanTag,
+                                                                   @RequestParam("season") String season) {
+        ClanCurrentWarResponse ClanCurrentWarRes = clansService.getClanWarLeagueRound(clanTag, season, warTag);
+        return ResponseEntity.ok().body(ClanCurrentWarRes);
     }
 
 }

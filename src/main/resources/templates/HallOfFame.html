@@ -12,6 +12,7 @@
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/api/raid.js"></script>
+  <script src="/static/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
   <script type="text/javascript">
@@ -60,7 +61,7 @@
       };
     }
 
-    function renderRaidCurrentSeason(sectionClassName, players) {
+    function renderRankings(sectionClassName, players) {
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
       let rank = 1;
       for(const player of players) {
@@ -73,17 +74,29 @@
 
     async function fetchRaidCurrentSeason() {
       const rankings = await fetchRankingRaidCurrentSeason();
-      renderRaidCurrentSeason('raid-current-season', rankings);
+      renderRankings('raid-current-season', rankings);
     }
 
     async function fetchRaidAverageSeason() {
       const rankings = await fetchRankingRaidAverageSeason();
-      renderRaidCurrentSeason('raid-average-season', rankings);
+      renderRankings('raid-average-season', rankings);
+    }
+
+    async function fetchCurrentTrophies() {
+      const rankings = await fetchRankingPlayerTrophies();
+      renderRankings('current-trophies', rankings);
+    }
+
+    async function fetchCurrentAttackWins() {
+      const rankings = await fetchRankingPlayerAttackWins();
+      renderRankings('current-attack-wins', rankings);
     }
 
     window.onload = async () => {
       fetchRaidCurrentSeason();
       fetchRaidAverageSeason();
+      fetchCurrentTrophies();
+      fetchCurrentAttackWins();
     }
   </script>
 
@@ -136,6 +149,44 @@
 
       </div>
 
+      <div class="section-wrapper">
+        <div class="section-title">개인 기록 부문</div>
+
+        <div class="section-contents">
+
+          <div class="section current-trophies">
+            <div class="sub-title">현재 트로피 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section current-attack-wins">
+            <div class="sub-title">현재 공성 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
     </div>
 
 </body>

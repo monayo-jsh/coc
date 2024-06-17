@@ -3,8 +3,7 @@ package open.api.coc.clans.database.repository.raid;
 import java.time.LocalDate;
 import java.util.List;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
-import open.api.coc.clans.domain.raid.RankingRaidScore;
-import org.springframework.data.domain.PageRequest;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,7 +22,7 @@ public interface RaiderRepository extends JpaRepository<RaiderEntity, Long> {
         + " from RaiderEntity raider "
         + " join fetch RaidEntity raid on raid.startDate in :startDate and raid.id = raider.raid.id"
         + " order by raider.resourceLooted desc")
-    List<RankingRaidScore> getRankingByStartDateAndLimit(LocalDate startDate, Pageable pageable);
+    List<RankingHallOfFame> getRankingByStartDateAndLimit(LocalDate startDate, Pageable pageable);
 
     @Query("select raider.tag as tag, max(raider.name) as name, avg(raider.resourceLooted) as score "
         + " from RaiderEntity raider "
@@ -31,5 +30,5 @@ public interface RaiderRepository extends JpaRepository<RaiderEntity, Long> {
         + " group by raider.tag"
         + " having count(raider.tag) = :average"
         + " order by score desc")
-    List<RankingRaidScore> getRankingByStartDatesAndLimit(List<LocalDate> startDates, Integer average, PageRequest pageable);
+    List<RankingHallOfFame> getRankingByStartDatesAndLimit(List<LocalDate> startDates, Integer average, Pageable pageable);
 }

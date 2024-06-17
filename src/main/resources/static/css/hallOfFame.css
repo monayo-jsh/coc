@@ -2,7 +2,6 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  white-space: nowrap;
 }
 
 .hall-of-fame {
@@ -19,10 +18,23 @@ body {
   }
 }
 
+.table-td:nth-child(1) {
+  width: 50px;
+}
+.table-td:nth-child(2) {
+  width: 150px;
+  white-space: nowrap;
+}
+.table-td:nth-child(3) {
+  width: 100px;
+  white-space: nowrap;
+}
+
 .section-wrapper {
   margin-top: 10px;
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
 
   .section-title {
@@ -31,11 +43,11 @@ body {
 
   .section-contents {
     display: flex;
-    width: 320px;
+    flex-wrap: wrap;
     justify-content: space-around;
 
     .section {
-      margin: 5px;
+      margin: 3px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -49,15 +61,15 @@ body {
         margin-top: 3px;
 
         .table-tr.rank-1 .table-td {
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 700;
         }
         .table-tr.rank-2 .table-td {
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
         }
         .table-tr.rank-3 .table-td {
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
         }
 

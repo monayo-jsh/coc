@@ -57,6 +57,5 @@ cms:
   admin-password: ${ADMIN_PASSWORD}
 
 hall-of-fame:
-  ranking:
-    limit: 10
-    average: 3
+  ranking: 10
+  average: 3

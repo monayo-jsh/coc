@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.raid.RaidEntity;
@@ -24,13 +25,12 @@ import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
-import open.api.coc.clans.domain.raid.RankingRaidScore;
 import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,11 +41,7 @@ import org.springframework.util.CollectionUtils;
 @Transactional(readOnly = true)
 public class RaidService {
 
-    @Value("${hall-of-fame.ranking.limit}")
-    private Integer rankingLimit;
-
-    @Value("${hall-of-fame.ranking.average}")
-    private Integer averageLimit;
+    private final HallOfFameConfig hallOfFameConfig;
 
     private final ClanApiService clanApiService;
     private final ClansService clansService;
@@ -166,21 +162,21 @@ public class RaidService {
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
-    public List<RankingRaidScore> getRankingCurrentSeason() {
+    public List<RankingHallOfFame> getRankingCurrentSeason() {
         LocalDate currentSeason = raidRepository.getCurrentSeason();
         if (Objects.isNull(currentSeason)) {
             return Collections.emptyList();
         }
 
-        return raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, rankingLimit));
+        return raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
-    public List<RankingRaidScore> getRankingAverageSeason() {
-        List<LocalDate> averageSeasonStartDates = raidRepository.getAverageSeasonByLimit(PageRequest.of(0, averageLimit));
+    public List<RankingHallOfFame> getRankingAverageSeason() {
+        List<LocalDate> averageSeasonStartDates = raidRepository.getAverageSeasonByLimit(PageRequest.of(0, hallOfFameConfig.getAverage()));
         if (CollectionUtils.isEmpty(averageSeasonStartDates)) {
             return Collections.emptyList();
         }
 
-        return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, averageLimit, PageRequest.of(0, rankingLimit));
+        return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, hallOfFameConfig.getAverage(), PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 }

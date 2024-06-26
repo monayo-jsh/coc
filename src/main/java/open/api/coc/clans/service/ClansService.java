@@ -51,6 +51,7 @@ import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupRespon
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
+import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -87,6 +88,7 @@ public class ClansService {
     private final PlayersService playersService;
     private final PlayerResponseConverter playerResponseConverter;
 
+    private final TimeConverter timeConverter;
 
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
 
@@ -101,6 +103,8 @@ public class ClansService {
     public ClanCurrentWarResponse getClanCurrentWar(String clanTag) {
         ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
+
+        writeClanWarResult(clanTag, clanCurrentWar);
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
@@ -571,7 +575,7 @@ public class ClansService {
     }
 
     public ClanCurrentWarResponse getClanWarLeagueRound(String clanTag, String season, String warTag) {
-        ClanWar clanWar = findClanWarFromFile(clanTag, season, warTag);
+        ClanWar clanWar = findClanWarLeagueFromFile(clanTag, season, warTag);
 
         if (ObjectUtils.isEmpty(clanWar)) {
             clanWar = clanApiService.findWarLeagueByWarTag(warTag)
@@ -585,12 +589,34 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(clanWar);
     }
 
+    final String CLAN_WAR_ROOT_DIR = "./clan-war";
+    final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
+    private void writeClanWarResult(String clanTag, ClanWar clanWar) {
+        try {
+            // directory: ./clan-war/{clanTag}
+            final String path = CLAN_WAR_GROUP_DIR.replace("{clanTag}", clanTag);
+
+            ClassPathResource resource = checkAndMakeDirectory(path);
+
+            long startTimeMilliSec = timeConverter.toEpochMilliSecond(clanWar.getStartTime());
+            LocalDate startDate = timeConverter.toLocalDate(startTimeMilliSec);
+            String fileName = startDate.format(DateTimeFormatter.BASIC_ISO_DATE);
+
+            File file = new File(resource.getPath(), makeJsonFileName(fileName));
+            makeEmptyFile(file);
+
+            writeFile(file, clanWar);
+        } catch (IOException e) {
+            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
     final String LEAGUE_WAR_ROOT_DIR = "./war-league";
     final String LEAGUE_WAR_SEASON_DIR = "/{season}/{clanTag}";
     final String LEAGUE_WAR_SEASON_INFO_FILE_NAME = "league-info";
     final String LEAGUE_WAR_INFO_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR;
     final String LEAGUE_WAR_ROUND_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR + "/round";
-    final String LEAGUE_WAR_TAG_JSON_FILE_NAME = "%s.json";
+    final String JSON_FILE_NAME = "%s.json";
 
     private void writeClanWarLeagueSeasonGroup(String clanTag, ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup) {
         try {
@@ -613,7 +639,7 @@ public class ClansService {
     }
 
     private String getLeagueWarSeasonInfoFileName() {
-        return makeLeagueWarTagJsonFileName(LEAGUE_WAR_SEASON_INFO_FILE_NAME);
+        return makeJsonFileName(LEAGUE_WAR_SEASON_INFO_FILE_NAME);
     }
 
     private <T> void writeFile(File file, T data) throws IOException {
@@ -622,12 +648,12 @@ public class ClansService {
         writer.close();
     }
 
-    private ClanWar findClanWarFromFile(String clanTag, String season, String warTag) {
+    private ClanWar findClanWarLeagueFromFile(String clanTag, String season, String warTag) {
         final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
                                                 .replace("{clanTag}", clanTag);
 
         // directory: ./war-league/{season}/{clanTag}/round/{warTag}.json
-        File file = new File(path, makeLeagueWarTagJsonFileName(warTag));
+        File file = new File(path, makeJsonFileName(warTag));
 
         // Not Found.
         if (!file.exists()) return null;
@@ -648,7 +674,7 @@ public class ClansService {
 
             ClassPathResource resource = checkAndMakeDirectory(path);
 
-            File file = new File(resource.getPath(), makeLeagueWarTagJsonFileName(warTag));
+            File file = new File(resource.getPath(), makeJsonFileName(warTag));
             makeEmptyFile(file);
 
             writeFile(file, clanWar);
@@ -666,8 +692,8 @@ public class ClansService {
         }
     }
 
-    private String makeLeagueWarTagJsonFileName(String warTag) {
-        return LEAGUE_WAR_TAG_JSON_FILE_NAME.formatted(warTag);
+    private String makeJsonFileName(String warTag) {
+        return JSON_FILE_NAME.formatted(warTag);
     }
 
     private ClassPathResource checkAndMakeDirectory(String path) {

@@ -1,3 +1,7 @@
+function removeHashTag(playerTag) {
+  return playerTag.replaceAll("#", "");
+}
+
 function filterVillage(array, village = 'home') {
   return array.filter(data => data.village === village);
 }

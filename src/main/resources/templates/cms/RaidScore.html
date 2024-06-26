@@ -46,7 +46,7 @@
     }
 
     function increaseRowspan(playerTag, className) {
-      const firstDrawRow = document.querySelector(`.${playerTag.replace("#", "")}`);
+      const firstDrawRow = document.querySelector(`.tag-${removeHashTag(playerTag)}`);
       const targetTd = firstDrawRow.querySelector(`.${className}`);
       const rowspan = targetTd.getAttribute('rowspan');
       if (rowspan) {
@@ -59,7 +59,7 @@
     }
 
     function appendClassNewPlayer(tableRow, tag) {
-      tableRow.classList.add(tag.replace("#", ""), "start");
+      tableRow.classList.add(`tag-${removeHashTag(tag)}`, "start");
     }
 
     function drawRow(tableRow, tag) {

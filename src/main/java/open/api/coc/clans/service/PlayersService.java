@@ -128,6 +128,14 @@ public class PlayersService {
                       .collect(Collectors.toList());
     }
 
+    public List<PlayerResponse> findPlayersSummary(String name) {
+        List<PlayerEntity> players = playerRepository.findByName(name);
+
+        return players.stream()
+                      .map(playerResponseConverter::convert)
+                      .collect(Collectors.toList());
+    }
+
     public List<PlayerResponse> findAllSupportPlayers() {
         List<PlayerEntity> players = playerRepository.findAllBySupportYn(YnType.Y);
 
@@ -517,4 +525,5 @@ public class PlayersService {
     public List<RankingHallOfFame> getRankingAttackWins() {
         return playerRepository.selectRankingAttackWins(PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
+
 }

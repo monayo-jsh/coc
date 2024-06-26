@@ -27,6 +27,15 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
         + " left join fetch LeagueEntity l on l.id = p.league.id"
         + " left join fetch ClanEntity c on c.tag = p.clan.tag"
         + " left join fetch ClanBadgeEntity cb on cb.tag = c.tag"
+        + " where p.name like CONCAT(:name, '%')"
+    )
+    List<PlayerEntity> findByName(String name);
+
+    @Query("select p"
+        + " from PlayerEntity p"
+        + " left join fetch LeagueEntity l on l.id = p.league.id"
+        + " left join fetch ClanEntity c on c.tag = p.clan.tag"
+        + " left join fetch ClanBadgeEntity cb on cb.tag = c.tag"
         + " where p.supportYn = :supportYn"
     )
     List<PlayerEntity> findAllBySupportYn(YnType supportYn);
@@ -65,4 +74,5 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
 
     @Query("select player.name as name, player.playerTag as tag, player.attackWins as score from PlayerEntity player order by player.attackWins desc")
     List<RankingHallOfFame> selectRankingAttackWins(PageRequest pageable);
+
 }

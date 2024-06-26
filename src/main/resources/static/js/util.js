@@ -212,3 +212,49 @@ function copyClipboard(value) {
     document.body.removeChild(textArea);
   }
 }
+
+
+
+function validateString(str) {
+  if (!str) return false;
+  if (str.length < 0) return false;
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charAt(i);
+    if (isHangulIncomplete(char)) {
+      return false;
+    }
+    if (!isValidChar(char)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function isHangulIncomplete(char) {
+  const charCode = char.charCodeAt(0);
+  return (charCode >= 0x1100 && charCode <= 0x11FF) || // 한글 자모 (초성, 중성, 종성)
+      (charCode >= 0x3130 && charCode <= 0x318F) || // 한글 호환 자모
+      (charCode >= 0xA960 && charCode <= 0xA97F) || // 한글 자모 확장-A
+      (charCode >= 0xD7B0 && charCode <= 0xD7FF);   // 한글 자모 확장-B
+}
+
+function isValidChar(char) {
+  return isKoreanComplete(char) || isEnglish(char) || isDigit(char);
+}
+
+function isKoreanComplete(char) {
+  const charCode = char.charCodeAt(0);
+  return charCode >= 0xAC00 && charCode <= 0xD7A3; // 한글 완성된 글자
+}
+
+function isEnglish(char) {
+  const charCode = char.charCodeAt(0);
+  return (charCode >= 0x0041 && charCode <= 0x005A) || // 영어 대문자
+      (charCode >= 0x0061 && charCode <= 0x007A);   // 영어 소문자
+}
+
+function isDigit(char) {
+  const charCode = char.charCodeAt(0);
+  return charCode >= 0x0030 && charCode <= 0x0039; // 숫자
+}

@@ -2,6 +2,7 @@ const URI_PLAYERS = '/players'; //멤버 상세 조회
 
 const URI_PLAYERS_ALL = '/players/all'; //전체 클랜원 조회
 const URI_PLAYERS_ALL_SUMMARY = '/players/all/summary'; //전체 클랜원 요약 조회
+const URI_PLAYERS_SUMMARY = '/players/summary'; //클랜원 요약 이름 조회
 const URI_PLAYERS_ALL_TAGS = '/players/all/tags'; //전체 클랜원 태그 조회
 
 const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
@@ -40,6 +41,19 @@ async function fetchAllPlayerTags() {
 
 async function fetchAllClanPlayersSummary() {
   return await axios.get(URI_PLAYERS_ALL_SUMMARY)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchPlayersSummaryByName(playerName) {
+  const uri = URI_PLAYERS_SUMMARY + `?name=${encodeURIComponent(playerName)}`
+  return await axios.get(uri)
                     .then(response => {
                       const { data } = response
                       return data;

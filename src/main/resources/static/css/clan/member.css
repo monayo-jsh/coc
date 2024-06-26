@@ -24,6 +24,17 @@
     .toggle-button-cover {
       margin-left: 5px;
     }
+
+    .title {
+      border: 1px solid gray;
+      padding: 5px 0;
+      width: 100%;
+      text-align: center;
+      border-radius: 9px;
+      background-color: #515151;
+      color: white;
+      font-weight: bold;
+    }
   }
 
   .radio-tile-group {
@@ -106,7 +117,8 @@
     border: 2px solid transparent;
     border-radius: 8px;
     outline: none;
-    background-color: #f3f3f4;
+    background-color: #f1f1f1;
+    font-size: 14px;
     color: #0d0c22;
     transition: .3s ease;
   }

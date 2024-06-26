@@ -25,6 +25,12 @@ public class ViewNormalController {
         return "clan/Member";
     }
 
+    /** 클랜원 목록 */
+    @GetMapping("/find/member")
+    public String findClanMember() {
+        return "clan/FindMember";
+    }
+
     /** 클랜 목록 */
     @GetMapping("/clan")
     public String clan() {

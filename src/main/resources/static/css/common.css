@@ -192,12 +192,19 @@ body::before {
 .color-green {
   color: green !important;
 }
+.color-gold {
+  color: gold !important;
+}
 .color-red {
   color: red !important;
 }
 
 .cursor-pointer {
   cursor: pointer !important;
+}
+
+.flex-row {
+  flex-direction: row !important;
 }
 
 .align-items-center {
@@ -249,6 +256,10 @@ body::before {
 .bg-black {
   background-color: black;
   color: white;
+}
+
+.bg-black-2 {
+  background-color: #232323;
 }
 
 .bg-pink {

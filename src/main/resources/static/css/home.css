@@ -10,6 +10,16 @@
   gap: 10px;
 }
 
+.card.blue-1 {
+  background-color: #0080ff;
+}
+.card.blue-2 {
+  background-color: #006bd5;
+}
+.card.blue-3 {
+  background-color: #016ad2;
+}
+
 .card.red-1 {
   background-color: #ff5a77;
 }
@@ -60,6 +70,7 @@
   background-color: #e8c42a;
 }
 
+
 .card-group {
   gap: 5px;
   display: flex;
@@ -109,6 +120,17 @@
 @media (max-width: 400px) {
   .card {
     width: 140px !important;
+  }
+  .card.w90 {
+    width: 90px !important;
+  }
+}
+
+.card.with-icon {
+  flex-direction: row;
+
+  .tip {
+    margin-left: 5px;
   }
 }
 

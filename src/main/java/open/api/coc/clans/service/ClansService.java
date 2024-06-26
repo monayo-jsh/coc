@@ -104,7 +104,9 @@ public class ClansService {
         ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
 
-        writeClanWarResult(clanTag, clanCurrentWar);
+        if (clanCurrentWar.isNotNotInWar()) {
+            writeClanWarResult(clanTag, clanCurrentWar);
+        }
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }

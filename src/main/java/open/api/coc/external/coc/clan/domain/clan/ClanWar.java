@@ -33,4 +33,7 @@ public class ClanWar {
         return "warEnded".equals(state);
     }
 
+    public boolean isNotNotInWar() {
+        return !"notInWar".equals(state);
+    }
 }

@@ -17,7 +17,7 @@ public class ClanWarController {
 
     private final ClanWarService clanWarService;
 
-    @GetMapping("ranking")
+    @GetMapping("/ranking/stars")
     public ResponseEntity<List<RankingHallOfFame>> getRankingClanWarStars(LocalDate searchMonth) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingClanWarStars(searchMonth));

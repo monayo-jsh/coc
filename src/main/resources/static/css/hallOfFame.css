@@ -19,14 +19,14 @@ body {
 }
 
 .table-td:nth-child(1) {
-  width: 50px;
 }
 .table-td:nth-child(2) {
-  width: 150px;
   white-space: nowrap;
 }
 .table-td:nth-child(3) {
-  width: 100px;
+  white-space: nowrap;
+}
+.table-td:nth-child(4) {
   white-space: nowrap;
 }
 
@@ -64,6 +64,7 @@ body {
 
       .rankings {
         margin-top: 3px;
+        width: 300px;
 
         .table-tr.rank-1 .table-td {
           font-size: 13px;
@@ -78,8 +79,22 @@ body {
           font-weight: 500;
         }
 
+        .table-th {
+          font-size: 0.9em;
+        }
+
         .table-td {
           font-size: 10px;
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+          }
+        }
+
+        .table-td.empty {
+          font-size: 13px;
+          height: 300px;
         }
       }
     }

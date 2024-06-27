@@ -2,13 +2,19 @@ function removeHashTag(playerTag) {
   return playerTag.replaceAll("#", "");
 }
 
+function formatMinuteSecond(sec) {
+  // import 필수
+  // <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  return dayjs.duration(sec * 1000).format('m분 ss초');
+}
+
 function filterVillage(array, village = 'home') {
   return array.filter(data => data.village === village);
 }
 
 function convertArrayToLevelMapByKoreanName(array) {
   return filterVillage(array).reduce((map, row) => {
-    const { koreanName, level } = row;
+    const {koreanName, level} = row;
     map[koreanName] = level
     return map
   }, {});

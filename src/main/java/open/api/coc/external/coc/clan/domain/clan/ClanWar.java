@@ -14,6 +14,9 @@ public class ClanWar {
     private Integer teamSize;
     private Integer attacksPerMember = 1; //default
 
+    private String battleModifier;
+
+    private String preparationStartTime;
     private String startTime;
     private String endTime;
 

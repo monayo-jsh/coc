@@ -3,10 +3,8 @@ package open.api.coc.clans.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class TestController {
-
-
 
 }

@@ -92,4 +92,13 @@ public class ClanEntity implements Persistable<String> {
     public void add(PlayerEntity player) {
         this.players.add(player);
     }
+
+
+    public boolean isNotUsed() {
+        return !isUsed();
+    }
+
+    public boolean isUsed() {
+        return YnType.Y.equals(this.visibleYn);
+    }
 }

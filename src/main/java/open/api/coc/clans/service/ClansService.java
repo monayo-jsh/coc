@@ -73,6 +73,7 @@ import org.springframework.util.StringUtils;
 public class ClansService {
 
     private final ClanApiService clanApiService;
+    private final ClanWarService clanWarService;
 
     private final ClanRepository clanRepository;
     private final ClanContentRepository clanContentRepository;
@@ -106,6 +107,7 @@ public class ClansService {
 
         if (clanCurrentWar.isNotNotInWar()) {
             writeClanWarResult(clanTag, clanCurrentWar);
+            clanWarService.mergeClanWar(clanCurrentWar);
         }
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);

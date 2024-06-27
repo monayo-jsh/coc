@@ -3,19 +3,23 @@ package open.api.coc.clans.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
-import open.api.coc.clans.database.repository.clan.ClanWarRespository;
+import open.api.coc.clans.database.repository.clan.ClanRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
@@ -25,7 +29,8 @@ import org.springframework.util.ObjectUtils;
 @RequiredArgsConstructor
 public class ClanWarService {
 
-    private final ClanWarRespository clanWarRespository;
+    private final ClanRepository clanRepository;
+    private final ClanWarRepository clanWarRepository;
 
     private final TimeConverter timeConverter;
 
@@ -34,7 +39,37 @@ public class ClanWarService {
     private final String JSON_FILE_NAME = "%s.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Transactional
+    /**
+     * 클랜전 현황 메타 정보를 생성
+     * 생성된 경우 상태값, 종료시간 갱신
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void mergeClanWar(ClanWar clanWar) {
+
+        String clanTag = clanWar.getClan().getTag();
+
+        Optional<ClanEntity> findClan = clanRepository.findById(clanTag);
+        if (findClan.isEmpty()) { return; }
+        ClanEntity clanEntity = findClan.get();
+        if (clanEntity.isNotUsed()) { return; }
+
+        LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
+
+        Optional<ClanWarEntity> findClanWar = clanWarRepository.findByClanTagAndStartTime(clanTag, startTime);
+        if (findClanWar.isPresent()) {
+            ClanWarEntity clanWarEntity = findClanWar.get();
+            clanWarEntity.setState(clanWar.getState());
+            LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
+            clanWarEntity.setEndTime(endTime);
+
+            return;
+        }
+
+        // 클랜전 기록 생성
+        saveClanWar(clanWar);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveClanWarResult() {
 
         String tag = "#2GJGRU920";
@@ -97,7 +132,7 @@ public class ClanWarService {
                                                    .attacksPerMember(clanWar.getAttacksPerMember())
                                                    .build();
 
-        return clanWarRespository.save(clanWarEntity);
+        return clanWarRepository.save(clanWarEntity);
     }
 
     private LocalDateTime getLocalDateTime(String preparationStartTime) {

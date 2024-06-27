@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,4 +18,16 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
 
     @Query("select clanWar from ClanWarEntity clanWar where clanWar.endTime < :now and clanWar.state != :state")
     List<ClanWarEntity> findAfterEndTimeAndNotState(LocalDateTime now, String state);
+
+    @Query("SELECT max(clanWarMemberAttack.id.tag) as tag, max(player.name) as name, sum(clanWarMemberAttack.stars) as score, avg(clanWarMemberAttack.duration) as duration, max(clan.name) as clanName"
+        + " FROM ClanWarEntity clanWar"
+        + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
+        + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
+        + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
+        + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag"
+        + " WHERE clanWar.state = 'warCollected'"
+        + " AND clanWar.endTime between :startTime and :endTime"
+        + " group by clanWarMemberAttack.id.warId, clanWarMemberAttack.id.tag"
+        + " order by score desc, duration")
+    List<RankingHallOfFame> selectRankingClanWarStars(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 }

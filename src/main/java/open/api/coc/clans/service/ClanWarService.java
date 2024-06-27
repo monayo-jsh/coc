@@ -7,11 +7,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackEntity;
@@ -21,11 +24,13 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,8 @@ import org.springframework.util.ObjectUtils;
 @Service
 @RequiredArgsConstructor
 public class ClanWarService {
+
+    private final HallOfFameConfig hallOfFameConfig;
 
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
@@ -238,5 +245,22 @@ public class ClanWarService {
         } catch (IOException e) {
             log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
         }
+    }
+
+    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth) {
+        LocalDateTime startTime = getStartTime(searchMonth);
+        LocalDateTime endTime = getEndTime(searchMonth);
+
+        return clanWarRepository.selectRankingClanWarStars(startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
+
+    private LocalDateTime getStartTime(LocalDate searchMonth) {
+        LocalDate startDate = searchMonth.with(TemporalAdjusters.firstDayOfMonth());
+        return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
+    }
+
+    private LocalDateTime getEndTime(LocalDate endTime) {
+        LocalDate endDate = endTime.with(TemporalAdjusters.lastDayOfMonth());
+        return LocalDateTime.of(endDate, LocalTime.MAX.withNano(999_999_000));
     }
 }

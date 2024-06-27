@@ -36,6 +36,7 @@ public class ClanWar {
         return "warEnded".equals(state);
     }
 
+    @JsonIgnore
     public boolean isNotNotInWar() {
         return !"notInWar".equals(state);
     }

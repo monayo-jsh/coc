@@ -64,4 +64,14 @@ public class ClanWarEntity {
         this.members.add(clanWarMemberEntity);
         clanWarMemberEntity.changeClanWar(this);
     }
+
+    public boolean isCollected() {
+        return STATE_WAR_COLLECTED.equals(this.state);
+    }
+
+    public void changeStateWarCollected() {
+        this.state = STATE_WAR_COLLECTED;
+    }
+
+    public static final String STATE_WAR_COLLECTED = "warCollected";
 }

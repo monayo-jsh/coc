@@ -89,8 +89,6 @@ public class ClansService {
     private final PlayersService playersService;
     private final PlayerResponseConverter playerResponseConverter;
 
-    private final TimeConverter timeConverter;
-
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -106,8 +104,7 @@ public class ClansService {
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
 
         if (clanCurrentWar.isNotNotInWar()) {
-            writeClanWarResult(clanTag, clanCurrentWar);
-            clanWarService.mergeClanWar(clanCurrentWar);
+            clanWarService.saveCurrentClanWar(clanCurrentWar);
         }
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);
@@ -591,28 +588,6 @@ public class ClansService {
         }
 
         return clanCurrentWarResConverter.convert(clanWar);
-    }
-
-    final String CLAN_WAR_ROOT_DIR = "./clan-war";
-    final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
-    private void writeClanWarResult(String clanTag, ClanWar clanWar) {
-        try {
-            // directory: ./clan-war/{clanTag}
-            final String path = CLAN_WAR_GROUP_DIR.replace("{clanTag}", clanTag);
-
-            ClassPathResource resource = checkAndMakeDirectory(path);
-
-            long startTimeMilliSec = timeConverter.toEpochMilliSecond(clanWar.getStartTime());
-            LocalDate startDate = timeConverter.toLocalDate(startTimeMilliSec);
-            String fileName = startDate.format(DateTimeFormatter.BASIC_ISO_DATE);
-
-            File file = new File(resource.getPath(), makeJsonFileName(fileName));
-            makeEmptyFile(file);
-
-            writeFile(file, clanWar);
-        } catch (IOException e) {
-            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
-        }
     }
 
     final String LEAGUE_WAR_ROOT_DIR = "./war-league";

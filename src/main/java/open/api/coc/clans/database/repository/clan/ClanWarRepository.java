@@ -19,7 +19,12 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
     @Query("select clanWar from ClanWarEntity clanWar where clanWar.endTime < :now and clanWar.state != :state")
     List<ClanWarEntity> findAfterEndTimeAndNotState(LocalDateTime now, String state);
 
-    @Query("SELECT max(clanWarMemberAttack.id.tag) as tag, max(player.name) as name, sum(clanWarMemberAttack.stars) as score, avg(clanWarMemberAttack.duration) as duration, max(clan.name) as clanName"
+    @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
+        + "         max(player.name) as name, "
+        + "         sum(clanWarMemberAttack.stars) as score, "
+        + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
+        + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         max(clan.name) as clanName"
         + " FROM ClanWarEntity clanWar"
         + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
         + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
@@ -27,7 +32,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag"
         + " WHERE clanWar.state = 'warCollected'"
         + " AND clanWar.endTime between :startTime and :endTime"
-        + " group by clanWarMemberAttack.id.warId, clanWarMemberAttack.id.tag"
-        + " order by score desc, duration")
+        + " group by clanWarMemberAttack.id.tag"
+        + " order by score desc, destructionPercentage desc, duration")
     List<RankingHallOfFame> selectRankingClanWarStars(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 }

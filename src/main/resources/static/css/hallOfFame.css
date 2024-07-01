@@ -89,17 +89,44 @@ body {
           .td-wrap {
             display: flex;
             justify-content: center;
+            align-items: center;
+          }
+
+          .td-wrap:not(:first-child) {
+            margin-top: 3px;
           }
         }
 
         .table-td.empty {
           font-size: 13px;
-          height: 300px;
+          height: 461.5px;
+        }
+
+        @media (max-width: 400px) {
+          .table-td.empty {
+            font-size: 13px;
+            height: 100px;
+          }
         }
       }
     }
   }
 
+}
+
+i.fa-star {
+  margin-right: 5px;
+  color: gold;
+}
+
+div.icon.trophies,
+div.icon-sword,
+div.icon-damage,
+div.icon-clock,
+div.icon-clan-capital {
+  margin-right: 5px;
+  width: 18px;
+  height: 16px;
 }
 
 i.first-place {

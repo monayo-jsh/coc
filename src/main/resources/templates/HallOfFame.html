@@ -40,11 +40,12 @@
       const rankingRow = document.importNode(rankingRowTemplate.content, true);
       const row = rankingRow.querySelector('.table-tr');
 
-      const { rank, name, score } = rowData;
+      const { rank, name, score, icon_class_name } = rowData;
 
       row.innerHTML = row.innerHTML
                          .replace(/{RANK}/, rank)
                          .replace(/{NAME}/, name)
+                         .replace(/{ICON_CLASS_NAME}/, icon_class_name)
                          .replace(/{SCORE}/, score);
 
       row.classList.add(`rank-${rank}`);
@@ -60,19 +61,20 @@
       return row;
     }
 
-    function convHallOfFameRankingItem(rank, name, score) {
+    function convHallOfFameRankingItem(rank, name, score, iconClassName) {
       return {
         rank: rank,
         name: name,
-        score: score
+        score: score,
+        icon_class_name: iconClassName
       };
     }
 
-    function renderRankings(sectionClassName, players) {
+    function renderRankings(sectionClassName, players, iconClassName) {
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
       let rank = 1;
       for(const player of players) {
-        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString());
+        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
         const row = makeRankRow(rowData);
         rankingTbody.appendChild(row);
         rank++;
@@ -84,13 +86,14 @@
       const rankingRow = document.importNode(rankingRowTemplate.content, true);
       const row = rankingRow.querySelector('.table-tr');
 
-      const { rank, name, clan_name, score, duration } = rowData;
+      const { rank, name, clan_name, score, destruction_percentage, duration } = rowData;
 
       row.innerHTML = row.innerHTML
                          .replace(/{RANK}/, rank)
                          .replace(/{NAME}/, name)
                          .replace(/{CLAN_NAME}/, clan_name)
                          .replace(/{SCORE}/, score)
+                         .replace(/{DESTRUCTION_PERCENTAGE}/, destruction_percentage)
                          .replace(/{DURATION}/, duration);
 
       row.classList.add(`rank-${rank}`);
@@ -106,12 +109,13 @@
       return row;
     }
 
-    function convHallOfFameRankingClanWarItem(rank, name, clanName, score, duration) {
+    function convHallOfFameRankingClanWarItem(rank, name, clanName, score, destructionPercentage, duration) {
       return {
         rank: rank,
         name: name,
         clan_name: clanName,
         score: score,
+        destruction_percentage: destructionPercentage,
         duration: duration
       };
     }
@@ -132,7 +136,12 @@
 
       let rank = 1;
       for(const player of players) {
-        const rowData = convHallOfFameRankingClanWarItem(rank, player.name, player.clanName, Number(player.score).toLocaleString(), formatMinuteSecond(Number(player.duration)));
+        const rowData = convHallOfFameRankingClanWarItem(
+            rank, player.name, player.clanName,
+            Number(player.score).toLocaleString(),
+            Number(player.destructionPercentage),
+            formatMinuteSecond(Number(player.duration))
+        );
         const row = makeRankClanWarRow(rowData);
         rankingTbody.appendChild(row);
         rank++;
@@ -141,28 +150,34 @@
 
     async function fetchRaidCurrentSeason() {
       const rankings = await fetchRankingRaidCurrentSeason();
-      renderRankings('raid-current-season', rankings);
+      renderRankings('raid-current-season', rankings, 'icon-clan-capital');
     }
 
     async function fetchRaidAverageSeason() {
       const rankings = await fetchRankingRaidAverageSeason();
-      renderRankings('raid-average-season', rankings);
+      renderRankings('raid-average-season', rankings, 'icon-clan-capital');
     }
 
     async function fetchCurrentTrophies() {
       const rankings = await fetchRankingPlayerTrophies();
-      renderRankings('current-trophies', rankings);
+      renderRankings('current-trophies', rankings, 'icon trophies');
     }
 
     async function fetchCurrentAttackWins() {
       const rankings = await fetchRankingPlayerAttackWins();
-      renderRankings('current-attack-wins', rankings);
+      renderRankings('current-attack-wins', rankings, 'icon-sword');
     }
 
     async function fetchThisMonthClanWarStars() {
       const searchMonth = dayjs().format('YYYY-MM-DD');
       const rankings = await fetchRankingClanWarStars(searchMonth);
       renderRankingsClanWar('this-month-clan-war-stars', rankings)
+    }
+
+    async function fetchLastMonthClanWarStars() {
+      const searchMonth = dayjs().add(-1, 'month').format('YYYY-MM-DD');
+      const rankings = await fetchRankingClanWarStars(searchMonth);
+      renderRankingsClanWar('last-month-clan-war-stars', rankings)
     }
 
     window.onload = async () => {
@@ -172,6 +187,7 @@
 
       //클랜전 부문
       fetchThisMonthClanWarStars();
+      fetchLastMonthClanWarStars();
 
       //습격전 부문
       fetchRaidCurrentSeason();
@@ -247,8 +263,25 @@
                 <tr class="table-tr">
                   <th class="table-th">순위</th>
                   <th class="table-th">이름</th>
-                  <th class="table-th">클랜</th>
-                  <th class="table-th">총 획득별<br/>(평균 완파시간)</th>
+                  <th class="table-th">총 획득별</th>
+                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section last-month-clan-war-stars">
+            <div class="sub-title">지난달 획득별 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">총 획득별</th>
+                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
                 </tr>
                 </thead>
                 <tbody class="table-tbody"></tbody>
@@ -307,15 +340,15 @@
   <tr class="table-tr">
     <td class="table-td rank">{RANK}</td>
     <td class="table-td name">{NAME}</td>
-    <td class="table-td">{SCORE}</td>
+    <td class="table-td"><div class="td-wrap"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div></td>
   </tr>
 </template>
 <template id="ranking-clan-war-row-template">
   <tr class="table-tr">
     <td class="table-td rank">{RANK}</td>
-    <td class="table-td name">{NAME}</td>
-    <td class="table-td"><div class="td-wrap"><div class="chip bg-green">{CLAN_NAME}</div></div></td>
-    <td class="table-td">{SCORE}<br/>({DURATION})</td>
+    <td class="table-td name"><div class="td-wrap flex-colum">{NAME}<div class="chip bg-green">{CLAN_NAME}</div></div></td>
+    <td class="table-td"><i class="fa-solid fa-star"></i>{SCORE}</td>
+    <td class="table-td"><div class="td-wrap"><div class="icon-damage"></div>{DESTRUCTION_PERCENTAGE} %</div><div class="td-wrap"><div class="icon-clock"></div>{DURATION}</div></td>
   </tr>
 </template>
 <template id="ranking-clan-war-empty-row-template">

@@ -32,7 +32,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
         + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
         + " WHERE clanWar.state = 'warCollected'"
-        + " AND clanWar.endTime between :startTime and :endTime"
+        + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
     List<RankingHallOfFame> selectRankingClanWarStars(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
@@ -51,7 +51,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
         + " WHERE clanWar.clanTag = :clanTag "
         + " AND clanWar.state = 'warCollected'"
-        + " AND clanWar.endTime between :startTime and :endTime"
+        + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
     List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);

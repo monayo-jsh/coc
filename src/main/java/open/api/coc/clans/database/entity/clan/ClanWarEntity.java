@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
@@ -24,7 +25,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_clan_war")
+@Table(
+    name = "tb_clan_war",
+    indexes = {
+        @Index(name = "TCW_IDX_01", columnList = "end_time, clan_tag")
+    }
+)
 public class ClanWarEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

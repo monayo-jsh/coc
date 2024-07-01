@@ -8,6 +8,7 @@ import open.api.coc.clans.service.ClanWarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,9 +19,10 @@ public class ClanWarController {
     private final ClanWarService clanWarService;
 
     @GetMapping("/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFame>> getRankingClanWarStars(LocalDate searchMonth) {
+    public ResponseEntity<List<RankingHallOfFame>> getRankingClanWarStars(@RequestParam LocalDate searchMonth,
+                                                                          @RequestParam String clanTag) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getRankingClanWarStars(searchMonth));
+                             .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag));
     }
 
 }

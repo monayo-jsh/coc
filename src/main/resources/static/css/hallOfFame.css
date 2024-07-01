@@ -30,6 +30,28 @@ body {
   white-space: nowrap;
 }
 
+@media (max-width: 400px) {
+ .support-area {
+   width: 300px;
+ }
+}
+.support-area {
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  .radio-inputs {
+    flex-wrap: nowrap;
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
+}
 .section-wrapper {
   margin-top: 10px;
   display: flex;
@@ -58,7 +80,7 @@ body {
       align-items: center;
 
       .sub-title {
-        font-size: .9em;
+        font-size: .8em;
         font-weight: bold;
       }
 

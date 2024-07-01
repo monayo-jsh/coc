@@ -8,12 +8,14 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/hallOfFame.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/raid.js"></script>
   <script src="/static/js/api/player.js"></script>
+  <script src="/static/js/api/clan.js"></script>
   <script src="/static/js/api/clanWar.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -129,6 +131,9 @@
     function renderRankingsClanWar(sectionClassName, players) {
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
 
+      // clear
+      rankingTbody.innerHTML = '';
+
       if (!players.length) {
         rankingTbody.appendChild(emptyRankClanWarRow());
         return;
@@ -168,16 +173,42 @@
       renderRankings('current-attack-wins', rankings, 'icon-sword');
     }
 
-    async function fetchThisMonthClanWarStars() {
+    async function fetchThisMonthClanWarStars(clanTag) {
       const searchMonth = dayjs().format('YYYY-MM-DD');
-      const rankings = await fetchRankingClanWarStars(searchMonth);
+      const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
       renderRankingsClanWar('this-month-clan-war-stars', rankings)
     }
 
-    async function fetchLastMonthClanWarStars() {
+    async function fetchLastMonthClanWarStars(clanTag) {
       const searchMonth = dayjs().add(-1, 'month').format('YYYY-MM-DD');
-      const rankings = await fetchRankingClanWarStars(searchMonth);
+      const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
       renderRankingsClanWar('last-month-clan-war-stars', rankings)
+    }
+
+    function renderClan(clan) {
+      const { tag, name } = clan;
+      const radioItemTemplate = document.querySelector('#radio-item-template');
+      const radioItem = document.importNode(radioItemTemplate.content, true);
+      const radio = radioItem.querySelector('.radio.item');
+
+      radio.innerHTML = radio.innerHTML
+                             .replace(/{CLAN_TAG}/, tag)
+                             .replace(/{CLAN_NAME}/, name);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      radioInputs.appendChild(radio);
+    }
+    function renderClans(clans) {
+      for(const clan of clans) {
+        renderClan(clan);
+      }
+    }
+
+    async function fetchClanWarStars(type) {
+      let clanTag = type;
+      if (clanTag === 'all') clanTag = '';
+      fetchThisMonthClanWarStars(clanTag);
+      fetchLastMonthClanWarStars(clanTag);
     }
 
     window.onload = async () => {
@@ -186,8 +217,9 @@
       fetchCurrentAttackWins();
 
       //클랜전 부문
-      fetchThisMonthClanWarStars();
-      fetchLastMonthClanWarStars();
+      const warClans = await fetchWarClans();
+      await renderClans(warClans);
+      fetchClanWarStars('all');
 
       //습격전 부문
       fetchRaidCurrentSeason();
@@ -252,6 +284,14 @@
 
       <div class="section-wrapper">
         <div class="section-title">클랜전 부문</div>
+        <div class="support-area">
+          <div class="radio-inputs">
+            <label class="radio item">
+              <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+              <span class="name">전체</span>
+            </label>
+          </div>
+        </div>
 
         <div class="section-contents">
 
@@ -364,5 +404,11 @@
 </template>
 <template id="ranking-third-place-template">
   <i class="fa-solid fa-medal third-place"></i>
+</template>
+<template id="radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
 </template>
 </html>

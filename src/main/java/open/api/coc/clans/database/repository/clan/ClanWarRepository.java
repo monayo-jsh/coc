@@ -29,10 +29,30 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
         + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
         + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
-        + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag"
+        + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
+        + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
         + " WHERE clanWar.state = 'warCollected'"
         + " AND clanWar.endTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
     List<RankingHallOfFame> selectRankingClanWarStars(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+
+    @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
+        + "         max(player.name) as name, "
+        + "         sum(clanWarMemberAttack.stars) as score, "
+        + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
+        + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         max(clan.name) as clanName"
+        + " FROM ClanWarEntity clanWar"
+        + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
+        + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
+        + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
+        + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
+        + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
+        + " WHERE clanWar.clanTag = :clanTag "
+        + " AND clanWar.state = 'warCollected'"
+        + " AND clanWar.endTime between :startTime and :endTime"
+        + " group by clanWarMemberAttack.id.tag"
+        + " order by score desc, destructionPercentage desc, duration")
+    List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
 }

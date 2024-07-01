@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.thymeleaf.util.StringUtils;
 
 @Slf4j
 @Service
@@ -247,11 +248,15 @@ public class ClanWarService {
         }
     }
 
-    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth) {
+    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth, String clanTag) {
         LocalDateTime startTime = getStartTime(searchMonth);
         LocalDateTime endTime = getEndTime(searchMonth);
 
-        return clanWarRepository.selectRankingClanWarStars(startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        if (StringUtils.isEmpty(clanTag)) {
+            return clanWarRepository.selectRankingClanWarStars(startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        }
+
+        return clanWarRepository.selectRankingClanWarStarsByClanTag(startTime, endTime, clanTag, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
     private LocalDateTime getStartTime(LocalDate searchMonth) {

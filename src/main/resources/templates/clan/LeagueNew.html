@@ -619,6 +619,12 @@
         return;
       }
 
+      if (state === 'notInWar') {
+        //전쟁중이 아님
+        leagueWarClanContents.innerHTML = `<div class="fail"><div class="name">${name}</div><div class="reason color-yellow-green">상대 클랜 검색중</div></div>`;
+        return;
+      }
+
       initLeagueClan(leagueClanMap, clans);
       await fetchLeagueClanRoundInfo(leagueClanMap, tag, season, rounds);
 

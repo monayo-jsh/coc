@@ -192,6 +192,9 @@ body::before {
 .color-green {
   color: green !important;
 }
+.color-yellow-green {
+  color: yellowgreen !important;
+}
 .color-gold {
   color: gold !important;
 }

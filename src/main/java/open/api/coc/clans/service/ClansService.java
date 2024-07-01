@@ -51,7 +51,6 @@ import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupRespon
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
-import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -551,6 +550,9 @@ public class ClansService {
             clanCurrentWarLeagueGroup = clanApiService.findClanCurrentWarLeagueGroupBy(clanTag)
                                                       .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
+            if (clanCurrentWarLeagueGroup.isNotInWar()) {
+                clanCurrentWarLeagueGroup.setSeason(season);
+            }
             writeClanWarLeagueSeasonGroup(clanTag, clanCurrentWarLeagueGroup);
         }
 

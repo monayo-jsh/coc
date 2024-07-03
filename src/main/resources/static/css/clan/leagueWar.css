@@ -83,27 +83,28 @@
     font-size: 0.8rem;
 
     .rank {
-      flex: 15px;
+
     }
 
     .badge {
       display: flex;
+      margin-left: 5px;
 
       .clan {
         flex: 10%;
-        width: 35px;
+        width: 25px;
       }
     }
 
     .name {
-      flex: 55%;
+      flex: 100%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
     }
 
     .stars {
-      width: 65px;
+      width: 80px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -119,10 +120,20 @@
     }
 
     .destruction-percentage {
-      background-color: black;
       margin-left: 5px;
       padding: 4px 8px;
       width: 80px;
+      background-color: black;
+    }
+
+    @media (max-width: 400px) {
+      .stars {
+        width: 100px;
+      }
+
+      .destruction-percentage {
+        width: 100px;
+      }
     }
   }
 }
@@ -281,16 +292,17 @@
     font-size: 0.8rem;
 
     .rank {
-      flex: 30px;
+      white-space: nowrap;
     }
 
     .town-hall {
-      flex: 10%;
+      width: 25px;
+      height: 25px;
       margin: 0 5px;
     }
 
     .name {
-      flex: 55%;
+      flex: 100%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -325,6 +337,18 @@
       width: 55px;
       display: flex;
       justify-content: center;
+    }
+
+    @media (max-width: 400px) {
+      .stars {
+        width: 100px;
+      }
+      .destruction-percentage {
+        width: 100px;
+      }
+      .attacks {
+        width: 80px;
+      }
     }
   }
 }

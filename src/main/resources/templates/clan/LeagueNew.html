@@ -445,12 +445,19 @@
 
       let rank = 0;
       for(const [key, value] of sortedRankMap) {
+
+        ++rank;
+
         const leagueDashboardRow = document.importNode(leagueDashboardRowTemplate.content, true);
         const row = leagueDashboardRow.querySelector('.row');
 
         const { badgeUrls, name, totalStars, totalDestructionPercentage, tag } = value;
+
+        //dataset
+        value.rank = rank;
+
         row.innerHTML = row.innerHTML
-                           .replace(/{RANK}/, ++rank)
+                           .replace(/{RANK}/, rank)
                            .replace(/{NAME}/, name)
                            .replace(/{STARS}/,totalStars)
                            .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage);
@@ -722,6 +729,25 @@
       showElement(clanWarCard.querySelector('.member-attack-wrapper'));
     }
 
+    function drawClanRank(clanTag) {
+      const clan = clanLeagueInfoMap.get(clanTag);
+
+      const { tag, badgeUrls, rank, totalStars, totalDestructionPercentage } = clan;
+      console.log(clan);
+
+      const clanRankElement = document.querySelector(`.league-rank .tag-${removeHashTag(tag)}`);
+
+      const clanIcon = clanRankElement.querySelector('.clan-icon img.clan');
+      clanIcon.src = badgeUrls.small;
+
+      clanRankElement.innerHTML = clanRankElement.innerHTML
+                                                 .replace(/{RANK}/, `${rank}위`)
+                                                 .replace(/{TOTAL_STAR_COUNT}/, totalStars)
+                                                 .replace(/{DESTRUCTION_PERCENTAGE}/, totalDestructionPercentage);
+
+      clanRankElement.classList.remove('display-none');
+    }
+
     async function drawLeagueClanCards(warLeagueClans) {
       if (!warLeagueClans || !warLeagueClans.length) {
         emptyWarLeagueClans();
@@ -750,6 +776,7 @@
           hideClanWarCardLoader(leagueWarClanContents);
           settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));
 
+          drawClanRank(tag);
           drawLeagueRoundState(tag);
         });
       }
@@ -851,6 +878,28 @@
       roundResultElement.classList.remove('display-none');
     }
 
+    function drawLeagueRank(leagueClans) {
+      for(const clan of leagueClans) {
+        const { tag, name, warLeague } = clan;
+
+        const roundWarLeague = drawWarLeague('league-rank', warLeague);
+        const clanRankRow = drawClanRankRow(tag, name);
+
+        roundWarLeague.appendChild(clanRankRow);
+      }
+    }
+
+    function drawClanRankRow(tag, name) {
+      const clanRankRow = document.querySelector('#clan-rank-row');
+      const clanRank = document.importNode(clanRankRow.content, true);
+      const clan = clanRank.querySelector('.clan-rank');
+      clan.innerHTML = clan.innerHTML.replace(/{CLAN_NAME}/, name);
+
+      clan.classList.add(`tag-${removeHashTag(tag)}`);
+
+      return clan;
+    }
+
     async function getClansForLeague() {
       showWifiLoading('.card-container');
       await loadLeagues();
@@ -858,6 +907,7 @@
       hideWifiLoading('.card-container');
 
       const sortedLeagueClans = sortByLeague(warLeagueClans);
+      drawLeagueRank(sortedLeagueClans);
       drawLeagueRounds(sortedLeagueClans);
       await drawLeagueClanCards(sortedLeagueClans);
     }
@@ -923,7 +973,7 @@
       </div>
     </div>
     <div class="contents">
-      <div class="league-rank display-none">리그 순위</div>
+      <div class="league-rank display-none"></div>
       <div class="carousel current-round"></div>
       <div class="round-summary display-none">
       </div>
@@ -938,6 +988,26 @@
     <div class="war-info">
       <div class="img-icon"></div>
       <div class="label">{NAME}</div>
+    </div>
+  </div>
+</template>
+
+<template id="clan-rank-row">
+  <div class="clan-rank display-none">
+    <div class="rank">{RANK}</div>
+    <div class="clan-info">
+      <div class="clan-icon">
+        <img class="clan" alt="">
+      </div>
+      <div class="name">{CLAN_NAME}</div>
+    </div>
+    <div class="stars">
+      <i class="fa-solid fa-star color-gold"></i>
+      <span class="count">{TOTAL_STAR_COUNT}</span>
+    </div>
+    <div class="destruction-percentage">
+      <div class="icon-damage"></div>
+      <span class="count">{DESTRUCTION_PERCENTAGE}%</span>
     </div>
   </div>
 </template>

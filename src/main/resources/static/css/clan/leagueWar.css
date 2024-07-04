@@ -421,6 +421,80 @@
   }
 }
 
+.league-rank {
+
+  .war-league {
+    margin: 5px 0;
+    padding: 10px 0;
+    border-bottom: 2px double black;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .war-info {
+      display: flex;
+      align-items: center;
+
+      .label {
+        margin-left: 5px;
+        font-weight: bold;
+      }
+    }
+
+    .clan-rank {
+      margin-left: 3px;
+      margin-top: 10px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+
+      .stars {
+        margin-top: 2px;
+        margin-left: 10px;
+      }
+
+      .destruction-percentage {
+        margin-top: 2px;
+        margin-left: 10px;
+        display: flex;
+        align-items: center;
+
+        .icon-damage {
+          width: 15px;
+        }
+
+        .count {
+          margin-left: 5px;
+        }
+      }
+    }
+
+    .clan-info {
+      margin-top: 2px;
+      margin-left: 5px;
+      display: flex;
+      align-items: center;
+
+      .clan-icon {
+        width: fit-content;
+
+        img.clan {
+          width: 25px;
+        }
+      }
+      .name {
+        margin-left: 5px;
+        font-weight: bold;
+        font-size: 14px;
+      }
+    }
+  }
+
+}
+
 .round-summary {
 
   .war-league {

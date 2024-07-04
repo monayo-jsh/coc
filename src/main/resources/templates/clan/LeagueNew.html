@@ -814,6 +814,7 @@
       const warLeagueElement = document.importNode(warLeagueWrap.content, true);
       const element = warLeagueElement.querySelector('.war-league');
       element.classList.add(warLeagueIconClassName);
+      element.innerHTML = element.innerHTML.replace(/{NAME}/, convLeagueName(name));
 
       const imgIcon = element.querySelector('.img-icon');
       imgIcon.classList.add(warLeagueIconClassName);
@@ -934,7 +935,10 @@
 
 <template id="war-league-wrap">
   <div class="war-league">
-    <div class="img-icon"></div>
+    <div class="war-info">
+      <div class="img-icon"></div>
+      <div class="label">{NAME}</div>
+    </div>
   </div>
 </template>
 

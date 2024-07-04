@@ -311,7 +311,7 @@
       for (const round of rounds) {
         const { warTags } = round;
 
-          // 전쟁태그 없는 경우
+        // 전쟁태그 없는 경우
         if (warTags.filter(warTag => warTag === '#0').length > 0) continue;
 
         const currentWarLeagueRounds = await fetchCurrentWarLeagueRound(warTags, clanTag, season)
@@ -507,22 +507,45 @@
       return cell;
     }
 
+    function drawLeagueRoundRow(leagueClanRecord) {
+      const leagueRoundRow = document.querySelector('#league-round-row');
+      const roundRow = document.importNode(leagueRoundRow.content, true);
+      const row = roundRow.querySelector('.round');
+      const roundResult = leagueClanRecord.querySelector('.round-result');
+      const round = roundResult.children.length + 1;
+      row.innerHTML = row.innerHTML.replace(/{ROUND}/, round);
+      roundResult.appendChild(row);
+      return row;
+    }
+
     function drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo) {
-      const { rounds } = clanWarLeagueInfo;
+      const { rounds, round_size } = clanWarLeagueInfo;
       const leagueClanRecord = leagueWarClanContents.querySelector('.league-clan-record');
 
+      const leagueRoundRows = [];
+      for (let i=0; i<round_size; i++) {
+        leagueRoundRows.push(drawLeagueRoundRow(leagueClanRecord));
+      }
+
+      let roundIndex = -1;
       for(const round of rounds) {
+        roundIndex++;
+
         const { state, clan, opponent } = round;
 
         //준비중인 라운드는 제외
         if (state === 'preparation') continue;
+
+        const isResult = isClanWarResult(clan, opponent);
+
+        leagueRoundRows[roundIndex].classList.add(isResult);
 
         const clanCell = makeClanRecordCell(clan);
         const opponentCell = makeClanRecordCell(opponent);
         opponentCell.classList.add('opponent');
 
         const row = document.createElement('div');
-        row.classList.add('row', isClanWarResult(clan, opponent));
+        row.classList.add('row', isResult);
         row.appendChild(clanCell);
         row.appendChild(opponentCell)
 
@@ -631,6 +654,8 @@
       leagueClanMap.forEach(calcLeagueWarResult)
 
       const clanWarLeagueInfo = leagueClanMap.get(tag);
+      clanWarLeagueInfo.round_size = rounds.length;
+
       let drawRound = findDrawRound(clanWarLeagueInfo);
       drawLeagueWarRound(leagueWarClanContents, drawRound);
 
@@ -805,6 +830,7 @@
       <div class="clan-war" data-clan-tag="{CLAN_TAG}" data-clan-name="{CLAN_NAME}">
 
         <div class="summary">
+
           <div class="button-wrapper display-none">
             <button class="refresh" onclick="refreshWarStatus(this); return false;">
               <svg
@@ -825,6 +851,7 @@
               </svg>
             </button>
           </div>
+
           <div class="clan">
 
             <div class="name">{CLAN_NAME}</div>
@@ -939,7 +966,9 @@
         </div>
 
         <div class="league-dashboard"></div>
-        <div class="league-clan-record"></div>
+        <div class="league-clan-record">
+          <div class="round-result"></div>
+        </div>
         <div class="league-member-record"></div>
         <div class="member-attack-wrapper">
           <div class="sub-summary">
@@ -1023,6 +1052,13 @@
       <img>
     </div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+  </div>
+</template>
+
+<template id="league-round-row">
+  <div class="round">
+    <span class="label">{ROUND}</span>
+    <i class="fa-regular fa-square-check"></i>
   </div>
 </template>
 

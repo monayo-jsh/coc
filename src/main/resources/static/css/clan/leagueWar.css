@@ -143,6 +143,35 @@
   flex-direction: column;
   margin-top: 5px;
 
+  .round-result {
+    display: flex;
+    justify-content: space-evenly;
+
+    .round {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #ffc251;
+
+      .label {
+        font-size: 12px;
+        font-weight: bold;
+        width: 14px;
+        height: 16px;
+        text-align: center;
+      }
+    }
+    .round.win {
+      color: darkgreen;
+    }
+    .round.lose {
+      color: darkred;
+    }
+    .round.tie {
+      color: #0000007a;
+    }
+  }
+
   @media (max-width: 400px) {
     .row {
       flex-direction: column;

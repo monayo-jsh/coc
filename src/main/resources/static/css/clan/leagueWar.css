@@ -47,7 +47,6 @@
   margin-top: 5px;
 
   .radio-inputs {
-
     input:checked + .name {
       color: white;
       background-color: #6a0000;
@@ -381,7 +380,9 @@
   margin-top: 5px;
 
   .radio-inputs {
+    font-size: 11px;
     flex-wrap: nowrap;
+
     .name {
       color: black;
     }

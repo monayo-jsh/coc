@@ -130,6 +130,10 @@ body::before {
   background-position: center;
 }
 
+.font-nowrap {
+  white-space: nowrap !important;
+}
+
 .text-align-center {
   text-align: center;
 }

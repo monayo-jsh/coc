@@ -491,21 +491,38 @@
       };
     }
 
+    function makeSummaryStar(summaryStar) {
+      const summaryStarsTemplate = document.querySelector('#summary-stars');
+      const summaryStars = document.importNode(summaryStarsTemplate.content, true);
+      const stars = summaryStars.querySelector('.stars');
+
+      const { three, two, one, zero } = summaryStar;
+
+      stars.innerHTML = stars.innerHTML
+                           .replace(/{THREE}/, three)
+                           .replace(/{TWO}/, two)
+                           .replace(/{ONE}/, one)
+                           .replace(/{ZERO}/, zero);
+
+      return stars;
+    }
+
     function makeClanRecordCell(clan) {
       const leagueClanRecordCellTemplate = document.querySelector('#league-clan-record-cell');
       const leagueClanRecordCell = document.importNode(leagueClanRecordCellTemplate.content, true);
       const cell = leagueClanRecordCell.querySelector('.cell');
 
       const { name, badge, stars, attacks, members } = clan;
-      const { three, two, one, zero } = calcStars(members);
+
       cell.innerHTML = cell.innerHTML
                          .replace(/{NAME}/, name)
                          .replace(/{STARS}/,stars)
-                         .replace(/{ATTACKS}/, attacks)
-                         .replace(/{THREE}/, three)
-                         .replace(/{TWO}/, two)
-                         .replace(/{ONE}/, one)
-                         .replace(/{ZERO}/, zero);
+                         .replace(/{ATTACKS}/, attacks);
+
+      const summaryStar = calcStars(members);
+      const summaryStarElement = makeSummaryStar(summaryStar)
+      const summaryStars = cell.querySelector('.summary');
+      summaryStars.appendChild(summaryStarElement);
 
       const { small } = badge;
       const icon = cell.querySelector('.badge .clan');
@@ -575,6 +592,18 @@
         value.totalDestructionPercentage = 0;
         value.useAttacks = 0;
         value.totalAttacks = 0;
+        value.summaryAttackStar = {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        }
+        value.summaryDefenseStar = {
+          "0": 0,
+          "1": 0,
+          "2": 0,
+          "3": 0
+        }
       }
     }
 
@@ -588,17 +617,37 @@
 
         const { members } = clan;
         for(const member of members) {
-          const { tag, attacks } = member;
-            const memberRecord = leagueMemberMap.get(tag);
-            memberRecord.totalAttacks += 1;
-            const [attack]= attacks;
-            if (attack) {
-              memberRecord.useAttacks += 1;
-              memberRecord.totalStars += attack.stars;
-              memberRecord.totalDestructionPercentage += attack.destructionPercentage;
-            }
+          const { tag, attacks, bestOpponentAttack } = member;
+          const memberRecord = leagueMemberMap.get(tag);
+
+          memberRecord.assignedLeague = {
+            tag: clan.tag,
+            name: clan.name
+          };
+
+          // 공격 dataset
+          memberRecord.totalAttacks += 1;
+          const [attack]= attacks;
+          if (attack) {
+            memberRecord.useAttacks += 1;
+            memberRecord.totalStars += attack.stars;
+            memberRecord.totalDestructionPercentage += attack.destructionPercentage;
+            memberRecord.summaryAttackStar[String(attack.stars)]++;
+          }
+
+          // 방어 dataset
+          if (bestOpponentAttack) {
+            memberRecord.summaryDefenseStar[String(bestOpponentAttack.stars)]++;
+          }
         }
       }
+    }
+
+    const memberLeagueInfoMap = new Map();
+
+    function appendSummaryStar(row, className, summaryStar) {
+      const targetElement = row.querySelector(`.member-summary.${className}`);
+      targetElement.appendChild(summaryStar);
     }
 
     function drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, clanTag) {
@@ -606,6 +655,11 @@
 
       const leagueMemberMap = convertArrayToMapByKey(leagueClan.memberList);
       calcMemberRecord(leagueMemberMap, leagueClan.rounds);
+
+      // dataset;
+      for(const [key, value] of leagueMemberMap) {
+        memberLeagueInfoMap.set(key, value);
+      }
 
       const sortedRankMap = sortedByRank(leagueMemberMap);
       const leagueMemberRecord = leagueWarClanContents.querySelector('.league-member-record');
@@ -733,7 +787,6 @@
       const clan = clanLeagueInfoMap.get(clanTag);
 
       const { tag, badgeUrls, rank, totalStars, totalDestructionPercentage } = clan;
-      console.log(clan);
 
       const clanRankElement = document.querySelector(`.league-rank .tag-${removeHashTag(tag)}`);
 
@@ -743,9 +796,62 @@
       clanRankElement.innerHTML = clanRankElement.innerHTML
                                                  .replace(/{RANK}/, `${rank}위`)
                                                  .replace(/{TOTAL_STAR_COUNT}/, totalStars)
-                                                 .replace(/{DESTRUCTION_PERCENTAGE}/, totalDestructionPercentage);
+                                                 .replace(/{DESTRUCTION_PERCENTAGE}/, Number(totalDestructionPercentage).toLocaleString());
 
       clanRankElement.classList.remove('display-none');
+    }
+
+    function convNumberToString(summaryStar) {
+      return {
+        three: summaryStar[3],
+        two: summaryStar[2],
+        one: summaryStar[1],
+        zero: summaryStar[0],
+      };
+    }
+
+    function renderMemberRank() {
+
+      // 리그전 현황 조회가 완료되었는지 판단
+      for(const [key, value] of isLoadedMap) {
+        if (!value) return;
+      }
+
+      const memberRankElement = document.querySelector('.member-rank');
+      const leagueMemberRankRowTemplate = document.querySelector('#league-member-rank-row');
+
+      const sortedMemberRankMap = sortedByRank(memberLeagueInfoMap);
+      for(const [key, value] of sortedMemberRankMap) {
+        const leagueMemberRankRow = document.importNode(leagueMemberRankRowTemplate.content, true);
+        const row = leagueMemberRankRow.querySelector('.row');
+
+        const { tag, name, assignedLeague, townHallLevel, totalStars, totalDestructionPercentage, useAttacks, totalAttacks, summaryAttackStar, summaryDefenseStar } = value;
+
+        if (!assignedLeague) {
+          // 공격 이력 없으면
+          continue;
+        }
+
+        row.innerHTML = row.innerHTML
+                           .replace(/{NAME}/, name)
+                           .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
+                           .replace(/{CLAN_NAME}/, assignedLeague ? assignedLeague.name : "")
+                           .replace(/{STARS}/,totalStars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/,totalDestructionPercentage)
+                           .replace(/{USE_ATTACKS}/,useAttacks)
+                           .replace(/{TOTAL_ATTACKS}/,totalAttacks);
+
+        appendSummaryStar(row, 'attack', makeSummaryStar(convNumberToString(summaryAttackStar)));
+        appendSummaryStar(row, 'defense', makeSummaryStar(convNumberToString(summaryDefenseStar)));
+
+        memberRankElement.appendChild(row);
+      }
+    }
+
+    function drawMemberRank(tag) {
+      isLoadedMap.set(tag, true);
+
+      renderMemberRank();
     }
 
     async function drawLeagueClanCards(warLeagueClans) {
@@ -778,7 +884,8 @@
 
           drawClanRank(tag);
           drawLeagueRoundState(tag);
-        });
+        })
+        .finally(() => drawMemberRank(tag));
       }
     }
 
@@ -900,6 +1007,13 @@
       return clan;
     }
 
+    const isLoadedMap = new Map();
+    function initLeagueMemberRank(leagueClans) {
+      for(const clan of leagueClans) {
+        isLoadedMap.set(clan.tag, false);
+      }
+    }
+
     async function getClansForLeague() {
       showWifiLoading('.card-container');
       await loadLeagues();
@@ -909,6 +1023,7 @@
       const sortedLeagueClans = sortByLeague(warLeagueClans);
       drawLeagueRank(sortedLeagueClans);
       drawLeagueRounds(sortedLeagueClans);
+      initLeagueMemberRank(sortedLeagueClans);
       await drawLeagueClanCards(sortedLeagueClans);
     }
 
@@ -975,9 +1090,8 @@
     <div class="contents">
       <div class="league-rank display-none"></div>
       <div class="carousel current-round"></div>
-      <div class="round-summary display-none">
-      </div>
-      <div class="member-rank display-none">클랜원 현황</div>
+      <div class="round-summary display-none"></div>
+      <div class="member-rank display-none"></div>
     </div>
   </div>
 </section>
@@ -1172,7 +1286,7 @@
 
             <label class="radio">
               <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberRecord(this); return false;">
-              <span class="name">클랜원 순위</span>
+              <span class="name">클랜원 기록</span>
             </label>
 
             <label class="radio">
@@ -1294,26 +1408,7 @@
         <img>
       </div>
     </div>
-    <div class="summary">
-      <div class="stars">
-        <div class="star">
-          <div class="label">3별:</div>
-          <div class="count">{THREE} 개</div>
-        </div>
-        <div class="star">
-          <div class="label">2별:</div>
-          <div class="count">{TWO}개</div>
-        </div>
-        <div class="star">
-          <div class="label">1별:</div>
-          <div class="count">{ONE}개</div>
-        </div>
-        <div class="star">
-          <div class="label">0별:</div>
-          <div class="count">{ZERO}개</div>
-        </div>
-      </div>
-    </div>
+    <div class="summary"></div>
   </div>
 </template>
 
@@ -1323,12 +1418,75 @@
     <div class="town-hall th{TOWN_HALL_LEVEL}"></div>
     <div class="name">{NAME}</div>
     <div class="stars">
-      <span class="count">{STARS}</span>
       <i class="fa-solid fa-star"></i>
-      <img>
+      <span class="count">{STARS}</span>
     </div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
     <div class="attacks">{USE_ATTACKS}/{TOTAL_ATTACKS}</div>
+  </div>
+</template>
+
+<template id="league-member-rank-row">
+  <div class="row">
+    <div class="member-info-wrap">
+      <div class="member-info">
+        <div class="town-hall th{TOWN_HALL_LEVEL}"></div>
+        <div class="name">{NAME}</div>
+        <div class="clan">
+          <div class="chip bg-crimson font-nowrap">{CLAN_NAME}</div>
+        </div>
+      </div>
+
+      <div class="member-result">
+        <div class="stars">
+          <div class="label chip">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <span class="count">{STARS}</span>
+        </div>
+        <div class="destruction-percentage">
+          <div class="label chip">
+            <i class="fa-solid fa-percent"></i>
+          </div>
+          <div class="count">{DESTRUCTION_PERCENTAGE}</div>
+        </div>
+        <div class="attacks">
+          <div class="label chip">
+            <div class="icon-sword"></div>
+          </div>
+          <div class="count">{USE_ATTACKS}/{TOTAL_ATTACKS}</div>
+        </div>
+      </div>
+    </div>
+    <div class="member-summary-wrap">
+      <div class="member-summary attack">
+        <div class="label chip bg-green">공격</div>
+      </div>
+      <div class="member-summary defense">
+        <div class="label chip bg-blue">방어</div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="summary-stars">
+  <div class="stars">
+    <div class="star">
+      <div class="label">3별:</div>
+      <div class="count">{THREE} 개</div>
+    </div>
+    <div class="star">
+      <div class="label">2별:</div>
+      <div class="count">{TWO}개</div>
+    </div>
+    <div class="star">
+      <div class="label">1별:</div>
+      <div class="count">{ONE}개</div>
+    </div>
+    <div class="star">
+      <div class="label">0별:</div>
+      <div class="count">{ZERO}개</div>
+    </div>
   </div>
 </template>
 </html>

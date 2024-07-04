@@ -507,23 +507,29 @@
       return cell;
     }
 
-    function drawLeagueRoundRow(leagueClanRecord) {
+    function drawLeagueRoundRow(element) {
       const leagueRoundRow = document.querySelector('#league-round-row');
       const roundRow = document.importNode(leagueRoundRow.content, true);
       const row = roundRow.querySelector('.round');
-      const roundResult = leagueClanRecord.querySelector('.round-result');
+      const roundResult = element.querySelector('.round-result');
       const round = roundResult.children.length + 1;
+
+      if (round === 1) {
+        // clear
+        roundResult.innerHTML = "";
+      }
+
       row.innerHTML = row.innerHTML.replace(/{ROUND}/, round);
       roundResult.appendChild(row);
       return row;
     }
 
     function drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo) {
-      const { rounds, round_size } = clanWarLeagueInfo;
+      const { rounds, roundSize } = clanWarLeagueInfo;
       const leagueClanRecord = leagueWarClanContents.querySelector('.league-clan-record');
 
       const leagueRoundRows = [];
-      for (let i=0; i<round_size; i++) {
+      for (let i=0; i<roundSize; i++) {
         leagueRoundRows.push(drawLeagueRoundRow(leagueClanRecord));
       }
 
@@ -537,6 +543,9 @@
         if (state === 'preparation') continue;
 
         const isResult = isClanWarResult(clan, opponent);
+
+        // dataset
+        round.warResult = isResult;
 
         leagueRoundRows[roundIndex].classList.add(isResult);
 
@@ -632,6 +641,8 @@
       warLeagueElement.classList.add(warLeagueIconClassName);
     }
 
+    const clanLeagueInfoMap = new Map();
+
     async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name) {
       const leagueClanMap = new Map();
       const clanWarLeague = await fetchClanWarLeague(tag);
@@ -649,12 +660,16 @@
       }
 
       initLeagueClan(leagueClanMap, clans);
+
+      //dataset
+      clanLeagueInfoMap.set(tag, leagueClanMap.get(tag));
+
       await fetchLeagueClanRoundInfo(leagueClanMap, tag, season, rounds);
 
       leagueClanMap.forEach(calcLeagueWarResult)
 
       const clanWarLeagueInfo = leagueClanMap.get(tag);
-      clanWarLeagueInfo.round_size = rounds.length;
+      clanWarLeagueInfo.roundSize = rounds.length;
 
       let drawRound = findDrawRound(clanWarLeagueInfo);
       drawLeagueWarRound(leagueWarClanContents, drawRound);
@@ -734,6 +749,8 @@
         .then(() => {
           hideClanWarCardLoader(leagueWarClanContents);
           settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));
+
+          drawLeagueRoundState(tag);
         });
       }
     }
@@ -763,13 +780,95 @@
       return warLeagueClans.sort((a, b) => b.warLeague.id - a.warLeague.id || a.order - b.order);
     }
 
+    function drawLeagueRounds(leagueClans) {
+      for(const clan of leagueClans) {
+        const { tag, name, warLeague } = clan;
+
+        const roundWarLeague = drawWarLeague('round-summary', warLeague);
+        const clanRoundStateElement = drawClanRoundState(tag, name);
+
+        roundWarLeague.appendChild(clanRoundStateElement);
+      }
+    }
+
+    function drawClanRoundState(tag, name) {
+      const clanRoundStateRow = document.querySelector('#clan-round-state-row');
+      const clanRoundState = document.importNode(clanRoundStateRow.content, true);
+      const clanRound = clanRoundState.querySelector('.clan-round-state');
+      clanRound.innerHTML = clanRound.innerHTML.replace(/{CLAN_NAME}/, name);
+
+      clanRound.classList.add(`tag-${removeHashTag(tag)}`);
+
+      return clanRound;
+    }
+
+    function drawWarLeague(className, warLeague) {
+      const { name } = warLeague;
+      let warLeagueIconClassName = name.replace(/\s/g, "");
+
+      const contentElement = document.querySelector(`.${className}`);
+      let findWarLeagueElement = contentElement.querySelector(`.${warLeagueIconClassName}`);
+      if (findWarLeagueElement) return findWarLeagueElement;
+
+      const warLeagueWrap = document.querySelector('#war-league-wrap');
+      const warLeagueElement = document.importNode(warLeagueWrap.content, true);
+      const element = warLeagueElement.querySelector('.war-league');
+      element.classList.add(warLeagueIconClassName);
+
+      const imgIcon = element.querySelector('.img-icon');
+      imgIcon.classList.add(warLeagueIconClassName);
+
+      contentElement.appendChild(element);
+
+      return element;
+    }
+
+    async function drawLeagueRoundState(clanTag) {
+      const clan = clanLeagueInfoMap.get(clanTag);
+
+      const { tag, roundSize, rounds, badgeUrls } = clan;
+
+      const roundResultElement = document.querySelector(`.round-summary .tag-${removeHashTag(tag)}`);
+
+      const clanIcon = roundResultElement.querySelector('.clan-icon img.clan');
+      clanIcon.src = badgeUrls.small;
+
+      const leagueRoundRows = [];
+      for (let i=0; i<roundSize; i++) {
+        leagueRoundRows.push(drawLeagueRoundRow(roundResultElement));
+      }
+
+      let roundIndex = -1;
+      for (const round of rounds) {
+        roundIndex++;
+        const { warResult } = round;
+        if (warResult) {
+          leagueRoundRows[roundIndex].classList.add(warResult);
+        }
+      }
+
+      roundResultElement.classList.remove('display-none');
+    }
+
     async function getClansForLeague() {
       showWifiLoading('.card-container');
       await loadLeagues();
       const warLeagueClans = await fetchWarLeagueClans();
       hideWifiLoading('.card-container');
 
-      await drawLeagueClanCards(sortByLeague(warLeagueClans));
+      const sortedLeagueClans = sortByLeague(warLeagueClans);
+      drawLeagueRounds(sortedLeagueClans);
+      await drawLeagueClanCards(sortedLeagueClans);
+    }
+
+    function displayView(type) {
+      const contents = document.querySelector('.contents');
+      for (const child of contents.children) {
+        child.classList.add('display-none');
+      }
+
+      const targetContent = contents.querySelector(`.${type}`);
+      targetContent.classList.remove('display-none');
     }
 
     window.onload = async () => {
@@ -802,10 +901,54 @@
 
   <div class="card-container">
     <div class="card-title bg-crimson">리그전 현황</div>
-    <div class="carousel"></div>
+    <div class="support-area">
+      <div class="radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('league-rank'); return false;">
+          <span class="name">리그 순위</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('current-round'); return false;" checked>
+          <span class="name">진행 라운드</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('round-summary'); return false;">
+          <span class="name">라운드 결과</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('member-rank'); return false;">
+          <span class="name">클랜원 기록</span>
+        </label>
+      </div>
+    </div>
+    <div class="contents">
+      <div class="league-rank display-none">리그 순위</div>
+      <div class="carousel current-round"></div>
+      <div class="round-summary display-none">
+      </div>
+      <div class="member-rank display-none">클랜원 현황</div>
+    </div>
   </div>
 </section>
 </body>
+
+<template id="war-league-wrap">
+  <div class="war-league">
+    <div class="img-icon"></div>
+  </div>
+</template>
+
+<template id="clan-round-state-row">
+  <div class="clan-round-state display-none">
+    <div class="clan-info">
+      <div class="clan-icon">
+        <img class="clan" alt="">
+      </div>
+      <div class="name">{CLAN_NAME}</div>
+    </div>
+    <div class="round-result"></div>
+  </div>
+</template>
 
 <template id="section-clan-war">
   <div class="section-clan-war">

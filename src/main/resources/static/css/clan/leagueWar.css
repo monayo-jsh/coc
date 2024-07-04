@@ -143,35 +143,6 @@
   flex-direction: column;
   margin-top: 5px;
 
-  .round-result {
-    display: flex;
-    justify-content: space-evenly;
-
-    .round {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: #ffc251;
-
-      .label {
-        font-size: 12px;
-        font-weight: bold;
-        width: 14px;
-        height: 16px;
-        text-align: center;
-      }
-    }
-    .round.win {
-      color: darkgreen;
-    }
-    .round.lose {
-      color: darkred;
-    }
-    .round.tie {
-      color: #0000007a;
-    }
-  }
-
   @media (max-width: 400px) {
     .row {
       flex-direction: column;
@@ -387,4 +358,104 @@
 }
 .row.lose {
   background-color: darkred;
+}
+
+.card-contents:not(:first-child) {
+  margin-top: unset !important;
+}
+
+.section-clan-war {
+  margin-top: 5px;
+}
+
+.season {
+  width: 100%;
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+}
+.support-area {
+  margin-top: 5px;
+
+  .radio-inputs {
+    flex-wrap: nowrap;
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
+}
+
+.round-result {
+  display: flex;
+  justify-content: space-evenly;
+  font-size: 12px;
+  font-weight: bold;
+
+  .round {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #ffc251;
+
+    .label {
+      font-size: 12px;
+      font-weight: bold;
+      width: 14px;
+      height: 16px;
+      text-align: center;
+    }
+  }
+  .round.win {
+    color: darkgreen;
+  }
+  .round.lose {
+    color: orangered;
+  }
+  .round.tie {
+    color: #0000007a;
+  }
+}
+
+.round-summary {
+
+  .war-league {
+    margin: 5px 0;
+    padding: 10px 0;
+    border-bottom: 2px double black;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .clan-round-state {
+      margin-top: 10px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      .clan-info {
+        display: flex;
+        align-items: center;
+
+        .clan-icon {
+          width: fit-content;
+
+          img.clan {
+            width: 25px;
+          }
+        }
+        .name {
+          margin-left: 5px;
+          font-weight: bold;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
 }

@@ -130,6 +130,10 @@ body::before {
   background-position: center;
 }
 
+.mt-5 {
+  margin-top: 5px;
+}
+
 .font-nowrap {
   white-space: nowrap !important;
 }

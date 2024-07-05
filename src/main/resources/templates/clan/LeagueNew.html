@@ -543,9 +543,32 @@
         roundResult.innerHTML = "";
       }
 
-      row.innerHTML = row.innerHTML.replace(/{ROUND}/, round);
+      row.innerHTML = row.innerHTML
+                         .replace(/{ROUND}/, round);
       roundResult.appendChild(row);
       return row;
+    }
+
+    function convWarResultName(resultStr) {
+      switch (resultStr) {
+        case "win": return "승";
+        case "lose": return "패";
+        case "tie": return "무";
+      }
+      return resultStr;
+    }
+
+    function convertStateAndDisplay(leagueRoundRow, resultStr, state) {
+      leagueRoundRow.classList.add(resultStr);
+      leagueRoundRow.innerHTML = leagueRoundRow.innerHTML
+                                               .replace(/{STATE}/, state);
+
+      const stateElement = leagueRoundRow.querySelector('.state');
+      stateElement.classList.remove('display-none');
+
+      if (state === '진행중') {
+        stateElement.classList.add('color-black');
+      }
     }
 
     function drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo) {
@@ -571,7 +594,11 @@
         // dataset
         round.warResult = isResult;
 
-        leagueRoundRows[roundIndex].classList.add(isResult);
+        let stateName = convWarResultName(isResult);
+        if (state === 'inWar') {
+          stateName = '진행중';
+        }
+        convertStateAndDisplay(leagueRoundRows[roundIndex], isResult, stateName);
 
         const clanCell = makeClanRecordCell(clan);
         const opponentCell = makeClanRecordCell(opponent);
@@ -976,9 +1003,13 @@
       let roundIndex = -1;
       for (const round of rounds) {
         roundIndex++;
-        const { warResult } = round;
+        const { state, warResult } = round;
         if (warResult) {
-          leagueRoundRows[roundIndex].classList.add(warResult);
+          let stateName = convWarResultName(warResult);
+          if (state === 'inWar') {
+            stateName = '진행중';
+          }
+          convertStateAndDisplay(leagueRoundRows[roundIndex], warResult, stateName);
         }
       }
 
@@ -1390,6 +1421,7 @@
   <div class="round">
     <span class="label">{ROUND}</span>
     <i class="fa-regular fa-square-check"></i>
+    <span class="label display-none state mt-5">{STATE}</span>
   </div>
 </template>
 

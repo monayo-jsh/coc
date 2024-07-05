@@ -1,3 +1,26 @@
+.icon {
+  width: 15px;
+  height: 15px;
+}
+.icon.promoted {
+  background-image: url("/static/images/etc/wl_icon_promoted.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.icon.demoted {
+  background-image: url("/static/images/etc/wl_icon_demoted.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.icon.stay {
+  background-image: url("/static/images/etc/wl_icon_stay.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .fail {
   display: flex;
   justify-content: center;
@@ -82,7 +105,6 @@
     font-size: 0.8rem;
 
     .rank {
-
     }
 
     .badge {
@@ -454,6 +476,10 @@
       align-items: center;
       font-size: 14px;
       font-weight: bold;
+
+      .rank {
+        margin-left: 5px;
+      }
 
       .stars {
         margin-top: 2px;

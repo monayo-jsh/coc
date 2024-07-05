@@ -296,6 +296,7 @@
       for(const clan of clans) {
         // 라운드 별 dataset
         clan.rounds = [];
+        clan.leagueClanCount = clans.length;
         leagueClanMap.set(clan.tag, clan);
       }
     }
@@ -810,16 +811,127 @@
       showElement(clanWarCard.querySelector('.member-attack-wrapper'));
     }
 
+    function getWarLeagueCriteria(warLeagueName, rank, leagueClanCount) {
+      switch (warLeagueName) {
+        case 'ChampionLeagueI': {
+          // 강등 기준
+          const demotedCriteria = 3;
+          const demotedRank = leagueClanCount - demotedCriteria;
+          if (demotedRank < rank) {
+            // 강등권 순위 표기
+            return 'demoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+        case 'ChampionLeagueII':
+        case 'ChampionLeagueIII':
+        case 'MasterLeagueI':
+        case 'MasterLeagueII':
+        case 'MasterLeagueIII': {
+          // 승급 기준
+          const promotedCriteria = 1;
+          if (rank === promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+          // 강등 기준
+          const demotedCriteria = 2;
+          const demotedRank = leagueClanCount - demotedCriteria;
+          if (demotedRank < rank) {
+            // 강등권 순위 표기
+            return 'demoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+        case 'CrystalLeagueI':
+        case 'CrystalLeagueII':
+        case 'CrystalLeagueIII':
+        case 'GoldLeagueI':
+        case 'GoldLeagueII':
+        case 'GoldLeagueIII':
+        case 'SilverLeagueI':
+        case 'SilverLeagueII':
+        case 'SilverLeagueIII': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank < promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+          // 강등 기준
+          const demotedCriteria = 2;
+          const demotedRank = leagueClanCount - demotedCriteria;
+          if (demotedRank < rank) {
+            // 강등권 순위 표기
+            return 'demoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+        case 'BronzeLeagueI':
+        case 'BronzeLeagueII': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank < promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+          // 강등 기준
+          const demotedCriteria = 1;
+          const demotedRank = leagueClanCount - demotedCriteria;
+          if (demotedRank === rank) {
+            // 강등권 순위 표기
+            return 'demoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+        case 'BronzeLeagueIII': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank < promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+      }
+
+      return 'stay';
+    }
+
+    function convPromotedOrDemotedOrStay(clanRankElement, rank, leagueClanCount) {
+      const warLeagueElement = clanRankElement.closest('.war-league');
+      const warLeagueName = warLeagueElement.classList.value.replace('war-league ', '');
+      const criteria = getWarLeagueCriteria(warLeagueName, rank, leagueClanCount);
+
+      const wlIconTemplate = document.querySelector(`#wl-icon-${criteria}`);
+      const wlIcon = document.importNode(wlIconTemplate.content, true);
+
+      const promotionDemotion = clanRankElement.querySelector('.promotion-demotion');
+      promotionDemotion.appendChild(wlIcon);
+    }
+
     function drawClanRank(clanTag) {
       const clan = clanLeagueInfoMap.get(clanTag);
 
-      const { tag, badgeUrls, rank, totalStars, totalDestructionPercentage } = clan;
+      const { tag, badgeUrls, rank, leagueClanCount, totalStars, totalDestructionPercentage } = clan;
 
       const clanRankElement = document.querySelector(`.league-rank .tag-${removeHashTag(tag)}`);
 
       const clanIcon = clanRankElement.querySelector('.clan-icon img.clan');
       clanIcon.src = badgeUrls.small;
 
+      convPromotedOrDemotedOrStay(clanRankElement, rank, leagueClanCount);
+      
       clanRankElement.innerHTML = clanRankElement.innerHTML
                                                  .replace(/{RANK}/, `${rank}위`)
                                                  .replace(/{TOTAL_STAR_COUNT}/, totalStars)
@@ -1139,6 +1251,7 @@
 
 <template id="clan-rank-row">
   <div class="clan-rank display-none">
+    <div class="promotion-demotion"></div>
     <div class="rank">{RANK}</div>
     <div class="clan-info">
       <div class="clan-icon">
@@ -1520,5 +1633,15 @@
       <div class="count">{ZERO}개</div>
     </div>
   </div>
+</template>
+
+<template id="wl-icon-promoted">
+  <div class="icon promoted"></div>
+</template>
+<template id="wl-icon-demoted">
+  <div class="icon demoted"></div>
+</template>
+<template id="wl-icon-stay">
+  <div class="icon stay"></div>
 </template>
 </html>

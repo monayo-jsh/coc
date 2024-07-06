@@ -105,6 +105,7 @@
     font-size: 0.8rem;
 
     .rank {
+      margin-left: 5px;
     }
 
     .badge {
@@ -149,11 +150,11 @@
 
     @media (max-width: 400px) {
       .stars {
-        width: 100px;
+        width: 110px;
       }
 
       .destruction-percentage {
-        width: 100px;
+        width: 110px;
       }
     }
   }

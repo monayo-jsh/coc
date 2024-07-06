@@ -292,11 +292,12 @@
       cardContents.classList.remove('opacity-0');
     }
 
-    function initLeagueClan(leagueClanMap, clans) {
+    function initLeagueClan(leagueClanMap, warLeague, clans) {
       for(const clan of clans) {
         // 라운드 별 dataset
         clan.rounds = [];
         clan.leagueClanCount = clans.length;
+        clan.warLeague = _.cloneDeep(warLeague);
         leagueClanMap.set(clan.tag, clan);
       }
     }
@@ -452,10 +453,12 @@
         const leagueDashboardRow = document.importNode(leagueDashboardRowTemplate.content, true);
         const row = leagueDashboardRow.querySelector('.row');
 
-        const { badgeUrls, name, totalStars, totalDestructionPercentage, tag } = value;
+        const { badgeUrls, name, warLeague, leagueClanCount, totalStars, totalDestructionPercentage, tag } = value;
 
         //dataset
         value.rank = rank;
+
+        convPromotedOrDemotedOrStay(row, warLeague, rank, leagueClanCount);
 
         row.innerHTML = row.innerHTML
                            .replace(/{RANK}/, rank)
@@ -732,7 +735,7 @@
 
     const clanLeagueInfoMap = new Map();
 
-    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name) {
+    async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name, warLeague) {
       const leagueClanMap = new Map();
       const clanWarLeague = await fetchClanWarLeague(tag);
       const { state, season, clans, rounds } = clanWarLeague;
@@ -748,7 +751,7 @@
         return;
       }
 
-      initLeagueClan(leagueClanMap, clans);
+      initLeagueClan(leagueClanMap, warLeague, clans);
 
       //dataset
       clanLeagueInfoMap.set(tag, leagueClanMap.get(tag));
@@ -813,9 +816,57 @@
 
     function getWarLeagueCriteria(warLeagueName, rank, leagueClanCount) {
       switch (warLeagueName) {
-        case 'ChampionLeagueI': {
+
+        case 'BronzeLeagueIII': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank <= promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+
+        case 'BronzeLeagueII':
+        case 'BronzeLeagueI': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank <= promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+
           // 강등 기준
-          const demotedCriteria = 3;
+          const demotedCriteria = 1;
+          const demotedRank = leagueClanCount - demotedCriteria;
+          if (demotedRank === rank) {
+            // 강등권 순위 표기
+            return 'demoted';
+          }
+
+          // 유지
+          return 'stay';
+        }
+
+        case 'SilverLeagueIII':
+        case 'SilverLeagueII':
+        case 'SilverLeagueI':
+        case 'GoldLeagueIII':
+        case 'GoldLeagueII':
+        case 'GoldLeagueI':
+        case 'CrystalLeagueIII':
+        case 'CrystalLeagueII': {
+          // 승급 기준
+          const promotedCriteria = 2;
+          if (rank <= promotedCriteria) {
+            // 승격 순위 표기
+            return 'promoted';
+          }
+
+          // 강등 기준
+          const demotedCriteria = 2;
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기
@@ -825,11 +876,13 @@
           // 유지
           return 'stay';
         }
-        case 'ChampionLeagueII':
-        case 'ChampionLeagueIII':
-        case 'MasterLeagueI':
+
+        case 'CrystalLeagueI':
+        case 'MasterLeagueIII':
         case 'MasterLeagueII':
-        case 'MasterLeagueIII': {
+        case 'MasterLeagueI':
+        case 'ChampionLeagueIII':
+        case 'ChampionLeagueII': {
           // 승급 기준
           const promotedCriteria = 1;
           if (rank === promotedCriteria) {
@@ -847,23 +900,12 @@
           // 유지
           return 'stay';
         }
-        case 'CrystalLeagueI':
-        case 'CrystalLeagueII':
-        case 'CrystalLeagueIII':
-        case 'GoldLeagueI':
-        case 'GoldLeagueII':
-        case 'GoldLeagueIII':
-        case 'SilverLeagueI':
-        case 'SilverLeagueII':
-        case 'SilverLeagueIII': {
-          // 승급 기준
-          const promotedCriteria = 2;
-          if (rank < promotedCriteria) {
-            // 승격 순위 표기
-            return 'promoted';
-          }
+
+        case 'ChampionLeagueI': {
+          // 승급 없음
+
           // 강등 기준
-          const demotedCriteria = 2;
+          const demotedCriteria = 3;
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기
@@ -873,64 +915,34 @@
           // 유지
           return 'stay';
         }
-        case 'BronzeLeagueI':
-        case 'BronzeLeagueII': {
-          // 승급 기준
-          const promotedCriteria = 2;
-          if (rank < promotedCriteria) {
-            // 승격 순위 표기
-            return 'promoted';
-          }
-          // 강등 기준
-          const demotedCriteria = 1;
-          const demotedRank = leagueClanCount - demotedCriteria;
-          if (demotedRank === rank) {
-            // 강등권 순위 표기
-            return 'demoted';
-          }
 
-          // 유지
-          return 'stay';
-        }
-        case 'BronzeLeagueIII': {
-          // 승급 기준
-          const promotedCriteria = 2;
-          if (rank < promotedCriteria) {
-            // 승격 순위 표기
-            return 'promoted';
-          }
-
-          // 유지
-          return 'stay';
-        }
       }
 
       return 'stay';
     }
 
-    function convPromotedOrDemotedOrStay(clanRankElement, rank, leagueClanCount) {
-      const warLeagueElement = clanRankElement.closest('.war-league');
-      const warLeagueName = warLeagueElement.classList.value.replace('war-league ', '');
+    function convPromotedOrDemotedOrStay(row, warLeague, rank, leagueClanCount) {
+      const warLeagueName = warLeague.name.replace(/\s/g, "");
       const criteria = getWarLeagueCriteria(warLeagueName, rank, leagueClanCount);
 
       const wlIconTemplate = document.querySelector(`#wl-icon-${criteria}`);
       const wlIcon = document.importNode(wlIconTemplate.content, true);
 
-      const promotionDemotion = clanRankElement.querySelector('.promotion-demotion');
+      const promotionDemotion = row.querySelector('.promotion-demotion');
       promotionDemotion.appendChild(wlIcon);
     }
 
     function drawClanRank(clanTag) {
       const clan = clanLeagueInfoMap.get(clanTag);
 
-      const { tag, badgeUrls, rank, leagueClanCount, totalStars, totalDestructionPercentage } = clan;
+      const { tag, badgeUrls, warLeague, rank, leagueClanCount, totalStars, totalDestructionPercentage } = clan;
 
       const clanRankElement = document.querySelector(`.league-rank .tag-${removeHashTag(tag)}`);
 
       const clanIcon = clanRankElement.querySelector('.clan-icon img.clan');
       clanIcon.src = badgeUrls.small;
 
-      convPromotedOrDemotedOrStay(clanRankElement, rank, leagueClanCount);
+      convPromotedOrDemotedOrStay(clanRankElement, warLeague, rank, leagueClanCount);
       
       clanRankElement.innerHTML = clanRankElement.innerHTML
                                                  .replace(/{RANK}/, `${rank}위`)
@@ -1016,7 +1028,7 @@
 
         renderWarLeagueBadge(leagueWarClanContents, warLeague);
 
-        renderingLeagueWarClanDetail(leagueWarClanContents, tag, name)
+        renderingLeagueWarClanDetail(leagueWarClanContents, tag, name, warLeague)
         .then(() => {
           hideClanWarCardLoader(leagueWarClanContents);
           settingTooltip(leagueWarClanContents.querySelector('.war-league .img-icon'), convLeagueName(warLeague.name));
@@ -1516,6 +1528,7 @@
 
 <template id="league-dashboard-row">
   <div class="row">
+    <div class="promotion-demotion"></div>
     <div class="rank">{RANK}.</div>
     <div class="badge">
       <img class="clan" alt=""/>

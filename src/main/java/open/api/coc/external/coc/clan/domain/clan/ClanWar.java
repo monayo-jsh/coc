@@ -37,7 +37,17 @@ public class ClanWar {
     }
 
     @JsonIgnore
+    public boolean isInWar() {
+        return "inWar".equals(state);
+    }
+
+    @JsonIgnore
     public boolean isNotNotInWar() {
-        return !"notInWar".equals(state);
+        return !isNotInWar();
+    }
+
+    @JsonIgnore
+    public boolean isNotInWar() {
+        return "notInWar".equals(state);
     }
 }

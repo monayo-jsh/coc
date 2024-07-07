@@ -29,6 +29,7 @@ import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
@@ -103,7 +104,8 @@ public class ClansService {
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
 
         if (clanCurrentWar.isNotNotInWar()) {
-            clanWarService.saveCurrentClanWar(clanCurrentWar);
+            ClanWarEntity clanWarEntity = clanWarService.saveCurrentClanWar(clanCurrentWar);
+            clanWarService.mergeClanWarMember(clanWarEntity, clanCurrentWar);
         }
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);

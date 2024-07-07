@@ -80,4 +80,8 @@ public class ClanWarEntity {
     }
 
     public static final String STATE_WAR_COLLECTED = "warCollected";
+
+    public static ClanWarEntity empty() {
+        return ClanWarEntity.builder().build();
+    }
 }

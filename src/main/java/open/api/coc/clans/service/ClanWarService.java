@@ -11,7 +11,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.config.HallOfFameConfig;
@@ -22,6 +24,8 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarMemberAttackRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
@@ -48,6 +52,8 @@ public class ClanWarService {
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
     private final ClanWarRepository clanWarRepository;
+    private final ClanWarMemberRepository clanWarMemberRepository;
+    private final ClanWarMemberAttackRepository clanWarMemberAttackRepository;
 
     private final TimeConverter timeConverter;
 
@@ -61,14 +67,14 @@ public class ClanWarService {
      * 생성된 경우 상태값, 종료시간 갱신
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void mergeClanWar(ClanWar clanWar) {
+    public ClanWarEntity mergeClanWar(ClanWar clanWar) {
 
         String clanTag = clanWar.getClan().getTag();
 
         Optional<ClanEntity> findClan = clanRepository.findById(clanTag);
-        if (findClan.isEmpty()) { return; }
+        if (findClan.isEmpty()) { return ClanWarEntity.empty(); }
         ClanEntity clanEntity = findClan.get();
-        if (clanEntity.isNotUsed()) { return; }
+        if (clanEntity.isNotUsed()) { return ClanWarEntity.empty(); }
 
         LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
 
@@ -77,50 +83,71 @@ public class ClanWarService {
             ClanWarEntity clanWarEntity = findClanWar.get();
 
             // 이미 수집된 경우
-            if (clanWarEntity.isCollected()) { return; }
+            if (clanWarEntity.isCollected()) { return ClanWarEntity.empty(); }
 
             clanWarEntity.setState(clanWar.getState());
             LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
             clanWarEntity.setEndTime(endTime);
 
-            return;
+            return clanWarEntity;
         }
 
         // 클랜전 기록 생성
-        saveClanWar(clanWar);
+        return saveClanWar(clanWar);
     }
 
-    private void saveClanWarMember(ClanWarEntity clanWarEntity, ClanWar clanWar) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void mergeClanWarMember(ClanWarEntity clanWarEntity, ClanWar clanWar) {
+        // 수집 대상 객체가 아닌 경우 warId를 전달받지 못함
+        if (ObjectUtils.isEmpty(clanWarEntity.getWarId())) return;
+
+        Map<String, ClanWarMemberEntity> clanWarMemberEntityMap = clanWarEntity.getMembers()
+                                                                               .stream()
+                                                                               .collect(Collectors.toMap(clanWarMemberEntity -> clanWarMemberEntity.getId().getTag(),
+                                                                                                         clanWarMemberEntity -> clanWarMemberEntity));
+
         for (ClanWarMember clanWarMember : clanWar.getClan().getMembers()) {
-            ClanWarMemberEntity clanWarMemberEntity = ClanWarMemberEntity.builder()
-                                                                         .id(ClanWarMemberPKEntity.builder()
-                                                                                                  .warId(clanWarEntity.getWarId())
-                                                                                                  .tag(clanWarMember.getTag())
-                                                                                                  .build())
-                                                                         .mapPosition(clanWarMember.getMapPosition())
-                                                                         .name(clanWarMember.getName())
-                                                                         .build();
+            ClanWarMemberEntity clanWarMemberEntity = clanWarMemberEntityMap.get(clanWarMember.getTag());
+            if (ObjectUtils.isEmpty(clanWarMemberEntity)) {
+                clanWarMemberEntity = ClanWarMemberEntity.builder()
+                                                         .id(ClanWarMemberPKEntity.builder()
+                                                                                  .warId(clanWarEntity.getWarId())
+                                                                                  .tag(clanWarMember.getTag())
+                                                                                  .build())
+                                                         .mapPosition(clanWarMember.getMapPosition())
+                                                         .name(clanWarMember.getName())
+                                                         .build();
 
-            saveClanWarMemberAttacks(clanWarMemberEntity, clanWarMember);
+                clanWarEntity.addMember(clanWarMemberEntity);
+            }
 
-            clanWarEntity.addMember(clanWarMemberEntity);
+            mergeClanWarMemberAttacks(clanWarMemberEntity, clanWarMember);
         }
     }
 
-    private void saveClanWarMemberAttacks(ClanWarMemberEntity clanWarMemberEntity, ClanWarMember clanWarMember) {
+    private void mergeClanWarMemberAttacks(ClanWarMemberEntity clanWarMemberEntity, ClanWarMember clanWarMember) {
         if (CollectionUtils.isEmpty(clanWarMember.getAttacks())) return;
 
+        Map<Integer, ClanWarMemberAttackEntity> clanWarMemberAttackEntityMap = clanWarMemberEntity.getAttacks()
+                                                                                                  .stream()
+                                                                                                  .collect(Collectors.toMap(clanWarMemberAttackEntity -> clanWarMemberAttackEntity.getId().getOrder(),
+                                                                                                                            clanWarMemberAttackEntity -> clanWarMemberAttackEntity));
+
         for (ClanWarAttack clanWarAttack : clanWarMember.getAttacks()) {
-            ClanWarMemberAttackEntity clanWarMemberAttackEntity = ClanWarMemberAttackEntity.builder()
-                                                                                           .id(ClanWarMemberAttackPKEntity.builder()
-                                                                                                                          .warId(clanWarMemberEntity.getId().getWarId())
-                                                                                                                          .tag(clanWarMemberEntity.getId().getTag())
-                                                                                                                          .order(clanWarAttack.getOrder())
-                                                                                                                          .build())
-                                                                                           .stars(clanWarAttack.getStars())
-                                                                                           .destructionPercentage(clanWarAttack.getDestructionPercentage())
-                                                                                           .duration(clanWarAttack.getDuration())
-                                                                                           .build();
+            ClanWarMemberAttackEntity clanWarMemberAttackEntity = clanWarMemberAttackEntityMap.get(clanWarAttack.getOrder());
+
+            if (!ObjectUtils.isEmpty(clanWarMemberAttackEntity)) { continue; }
+
+            clanWarMemberAttackEntity = ClanWarMemberAttackEntity.builder()
+                                                                 .id(ClanWarMemberAttackPKEntity.builder()
+                                                                                                .warId(clanWarMemberEntity.getId().getWarId())
+                                                                                                .tag(clanWarMemberEntity.getId().getTag())
+                                                                                                .order(clanWarAttack.getOrder())
+                                                                                                .build())
+                                                                 .stars(clanWarAttack.getStars())
+                                                                 .destructionPercentage(clanWarAttack.getDestructionPercentage())
+                                                                 .duration(clanWarAttack.getDuration())
+                                                                 .build();
 
             clanWarMemberEntity.addAttacks(clanWarMemberAttackEntity);
         }
@@ -191,12 +218,19 @@ public class ClanWarService {
                 log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanWarEntity.getClanTag());
             } else {
                 // 수집하기 직전 최신 데이터로 수집 진행
-                clanWar = findClanWar.get();
+                ClanWar currentClanWar = findClanWar.get();
+                if (currentClanWar.isWarEnded() || currentClanWar.isInWar()) {
+                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                    clanWar = currentClanWar;
+                } else {
+                    log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanWarEntity.getClanTag());
+                }
+
             }
 
         }
 
-        saveClanWarMember(clanWarEntity, clanWar);
+        mergeClanWarMember(clanWarEntity, clanWar);
         clanWarEntity.changeStateWarCollected();
     }
 
@@ -226,9 +260,9 @@ public class ClanWarService {
     }
 
     @Transactional
-    public void saveCurrentClanWar(ClanWar clanWar) {
+    public ClanWarEntity saveCurrentClanWar(ClanWar clanWar) {
         writeClanWarToFile(clanWar);
-        mergeClanWar(clanWar);
+        return mergeClanWar(clanWar);
     }
     public void writeClanWarToFile(ClanWar clanWar) {
         try {

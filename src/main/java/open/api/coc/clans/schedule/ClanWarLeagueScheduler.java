@@ -2,6 +2,18 @@ package open.api.coc.clans.schedule;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.AcademeClan;
@@ -9,16 +21,7 @@ import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.WarClan;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +32,7 @@ public class ClanWarLeagueScheduler {
     private static final String RESOURCE_ROOT =  "./src/main/resources/static/clanwarleague";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
 
-    @Scheduled(cron = "0 0 0/6 1-8 * *")
+    //@Scheduled(cron = "0 0 0/6 1-8 * *")
     public void createWarRoundFile() throws IOException {
         createFile();
     }

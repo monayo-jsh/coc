@@ -150,11 +150,11 @@
 
     @media (max-width: 400px) {
       .stars {
-        width: 110px;
+        width: 120px;
       }
 
       .destruction-percentage {
-        width: 110px;
+        width: 120px;
       }
     }
   }

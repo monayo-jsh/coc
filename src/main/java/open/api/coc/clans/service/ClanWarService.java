@@ -185,13 +185,15 @@ public class ClanWarService {
 
         if (ObjectUtils.isEmpty(clanWar)) { return; }
         if (!clanWar.isWarEnded()) {
+            // 수집하기전 클랜전 종료 상태 데이터로 수집하도록 데이터 현행화 수행
             Optional<ClanWar> findClanWar = clanApiService.findClanCurrentWarByClanTag(clanWarEntity.getClanTag());
             if (findClanWar.isEmpty()) {
-                log.info("clanApiService.findClanCurrentWarByClanTag({}) failed ..", clanWarEntity.getClanTag());
-                return;
+                log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanWarEntity.getClanTag());
+            } else {
+                // 수집하기 직전 최신 데이터로 수집 진행
+                clanWar = findClanWar.get();
             }
-            clanWar = findClanWar.get();
-            if (!clanWar.isWarEnded()) { return; }
+
         }
 
         saveClanWarMember(clanWarEntity, clanWar);

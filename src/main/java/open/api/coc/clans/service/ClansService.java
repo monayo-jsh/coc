@@ -29,6 +29,7 @@ import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanLeagueWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
@@ -36,6 +37,7 @@ import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
+import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
@@ -79,6 +81,8 @@ public class ClansService {
     private final ClanContentRepository clanContentRepository;
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
+
+    private final ClanLeagueWarRepository clanLeagueWarRepository;
 
     private final ClanResponseConverter clanResponseConverter;
     private final IconUrlEntityConverter iconUrlEntityConverter;
@@ -538,13 +542,27 @@ public class ClansService {
     public List<ClanResponse> getWarLeagueClanResList() {
         List<ClanEntity> clanWarLeagueList = clanRepository.findWarLeagueClanList();
 
+        changeCurrentSeasonWarLeague(clanWarLeagueList);
+
         return clanWarLeagueList.stream()
                                 .map(clanResponseConverter::convert)
                                 .collect(Collectors.toList());
     }
 
+    private void changeCurrentSeasonWarLeague(List<ClanEntity> clanWarLeagueList) {
+        String season = getCurrentSeason();
+        for (ClanEntity clanEntity : clanWarLeagueList) {
+            Optional<ClanLeagueWarEntity> findClanLeagueWarEntity = clanLeagueWarRepository.findByClanTagAndSeason(clanEntity.getTag(), season);
+            findClanLeagueWarEntity.ifPresent(clanLeagueWarEntity -> clanEntity.changeWarLeague(clanLeagueWarEntity.getWarLeague()));
+        }
+    }
+
+    @Transactional
     public ClanCurrentWarLeagueGroupResponse getClanCurrentWarLeagueGroup(String clanTag) {
-        String season = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String season = getCurrentSeason();
+
+        createClanLeagueWar(clanTag, season);
+
         ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup = findClanCurrentWarLeagueGroupFromFile(season, clanTag);
 
         if (ObjectUtils.isEmpty(clanCurrentWarLeagueGroup) || clanCurrentWarLeagueGroup.isWarNotEnded()) {
@@ -559,6 +577,30 @@ public class ClansService {
         }
 
         return clanCurrentWarLeagueGroupResponseConverter.convert(clanCurrentWarLeagueGroup);
+    }
+
+    private static String getCurrentSeason() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createClanLeagueWar(String clanTag, String season) {
+        Optional<ClanLeagueWarEntity> findClanLeagueWar = clanLeagueWarRepository.findByClanTagAndSeason(clanTag, season);
+
+        // 생성된 경우
+        if (findClanLeagueWar.isPresent()) return;
+
+        ClanEntity clanEntity = clanRepository.findById(clanTag).orElseGet(null);
+        if (Objects.isNull(clanEntity)) return; // 클랜 메타 정보가 없는 경우
+
+        // 현재 소속된 리그 정보 저장
+        ClanLeagueWarEntity clanLeagueWarEntity = ClanLeagueWarEntity.builder()
+                                                                     .clanTag(clanTag)
+                                                                     .season(season)
+                                                                     .warLeague(clanEntity.getWarLeague())
+                                                                     .build();
+
+        clanLeagueWarRepository.save(clanLeagueWarEntity);
     }
 
     private ClanCurrentWarLeagueGroup findClanCurrentWarLeagueGroupFromFile(String season, String clanTag) {

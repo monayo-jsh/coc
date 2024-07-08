@@ -101,4 +101,8 @@ public class ClanEntity implements Persistable<String> {
     public boolean isUsed() {
         return YnType.Y.equals(this.visibleYn);
     }
+
+    public void changeWarLeague(String warLeague) {
+        this.warLeague = warLeague;
+    }
 }

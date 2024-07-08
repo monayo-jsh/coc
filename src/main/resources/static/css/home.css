@@ -82,6 +82,18 @@
   font-weight: bold;
 }
 
+.card-inner-group {
+  .title {
+    text-align: left;
+    border-left: 5px solid black;
+    padding-left: 5px;
+  }
+
+  .cards {
+    margin-top: 5px;
+  }
+}
+
 .hall-of-fame {
   color: gold;
   padding: 5px 10px;

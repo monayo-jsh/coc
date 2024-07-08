@@ -32,10 +32,10 @@ public class ViewAdminController {
         return "cms/ClanManager";
     }
 
-    /** 습격전 기록 조회 */
-    @GetMapping("/raid/score")
-    public String raidScore() {
-        return "cms/RaidScore";
+    /** 습격전 위반 현황 */
+    @GetMapping("/raid/missing/attack")
+    public String raidMissingAttack() {
+        return "cms/RaidMissingAttack";
     }
 
     /** 습격전 위반 현황 */
@@ -43,5 +43,12 @@ public class ViewAdminController {
     public String raid() {
         return "cms/Raid";
     }
+
+    /** 습격전 기록 조회 */
+    @GetMapping("/raid/score")
+    public String raidScore() {
+        return "cms/RaidScore";
+    }
+
 
 }

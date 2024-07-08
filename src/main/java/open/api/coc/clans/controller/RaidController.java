@@ -42,6 +42,13 @@ public class RaidController {
         return ResponseEntity.ok().body(playerRaidScores);
     }
 
+    @GetMapping("/missing/attack")
+    public ResponseEntity<List<RaidScoreResponse>> getMissingAttack() {
+        List<RaidScoreResponse> playerRaidScores = raidService.getMissingAttackPlayers();
+        return ResponseEntity.ok().body(playerRaidScores);
+    }
+
+
     @GetMapping("/ranking/current/season")
     public ResponseEntity<List<RankingHallOfFame>> rankingCurrentSeason() {
         List<RankingHallOfFame> rankingCurrentSeasons = raidService.getRankingCurrentSeason();

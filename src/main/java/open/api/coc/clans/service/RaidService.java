@@ -179,4 +179,16 @@ public class RaidService {
 
         return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, hallOfFameConfig.getAverage(), PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
+
+    public List<RaidScoreResponse> getMissingAttackPlayers() {
+        LocalDate currentSeason = raidRepository.getCurrentSeason();
+        if (Objects.isNull(currentSeason)) {
+            return Collections.emptyList();
+        }
+
+        final Integer ESSENTIAL_ATTACK_COUNT = 6;
+        List<RaiderEntity> raiderEntities = raiderRepository.getMissingAttacks(currentSeason, ESSENTIAL_ATTACK_COUNT);
+
+        return getRaidScoreResponses(raiderEntities);
+    }
 }

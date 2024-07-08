@@ -18,6 +18,13 @@ public interface RaiderRepository extends JpaRepository<RaiderEntity, Long> {
     @Query("select raider from RaiderEntity raider where raider.name like CONCAT(:playerName, '%')")
     List<RaiderEntity> findByName(String playerName);
 
+    @Query("select raider"
+        + " from RaiderEntity raider "
+        + " join RaidEntity raid on raid.id = raider.raid.id "
+        + " where raid.startDate = :startDate "
+        + " and raider.attacks < :attacks")
+    List<RaiderEntity> getMissingAttacks(LocalDate startDate, Integer attacks);
+
     @Query("select raider.tag as tag, raider.name as name, raider.resourceLooted as score "
         + " from RaiderEntity raider "
         + " join fetch RaidEntity raid on raid.startDate in :startDate and raid.id = raider.raid.id"

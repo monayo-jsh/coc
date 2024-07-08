@@ -126,7 +126,7 @@
     }
 
     .stars {
-      width: 80px;
+      width: 110px;
       display: flex;
       justify-content: flex-end;
       align-items: center;
@@ -144,11 +144,11 @@
     .destruction-percentage {
       margin-left: 5px;
       padding: 4px 8px;
-      width: 80px;
+      width: 110px;
       background-color: black;
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 620px) {
       .stars {
         width: 120px;
       }
@@ -165,7 +165,7 @@
   flex-direction: column;
   margin-top: 5px;
 
-  @media (max-width: 400px) {
+  @media (max-width: 620px) {
     .row {
       flex-direction: column;
 
@@ -364,7 +364,7 @@
       justify-content: center;
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 620px) {
       .stars {
         width: 100px;
       }
@@ -523,7 +523,7 @@
       }
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 620px) {
       .clan-rank {
         font-size: 12px;
       }
@@ -742,7 +742,7 @@
     }
 
 
-    @media (max-width: 400px) {
+    @media (max-width: 620px) {
       .member-info-wrap {
         flex-direction: column;
         justify-content: unset;

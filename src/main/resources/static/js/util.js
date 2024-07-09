@@ -2,6 +2,12 @@ function removeHashTag(playerTag) {
   return playerTag.replaceAll("#", "");
 }
 
+function formatTime(time) {
+  // import 필수
+  // <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  return dayjs(time).format('HH:mm')
+}
+
 function formatMinuteSecond(sec) {
   // import 필수
   // <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -191,6 +197,10 @@ function formatYYMMDate(date) {
 
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
+}
+
+function formatYYYYMMDDHHMM(date) {
+  return dayjs(date).format('YYYY-MM-DD HH:mm');
 }
 
 function copyClipboard(value) {

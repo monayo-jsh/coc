@@ -32,6 +32,12 @@ public class ViewAdminController {
         return "cms/ClanManager";
     }
 
+    /** 클랜전 미공 캘린더 */
+    @GetMapping("/clan/war/calendar")
+    public String clanCalendar() {
+        return "cms/ClanWarCalendar";
+    }
+
     /** 습격전 위반 현황 */
     @GetMapping("/raid/missing/attack")
     public String raidMissingAttack() {

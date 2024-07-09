@@ -32,6 +32,11 @@ public class TimeUtils implements TimeConverter {
     }
 
     @Override
+    public long toEpochMilliSecond(LocalDateTime localDate) {
+        return localDate.toEpochSecond(OffsetDateTime.now().getOffset()) * 1000;
+    }
+
+    @Override
     public LocalDate toLocalDate(long epochMilli) {
         return getZonedDateTime(epochMilli).toLocalDate();
     }

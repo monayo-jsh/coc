@@ -133,6 +133,9 @@ body::before {
 .mt-5 {
   margin-top: 5px;
 }
+.ml-5 {
+  margin-left: 5px;
+}
 
 .font-nowrap {
   white-space: nowrap !important;
@@ -229,6 +232,10 @@ body::before {
 
 .justify-content-center {
   justify-content: center !important;
+}
+
+.justify-content-left {
+  justify-content: left !important;
 }
 
 .justify-content-right {

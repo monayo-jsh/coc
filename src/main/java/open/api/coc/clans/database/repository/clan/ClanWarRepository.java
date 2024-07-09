@@ -13,6 +13,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
 
+    @Query("select clanWar from ClanWarEntity clanWar where clanWar.startTime between :startTime and :endTime order by clanWar.warId")
+    List<ClanWarEntity> findAllByPeriod(LocalDateTime startTime, LocalDateTime endTime);
+
     @Query("select clanWar from ClanWarEntity clanWar where clanWar.clanTag = :clanTag and clanWar.startTime = :startTime")
     Optional<ClanWarEntity> findByClanTagAndStartTime(String clanTag, LocalDateTime startTime);
 
@@ -55,4 +58,11 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
     List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
+
+    @Query("select clanWar"
+        + " from ClanWarEntity clanWar"
+        + " join ClanWarMemberEntity clanWarMember on clanWarMember.clanWar.warId = clanWar.warId "
+        + " left join ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag "
+        + " where clanWar.warId = :warId ")
+    Optional<ClanWarEntity> findByWarId(Long warId);
 }

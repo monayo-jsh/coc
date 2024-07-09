@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.domain.Persistable;
+import org.springframework.lang.NonNull;
 
 @Builder
 @Getter @Setter
@@ -62,7 +63,7 @@ public class ClanWarMemberAttackEntity implements Persistable<ClanWarMemberAttac
     }
 
     @Override
-    public ClanWarMemberAttackPKEntity getId() {
+    public @NonNull ClanWarMemberAttackPKEntity getId() {
         return this.id;
     }
 

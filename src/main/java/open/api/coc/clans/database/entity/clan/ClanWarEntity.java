@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,9 @@ public class ClanWarEntity {
     @OneToMany(fetch = LAZY, mappedBy = "clanWar", cascade = CascadeType.ALL)
     private List<ClanWarMemberEntity> members = new ArrayList<>();
 
+    @Transient
+    private ClanEntity clan;
+
     public void addMember(ClanWarMemberEntity clanWarMemberEntity) {
         this.members.add(clanWarMemberEntity);
         clanWarMemberEntity.changeClanWar(this);
@@ -80,6 +84,10 @@ public class ClanWarEntity {
     }
 
     public static final String STATE_WAR_COLLECTED = "warCollected";
+
+    public void changeClan(ClanEntity clan) {
+        this.clan = clan;
+    }
 
     public static ClanWarEntity empty() {
         return ClanWarEntity.builder().build();

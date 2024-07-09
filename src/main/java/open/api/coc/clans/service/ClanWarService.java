@@ -1,5 +1,7 @@
 package open.api.coc.clans.service;
 
+import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -27,12 +30,15 @@ import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberAttackRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
+import open.api.coc.clans.domain.clans.ClanWarResponse;
+import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -56,6 +62,7 @@ public class ClanWarService {
     private final ClanWarMemberAttackRepository clanWarMemberAttackRepository;
 
     private final TimeConverter timeConverter;
+    private final EntityClanWarResponseConverter entityClanWarResponseConverter;
 
     private final String CLAN_WAR_ROOT_DIR = "./clan-war";
     private final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
@@ -303,5 +310,39 @@ public class ClanWarService {
     private LocalDateTime getEndTime(LocalDate endTime) {
         LocalDate endDate = endTime.with(TemporalAdjusters.lastDayOfMonth());
         return LocalDateTime.of(endDate, LocalTime.MAX.withNano(999_999_000));
+    }
+
+    public List<ClanWarResponse> getClanWars(LocalDate searchMonth) {
+
+        LocalDateTime startTime = getStartTime(searchMonth);
+        LocalDateTime endTime = getEndTime(searchMonth);
+
+        List<ClanWarEntity> clanWarEntities = clanWarRepository.findAllByPeriod(startTime, endTime);
+
+        return clanWarEntities.stream()
+                              .map(clanWarEntity -> {
+                                  ClanWarResponse clanWar = entityClanWarResponseConverter.convertWithoutMember(clanWarEntity);
+                                  clanWar.setClanName(getClanName(clanWar.getClanTag()));
+                                  return clanWar;
+                              })
+                              .collect(Collectors.toList());
+    }
+
+    private String getClanName(String clanTag) {
+        ClanEntity clanEntity = clanRepository.findById(clanTag).orElseGet(null);
+
+        String clanName = Strings.EMPTY;
+        if (Objects.nonNull(clanEntity)) {
+            clanName = clanEntity.getName();
+        }
+        return clanName;
+    }
+
+    public ClanWarResponse getClanWar(Long warId) {
+        ClanWarEntity clanWarEntity = clanWarRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
+
+        ClanWarResponse clanWar = entityClanWarResponseConverter.convertWithMember(clanWarEntity);
+        clanWar.setClanName(getClanName(clanWar.getClanTag()));
+        return clanWar;
     }
 }

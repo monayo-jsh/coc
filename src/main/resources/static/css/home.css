@@ -83,6 +83,8 @@
 }
 
 .card-inner-group {
+  margin-top: 5px;
+
   .title {
     text-align: left;
     border-left: 5px solid black;

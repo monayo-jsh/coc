@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/hallOfFame.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/raid.js"></script>
+  <script src="/static/js/api/player.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/clanWar.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script type="text/javascript">
+    dayjs.locale('ko')
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+
+    function getMedalIcon(rank) {
+      let templateId = "";
+      if (rank === 1) templateId = "ranking-first-place-template";
+      if (rank === 2) templateId = "ranking-second-place-template";
+      if (rank === 3) templateId = "ranking-third-place-template";
+
+      const medalTemplate = document.querySelector(`#${templateId}`);
+      return document.importNode(medalTemplate.content, true);
+    }
+
+    function makeRankRow(rowData) {
+      const rankingRowTemplate = document.querySelector('#ranking-row-template');
+      const rankingRow = document.importNode(rankingRowTemplate.content, true);
+      const row = rankingRow.querySelector('.table-tr');
+
+      const { rank, name, score, icon_class_name } = rowData;
+
+      row.innerHTML = row.innerHTML
+                         .replace(/{RANK}/, rank)
+                         .replace(/{NAME}/, name)
+                         .replace(/{ICON_CLASS_NAME}/, icon_class_name)
+                         .replace(/{SCORE}/, score);
+
+      row.classList.add(`rank-${rank}`);
+
+      if (rank < 4) {
+        //순위권 메달 표기
+        const medalIcon = getMedalIcon(rank);
+        const rankTd = row.querySelector('.table-td.rank');
+        rankTd.innerHTML = "";
+        rankTd.appendChild(medalIcon);
+      }
+
+      return row;
+    }
+
+    function convHallOfFameRankingItem(rank, name, score, iconClassName) {
+      return {
+        rank: rank,
+        name: name,
+        score: score,
+        icon_class_name: iconClassName
+      };
+    }
+
+    function renderRankings(sectionClassName, players, iconClassName) {
+      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
+      let rank = 1;
+      for(const player of players) {
+        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
+        const row = makeRankRow(rowData);
+        rankingTbody.appendChild(row);
+        rank++;
+      }
+    }
+
+    function makeRankClanWarRow(rowData) {
+      const rankingRowTemplate = document.querySelector('#ranking-clan-war-row-template');
+      const rankingRow = document.importNode(rankingRowTemplate.content, true);
+      const row = rankingRow.querySelector('.table-tr');
+
+      const { rank, name, clan_name, score, destruction_percentage, duration } = rowData;
+
+      row.innerHTML = row.innerHTML
+                         .replace(/{RANK}/, rank)
+                         .replace(/{NAME}/, name)
+                         .replace(/{CLAN_NAME}/, clan_name)
+                         .replace(/{SCORE}/, score)
+                         .replace(/{DESTRUCTION_PERCENTAGE}/, destruction_percentage)
+                         .replace(/{DURATION}/, duration);
+
+      row.classList.add(`rank-${rank}`);
+
+      if (rank < 4) {
+        //순위권 메달 표기
+        const medalIcon = getMedalIcon(rank);
+        const rankTd = row.querySelector('.table-td.rank');
+        rankTd.innerHTML = "";
+        rankTd.appendChild(medalIcon);
+      }
+
+      return row;
+    }
+
+    function convHallOfFameRankingClanWarItem(rank, name, clanName, score, destructionPercentage, duration) {
+      return {
+        rank: rank,
+        name: name,
+        clan_name: clanName,
+        score: score,
+        destruction_percentage: destructionPercentage,
+        duration: duration
+      };
+    }
+
+    function emptyRankClanWarRow() {
+      const rankingRowTemplate = document.querySelector('#ranking-clan-war-empty-row-template');
+      const rankingRow = document.importNode(rankingRowTemplate.content, true);
+      return rankingRow.querySelector('.table-tr');
+    }
+
+    function renderRankingsClanWar(sectionClassName, players) {
+      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
+
+      // clear
+      rankingTbody.innerHTML = '';
+
+      if (!players.length) {
+        rankingTbody.appendChild(emptyRankClanWarRow());
+        return;
+      }
+
+      let rank = 1;
+      for(const player of players) {
+        const rowData = convHallOfFameRankingClanWarItem(
+            rank, player.name, player.clanName,
+            Number(player.score).toLocaleString(),
+            Number(player.destructionPercentage),
+            formatMinuteSecond(Number(player.duration))
+        );
+        const row = makeRankClanWarRow(rowData);
+        rankingTbody.appendChild(row);
+        rank++;
+      }
+    }
+
+    async function fetchRaidCurrentSeason() {
+      const rankings = await fetchRankingRaidCurrentSeason();
+      renderRankings('raid-current-season', rankings, 'icon-clan-capital');
+    }
+
+    async function fetchRaidAverageSeason() {
+      const rankings = await fetchRankingRaidAverageSeason();
+      renderRankings('raid-average-season', rankings, 'icon-clan-capital');
+    }
+
+    async function fetchCurrentTrophies() {
+      const rankings = await fetchRankingPlayerTrophies();
+      renderRankings('current-trophies', rankings, 'icon trophies');
+    }
+
+    async function fetchCurrentAttackWins() {
+      const rankings = await fetchRankingPlayerAttackWins();
+      renderRankings('current-attack-wins', rankings, 'icon-sword');
+    }
+
+    async function fetchThisMonthClanWarStars(clanTag) {
+      const searchMonth = dayjs().format('YYYY-MM-DD');
+      const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
+      renderRankingsClanWar('this-month-clan-war-stars', rankings)
+    }
+
+    async function fetchLastMonthClanWarStars(clanTag) {
+      const searchMonth = dayjs().add(-1, 'month').format('YYYY-MM-DD');
+      const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
+      renderRankingsClanWar('last-month-clan-war-stars', rankings)
+    }
+
+    function renderClan(clan) {
+      const { tag, name } = clan;
+      const radioItemTemplate = document.querySelector('#radio-item-template');
+      const radioItem = document.importNode(radioItemTemplate.content, true);
+      const radio = radioItem.querySelector('.radio.item');
+
+      radio.innerHTML = radio.innerHTML
+                             .replace(/{CLAN_TAG}/, tag)
+                             .replace(/{CLAN_NAME}/, name);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      radioInputs.appendChild(radio);
+    }
+    function renderClans(clans) {
+      for(const clan of clans) {
+        renderClan(clan);
+      }
+    }
+
+    async function fetchClanWarStars(type) {
+      let clanTag = type;
+      if (clanTag === 'all') clanTag = '';
+      fetchThisMonthClanWarStars(clanTag);
+      fetchLastMonthClanWarStars(clanTag);
+    }
+
+    window.onload = async () => {
+      //개인 기록 부문
+      fetchCurrentTrophies();
+      fetchCurrentAttackWins();
+
+      //클랜전 부문
+      const warClans = await fetchWarClans();
+      await renderClans(warClans);
+      fetchClanWarStars('all');
+
+      //습격전 부문
+      fetchRaidCurrentSeason();
+      fetchRaidAverageSeason();
+    }
+  </script>
+
+  <title>아카데미 명예의전당</title>
+</head>
+<body>
+    <div class="title hall-of-fame" onclick="renderPage('/hall-of-fame'); return false;">
+      <i class="fa-solid fa-trophy"></i>
+      명예의전당
+      <i class="fa-solid fa-medal"></i>
+    </div>
+
+    <div class="section-wrapper">
+
+      <div class="section-wrapper">
+        <div class="section-title">개인 기록 부문</div>
+
+        <div class="section-contents">
+
+          <div class="section current-trophies">
+            <div class="sub-title">현재 트로피 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section current-attack-wins">
+            <div class="sub-title">현재 공성 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-wrapper">
+
+      <div class="section-wrapper">
+        <div class="section-title">클랜전 부문</div>
+        <div class="support-area">
+          <div class="radio-inputs">
+            <label class="radio item">
+              <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+              <span class="name">전체</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-contents">
+
+          <div class="section this-month-clan-war-stars">
+            <div class="sub-title">이번달 완파 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">총 획득별</th>
+                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="section last-month-clan-war-stars">
+            <div class="sub-title">지난달 완파 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">총 획득별</th>
+                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-wrapper">
+      <div class="section-title">습격전 부문</div>
+
+      <div class="section-contents">
+
+        <div class="section raid-current-season">
+          <div class="sub-title">현재 시즌 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div class="section raid-average-season">
+          <div class="sub-title">최근 3주 평균 순위</div>
+          <div class="rankings">
+            <table class="table">
+              <thead>
+              <tr class="table-tr">
+                <th class="table-th">순위</th>
+                <th class="table-th">이름</th>
+                <th class="table-th">점수</th>
+              </tr>
+              </thead>
+              <tbody class="table-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+</body>
+<template id="ranking-row-template">
+  <tr class="table-tr">
+    <td class="table-td rank">{RANK}</td>
+    <td class="table-td name">{NAME}</td>
+    <td class="table-td"><div class="td-wrap"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div></td>
+  </tr>
+</template>
+<template id="ranking-clan-war-row-template">
+  <tr class="table-tr">
+    <td class="table-td rank">{RANK}</td>
+    <td class="table-td name"><div class="td-wrap flex-colum">{NAME}<div class="chip bg-green">{CLAN_NAME}</div></div></td>
+    <td class="table-td"><i class="fa-solid fa-star"></i>{SCORE}</td>
+    <td class="table-td"><div class="td-wrap"><div class="icon-damage"></div>{DESTRUCTION_PERCENTAGE} %</div><div class="td-wrap"><div class="icon-clock"></div>{DURATION}</div></td>
+  </tr>
+</template>
+<template id="ranking-clan-war-empty-row-template">
+  <tr class="table-tr">
+    <td class="table-td empty" colspan="4">데이터 수집중</td>
+  </tr>
+</template>
+<template id="ranking-first-place-template">
+  <i class="fa-solid fa-medal first-place"></i>
+</template>
+<template id="ranking-second-place-template">
+  <i class="fa-solid fa-medal second-place"></i>
+</template>
+<template id="ranking-third-place-template">
+  <i class="fa-solid fa-medal third-place"></i>
+</template>
+<template id="radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
+</template>
+</html>

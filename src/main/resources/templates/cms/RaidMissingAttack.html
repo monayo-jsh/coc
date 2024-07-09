@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/raidMissingAttack.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/raid.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>습격전 미공 조회</title>
+  <script>
+    function clearTableBody() {
+      let tableTbody = document.querySelector('.table-tbody');
+      tableTbody.innerHTML = "";
+    }
+
+    function renderEmptyRow() {
+      const raidRowEmptyTemplate = document.querySelector('#raid-row-empty-template');
+      const raidRowEmptyElement = document.importNode(raidRowEmptyTemplate.content, true);
+      const tableTbody = document.querySelector('.table-tbody');
+      tableTbody.appendChild(raidRowEmptyElement);
+    }
+
+    function increaseRowspan(playerTag, className) {
+      const firstDrawRow = document.querySelector(`.tag-${removeHashTag(playerTag)}`);
+      const targetTd = firstDrawRow.querySelector(`.${className}`);
+      const rowspan = targetTd.getAttribute('rowspan');
+      if (rowspan) {
+        targetTd.setAttribute('rowspan', Number(rowspan)+1);
+      }
+    }
+
+    function removeCell(tableRow, removeCellClassName) {
+      tableRow.querySelector(`.${removeCellClassName}`).remove();
+    }
+
+    function appendClassNewPlayer(tableRow, tag) {
+      tableRow.classList.add(`tag-${removeHashTag(tag)}`, "start");
+    }
+
+    function drawRow(tableRow, tag) {
+      const tableTbody = document.querySelector('.table-tbody');
+      const lastRow = tableTbody.children[tableTbody.children.length-1]
+      if (!lastRow) {
+        appendClassNewPlayer(tableRow, tag);
+        tableTbody.appendChild(tableRow);
+        return;
+      }
+
+      // 마지막 행이 그려야할 플레이어와 동일하면 중복 제거
+      const beforeRowPlayerTag = lastRow.dataset.tag;
+
+      if (tag === beforeRowPlayerTag) {
+        increaseRowspan(tag, 'name');
+        increaseRowspan(tag, 'tag');
+        removeCell(tableRow, 'name');
+        removeCell(tableRow, 'tag');
+      } else {
+        // 신규 플레이어
+        appendClassNewPlayer(tableRow, tag);
+      }
+
+      tableTbody.appendChild(tableRow);
+    }
+
+    function renderRow(playerRaidScore) {
+      const { name, tag, clan, resourceLooted, attacks } = playerRaidScore;
+
+      const raidRowEmptyTemplate = document.querySelector('#raid-row-template');
+      const raidRowEmptyElement = document.importNode(raidRowEmptyTemplate.content, true);
+      const tableRow = raidRowEmptyElement.querySelector('.table-tr');
+
+      const displayClanName = clan ? clan.name : '정보 없음'
+
+      // dataset
+      tableRow.dataset.tag = tag;
+
+      tableRow.innerHTML = tableRow.innerHTML
+                                   .replace(/{NAME}/, name)
+                                   .replace(/{TAG}/, tag)
+                                   .replace(/{CLAN_NAME}/, displayClanName)
+                                   .replace(/{SCORE}/, Number(resourceLooted).toLocaleString())
+                                   .replace(/{ATTACKS}/, Number(attacks).toLocaleString());
+
+      // 테이블에 행 입력
+      drawRow(tableRow, tag);
+    }
+
+    function renderTableBody(players) {
+      clearTableBody();
+      if (!players.length) {
+        renderEmptyRow();
+        return;
+      }
+
+      for(const player of players) {
+        renderRow(player);
+      }
+    }
+
+    function showLoading(className) {
+      const loader = document.querySelector('#loader');
+      const loaderElement = document.importNode(loader.content, true);
+
+      const target = document.querySelector(className);
+      target.classList.add('opacity-01');
+      target.appendChild(loaderElement);
+    }
+
+    function hideLoading(className) {
+      const target = document.querySelector(className);
+      target.classList.remove('opacity-01');
+    }
+
+    async function searchRaidMissingAttack() {
+      showLoading('.table-tbody');
+      const raidMissingAttackPlayers = await fetchRaidMissingAttackPlayers();
+      hideLoading('.table-tbody');
+
+      renderTableBody(raidMissingAttackPlayers);
+    }
+
+    async function refreshClanRaidSeason() {
+      showWifiLoading('.body');
+      await collectRaidSeason()
+      .then(searchRaidMissingAttack);
+      hideWifiLoading('.body');
+    }
+
+    window.onload = async () => {
+      await searchRaidMissingAttack();
+    }
+  </script>
+</head>
+<body>
+  <div class="capital-raid">
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">이번 시즌 미공 조회</span>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="buttons">
+        <div class="button-chip">
+          <button class="refresh" onclick="refreshClanRaidSeason(); return false;">
+            최근 습격전 기록 업데이트
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-arrow-repeat"
+                viewBox="0 0 16 16"
+            >
+              <path
+                  d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"
+              ></path>
+              <path
+                  fill-rule="evenodd"
+                  d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div id="wifi-loader" class="display-none">
+        <svg class="circle-outer" viewBox="0 0 86 86">
+          <circle class="back" cx="43" cy="43" r="40"></circle>
+          <circle class="front" cx="43" cy="43" r="40"></circle>
+          <circle class="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg class="circle-middle" viewBox="0 0 60 60">
+          <circle class="back" cx="30" cy="30" r="27"></circle>
+          <circle class="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg class="circle-inner" viewBox="0 0 34 34">
+          <circle class="back" cx="17" cy="17" r="14"></circle>
+          <circle class="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        <div class="text" data-text="Searching"></div>
+      </div>
+
+      <div class="container contents">
+        <table class="table">
+          <thead class="table-thead">
+          <tr class="table-tr">
+            <th class="table-th">플레이어</th>
+            <th class="table-th">진행 클랜</th>
+            <th class="table-th">점수</th>
+            <th class="table-th">공격수</th>
+          </tr>
+          </thead>
+          <tbody class="table-tbody">
+          <tr class="table-tr">
+            <td class="table-td" colspan="6">미공 없음</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+<template id="loader">
+  <div class="loader-circle">
+    <div class="bar1"></div>
+    <div class="bar2"></div>
+    <div class="bar3"></div>
+    <div class="bar4"></div>
+    <div class="bar5"></div>
+    <div class="bar6"></div>
+    <div class="bar7"></div>
+    <div class="bar8"></div>
+    <div class="bar9"></div>
+    <div class="bar10"></div>
+    <div class="bar11"></div>
+    <div class="bar12"></div>
+  </div>
+</template>
+<template id="raid-row-template">
+  <tr class="table-tr">
+    <td class="table-td name" rowspan=1>{NAME}<br/><span class="chip">{TAG}</span></td>
+    <td class="table-td"><span class="chip bg-green">{CLAN_NAME}</span></td>
+    <td class="table-td"><span class="span-score">{SCORE}</span></td>
+    <td class="table-td"><span class="span-attacks">{ATTACKS}</span></td>
+  </tr>
+</template>
+<template id="raid-row-empty-template">
+  <tr class="table-tr">
+    <td class="table-td" colspan="6">미공 없음</td>
+  </tr>
+</template>
+</html>

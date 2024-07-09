@@ -2,6 +2,7 @@ package open.api.coc.clans.domain.clans.converter;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -31,9 +32,21 @@ public class TimeUtils implements TimeConverter {
     }
 
     @Override
-    public LocalDate toLocalDate(long epochMilli) {
-        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"))
-                .toLocalDate();
+    public long toEpochMilliSecond(LocalDateTime localDate) {
+        return localDate.toEpochSecond(OffsetDateTime.now().getOffset()) * 1000;
     }
 
+    @Override
+    public LocalDate toLocalDate(long epochMilli) {
+        return getZonedDateTime(epochMilli).toLocalDate();
+    }
+
+    @Override
+    public LocalDateTime toLocalDateTime(long epochMilli) {
+        return getZonedDateTime(epochMilli).toLocalDateTime();
+    }
+
+    private ZonedDateTime getZonedDateTime(long epochMilli) {
+        return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"));
+    }
 }

@@ -1,0 +1,111 @@
+.contents {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card {
+  max-width: 1240px;
+  width: 100%;
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  background: #1b233d;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.clan-war-calendar {
+  max-width: 1240px;
+  width: 100%;
+  height: 600px;
+}
+
+/** toast ui custom */
+.toastui-calendar-weekday-event-dot {
+
+  display: none !important;
+}
+
+.chip {
+  font-size: .9em;
+  line-height: 1.5;
+}
+
+.clan-war-detail-wrap {
+  width: 100%;
+}
+
+.icon-damage {
+  width: 15px;
+}
+
+.icon-clock {
+  width: 15px;
+}
+
+.th-wrap {
+  padding: 3px;
+  display: flex;
+  justify-content: center;
+}
+
+.td-wrap {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  padding: 5px;
+  display: flex;
+}
+
+.calendar-date {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.calendar-icon {
+  margin: 5px;
+  border: 1px solid #bbb;
+  border-radius: 25px;
+  padding: 3px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.clan-war-info {
+
+  th {
+    width: 100px;
+  }
+
+  td {
+    width: 100%;
+  }
+}
+
+.table.missing-attack {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}

@@ -14,10 +14,21 @@ public class ViewNormalController {
         return "Home";
     }
 
+    @GetMapping("/hall-of-fame")
+    public String hallOfFame() {
+        return "HallOfFame";
+    }
+
     /** 클랜원 목록 */
     @GetMapping("/clan/member")
     public String clanMember() {
         return "clan/Member";
+    }
+
+    /** 클랜원 목록 */
+    @GetMapping("/find/member")
+    public String findClanMember() {
+        return "clan/FindMember";
     }
 
     /** 클랜 목록 */

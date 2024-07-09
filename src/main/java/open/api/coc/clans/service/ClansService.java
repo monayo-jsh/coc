@@ -29,12 +29,15 @@ import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanLeagueWarEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
+import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
@@ -72,11 +75,14 @@ import org.springframework.util.StringUtils;
 public class ClansService {
 
     private final ClanApiService clanApiService;
+    private final ClanWarService clanWarService;
 
     private final ClanRepository clanRepository;
     private final ClanContentRepository clanContentRepository;
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
+
+    private final ClanLeagueWarRepository clanLeagueWarRepository;
 
     private final ClanResponseConverter clanResponseConverter;
     private final IconUrlEntityConverter iconUrlEntityConverter;
@@ -86,7 +92,6 @@ public class ClansService {
     private final PlayerRepository playerRepository;
     private final PlayersService playersService;
     private final PlayerResponseConverter playerResponseConverter;
-
 
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
 
@@ -101,6 +106,11 @@ public class ClansService {
     public ClanCurrentWarResponse getClanCurrentWar(String clanTag) {
         ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
                                                .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "현재 클랜 전쟁 조회 실패"));
+
+        if (clanCurrentWar.isNotNotInWar()) {
+            ClanWarEntity clanWarEntity = clanWarService.saveCurrentClanWar(clanCurrentWar);
+            clanWarService.mergeClanWarMember(clanWarEntity, clanCurrentWar);
+        }
 
         return clanCurrentWarResConverter.convert(clanCurrentWar);
     }
@@ -532,13 +542,27 @@ public class ClansService {
     public List<ClanResponse> getWarLeagueClanResList() {
         List<ClanEntity> clanWarLeagueList = clanRepository.findWarLeagueClanList();
 
+        changeCurrentSeasonWarLeague(clanWarLeagueList);
+
         return clanWarLeagueList.stream()
                                 .map(clanResponseConverter::convert)
                                 .collect(Collectors.toList());
     }
 
+    private void changeCurrentSeasonWarLeague(List<ClanEntity> clanWarLeagueList) {
+        String season = getCurrentSeason();
+        for (ClanEntity clanEntity : clanWarLeagueList) {
+            Optional<ClanLeagueWarEntity> findClanLeagueWarEntity = clanLeagueWarRepository.findByClanTagAndSeason(clanEntity.getTag(), season);
+            findClanLeagueWarEntity.ifPresent(clanLeagueWarEntity -> clanEntity.changeWarLeague(clanLeagueWarEntity.getWarLeague()));
+        }
+    }
+
+    @Transactional
     public ClanCurrentWarLeagueGroupResponse getClanCurrentWarLeagueGroup(String clanTag) {
-        String season = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String season = getCurrentSeason();
+
+        createClanLeagueWar(clanTag, season);
+
         ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup = findClanCurrentWarLeagueGroupFromFile(season, clanTag);
 
         if (ObjectUtils.isEmpty(clanCurrentWarLeagueGroup) || clanCurrentWarLeagueGroup.isWarNotEnded()) {
@@ -546,10 +570,37 @@ public class ClansService {
             clanCurrentWarLeagueGroup = clanApiService.findClanCurrentWarLeagueGroupBy(clanTag)
                                                       .orElseThrow(() -> createNotFoundException("클랜(%s) 현재 리그전 정보 조회 실패".formatted(clanTag)));
 
+            if (clanCurrentWarLeagueGroup.isNotInWar()) {
+                clanCurrentWarLeagueGroup.setSeason(season);
+            }
             writeClanWarLeagueSeasonGroup(clanTag, clanCurrentWarLeagueGroup);
         }
 
         return clanCurrentWarLeagueGroupResponseConverter.convert(clanCurrentWarLeagueGroup);
+    }
+
+    private static String getCurrentSeason() {
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void createClanLeagueWar(String clanTag, String season) {
+        Optional<ClanLeagueWarEntity> findClanLeagueWar = clanLeagueWarRepository.findByClanTagAndSeason(clanTag, season);
+
+        // 생성된 경우
+        if (findClanLeagueWar.isPresent()) return;
+
+        ClanEntity clanEntity = clanRepository.findById(clanTag).orElseGet(null);
+        if (Objects.isNull(clanEntity)) return; // 클랜 메타 정보가 없는 경우
+
+        // 현재 소속된 리그 정보 저장
+        ClanLeagueWarEntity clanLeagueWarEntity = ClanLeagueWarEntity.builder()
+                                                                     .clanTag(clanTag)
+                                                                     .season(season)
+                                                                     .warLeague(clanEntity.getWarLeague())
+                                                                     .build();
+
+        clanLeagueWarRepository.save(clanLeagueWarEntity);
     }
 
     private ClanCurrentWarLeagueGroup findClanCurrentWarLeagueGroupFromFile(String season, String clanTag) {
@@ -571,7 +622,7 @@ public class ClansService {
     }
 
     public ClanCurrentWarResponse getClanWarLeagueRound(String clanTag, String season, String warTag) {
-        ClanWar clanWar = findClanWarFromFile(clanTag, season, warTag);
+        ClanWar clanWar = findClanWarLeagueFromFile(clanTag, season, warTag);
 
         if (ObjectUtils.isEmpty(clanWar)) {
             clanWar = clanApiService.findWarLeagueByWarTag(warTag)
@@ -590,7 +641,7 @@ public class ClansService {
     final String LEAGUE_WAR_SEASON_INFO_FILE_NAME = "league-info";
     final String LEAGUE_WAR_INFO_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR;
     final String LEAGUE_WAR_ROUND_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR + "/round";
-    final String LEAGUE_WAR_TAG_JSON_FILE_NAME = "%s.json";
+    final String JSON_FILE_NAME = "%s.json";
 
     private void writeClanWarLeagueSeasonGroup(String clanTag, ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup) {
         try {
@@ -613,7 +664,7 @@ public class ClansService {
     }
 
     private String getLeagueWarSeasonInfoFileName() {
-        return makeLeagueWarTagJsonFileName(LEAGUE_WAR_SEASON_INFO_FILE_NAME);
+        return makeJsonFileName(LEAGUE_WAR_SEASON_INFO_FILE_NAME);
     }
 
     private <T> void writeFile(File file, T data) throws IOException {
@@ -622,12 +673,12 @@ public class ClansService {
         writer.close();
     }
 
-    private ClanWar findClanWarFromFile(String clanTag, String season, String warTag) {
+    private ClanWar findClanWarLeagueFromFile(String clanTag, String season, String warTag) {
         final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
                                                 .replace("{clanTag}", clanTag);
 
         // directory: ./war-league/{season}/{clanTag}/round/{warTag}.json
-        File file = new File(path, makeLeagueWarTagJsonFileName(warTag));
+        File file = new File(path, makeJsonFileName(warTag));
 
         // Not Found.
         if (!file.exists()) return null;
@@ -648,7 +699,7 @@ public class ClansService {
 
             ClassPathResource resource = checkAndMakeDirectory(path);
 
-            File file = new File(resource.getPath(), makeLeagueWarTagJsonFileName(warTag));
+            File file = new File(resource.getPath(), makeJsonFileName(warTag));
             makeEmptyFile(file);
 
             writeFile(file, clanWar);
@@ -666,8 +717,8 @@ public class ClansService {
         }
     }
 
-    private String makeLeagueWarTagJsonFileName(String warTag) {
-        return LEAGUE_WAR_TAG_JSON_FILE_NAME.formatted(warTag);
+    private String makeJsonFileName(String warTag) {
+        return JSON_FILE_NAME.formatted(warTag);
     }
 
     private ClassPathResource checkAndMakeDirectory(String path) {

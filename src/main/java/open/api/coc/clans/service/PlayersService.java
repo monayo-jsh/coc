@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
@@ -45,6 +46,7 @@ import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.clans.domain.players.converter.RankingHeroEquipmentResponseConverter;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -52,6 +54,7 @@ import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,6 +64,8 @@ import org.springframework.util.CollectionUtils;
 @Service
 @RequiredArgsConstructor
 public class PlayersService {
+
+    private final HallOfFameConfig hallOfFameConfig;
 
     private final ClanApiService clanApiService;
 
@@ -117,6 +122,14 @@ public class PlayersService {
 
     public List<PlayerResponse> findAllPlayersSummary() {
         List<PlayerEntity> players = playerRepository.findAll();
+
+        return players.stream()
+                      .map(playerResponseConverter::convert)
+                      .collect(Collectors.toList());
+    }
+
+    public List<PlayerResponse> findPlayersSummary(String name) {
+        List<PlayerEntity> players = playerRepository.findByName(name);
 
         return players.stream()
                       .map(playerResponseConverter::convert)
@@ -504,4 +517,13 @@ public class PlayersService {
                                          .map(ClanAssignedPlayerEntity::getPlayerTag)
                                          .toList();
     }
+
+    public List<RankingHallOfFame> getRankingTrophiesCurrent() {
+        return playerRepository.selectRankingTrophiesCurrent(PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
+
+    public List<RankingHallOfFame> getRankingAttackWins() {
+        return playerRepository.selectRankingAttackWins(PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
+
 }

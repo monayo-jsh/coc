@@ -861,40 +861,24 @@
       }
     }
 
-    function removeClanAssignedPlayer(dataset, playerInfoElement) {
+    async function removeClanAssignedPlayer(dataset, playerInfoElement) {
 
       const { clanTag, seasonDate, playerTag, joinedStatus, warPreference } = dataset;
-      const result = deleteAssignedMember(clanTag, seasonDate, playerTag);
+      const result = await deleteAssignedMember(clanTag, seasonDate, playerTag);
       if (result) {
         const cardElement = playerInfoElement.closest('div.card');
-        const totalSize = cardElement.querySelector('.total-size');
-        totalSize.innerHTML = Number(totalSize.innerHTML) - 1; // 배정인원 갱신
-        if (JSON.parse(joinedStatus)) {
-          const joinedSize = cardElement.querySelector('.joined-size');
-          joinedSize.innerHTML = Number(joinedSize.innerHTML) - 1; // 이동인원 갱신
-        }
-        if (warPreference) {
-          const warPreferenceSize = cardElement.querySelector('.war-preference-size');
-          warPreferenceSize.innerHTML = Number(warPreferenceSize.innerHTML) - 1; // 선호인원 갱신
-        }
-        playerInfoElement.remove();
+        await viewAssignedPlayer(cardElement);
       }
 
     }
 
-    function removeLeagueAssignedPlayer(dataset, playerInfoElement) {
+    async function removeLeagueAssignedPlayer(dataset, playerInfoElement) {
 
       const { clanTag, seasonDate, playerTag, joinedStatus } = dataset;
-      const result = deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
+      const result = await deleteClanLeagueAssignedMember(clanTag, seasonDate, playerTag);
       if (result) {
         const cardLeagueAssignedPlayer = playerInfoElement.closest('.card-league-assigned-player');
-        const totalSize = cardLeagueAssignedPlayer.querySelector('.total-size');
-        totalSize.innerHTML = Number(totalSize.innerHTML) - 1; // 배정인원 갱신
-        if (JSON.parse(joinedStatus)) {
-          const joinedSize = cardLeagueAssignedPlayer.querySelector('.joined-size');
-          joinedSize.innerHTML = Number(joinedSize.innerHTML) - 1; // 이동인원 갱신
-        }
-        playerInfoElement.remove();
+        await viewLeagueAssignedPlayer(cardLeagueAssignedPlayer);
       }
 
     }

@@ -14,4 +14,10 @@ public interface RaidRepository extends JpaRepository<RaidEntity, Long> {
 
     @Query("select raidEntity from RaidEntity raidEntity join fetch raidEntity.raiderEntityList where raidEntity.clanTag = :clanTag and raidEntity.startDate = :startDate")
     Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
+
+    @Query("select max(raid.startDate) from RaidEntity raid")
+    LocalDate getCurrentSeason();
+
+    @Query("SELECT raid.startDate FROM RaidEntity raid group by raid.startDate order by raid.startDate desc")
+    List<LocalDate> getAverageSeasonByLimit(Pageable pageable);
 }

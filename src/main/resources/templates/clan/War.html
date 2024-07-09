@@ -99,10 +99,6 @@
       appendNotAttackRows(attackListElement, attacksPerMember, attacks.length)
     }
 
-    function formatMinuteSecond(sec) {
-      return dayjs.duration(sec * 1000).format('m분 ss초');
-    }
-
     function appendNotAttackRows(attackListElement, attacksPerMember, attackLength) {
       let no = getStartNo();
 

@@ -122,12 +122,23 @@ body::before {
 }
 
 .logo {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   background-image: url("/static/images/logo.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+.mt-5 {
+  margin-top: 5px;
+}
+.ml-5 {
+  margin-left: 5px;
+}
+
+.font-nowrap {
+  white-space: nowrap !important;
 }
 
 .text-align-center {
@@ -192,6 +203,12 @@ body::before {
 .color-green {
   color: green !important;
 }
+.color-yellow-green {
+  color: yellowgreen !important;
+}
+.color-gold {
+  color: gold !important;
+}
 .color-red {
   color: red !important;
 }
@@ -200,12 +217,25 @@ body::before {
   cursor: pointer !important;
 }
 
+.flex-row {
+  flex-direction: row !important;
+}
+
+.flex-colum {
+  flex-direction: column !important;
+}
+
+
 .align-items-center {
   align-items: center !important;
 }
 
 .justify-content-center {
   justify-content: center !important;
+}
+
+.justify-content-left {
+  justify-content: left !important;
 }
 
 .justify-content-right {
@@ -249,6 +279,10 @@ body::before {
 .bg-black {
   background-color: black;
   color: white;
+}
+
+.bg-black-2 {
+  background-color: #232323;
 }
 
 .bg-pink {
@@ -412,6 +446,21 @@ body::before {
 
 
 /** image icon */
+.icon-arrow-line-left {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAK1JREFUKBVjYKAFaGhoYMJlLjMuibS0NNZHjx6t1tHR0bx69eoBdHVYTQRpev/+/Uqg4sD////rYbOZEd0kZE1AufWCgoLhs2bN+o2uDkUjsZpAhsA1kqIJpBGrH0EShAA8VM+ePfvPxsZm3Y8fP3SAmgJBNIgPEsdmCFwjSJIUzRhOBYUgKCSB5qwH4kBQtBAVHSCbQQAWWIyMjJdWrVrVABYklsBmE7F6caoDAB4rYZDo034sAAAAAElFTkSuQmCC) no-repeat;
+}
+.icon-arrow-line-right {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAAAXNSR0IArs4c6QAAAKNJREFUKBVjYKA2aGhoYMJnJiM2ybCwsIb////rCQoKhs+aNes3NjUYpoJsAmkCKg58//79yrS0NFZsGrHaCFIM0gTSDMTrsdnMjM20s2fP/rOxsVn348cPHZBmEA3ig8Rh6rFqBEkS0ozhR5iJhGisfgRpIuRPrBoJaQIZjOFUUHQQClGQRozAOXDgwH8dHR1NoNx7bNEA0oQXEEpyeDXjkwQAiyNhSndGN/YAAAAASUVORK5CYII=) no-repeat;
+}
+
 .icon-clock {
   width: 36px;
   height: 36px;

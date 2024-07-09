@@ -2,11 +2,11 @@ package open.api.coc.clans.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
+import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayersController {
 
     private final PlayersService playersService;
-    private final PlayerRepository playerRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<PlayerResponse>> getAllPlayer() {
@@ -37,6 +36,12 @@ public class PlayersController {
     public ResponseEntity<List<PlayerResponse>> getAllPlayerSummary() {
         return ResponseEntity.ok()
                              .body(playersService.findAllPlayersSummary());
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<List<PlayerResponse>> getAllPlayerSummary(String name) {
+        return ResponseEntity.ok()
+                             .body(playersService.findPlayersSummary(name));
     }
 
     @GetMapping("/all/tags")
@@ -101,5 +106,17 @@ public class PlayersController {
     public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments(@RequestParam String clanTag) {
         return ResponseEntity.ok()
                              .body(playersService.getRankingHeroEquipments(clanTag));
+    }
+
+    @GetMapping("/ranking/trophies/current")
+    public ResponseEntity<List<RankingHallOfFame>> getRankingTrophiesCurrent() {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingTrophiesCurrent());
+    }
+
+    @GetMapping("/ranking/attack/wins")
+    public ResponseEntity<List<RankingHallOfFame>> getRankingAttackWins() {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingAttackWins());
     }
 }

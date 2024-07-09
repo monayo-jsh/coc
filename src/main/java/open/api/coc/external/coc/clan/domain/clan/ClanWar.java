@@ -14,6 +14,9 @@ public class ClanWar {
     private Integer teamSize;
     private Integer attacksPerMember = 1; //default
 
+    private String battleModifier;
+
+    private String preparationStartTime;
     private String startTime;
     private String endTime;
 
@@ -33,4 +36,18 @@ public class ClanWar {
         return "warEnded".equals(state);
     }
 
+    @JsonIgnore
+    public boolean isInWar() {
+        return "inWar".equals(state);
+    }
+
+    @JsonIgnore
+    public boolean isNotNotInWar() {
+        return !isNotInWar();
+    }
+
+    @JsonIgnore
+    public boolean isNotInWar() {
+        return "notInWar".equals(state);
+    }
 }

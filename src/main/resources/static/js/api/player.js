@@ -2,6 +2,7 @@ const URI_PLAYERS = '/players'; //멤버 상세 조회
 
 const URI_PLAYERS_ALL = '/players/all'; //전체 클랜원 조회
 const URI_PLAYERS_ALL_SUMMARY = '/players/all/summary'; //전체 클랜원 요약 조회
+const URI_PLAYERS_SUMMARY = '/players/summary'; //클랜원 요약 이름 조회
 const URI_PLAYERS_ALL_TAGS = '/players/all/tags'; //전체 클랜원 태그 조회
 
 const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
@@ -11,7 +12,8 @@ const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 �
 const URI_PLAYERS_SUPPORT = '/players/{playerTag}/support'; //지원 등록/해제
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
-
+const URI_PLAYERS_RANKING_CURRENT_TROPHIES = "/players/ranking/trophies/current" //현재 트로피 순위
+const URI_PLAYERS_RANKING_ATTACK_WINS = "/players/ranking/attack/wins" //현재 공성 순위
 async function findPlayer(playerTag) {
   const uri = URI_PLAYERS_REALTIME.replace(/{playerTag}/, encodeURIComponent(playerTag));
   return await axios.get(uri)
@@ -39,6 +41,19 @@ async function fetchAllPlayerTags() {
 
 async function fetchAllClanPlayersSummary() {
   return await axios.get(URI_PLAYERS_ALL_SUMMARY)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchPlayersSummaryByName(playerName) {
+  const uri = URI_PLAYERS_SUMMARY + `?name=${encodeURIComponent(playerName)}`
+  return await axios.get(uri)
                     .then(response => {
                       const { data } = response
                       return data;
@@ -133,6 +148,30 @@ async function fetchRankingHeroEquipments(clanTag) {
   const uri = URI_PLAYERS_RANKING_HERO_EQUIPMENTS + `?clanTag=${encodeURIComponent(clanTag)}`;
   return await axios.get(uri)
                     .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingPlayerTrophies() {
+  return await axios.get(URI_PLAYERS_RANKING_CURRENT_TROPHIES)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingPlayerAttackWins() {
+  return await axios.get(URI_PLAYERS_RANKING_ATTACK_WINS)
+                    .then((response) => {
                       const { data } = response
                       return data;
                     })

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>클랜전 캘린더</title>
+
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarCalendar.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clanWar.js"></script>
+  <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
+  <script type="text/javascript">
+
+    dayjs.locale('ko');
+
+    const Calendar = tui.Calendar;
+    let calendar;
+
+    function moveMonth(number) {
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset
+
+      // 캘린더 날짜 변경
+      calendar.move(number);
+      calendarDate.dataset.date = dayjs(date).add(number, 'month');
+      drawCalendar();
+    }
+
+    function getCalendarDate() {
+      return document.querySelector('.calendar-date');
+    }
+
+    function initCalendar(now) {
+      const calendarDate = getCalendarDate();
+      calendarDate.dataset.date = now;
+
+      const container = document.getElementById('calendar');
+      const options = {
+        defaultView: 'month',
+        isReadOnly: true,
+        month: {
+          dayNames: ['일', '월', '화', '수', '목', '금', '토']
+        },
+        timezone: {
+          zones: [
+            {
+              timezoneName: 'Asia/Seoul',
+              displayLabel: 'Seoul',
+            }
+          ],
+        },
+        template: {
+          time(event) {
+            const { start, end, title } = event;
+
+            return `<span>${formatTime(start)}</span><span class="chip bg-green ml-5 cursor-pointer">${title}</span>`;
+          }
+        }
+      };
+
+      calendar = new Calendar(container, options);
+      calendar.on('clickEvent', async (event) => {
+        const { id } = event.event;
+
+        const clanWar = await fetchClanWarDetail(id);
+        if (!clanWar) {
+          drawFailed();
+          return;
+        }
+
+        drawClanWarDetail(clanWar);
+      });
+    }
+
+    function createEvent(clanWar) {
+      const { warId, clanTag, clanName, battleType, teamSize, state, startTime, endTime } = clanWar;
+
+      return {
+        id: warId,
+        calendarId: warId,
+        title: clanName,
+        start: startTime,
+        end: startTime,
+        dueDateClass: state,
+        raw: clanWar
+      }
+    }
+    function renderClanWars(clanWars) {
+      calendar.clear();
+
+      const events = [];
+      for (const clanWar of clanWars) {
+        events.push(createEvent(clanWar));
+      }
+
+      const sortedEvent = events.sort((a, b) => a.start - b.start);
+
+      calendar.createEvents(sortedEvent);
+    }
+
+    function getClanWarDetailWrap() {
+      return document.querySelector('.clan-war-detail-wrap');
+    }
+
+    function drawFailed() {
+      const clanWarDetailWrap = getClanWarDetailWrap();
+      clanWarDetailWrap.innerHTML = "조회 실패";
+    }
+
+    function makePeriod(startTime, endTime) {
+      const startDate = formatYYYYMMDDHHMM(dayjs(startTime));
+      const endDate = formatYYYYMMDDHHMM(dayjs(endTime));
+      return `${startDate} ~ ${endDate}`;
+    }
+
+    function convStateName(state) {
+      switch (state) {
+        case 'preparation': return '준비중';
+        case 'inWar': return '진행중';
+        case 'warEnded':
+        case 'warCollected':
+          return '종료';
+      }
+
+      return state;
+    }
+
+    function convBattleTypeName(battleType) {
+      if (battleType === 'none') return '일반 모드';
+      return '하드 모드';
+    }
+
+    function renderClanWarInfo(clanWar) {
+      const { clanName, state, startTime, endTime, battleType, teamSize } = clanWar;
+
+      const templateClanWarInfo = document.querySelector('#template-clan-war-info');
+      const clanWarInfo = document.importNode(templateClanWarInfo.content, true);
+      const clanWarInfoTable = clanWarInfo.querySelector('.table');
+      clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
+                                                   .replace(/{NAME}/, clanName)
+                                                   .replace(/{BATTLE_TYPE}/, convBattleTypeName(battleType))
+                                                   .replace(/{TEAM_SIZE}/, teamSize)
+                                                   .replace(/{START_DATE}/, formatYYYYMMDDHHMM(dayjs(startTime)))
+                                                   .replace(/{END_DATE}/, formatYYYYMMDDHHMM(dayjs(endTime)))
+                                                   .replace(/{WAR_STATE}/, convStateName(state));
+
+
+      const clanWarInfoElement = document.querySelector(".clan-war-info");
+      clanWarInfoElement.innerHTML = "";
+      clanWarInfoElement.appendChild(clanWarInfoTable);
+    }
+
+    function showClanWarDetail() {
+      const clanWarDetailWrap = document.querySelector('.clan-war-detail-wrap');
+      clanWarDetailWrap.classList.remove('display-none');
+    }
+
+    function renderClanWarMember(attacksPerMember, member) {
+      const { tag, name, attacks } = member;
+
+      // 미공 표기만 선 개발
+      if (attacks.length === attacksPerMember) return;
+
+      const templateAttackRow = document.querySelector('#template-missing-attack-row');
+      const attackRow = document.importNode(templateAttackRow.content, true);
+      const row = attackRow.querySelector('.row');
+
+      row.innerHTML = row.innerHTML
+                         .replace(/{NAME}/, name)
+                         .replace(/{TAG}/, tag);
+
+      return row;
+    }
+
+    function renderClanWarMembers(clanWar) {
+      const { attacksPerMember, members } = clanWar;
+
+      const tableTbody = document.querySelector('.missing-attack .table-tbody');
+
+      //clear
+      tableTbody.innerHTML = "";
+
+      for (const member of members) {
+        const row = renderClanWarMember(attacksPerMember, member);
+        if (row){
+          tableTbody.appendChild(row);
+        }
+      }
+    }
+
+    function drawClanWarDetail(clanWar) {
+
+      renderClanWarInfo(clanWar);
+      renderClanWarMembers(clanWar);
+
+      showClanWarDetail();
+    }
+
+    async function drawCalendarEvents(date) {
+      const searchMonth = formatYYYYMMDD(date);
+      const clanWars = await fetchClanWars(searchMonth);
+
+      renderClanWars(clanWars);
+    }
+
+    async function drawCalendar() {
+      calendar.clear();
+
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset;
+      calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
+
+      await drawCalendarEvents(date);
+    }
+
+    window.onload = async () => {
+      const now = dayjs();
+      initCalendar(now);
+      await drawCalendar();
+    }
+  </script>
+</head>
+<body>
+  <div class="contents">
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">클랜전 캘린더</span>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+        <i class="icon-arrow-line-left"></i>
+      </div>
+      <div class="calendar-date"></div>
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+        <i class="icon-arrow-line-right"></i>
+      </div>
+    </div>
+    <div id="calendar" class="clan-war-calendar"></div>
+    <div id="clan-war-detail" class="clan-war-detail-wrap display-none">
+
+      <div class="table mt-5 clan-war-info"></div>
+
+      <div class="table mt-5 missing-attack">
+        <table class="table">
+          <thead>
+            <tr class="table-tr">
+              <th class="table-th">플레이어 (태그)</th>
+              <th class="table-th">
+                <div class="th-wrap">
+                  <i class="fa-solid fa-star color-gold"></i>
+                </div>
+              </th>
+              <th class="table-th">
+                <div class="th-wrap">
+                  <div class="icon-damage"></div>
+                </div>
+              </th>
+              <th class="table-th">
+                <div class="th-wrap">
+                  <div class="icon-clock"></div>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody class="table-tbody"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+<template id="template-clan-war-info">
+  <table class="table">
+    <tr>
+      <th class="th-wrap">클랜명</th>
+      <td>{NAME}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">인원</th>
+      <td>{TEAM_SIZE}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">전투</th>
+      <td>{BATTLE_TYPE}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">전투 시작</th>
+      <td>{START_DATE}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">전투 종료</th>
+      <td>{END_DATE}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">상태</th>
+      <td>{WAR_STATE}</td>
+    </tr>
+  </table>
+</template>
+<template id="template-missing-attack-row">
+  <tr class="table-tr row">
+    <td>
+      <div class="td-wrap justify-content-left">
+        <div class="name">{NAME}</div>
+        <div class="chip ml-5">{TAG}</div>
+      </div>
+    </td>
+    <td colspan="3">
+      <div class="td-wrap">
+        공격 기록 없음
+      </div>
+    </td>
+  </tr>
+</template>
+</html>

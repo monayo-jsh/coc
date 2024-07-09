@@ -10,6 +10,16 @@
   gap: 10px;
 }
 
+.card.blue-1 {
+  background-color: #0080ff;
+}
+.card.blue-2 {
+  background-color: #006bd5;
+}
+.card.blue-3 {
+  background-color: #016ad2;
+}
+
 .card.red-1 {
   background-color: #ff5a77;
 }
@@ -24,7 +34,11 @@
 }
 
 .card.green-1 {
-  background-color: #1ca34e;
+  background-color: #1ead53;
+}
+
+.card.green-2 {
+  background-color: #198d44;
 }
 
 .card.blue {
@@ -56,6 +70,7 @@
   background-color: #e8c42a;
 }
 
+
 .card-group {
   gap: 5px;
   display: flex;
@@ -65,6 +80,37 @@
 .title {
   text-align: center;
   font-weight: bold;
+}
+
+.card-inner-group {
+  margin-top: 5px;
+
+  .title {
+    text-align: left;
+    border-left: 5px solid black;
+    padding-left: 5px;
+  }
+
+  .cards {
+    margin-top: 5px;
+  }
+}
+
+.hall-of-fame {
+  color: gold;
+  padding: 5px 10px;
+  background-color: #232323;
+  border-radius: 10px;
+  width: 180px;
+  height: 55px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  i {
+    color: gold;
+  }
 }
 
 .description {
@@ -88,6 +134,17 @@
 @media (max-width: 400px) {
   .card {
     width: 140px !important;
+  }
+  .card.w90 {
+    width: 90px !important;
+  }
+}
+
+.card.with-icon {
+  flex-direction: row;
+
+  .tip {
+    margin-left: 5px;
   }
 }
 

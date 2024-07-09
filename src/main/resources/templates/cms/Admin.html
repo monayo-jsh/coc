@@ -71,19 +71,19 @@
         <div class="title">클랜 관리</div>
 
         <div class="cards">
-          <div class="card red-1" onclick="renderPage('/clan/cms/member/manager'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/cms/member/manager'); return false;">
             <p class="tip">클랜원 관리</p>
             <p class="second-text">(클랜원 등록/삭제)</p>
           </div>
 
-          <div class="card red-2" onclick="renderPage('/clan/cms/clan/manager'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/manager'); return false;">
             <p class="tip">클랜 관리</p>
             <p class="second-text">(클랜 등록/삭제)</p>
           </div>
         </div>
 
         <div class="cards">
-          <div class="card red-9" onclick="downloadAllClanMembers(); return false;">
+          <div class="card bg-black-2" onclick="downloadAllClanMembers(); return false;">
             <p class="tip">전체 클랜원</p>
             <p class="second-text">(엑셀 다운)</p>
           </div>
@@ -93,15 +93,35 @@
       <div class="card-group">
         <div class="title">컨텐츠 관리</div>
 
-        <div class="cards">
-          <div class="card coral-1" onclick="renderPage('/clan/cms/raid/score'); return false;">
-            <p class="tip">습격전 기록 조회</p>
-            <p class="second-text"></p>
+        <div class="card-inner-group">
+          <div class="title">클랜전</div>
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/calendar'); return false;">
+              <p class="tip">캘린더</p>
+              <p class="second-text">(미공)</p>
+            </div>
+          </div>
+        <div>
+        <div class="card-inner-group">
+          <div class="title">습격전</div>
+
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/missing/attack'); return false;">
+              <p class="tip">미공 조회</p>
+              <p class="second-text">(이번 시즌)</p>
+            </div>
+
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid'); return false;">
+              <p class="tip">위반 현황</p>
+              <p class="second-text">(직전 주 2만점 이하)</p>
+            </div>
           </div>
 
-          <div class="card coral" onclick="renderPage('/clan/cms/raid'); return false;">
-            <p class="tip">습격전 위반 현황</p>
-            <p class="second-text">(직전 주 2만점 이하)</p>
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/score'); return false;">
+              <p class="tip">습격전 기록 조회</p>
+              <p class="second-text">(클랜원)</p>
+            </div>
           </div>
         </div>
       </div>

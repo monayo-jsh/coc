@@ -216,6 +216,7 @@ public class ClansController {
         return ResponseEntity.ok().body(clanCurrentWar);
     }
 
+
     @GetMapping("/league-war")
     public ResponseEntity<ClanCurrentWarResponse> getClanWarLeagueRound(@RequestParam String clanTag, @RequestParam String roundTag) {
         return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));

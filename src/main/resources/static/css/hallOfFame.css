@@ -1,0 +1,162 @@
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.hall-of-fame {
+  margin-top: 10px;
+  color: black;
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  i {
+    color: gold;
+  }
+}
+
+.table-td:nth-child(1) {
+}
+.table-td:nth-child(2) {
+  white-space: nowrap;
+}
+.table-td:nth-child(3) {
+  white-space: nowrap;
+}
+.table-td:nth-child(4) {
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+ .support-area {
+   width: 300px;
+ }
+}
+.support-area {
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  .radio-inputs {
+    flex-wrap: nowrap;
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
+}
+.section-wrapper {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .section-title {
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: cornsilk;
+    padding: 5px 60px;
+  }
+
+  .section-contents {
+    min-width: 300px;
+    min-height: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    .section {
+      margin: 3px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .sub-title {
+        font-size: .8em;
+        font-weight: bold;
+      }
+
+      .rankings {
+        margin-top: 3px;
+        width: 300px;
+
+        .table-tr.rank-1 .table-td {
+          font-size: 13px;
+          font-weight: 700;
+        }
+        .table-tr.rank-2 .table-td {
+          font-size: 12px;
+          font-weight: 600;
+        }
+        .table-tr.rank-3 .table-td {
+          font-size: 11px;
+          font-weight: 500;
+        }
+
+        .table-th {
+          font-size: 0.9em;
+        }
+
+        .table-td {
+          font-size: 10px;
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .td-wrap:not(:first-child) {
+            margin-top: 3px;
+          }
+        }
+
+        .table-td.empty {
+          font-size: 13px;
+          height: 461.5px;
+        }
+
+        @media (max-width: 400px) {
+          .table-td.empty {
+            font-size: 13px;
+            height: 100px;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+i.fa-star {
+  margin-right: 5px;
+  color: gold;
+}
+
+div.icon.trophies,
+div.icon-sword,
+div.icon-damage,
+div.icon-clock,
+div.icon-clan-capital {
+  margin-right: 5px;
+  width: 18px;
+  height: 16px;
+}
+
+i.first-place {
+  color: #ffd700;
+}
+i.second-place {
+  color: #c0c0c0;
+}
+i.third-place {
+  color: #CD7F32;
+}

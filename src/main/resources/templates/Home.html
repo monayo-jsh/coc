@@ -5,6 +5,8 @@
   <meta http-equiv="refresh" CONTENT="no-cache">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
@@ -76,26 +78,44 @@
 
     <div class="contents">
 
+      <div class="card-group align-items-center flex-row justify-content-center">
+        <div class="title hall-of-fame" onclick="renderPage('/hall-of-fame'); return false;">
+          <i class="fa-solid fa-trophy"></i>
+          명예의전당
+          <i class="fa-solid fa-medal"></i>
+        </div>
+        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('https://www.youtube.com/@nomicoc'); return false;">
+          <i class="fa-brands fa-youtube fa-lg" style="color: gold;"></i>
+          <p class="tip">뱃튜브</p>
+        </div>
+      </div>
+
       <div class="card-group">
         <div class="title">아카데미 정보</div>
         <div class="cards">
-          <div class="card red-1" onclick="renderPage('/clan/member'); return false;">
-            <p class="tip">전체 클랜원</p>
+          <div class="card bg-black-2" onclick="renderPage('/lab/links'); return false;">
+            <p class="tip">연구소</p>
+            <p class="second-text"></p>
           </div>
-          <div class="card red-2" onclick="renderPage('/clan'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan'); return false;">
             <p class="tip">클랜 목록</p>
             <p class="second-text"></p>
           </div>
         </div>
+      </div>
+      <div class="card-group">
+        <div class="title">아카데미 클랜원</div>
         <div class="cards">
-          <div class="card red-3" onclick="renderPage('/lab/links'); return false;">
-            <p class="tip">연구소</p>
-            <p class="second-text"></p>
+          <div class="card bg-black-2" onclick="renderPage('/clan/member'); return false;">
+            <p class="tip">전체 클랜원</p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('/find/member'); return false;">
+            <p class="tip">클랜원 검색</p>
           </div>
         </div>
         <div class="cards">
-          <div class="card green-1" onclick="renderPage('/hero/equipments'); return false;">
-            <p class="tip">영웅 장비 랭킹</p>
+          <div class="card bg-black-2" onclick="renderPage('/hero/equipments'); return false;">
+            <p class="tip">영웅 장비 현황</p>
             <p class="second-text"></p>
           </div>
         </div>
@@ -104,31 +124,23 @@
       <div class="card-group">
         <div class="title">아카데미 컨텐츠</div>
         <div class="cards">
-          <div class="card green" onclick="renderPage('/capital/raid'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=normal'); return false;">
+            <p class="tip">클랜전 현황</p>
+            <p class="second-text">(토,월,수 매칭)</p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('/capital/raid'); return false;">
             <p class="tip">습격전 현황</p>
             <p class="second-text">(매주 금요일 진행)</p>
           </div>
         </div>
         <div class="cards">
-          <div class="card blue" onclick="renderPage('/clan/war?type=normal'); return false;">
-            <p class="tip">클랜전 현황</p>
-            <p class="second-text">(토,월,수 매칭)</p>
-          </div>
-        </div>
-        <div class="cards">
-          <div class="card black" onclick="renderPage('/clan/league'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/league/new'); return false;">
             <p class="tip">리그전 현황</p>
             <p class="second-text">(매월 초 진행)</p>
           </div>
-          <div class="card coral" onclick="renderPage('/clan/war?type=parallel'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=parallel'); return false;">
             <p class="tip">병행클랜전 현황</p>
             <p class="second-text">(월초 리그전 진행)</p>
-          </div>
-        </div>
-        <div class="cards">
-          <div class="card black" onclick="renderPage('/clan/league/new'); return false;">
-            <p class="tip">리그전 현황 (new)</p>
-            <p class="second-text">(매월 초 진행)</p>
           </div>
         </div>
       </div>

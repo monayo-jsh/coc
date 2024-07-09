@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>클랜전 캘린더</title>
 
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
@@ -18,14 +20,29 @@
   <script src="/static/js/api/clanWar.js"></script>
   <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
   <script type="text/javascript">
-    dayjs.locale('ko')
+
+    dayjs.locale('ko');
 
     const Calendar = tui.Calendar;
     let calendar;
 
-    function initCalendar() {
-      const calendarDate = document.querySelector('.calendar-date');
-      calendarDate.innerHTML = dayjs().format('YYYY년 MM월');
+    function moveMonth(number) {
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset
+
+      // 캘린더 날짜 변경
+      calendar.move(number);
+      calendarDate.dataset.date = dayjs(date).add(number, 'month');
+      drawCalendar();
+    }
+
+    function getCalendarDate() {
+      return document.querySelector('.calendar-date');
+    }
+
+    function initCalendar(now) {
+      const calendarDate = getCalendarDate();
+      calendarDate.dataset.date = now;
 
       const container = document.getElementById('calendar');
       const options = {
@@ -79,12 +96,16 @@
       }
     }
     function renderClanWars(clanWars) {
+      calendar.clear();
+
       const events = [];
       for (const clanWar of clanWars) {
         events.push(createEvent(clanWar));
       }
 
-      calendar.createEvents(events);
+      const sortedEvent = events.sort((a, b) => a.start - b.start);
+
+      calendar.createEvents(sortedEvent);
     }
 
     function getClanWarDetailWrap() {
@@ -129,7 +150,8 @@
                                                    .replace(/{NAME}/, clanName)
                                                    .replace(/{BATTLE_TYPE}/, convBattleTypeName(battleType))
                                                    .replace(/{TEAM_SIZE}/, teamSize)
-                                                   .replace(/{WAR_PERIOD}/, makePeriod(startTime, endTime))
+                                                   .replace(/{START_DATE}/, formatYYYYMMDDHHMM(dayjs(startTime)))
+                                                   .replace(/{END_DATE}/, formatYYYYMMDDHHMM(dayjs(endTime)))
                                                    .replace(/{WAR_STATE}/, convStateName(state));
 
 
@@ -138,7 +160,7 @@
       clanWarInfoElement.appendChild(clanWarInfoTable);
     }
 
-    function displayClanWarDetail() {
+    function showClanWarDetail() {
       const clanWarDetailWrap = document.querySelector('.clan-war-detail-wrap');
       clanWarDetailWrap.classList.remove('display-none');
     }
@@ -181,14 +203,30 @@
       renderClanWarInfo(clanWar);
       renderClanWarMembers(clanWar);
 
-      displayClanWarDetail();
+      showClanWarDetail();
+    }
+
+    async function drawCalendarEvents(date) {
+      const searchMonth = formatYYYYMMDD(date);
+      const clanWars = await fetchClanWars(searchMonth);
+
+      renderClanWars(clanWars);
+    }
+
+    async function drawCalendar() {
+      calendar.clear();
+
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset;
+      calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
+
+      await drawCalendarEvents(date);
     }
 
     window.onload = async () => {
-      initCalendar();
-      const searchMonth = formatYYYYMMDD(dayjs());
-      const clanWars = await fetchClanWars(searchMonth);
-      renderClanWars(clanWars);
+      const now = dayjs();
+      initCalendar(now);
+      await drawCalendar();
     }
   </script>
 </head>
@@ -200,12 +238,12 @@
       </div>
     </div>
 
-    <div class="header display-none">
-      <div class="calendar-icon cursor-pointer">
+    <div class="header">
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
         <i class="icon-arrow-line-left"></i>
       </div>
       <div class="calendar-date"></div>
-      <div class="calendar-icon cursor-pointer">
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
         <i class="icon-arrow-line-right"></i>
       </div>
     </div>
@@ -259,8 +297,12 @@
       <td>{BATTLE_TYPE}</td>
     </tr>
     <tr>
-      <th class="th-wrap">전투 기간</th>
-      <td>{WAR_PERIOD}</td>
+      <th class="th-wrap">전투 시작</th>
+      <td>{START_DATE}</td>
+    </tr>
+    <tr>
+      <th class="th-wrap">전투 종료</th>
+      <td>{END_DATE}</td>
     </tr>
     <tr>
       <th class="th-wrap">상태</th>

@@ -5,6 +5,7 @@
   flex-direction: column;
   align-items: center;
 }
+
 .card {
   max-width: 1240px;
   width: 100%;
@@ -45,10 +46,7 @@
 }
 
 .clan-war-detail-wrap {
-  width: 50%;
-  height: 500px;
-  overflow-y: auto;
-  scrollbar-width: thin;
+  width: 100%;
 }
 
 .icon-damage {
@@ -88,9 +86,26 @@
 .calendar-icon {
   margin: 5px;
   border: 1px solid #bbb;
-  border-radius: 50%;
-  padding: 8px;
+  border-radius: 25px;
+  padding: 3px 8px;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.clan-war-info {
+
+  th {
+    width: 100px;
+  }
+
+  td {
+    width: 100%;
+  }
+}
+
+.table.missing-attack {
+  max-height: 500px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }

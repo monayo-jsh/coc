@@ -24,6 +24,9 @@
     let calendar;
 
     function initCalendar() {
+      const calendarDate = document.querySelector('.calendar-date');
+      calendarDate.innerHTML = dayjs().format('YYYY년 MM월');
+
       const container = document.getElementById('calendar');
       const options = {
         defaultView: 'month',
@@ -197,6 +200,15 @@
       </div>
     </div>
 
+    <div class="header display-none">
+      <div class="calendar-icon cursor-pointer">
+        <i class="icon-arrow-line-left"></i>
+      </div>
+      <div class="calendar-date"></div>
+      <div class="calendar-icon cursor-pointer">
+        <i class="icon-arrow-line-right"></i>
+      </div>
+    </div>
     <div id="calendar" class="clan-war-calendar"></div>
     <div id="clan-war-detail" class="clan-war-detail-wrap display-none">
 

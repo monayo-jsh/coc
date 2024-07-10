@@ -1000,6 +1000,11 @@
         appendSummaryStar(row, 'attack', makeSummaryStar(convNumberToString(summaryAttackStar)));
         appendSummaryStar(row, 'defense', makeSummaryStar(convNumberToString(summaryDefenseStar)));
 
+        if (totalStars === (useAttacks * 3)) {
+          // 완파중인 경우 색상 적용
+          row.classList.add('complete-defeat');
+        }
+
         memberRankElement.appendChild(row);
       }
     }

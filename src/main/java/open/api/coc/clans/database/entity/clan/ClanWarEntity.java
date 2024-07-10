@@ -5,6 +5,8 @@ import static jakarta.persistence.FetchType.LAZY;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,6 +17,7 @@ import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,6 +44,11 @@ public class ClanWarEntity {
     @Column(name = "state")
     private String state;
 
+    @Column(name = "type", updatable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private ClanWarType type = ClanWarType.NONE;
+
     @Builder.Default
     @Column(name = "bttle_type")
     private String battleType = "none";
@@ -62,6 +70,10 @@ public class ClanWarEntity {
 
     @Column(name = "attacks_per_member")
     private Integer attacksPerMember;
+
+    // 리그전 클전의 경우 warTag 알 수 있음
+    @Column(name = "war_tag")
+    private String warTag;
 
     @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "clanWar", cascade = CascadeType.ALL)
@@ -91,5 +103,9 @@ public class ClanWarEntity {
 
     public static ClanWarEntity empty() {
         return ClanWarEntity.builder().build();
+    }
+
+    public boolean isLeagueWar() {
+        return Objects.equals(type, ClanWarType.LEAGUE);
     }
 }

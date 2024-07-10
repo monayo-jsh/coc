@@ -6,6 +6,7 @@ public interface RankingHallOfFame {
     String getTag();
     Integer getScore();
 
+    String getClanTag();
     String getClanName();
     Integer getDestructionPercentage();
     Integer getDuration();

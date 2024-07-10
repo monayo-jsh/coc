@@ -1,3 +1,4 @@
+
 package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
@@ -26,21 +27,23 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberAttackRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.ranking.ClanWarCount;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
+import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,15 +61,12 @@ public class ClanWarService {
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
     private final ClanWarRepository clanWarRepository;
-    private final ClanWarMemberRepository clanWarMemberRepository;
-    private final ClanWarMemberAttackRepository clanWarMemberAttackRepository;
 
     private final TimeConverter timeConverter;
     private final EntityClanWarResponseConverter entityClanWarResponseConverter;
 
     private final String CLAN_WAR_ROOT_DIR = "./clan-war";
     private final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
-    private final String JSON_FILE_NAME = "%s.json";
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -74,7 +74,7 @@ public class ClanWarService {
      * 생성된 경우 상태값, 종료시간 갱신
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public ClanWarEntity mergeClanWar(ClanWar clanWar) {
+    public ClanWarEntity mergeClanWar(ClanWar clanWar, ClanWarType clanWarType) {
 
         String clanTag = clanWar.getClan().getTag();
 
@@ -100,7 +100,19 @@ public class ClanWarService {
         }
 
         // 클랜전 기록 생성
-        return saveClanWar(clanWar);
+        return saveClanWar(clanWar, clanWarType);
+    }
+
+    @Transactional
+    public void mergeClanWarLeague(String clanTag, String warTag, ClanWar clanWar) {
+        // 처리를 위한 데이터 설정
+        clanWar.setBattleModifier("none");
+        clanWar.setWarTag(warTag);
+
+        clanWar.swapWarClan(clanTag);
+
+        ClanWarEntity clanWarEntity = mergeClanWar(clanWar, ClanWarType.LEAGUE);
+        mergeClanWarMember(clanWarEntity, clanWar);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -160,9 +172,11 @@ public class ClanWarService {
         }
     }
 
-    private ClanWarEntity saveClanWar(ClanWar clanWar) {
+    private ClanWarEntity saveClanWar(ClanWar clanWar, ClanWarType clanWarType) {
         ClanWarEntity clanWarEntity = ClanWarEntity.builder()
+                                                   .warTag(clanWar.getWarTag())
                                                    .state(clanWar.getState())
+                                                   .type(clanWarType)
                                                    .battleType(clanWar.getBattleModifier())
                                                    .clanTag(clanWar.getClan().getTag())
                                                    .preparationStartTime(getLocalDateTime(clanWar.getPreparationStartTime()))
@@ -199,6 +213,7 @@ public class ClanWarService {
     }
 
     private String makeJsonFileName(String warTag) {
+        String JSON_FILE_NAME = "%s.json";
         return JSON_FILE_NAME.formatted(warTag);
     }
 
@@ -215,9 +230,26 @@ public class ClanWarService {
 
     private void collectClanWar(ClanWarEntity clanWarEntity) {
 
+        ClanWar clanWar = getClanWar(clanWarEntity);
+
+        if (Objects.isNull(clanWar)) return;
+
+        mergeClanWarMember(clanWarEntity, clanWar);
+        clanWarEntity.changeStateWarCollected();
+    }
+
+    private ClanWar getClanWar(ClanWarEntity clanWarEntity) {
+        if (clanWarEntity.isLeagueWar()) {
+            return findClanLeagueWar(clanWarEntity);
+        }
+
+        return findClanWar(clanWarEntity);
+    }
+
+    private ClanWar findClanWar(ClanWarEntity clanWarEntity) {
         ClanWar clanWar = findClanWarFromFile(clanWarEntity);
 
-        if (ObjectUtils.isEmpty(clanWar)) { return; }
+        if (ObjectUtils.isEmpty(clanWar)) { return clanWar; }
         if (!clanWar.isWarEnded()) {
             // 수집하기전 클랜전 종료 상태 데이터로 수집하도록 데이터 현행화 수행
             Optional<ClanWar> findClanWar = clanApiService.findClanCurrentWarByClanTag(clanWarEntity.getClanTag());
@@ -233,14 +265,128 @@ public class ClanWarService {
                     log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanWarEntity.getClanTag());
                 }
 
+                // 최신 데이터 기록
+                writeClanWarToFile(clanWar);
             }
-
         }
 
-        mergeClanWarMember(clanWarEntity, clanWar);
-        clanWarEntity.changeStateWarCollected();
+        return clanWar;
     }
 
+    private ClanWar findClanLeagueWar(ClanWarEntity clanWarEntity) {
+        String clanTag = clanWarEntity.getClanTag();
+        String season = clanWarEntity.getStartTime().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        String warTag = clanWarEntity.getWarTag();
+
+        ClanWar clanWar = findClanWarLeagueFromFile(clanTag, season, warTag);
+        if (ObjectUtils.isEmpty(clanWar)) { return clanWar; }
+
+        if (!clanWar.isWarEnded()) {
+            // 수집하기전 클랜전 종료 상태 데이터로 수집하도록 데이터 현행화 수행
+            Optional<ClanWar> findClanWarLeague = clanApiService.findWarLeagueByWarTag(warTag);
+            if (findClanWarLeague.isEmpty()) {
+                log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanTag);
+            } else {
+                // 수집하기 직전 최신 데이터로 수집 진행
+                ClanWar clanWarLeague = findClanWarLeague.get();
+                if (clanWarLeague.isWarEnded() || clanWarLeague.isInWar()) {
+                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                    clanWar = clanWarLeague;
+                } else {
+                    log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanTag);
+                }
+
+                // 최신 데이터 기록
+                writeClanWarLeagueResult(clanTag, season, warTag, clanWar);
+            }
+        }
+
+        return clanWar;
+    }
+
+    final String LEAGUE_WAR_ROOT_DIR = "./war-league";
+    final String LEAGUE_WAR_SEASON_DIR = "/{season}/{clanTag}";
+    final String LEAGUE_WAR_SEASON_INFO_FILE_NAME = "league-info";
+    final String LEAGUE_WAR_ROUND_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR + "/round";
+
+    final String LEAGUE_WAR_INFO_DIR = LEAGUE_WAR_ROOT_DIR + LEAGUE_WAR_SEASON_DIR;
+
+    private String getLeagueWarSeasonInfoFileName() {
+        return makeJsonFileName(LEAGUE_WAR_SEASON_INFO_FILE_NAME);
+    }
+
+    public ClanCurrentWarLeagueGroup findClanCurrentWarLeagueGroupFromFile(String season, String clanTag) {
+        final String path = LEAGUE_WAR_INFO_DIR.replace("{season}", season)
+                                               .replace("{clanTag}", clanTag);
+
+        // directory: ./war-league/{season}/{clanTag}/round/{warTag}.json
+        File file = new File(path, getLeagueWarSeasonInfoFileName());
+
+        // Not Found.
+        if (!file.exists()) return null;
+
+        try {
+            return objectMapper.readValue(file, ClanCurrentWarLeagueGroup.class);
+        } catch (Exception e) {
+            log.error("파일({}) 파싱 오류, {}", file.getAbsoluteFile(), e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public void writeClanWarLeagueSeasonGroup(String clanTag, ClanCurrentWarLeagueGroup clanCurrentWarLeagueGroup) {
+        try {
+            // directory: ./war-league/{season}/{clanTag}
+            final String path = LEAGUE_WAR_INFO_DIR.replace("{season}", clanCurrentWarLeagueGroup.getSeason())
+                                                   .replace("{clanTag}", clanTag);
+
+            ClassPathResource resource = checkAndMakeDirectory(path);
+
+            // 이하 클랜태그별 폴더
+            String fileName = getLeagueWarSeasonInfoFileName();
+
+            File file = new File(resource.getPath(), fileName);
+            makeEmptyFile(file);
+
+            writeFile(file, clanCurrentWarLeagueGroup);
+        } catch (IOException e) {
+            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    public ClanWar findClanWarLeagueFromFile(String clanTag, String season, String warTag) {
+        final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
+                                                .replace("{clanTag}", clanTag);
+
+        // directory: ./war-league/{season}/{clanTag}/round/{warTag}.json
+        File file = new File(path, makeJsonFileName(warTag));
+
+        // Not Found.
+        if (!file.exists()) return null;
+
+        try {
+            return objectMapper.readValue(file, ClanWar.class);
+        } catch (Exception e) {
+            log.error("파일({}) 파싱 오류, {}", warTag, e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public void writeClanWarLeagueResult(String clanTag, String season, String warTag, ClanWar clanWar) {
+        try {
+            // directory: ./war-league/{season}/{clanTag}/round
+            final String path = LEAGUE_WAR_ROUND_DIR.replace("{season}", season)
+                                                    .replace("{clanTag}", clanTag);
+
+            ClassPathResource resource = checkAndMakeDirectory(path);
+
+            File file = new File(resource.getPath(), makeJsonFileName(warTag));
+            makeEmptyFile(file);
+
+            writeFile(file, clanWar);
+        } catch (IOException e) {
+            log.error("파일을 생성하는 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
 
     private <T> void writeFile(File file, T data) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
@@ -266,11 +412,6 @@ public class ClanWarService {
         return resource;
     }
 
-    @Transactional
-    public ClanWarEntity saveCurrentClanWar(ClanWar clanWar) {
-        writeClanWarToFile(clanWar);
-        return mergeClanWar(clanWar);
-    }
     public void writeClanWarToFile(ClanWar clanWar) {
         try {
             // directory: ./clan-war/{clanTag}
@@ -296,10 +437,10 @@ public class ClanWarService {
         LocalDateTime endTime = getEndTime(searchMonth);
 
         if (StringUtils.isEmpty(clanTag)) {
-            return clanWarRepository.selectRankingClanWarStars(startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
+            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
         }
 
-        return clanWarRepository.selectRankingClanWarStarsByClanTag(startTime, endTime, clanTag, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, startTime, endTime, clanTag, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
     private LocalDateTime getStartTime(LocalDate searchMonth) {
@@ -344,5 +485,33 @@ public class ClanWarService {
         ClanWarResponse clanWar = entityClanWarResponseConverter.convertWithMember(clanWarEntity);
         clanWar.setClanName(getClanName(clanWar.getClanTag()));
         return clanWar;
+    }
+
+    public List<RankingHallOfFame> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
+        LocalDateTime startTime = getStartTime(searchMonth);
+        LocalDateTime endTime = getEndTime(searchMonth);
+
+        List<RankingHallOfFame> rankingHallOfFames;
+
+        if (StringUtils.isEmpty(clanTag)) {
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStars(ClanWarType.LEAGUE, startTime, endTime, Pageable.unpaged());
+        } else {
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.LEAGUE, startTime, endTime, clanTag, Pageable.unpaged());
+        }
+
+        List<ClanWarCount> leagueClanWarRounds = clanWarRepository.selectClanWarCount(ClanWarType.LEAGUE, startTime, endTime);
+        Map<String, Integer> clanWarCountMap = leagueClanWarRounds.stream()
+                                                                  .collect(Collectors.toMap(ClanWarCount::getTag, ClanWarCount::getCount));
+
+        // 완파한 클랜원만 제공
+        return rankingHallOfFames.stream()
+                                 .filter(ranking -> isCompleteStars(ranking, clanWarCountMap))
+                                 .toList();
+    }
+
+    private boolean isCompleteStars(RankingHallOfFame ranking, Map<String, Integer> clanWarCountMap) {
+        Integer clanWarCount = clanWarCountMap.get(ranking.getClanTag());
+        Integer completedStarCount = clanWarCount * 3;
+        return Objects.equals(ranking.getScore(), completedStarCount);
     }
 }

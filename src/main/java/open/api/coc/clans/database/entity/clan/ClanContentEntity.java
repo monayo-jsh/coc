@@ -7,6 +7,7 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -63,5 +64,9 @@ public class ClanContentEntity implements Persistable<String> {
                                 .clanCapitalYn(YnType.N.name())
                                 .clanWarParallelYn(YnType.N.name())
                                 .build();
+    }
+
+    public boolean isClanWarParallel() {
+        return Objects.equals(YnType.Y.name(), clanWarParallelYn);
     }
 }

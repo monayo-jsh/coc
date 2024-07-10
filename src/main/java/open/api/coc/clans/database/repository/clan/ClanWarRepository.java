@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,12 +34,12 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
         + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
-        + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
-        + " WHERE clanWar.state = 'warCollected'"
+        + " WHERE clanWar.type = :type "
+        + " AND clanWar.state = 'warCollected'"
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
-    List<RankingHallOfFame> selectRankingClanWarStars(LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+    List<RankingHallOfFame> selectRankingClanWarStars(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
     @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
         + "         max(player.name) as name, "
@@ -51,13 +52,13 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag"
         + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
-        + " JOIN ClanContentEntity clanContent on clanContent.tag = clan.tag and clanContent.clanWarYn = 'Y' "
-        + " WHERE clanWar.clanTag = :clanTag "
+        + " WHERE clanWar.type = :type "
+        + " AND clanWar.clanTag = :clanTag "
         + " AND clanWar.state = 'warCollected'"
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
-    List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
+    List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
 
     @Query("select clanWar"
         + " from ClanWarEntity clanWar"

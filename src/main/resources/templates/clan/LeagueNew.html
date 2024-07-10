@@ -696,16 +696,21 @@
       const leagueMemberRecord = leagueWarClanContents.querySelector('.league-member-record');
       const leagueMemberRecordRowTemplate = document.querySelector('#league-member-record-row');
 
-      let rank = 0;
+      let rank = 1;
       let beforeTotalStars = 0
       let beforeTotalDestructionPercentage = 0;
+      let sameRankCount = 0;
       for(const [key, value] of sortedRankMap) {
+
         const leagueMemberRecordRow = document.importNode(leagueMemberRecordRowTemplate.content, true);
         const row = leagueMemberRecordRow.querySelector('.row');
 
         const { tag, name, townHallLevel, totalStars, totalDestructionPercentage, useAttacks, totalAttacks } = value;
         if (beforeTotalStars !== totalStars || beforeTotalDestructionPercentage !== totalDestructionPercentage) {
-          rank += 1;
+          rank += sameRankCount;
+          sameRankCount = 1;
+        } else {
+          sameRankCount++;
         }
 
         row.innerHTML = row.innerHTML

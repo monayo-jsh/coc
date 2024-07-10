@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
+import open.api.coc.clans.domain.ranking.ClanWarCount;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,6 +29,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + "         sum(clanWarMemberAttack.stars) as score, "
         + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
         + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         max(clan.tag) as clanTag, "
         + "         max(clan.name) as clanName"
         + " FROM ClanWarEntity clanWar"
         + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
@@ -46,6 +48,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + "         sum(clanWarMemberAttack.stars) as score, "
         + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
         + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         max(clan.tag) as clanTag, "
         + "         max(clan.name) as clanName"
         + " FROM ClanWarEntity clanWar"
         + " JOIN ClanWarMemberEntity clanWarMember on clanWarMember.id.warId = clanWar.warId"
@@ -66,4 +69,12 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " left join ClanWarMemberAttackEntity clanWarMemberAttack on clanWarMemberAttack.id.warId = clanWarMember.id.warId and clanWarMemberAttack.id.tag = clanWarMember.id.tag "
         + " where clanWar.warId = :warId ")
     Optional<ClanWarEntity> findByWarId(Long warId);
+
+    @Query("select clanWar.clanTag as tag, count(clanWar.clanTag) as count "
+        + " from ClanWarEntity clanWar"
+        + " where clanWar.type = :type "
+        + " and clanWar.startTime between :startTime and :endTime "
+        + " group by clanWar.clanTag "
+    )
+    List<ClanWarCount> selectClanWarCount(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime);
 }

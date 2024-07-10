@@ -33,6 +33,7 @@ import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.ranking.ClanWarCount;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
@@ -42,6 +43,7 @@ import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -485,4 +487,31 @@ public class ClanWarService {
         return clanWar;
     }
 
+    public List<RankingHallOfFame> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
+        LocalDateTime startTime = getStartTime(searchMonth);
+        LocalDateTime endTime = getEndTime(searchMonth);
+
+        List<RankingHallOfFame> rankingHallOfFames;
+
+        if (StringUtils.isEmpty(clanTag)) {
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStars(ClanWarType.LEAGUE, startTime, endTime, Pageable.unpaged());
+        } else {
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.LEAGUE, startTime, endTime, clanTag, Pageable.unpaged());
+        }
+
+        List<ClanWarCount> leagueClanWarRounds = clanWarRepository.selectClanWarCount(ClanWarType.LEAGUE, startTime, endTime);
+        Map<String, Integer> clanWarCountMap = leagueClanWarRounds.stream()
+                                                                  .collect(Collectors.toMap(ClanWarCount::getTag, ClanWarCount::getCount));
+
+        // 완파한 클랜원만 제공
+        return rankingHallOfFames.stream()
+                                 .filter(ranking -> isCompleteStars(ranking, clanWarCountMap))
+                                 .toList();
+    }
+
+    private boolean isCompleteStars(RankingHallOfFame ranking, Map<String, Integer> clanWarCountMap) {
+        Integer clanWarCount = clanWarCountMap.get(ranking.getClanTag());
+        Integer completedStarCount = clanWarCount * 3;
+        return Objects.equals(ranking.getScore(), completedStarCount);
+    }
 }

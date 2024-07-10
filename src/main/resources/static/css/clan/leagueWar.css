@@ -591,8 +591,11 @@
   .row.complete-defeat {
     background-color: rgb(255 215 0 / 30%);
 
-    .label {
-      background-color: black;
+    .member-result {
+      .label {
+        background-color: black;
+        color: white;
+      }
     }
   }
 

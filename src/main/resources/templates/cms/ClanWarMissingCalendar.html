@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>미공 캘린더</title>
+
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarCalendar.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    dayjs.locale('ko');
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+  </script>
+
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clanWar.js"></script>
+  <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
+  <script type="text/javascript">
+    const Calendar = tui.Calendar;
+    let calendar;
+
+    function moveMonth(number) {
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset
+
+      // 캘린더 날짜 변경
+      calendar.move(number);
+      calendarDate.dataset.date = dayjs(date).add(number, 'month');
+      drawCalendar();
+    }
+
+    function getCalendarDate() {
+      return document.querySelector('.calendar-date');
+    }
+
+    function initCalendar(now) {
+      const calendarDate = getCalendarDate();
+      calendarDate.dataset.date = now;
+
+      const container = document.getElementById('calendar');
+      const options = {
+        defaultView: 'month',
+        isReadOnly: true,
+        month: {
+          dayNames: ['일', '월', '화', '수', '목', '금', '토']
+        },
+        timezone: {
+          zones: [
+            {
+              timezoneName: 'Asia/Seoul',
+              displayLabel: 'Seoul',
+            }
+          ],
+        },
+        template: {
+          time(event) {
+            const { start, end, title, raw } = event;
+            const { type } = raw
+
+            let bgColor = getBgColor(type);
+
+            return `<span>${formatTime(start)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${title}</span>`;
+
+
+            function getBgColor(type = '') {
+              switch (type.toLowerCase()) {
+                case 'none': return 'bg-green';
+                case 'league': return 'bg-crimson';
+                case 'parallel': return 'bg-orange';
+              }
+              return type;
+            }
+          }
+        }
+      };
+
+      calendar = new Calendar(container, options);
+    }
+
+    function createEvent(clanWar) {
+      const { warId, clanTag, clanName, battleType, teamSize, state, startTime, endTime } = clanWar;
+
+      return {
+        id: warId,
+        calendarId: warId,
+        title: clanName,
+        start: startTime,
+        end: startTime,
+        dueDateClass: state,
+        raw: clanWar
+      }
+    }
+    function renderClanWars(clanWars) {
+      calendar.clear();
+
+      const events = [];
+      for (const clanWar of clanWars) {
+        events.push(createEvent(clanWar));
+      }
+
+      const sortedEvent = events.sort((a, b) => a.start - b.start);
+
+      calendar.createEvents(sortedEvent);
+    }
+
+    async function drawCalendarEvents(date) {
+      const searchMonth = formatYYYYMMDD(date);
+      const clanWars = await fetchClanWars(searchMonth);
+
+      renderClanWars(clanWars);
+    }
+
+    async function drawCalendar() {
+      calendar.clear();
+
+      const calendarDate = getCalendarDate();
+      const { date } = calendarDate.dataset;
+      calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
+
+      await drawCalendarEvents(date);
+    }
+
+    window.onload = async () => {
+      const now = dayjs();
+      initCalendar(now);
+      await drawCalendar();
+    }
+  </script>
+</head>
+<body>
+
+  <div class="contents">
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">미공 캘린더</span>
+      </div>
+    </div>
+
+    <div class="header">
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+        <i class="icon-arrow-line-left"></i>
+      </div>
+      <div class="calendar-date"></div>
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+        <i class="icon-arrow-line-right"></i>
+      </div>
+    </div>
+
+    <div id="calendar" class="clan-war-calendar"></div>
+
+  </div>
+
+</body>
+</html>

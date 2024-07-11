@@ -70,7 +70,18 @@
             const { raw } = event;
             const { clanName, warType, playerName } = raw;
 
-            return `<span class="chip ml-5 cursor-pointer">${playerName}</span>`;
+            const bgColor = getBgColor(warType);
+
+            return `<span class="chip ml-5 cursor-pointer ${bgColor}">${playerName}</span>`;
+
+            function getBgColor(type = '') {
+              switch (type.toLowerCase()) {
+                case 'none': return 'bg-green';
+                case 'league': return 'bg-crimson';
+                case 'parallel': return 'bg-orange';
+              }
+              return type;
+            }
           }
         }
       };

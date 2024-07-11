@@ -302,6 +302,7 @@ public class ClanWarService {
             }
         }
 
+        clanWar.swapWarClan(clanTag);
         return clanWar;
     }
 

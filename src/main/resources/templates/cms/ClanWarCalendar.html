@@ -15,14 +15,18 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    dayjs.locale('ko');
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+  </script>
 
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/clanWar.js"></script>
   <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
   <script type="text/javascript">
-
-    dayjs.locale('ko');
-
     const Calendar = tui.Calendar;
     let calendar;
 
@@ -75,7 +79,7 @@
                 case 'league': return 'bg-crimson';
                 case 'parallel': return 'bg-orange';
               }
-              return '';
+              return type;
             }
           }
         }
@@ -153,14 +157,22 @@
       return '하드 모드';
     }
 
+    function convTypeName(type) {
+      if (type === 'NONE') return '클랜전';
+      if (type === 'LEAGUE') return '리그전';
+      if (type === 'PARALLEL') return '리그전';
+      return type;
+    }
+
     function renderClanWarInfo(clanWar) {
-      const { clanName, state, startTime, endTime, battleType, teamSize } = clanWar;
+      const { clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
 
       const templateClanWarInfo = document.querySelector('#template-clan-war-info');
       const clanWarInfo = document.importNode(templateClanWarInfo.content, true);
       const clanWarInfoTable = clanWarInfo.querySelector('.table');
       clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
                                                    .replace(/{NAME}/, clanName)
+                                                   .replace(/{TYPE}/, convTypeName(type))
                                                    .replace(/{BATTLE_TYPE}/, convBattleTypeName(battleType))
                                                    .replace(/{TEAM_SIZE}/, teamSize)
                                                    .replace(/{START_DATE}/, formatYYYYMMDDHHMM(dayjs(startTime)))
@@ -181,32 +193,52 @@
     function renderClanWarMember(attacksPerMember, member) {
       const { tag, name, attacks } = member;
 
-      // 미공 표기만 선 개발
-      if (attacks.length === attacksPerMember) return;
+      const templateAttackRow = document.querySelector('#template-member-attack-row');
 
-      const templateAttackRow = document.querySelector('#template-missing-attack-row');
-      const attackRow = document.importNode(templateAttackRow.content, true);
-      const row = attackRow.querySelector('.row');
+      let rows = [];
+      for (const attack of attacks) {
+        const attackRow = document.importNode(templateAttackRow.content, true);
+        const row = attackRow.querySelector('.row');
 
-      row.innerHTML = row.innerHTML
-                         .replace(/{NAME}/, name)
-                         .replace(/{TAG}/, tag);
+        const { stars, destructionPercentage, duration } = attack;
 
-      return row;
+        row.innerHTML = row.innerHTML
+                           .replace(/{NAME}/, name)
+                           .replace(/{TAG}/, tag)
+                           .replace(/{STAR}/, stars)
+                           .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
+                           .replace(/{DURATION}/, formatMinuteSecond(duration));
+
+        rows.push(row);
+      }
+
+      // append missing attack row
+      for (let i=0; i<attacksPerMember - attacks.length; i++) {
+        const templateAttackRow = document.querySelector('#template-member-missing-attack-row');
+        const attackRow = document.importNode(templateAttackRow.content, true);
+        const row = attackRow.querySelector('.row');
+        row.innerHTML = row.innerHTML
+                           .replace(/{NAME}/, name)
+                           .replace(/{TAG}/, tag);
+        rows.push(row);
+      }
+
+      return rows;
     }
 
     function renderClanWarMembers(clanWar) {
       const { attacksPerMember, members } = clanWar;
 
-      const tableTbody = document.querySelector('.missing-attack .table-tbody');
+      const tableTbody = document.querySelector('.member-attack .table-tbody');
 
       //clear
       tableTbody.innerHTML = "";
 
       for (const member of members) {
-        const row = renderClanWarMember(attacksPerMember, member);
-        if (row){
-          tableTbody.appendChild(row);
+        const rows = renderClanWarMember(attacksPerMember, member);
+        if (rows){
+          for (const row of rows)
+            tableTbody.appendChild(row);
         }
       }
     }
@@ -265,7 +297,7 @@
 
       <div class="table mt-5 clan-war-info"></div>
 
-      <div class="table mt-5 missing-attack">
+      <div class="table mt-5 member-attack">
         <table class="table">
           <thead>
             <tr class="table-tr">
@@ -306,6 +338,10 @@
       <td>{TEAM_SIZE}</td>
     </tr>
     <tr>
+      <th class="th-wrap">유형</th>
+      <td>{TYPE}</td>
+    </tr>
+    <tr>
       <th class="th-wrap">전투</th>
       <td>{BATTLE_TYPE}</td>
     </tr>
@@ -323,7 +359,26 @@
     </tr>
   </table>
 </template>
-<template id="template-missing-attack-row">
+<template id="template-member-attack-row">
+  <tr class="table-tr row">
+    <td>
+      <div class="td-wrap justify-content-left">
+        <div class="name">{NAME}</div>
+        <div class="chip ml-5">{TAG}</div>
+      </div>
+    </td>
+    <td>
+      <div class="td-wrap">{STAR}</div>
+    </td>
+    <td>
+      <div class="td-wrap">{DESTRUCTION_PERCENTAGE}</div>
+    </td>
+    <td>
+      <div class="td-wrap">{DURATION}</div>
+    </td>
+  </tr>
+</template>
+<template id="template-member-missing-attack-row">
   <tr class="table-tr row">
     <td>
       <div class="td-wrap justify-content-left">
@@ -332,9 +387,7 @@
       </div>
     </td>
     <td colspan="3">
-      <div class="td-wrap">
-        공격 기록 없음
-      </div>
+      <div class="td-wrap">공격 기록 없음</div>
     </td>
   </tr>
 </template>

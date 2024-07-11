@@ -66,13 +66,22 @@
           ],
         },
         template: {
-          time(event) {
+          allday(event) {
             const { raw } = event;
-            const { clanName, warType, playerName } = raw;
+            const drawBody = [];
+            const players = [];
+            const sortedByName = raw.sort((a, b) => a.playerName.length - b.playerName.length)
+            for (const player of sortedByName) {
+              const { warType, playerName } = player;
 
-            const bgColor = getBgColor(warType);
+              const bgColor = getBgColor(warType);
+              const playerRow = `<span class="chip m-1 ${bgColor}">${playerName}</span>`;
+              players.push(playerRow);
+            }
 
-            return `<span class="chip ml-5 cursor-pointer ${bgColor}">${playerName}</span>`;
+            //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
+            drawBody.push(`<div class="players">${players.join("")}</div>`);
+            return drawBody.join("");
 
             function getBgColor(type = '') {
               switch (type.toLowerCase()) {
@@ -89,24 +98,45 @@
       calendar = new Calendar(container, options);
     }
 
-    function createEvent(player) {
-      const { warId, clanName, startTime, playerName, playerTag } = player;
+    function createEvent(key, value) {
+      const { warId, clanName, startTime, playerName, playerTag } = value;
 
       return {
-        id: warId,
-        calendarId: warId,
-        title: clanName,
-        start: startTime,
-        end: startTime,
-        raw: player
+        id: key,
+        calendarId: key,
+        title: key,
+        start: key,
+        end: key,
+        isAllDay: true,
+        category: 'allday',
+        raw: value
       }
     }
+
+    function convArrayGroupByDate(players) {
+      const map = new Map();
+      for(const player of players) {
+        const { startTime } = player;
+        const key = formatYYYYMMDD(startTime);
+        let list = map.get(key);
+        if (!list) {
+          //init
+          list = [];
+          map.set(key, list);
+        }
+
+        list.push(player);
+      }
+      return Array.from(map);
+    }
+
     function renderClanWars(players) {
       calendar.clear();
 
       const events = [];
-      for (const player of players) {
-        events.push(createEvent(player));
+      const days = convArrayGroupByDate(players);
+      for (const [key, value] of days) {
+        events.push(createEvent(key, value));
       }
 
       calendar.createEvents(events);

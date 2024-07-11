@@ -130,6 +130,9 @@ body::before {
   background-position: center;
 }
 
+.m-1 {
+  margin: 1px;
+}
 .mt-5 {
   margin-top: 5px;
 }

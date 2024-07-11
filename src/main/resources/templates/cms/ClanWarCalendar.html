@@ -61,9 +61,22 @@
         },
         template: {
           time(event) {
-            const { start, end, title } = event;
+            const { start, end, title, raw } = event;
+            const { type } = raw
 
-            return `<span>${formatTime(start)}</span><span class="chip bg-green ml-5 cursor-pointer">${title}</span>`;
+            let bgColor = getBgColor(type);
+
+            return `<span>${formatTime(start)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${title}</span>`;
+
+
+            function getBgColor(type = '') {
+              switch (type.toLowerCase()) {
+                case 'none': return 'bg-green';
+                case 'league': return 'bg-crimson';
+                case 'parallel': return 'bg-orange';
+              }
+              return '';
+            }
           }
         }
       };

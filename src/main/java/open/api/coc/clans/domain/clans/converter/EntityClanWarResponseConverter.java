@@ -34,6 +34,7 @@ public class EntityClanWarResponseConverter implements Converter<ClanWarEntity, 
     public @NonNull ClanWarResponse convert(ClanWarEntity source) {
         return ClanWarResponse.builder()
                               .warId(source.getWarId())
+                              .type(source.getType())
                               .clanTag(source.getClanTag())
                               .state(source.getState())
                               .battleType(source.getBattleType())

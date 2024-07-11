@@ -44,6 +44,12 @@ public class ViewAdminController {
         return "cms/ClanWarMissingCalendar";
     }
 
+    /** 클랜전 미공 인원 검색 */
+    @GetMapping("/clan/war/member/missing")
+    public String clanWarMissingMember() {
+        return "cms/ClanWarMissingMember";
+    }
+
     /** 습격전 위반 현황 */
     @GetMapping("/raid/missing/attack")
     public String raidMissingAttack() {

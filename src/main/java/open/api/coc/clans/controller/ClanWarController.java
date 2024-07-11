@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
+import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.service.ClanWarService;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,19 @@ public class ClanWarController {
         return ResponseEntity.ok()
                              .body(clanWarService.getClanWarMissingAttackPlayers(searchMonth));
     }
+
+    @GetMapping("/missing/attack/{playerTag}")
+    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithTag(@PathVariable String playerTag) {
+
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithTag(playerTag));
+    }
+
+    @GetMapping("/missing/attack/playerName")
+    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithName(@RequestParam String playerName) {
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName));
+
+    }
+
 
     @GetMapping("{warId}")
     public ResponseEntity<ClanWarResponse> getClanWarDetail(@PathVariable Long warId) {

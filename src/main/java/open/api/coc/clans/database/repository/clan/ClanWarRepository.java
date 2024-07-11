@@ -32,6 +32,34 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
             + " order by cw.war_id, cwm.map_position, sort ")
     List<ClanWarMissingAttackPlayer> findAllMissingAttackByPeriod(LocalDateTime startTime, LocalDateTime endTime);
 
+    @Query(nativeQuery = true,
+            value = "select c.name as clanName, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
+                    + " from tb_clan_war cw "
+                    + " join tb_clan c on c.tag = cw.clan_tag "
+                    + " join tb_clan_war_member cwm on cwm.war_id = cw.war_id"
+                    + " left join tb_clan_war_member_attack cwma on cwma.war_id = cwm.war_id and cwma.tag = cwm.tag "
+                    + " where cw.state != 'preparation'"
+                    + " and cwm.name LIKE :name%"
+                    + " and cw.start_time between :startTime and :endTime "
+                    + " group by cwm.war_id, cwm.tag "
+                    + " having count(cwma.orders) != cw.attacks_per_member "
+                    + " order by cw.war_id, cwm.map_position, sort ")
+    List<ClanWarMissingAttackPlayer> findAllMissingAttackByPeriodWithName(String name, LocalDateTime startTime, LocalDateTime endTime);
+
+    @Query(nativeQuery = true,
+            value = "select c.name as clanName, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
+                    + " from tb_clan_war cw "
+                    + " join tb_clan c on c.tag = cw.clan_tag "
+                    + " join tb_clan_war_member cwm on cwm.war_id = cw.war_id"
+                    + " left join tb_clan_war_member_attack cwma on cwma.war_id = cwm.war_id and cwma.tag = cwm.tag "
+                    + " where cw.state != 'preparation'"
+                    + " and cwm.tag = :tag"
+                    + " and cw.start_time between :startTime and :endTime "
+                    + " group by cwm.war_id, cwm.tag "
+                    + " having count(cwma.orders) != cw.attacks_per_member "
+                    + " order by cw.war_id, cwm.map_position, sort ")
+    List<ClanWarMissingAttackPlayer> findAllMissingAttackByPeriodWithTag(String tag, LocalDateTime startTime, LocalDateTime endTime);
+
     @Query("select clanWar from ClanWarEntity clanWar where clanWar.clanTag = :clanTag and clanWar.startTime = :startTime")
     Optional<ClanWarEntity> findByClanTagAndStartTime(String clanTag, LocalDateTime startTime);
 

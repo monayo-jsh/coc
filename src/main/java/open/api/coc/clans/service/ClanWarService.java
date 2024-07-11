@@ -445,6 +445,15 @@ public class ClanWarService {
         return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, startTime, endTime, clanTag, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
+    private LocalDateTime getStartTimeForLast90Days() {
+        LocalDate startDate = LocalDate.now().minusDays(90);
+        return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
+    }
+
+    private LocalDateTime getEndTimeForLast90Days() {
+        return LocalDateTime.of(LocalDate.now(), LocalTime.MAX.withNano(999_999_000));
+    }
+
     private LocalDateTime getStartTime(LocalDate searchMonth) {
         LocalDate startDate = searchMonth.with(TemporalAdjusters.firstDayOfMonth());
         return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
@@ -476,6 +485,19 @@ public class ClanWarService {
         LocalDateTime endTime = getEndTime(searchMonth);
 
         return clanWarRepository.findAllMissingAttackByPeriod(startTime, endTime);
+    }
+
+    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayersWithName(String playerName) {
+        LocalDateTime startTime = getStartTimeForLast90Days();
+        LocalDateTime endTime = getEndTimeForLast90Days();
+        return clanWarRepository.findAllMissingAttackByPeriodWithName(playerName, startTime, endTime);
+    }
+
+    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayersWithTag(String playerTag) {
+        LocalDateTime startTime = getStartTimeForLast90Days();
+        LocalDateTime endTime = getEndTimeForLast90Days();
+
+        return clanWarRepository.findAllMissingAttackByPeriodWithTag(playerTag, startTime, endTime);
     }
 
     private String getClanName(String clanTag) {

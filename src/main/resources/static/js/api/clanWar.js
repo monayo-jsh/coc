@@ -5,6 +5,9 @@ const URI_RANKING_CLAN_WAR_STARS = "/api/clan/war/ranking/stars" //월 클랜전
 
 const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" //월 리그전 획득별 순위
 
+const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME = "/api/clan/war/missing/attack/playerName"
+const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG = "/api/clan/war/missing/attack/{playerTag}"
+
 
 async function fetchClanWars(searchMonth) {
   const uri = URI_CLAN_WARS.replace(/{searchMonth}/, encodeURIComponent(searchMonth));
@@ -30,6 +33,38 @@ async function fetchClanWarMissingAttackPlayers(searchMonth) {
                       console.error(error);
                       return [];
                     });
+}
+
+async function fetchMissingAttackPlayerInLast90DaysWithTag(playerTag) {
+    const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG
+        .replace(/{playerTag}/, encodeURIComponent(playerTag));
+
+    return await axios.get(uri)
+        .then((response) => {
+            const { data } = response;
+            return data;
+        })
+        .catch((error) => {
+            console.error(error);
+            return [];
+        });
+}
+
+async function fetchMissingAttackPlayerInLast90DaysWithName(playerName) {
+
+    return await axios.get(URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME, {
+        params: {
+            playerName: playerName
+        }
+    })
+        .then((response) => {
+            const { data } = response;
+            return data;
+        })
+        .catch((error) => {
+            console.error(error);
+            return [];
+        });
 }
 
 async function fetchClanWarDetail(warId) {

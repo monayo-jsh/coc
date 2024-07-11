@@ -7,6 +7,7 @@
   <title>미공 캘린더</title>
 
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarCalendar.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
@@ -23,6 +24,7 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
 
+  <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/clanWar.js"></script>
   <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
@@ -65,22 +67,10 @@
         },
         template: {
           time(event) {
-            const { start, end, title, raw } = event;
-            const { type } = raw
+            const { raw } = event;
+            const { clanName, warType, playerName } = raw;
 
-            let bgColor = getBgColor(type);
-
-            return `<span>${formatTime(start)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${title}</span>`;
-
-
-            function getBgColor(type = '') {
-              switch (type.toLowerCase()) {
-                case 'none': return 'bg-green';
-                case 'league': return 'bg-crimson';
-                case 'parallel': return 'bg-orange';
-              }
-              return type;
-            }
+            return `<span class="chip ml-5 cursor-pointer">${playerName}</span>`;
           }
         }
       };
@@ -88,8 +78,8 @@
       calendar = new Calendar(container, options);
     }
 
-    function createEvent(clanWar) {
-      const { warId, clanTag, clanName, battleType, teamSize, state, startTime, endTime } = clanWar;
+    function createEvent(player) {
+      const { warId, clanName, startTime, playerName, playerTag } = player;
 
       return {
         id: warId,
@@ -97,38 +87,37 @@
         title: clanName,
         start: startTime,
         end: startTime,
-        dueDateClass: state,
-        raw: clanWar
+        raw: player
       }
     }
-    function renderClanWars(clanWars) {
+    function renderClanWars(players) {
       calendar.clear();
 
       const events = [];
-      for (const clanWar of clanWars) {
-        events.push(createEvent(clanWar));
+      for (const player of players) {
+        events.push(createEvent(player));
       }
 
-      const sortedEvent = events.sort((a, b) => a.start - b.start);
-
-      calendar.createEvents(sortedEvent);
+      calendar.createEvents(events);
     }
 
     async function drawCalendarEvents(date) {
       const searchMonth = formatYYYYMMDD(date);
-      const clanWars = await fetchClanWars(searchMonth);
+      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(searchMonth);
 
-      renderClanWars(clanWars);
+      renderClanWars(clanWarMissingAttackPlayers);
     }
 
     async function drawCalendar() {
       calendar.clear();
 
+      showWifiLoading('.section-wrapper');
       const calendarDate = getCalendarDate();
       const { date } = calendarDate.dataset;
       calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
 
       await drawCalendarEvents(date);
+      hideWifiLoading('.section-wrapper');
     }
 
     window.onload = async () => {
@@ -147,17 +136,36 @@
       </div>
     </div>
 
-    <div class="header">
-      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
-        <i class="icon-arrow-line-left"></i>
+    <div class="section-wrapper">
+      <div id="wifi-loader" class="display-none">
+        <svg class="circle-outer" viewBox="0 0 86 86">
+          <circle class="back" cx="43" cy="43" r="40"></circle>
+          <circle class="front" cx="43" cy="43" r="40"></circle>
+          <circle class="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg class="circle-middle" viewBox="0 0 60 60">
+          <circle class="back" cx="30" cy="30" r="27"></circle>
+          <circle class="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg class="circle-inner" viewBox="0 0 34 34">
+          <circle class="back" cx="17" cy="17" r="14"></circle>
+          <circle class="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        <div class="text" data-text="Searching"></div>
       </div>
-      <div class="calendar-date"></div>
-      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
-        <i class="icon-arrow-line-right"></i>
-      </div>
-    </div>
 
-    <div id="calendar" class="clan-war-calendar"></div>
+      <div class="header">
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+          <i class="icon-arrow-line-left"></i>
+        </div>
+        <div class="calendar-date"></div>
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+          <i class="icon-arrow-line-right"></i>
+        </div>
+      </div>
+
+      <div id="calendar" class="clan-war-calendar"></div>
+    </div>
 
   </div>
 

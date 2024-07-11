@@ -3,6 +3,7 @@ package open.api.coc.clans.controller;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.service.ClanWarService;
@@ -24,6 +25,12 @@ public class ClanWarController {
     public ResponseEntity<List<ClanWarResponse>> getClanWars(@PathVariable LocalDate searchMonth) {
         return ResponseEntity.ok()
                              .body(clanWarService.getClanWars(searchMonth));
+    }
+
+    @GetMapping("/missing/attack/period/{searchMonth}")
+    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayers(@PathVariable LocalDate searchMonth) {
+        return ResponseEntity.ok()
+                             .body(clanWarService.getClanWarMissingAttackPlayers(searchMonth));
     }
 
     @GetMapping("{warId}")

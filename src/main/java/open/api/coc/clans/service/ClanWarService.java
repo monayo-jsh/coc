@@ -30,6 +30,7 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
+import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
@@ -467,6 +468,13 @@ public class ClanWarService {
                                   return clanWar;
                               })
                               .collect(Collectors.toList());
+    }
+
+    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayers(LocalDate searchMonth) {
+        LocalDateTime startTime = getStartTime(searchMonth);
+        LocalDateTime endTime = getEndTime(searchMonth);
+
+        return clanWarRepository.findAllMissingAttackByPeriod(startTime, endTime);
     }
 
     private String getClanName(String clanTag) {

@@ -7,6 +7,10 @@
   cursor: unset !important;
 }
 
+.toastui-calendar-weekday-event-title {
+  font-weight: bold;
+}
+
 .toastui-calendar-template-allday {
   display: flex;
   flex-direction: column;
@@ -15,7 +19,7 @@
   .cell-wrap {
     display: flex;
     flex-wrap: wrap;
-    max-height: 140px;
+    max-height: 145px;
     overflow-y: auto;
   }
   .cell-wrap::-webkit-scrollbar {

@@ -1,7 +1,3 @@
-body {
-  overflow: hidden;
-}
-
 /** calendar custom */
 .toastui-calendar-weekday-event {
   background-color: transparent !important;
@@ -16,21 +12,21 @@ body {
   flex-direction: column;
   flex-wrap: wrap;
 
-  .players {
+  .cell-wrap {
     display: flex;
     flex-wrap: wrap;
     max-height: 140px;
     overflow-y: auto;
   }
-  .players::-webkit-scrollbar {
+  .cell-wrap::-webkit-scrollbar {
     width: 5px;
     height: 5px;
   }
-  .players::-webkit-scrollbar-thumb {
+  .cell-wrap::-webkit-scrollbar-thumb {
     background: rgb(168, 168, 168); /* 스크롤바 색상 */
     border-radius: 5px; /* 스크롤바 둥근 테두리 */
   }
-  .players::-webkit-scrollbar-track {
+  .cell-wrap::-webkit-scrollbar-track {
     background: rgba(182, 182, 182, 0.1);  /*스크롤바 뒷 배경 색상*/
   }
 }

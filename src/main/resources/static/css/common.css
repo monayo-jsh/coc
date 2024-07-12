@@ -223,6 +223,9 @@ body::before {
 .flex-row {
   flex-direction: row !important;
 }
+.flex-nowrap {
+  flex-wrap: nowrap !important;
+}
 
 .flex-colum {
   flex-direction: column !important;

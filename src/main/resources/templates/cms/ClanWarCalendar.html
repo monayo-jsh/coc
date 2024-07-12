@@ -64,14 +64,27 @@
           ],
         },
         template: {
-          time(event) {
-            const { start, end, title, raw } = event;
-            const { type } = raw
+          allday(event) {
+            const { raw } = event;
+            const drawBody = [];
+            const clans = [];
+            const sortedByDate = raw.sort((a, b) => a.start - b.start)
+            for (const clan of sortedByDate) {
+              const { warId, type, startTime, clanName } = clan;
 
-            let bgColor = getBgColor(type);
+              // is DOM Rending to Click Event
+              onClickEventWarIdSet.add(warId);
 
-            return `<span>${formatTime(start)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${title}</span>`;
+              const bgColor = getBgColor(type);
+              const row = `<div class="clan war-${warId}">
+                <span>${formatTime(startTime)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${clanName}</span>
+              </div>`;
+              clans.push(row);
+            }
 
+            //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
+            drawBody.push(`<div class="cell-wrap flex-colum flex-nowrap">${clans.join("")}</div>`);
+            return drawBody.join("");
 
             function getBgColor(type = '') {
               switch (type.toLowerCase()) {
@@ -86,38 +99,57 @@
       };
 
       calendar = new Calendar(container, options);
-      calendar.on('clickEvent', async (event) => {
-        const { id } = event.event;
-
-        const clanWar = await fetchClanWarDetail(id);
-        if (!clanWar) {
-          drawFailed();
-          return;
-        }
-
-        drawClanWarDetail(clanWar);
-      });
+      calendar.on('complete', (event) => {
+        console.log(event)
+      })
     }
 
-    function createEvent(clanWar) {
-      const { warId, clanTag, clanName, battleType, teamSize, state, startTime, endTime } = clanWar;
+    async function renderClanWarDetail(warId) {
+      const clanWar = await fetchClanWarDetail(warId);
+      if (!clanWar) {
+        drawFailed();
+        return;
+      }
 
+      drawClanWarDetail(clanWar);
+    }
+    function createEvent(key, value) {
       return {
-        id: warId,
-        calendarId: warId,
-        title: clanName,
-        start: startTime,
-        end: startTime,
-        dueDateClass: state,
-        raw: clanWar
+        id: key,
+        calendarId: key,
+        title: key,
+        start: key,
+        end: key,
+        isAllDay: true,
+        category: 'allday',
+        raw: value
       }
     }
+
+    function convArrayGroupByDate(players) {
+      const map = new Map();
+      for(const player of players) {
+        const { startTime } = player;
+        const key = formatYYYYMMDD(startTime);
+        let list = map.get(key);
+        if (!list) {
+          //init
+          list = [];
+          map.set(key, list);
+        }
+
+        list.push(player);
+      }
+      return Array.from(map);
+    }
+
     function renderClanWars(clanWars) {
       calendar.clear();
 
       const events = [];
-      for (const clanWar of clanWars) {
-        events.push(createEvent(clanWar));
+      const days = convArrayGroupByDate(clanWars);
+      for (const [key, value] of days) {
+        events.push(createEvent(key, value));
       }
 
       const sortedEvent = events.sort((a, b) => a.start - b.start);
@@ -268,10 +300,39 @@
       await drawCalendarEvents(date);
     }
 
+    function settingClickEventToClanWar() {
+      const warIdSet = new Set(onClickEventWarIdSet);
+      for(const warId of warIdSet) {
+        const target = document.querySelector(`.clan.war-${warId}`);
+        if (!target) {
+          // remove
+          onClickEventWarIdSet.delete(warId);
+          continue;
+        }
+
+        if (target.onclick) {
+          // remove
+          onClickEventWarIdSet.delete(warId);
+          continue;
+        }
+
+        // setting click event
+        target.onclick = () => renderClanWarDetail(warId);
+
+        // remove
+        onClickEventWarIdSet.delete(warId);
+      }
+    }
+
+    // 클랜 상세 표기 이벤트 생성을 위한 배열
+    let onClickEventWarIdSet = new Set();
+
     window.onload = async () => {
       const now = dayjs();
       initCalendar(now);
       await drawCalendar();
+
+      setInterval(() => settingClickEventToClanWar(), 1000);
     }
   </script>
 </head>

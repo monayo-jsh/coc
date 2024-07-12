@@ -80,7 +80,7 @@
             }
 
             //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
-            drawBody.push(`<div class="players">${players.join("")}</div>`);
+            drawBody.push(`<div class="cell-wrap">${players.join("")}</div>`);
             return drawBody.join("");
 
             function getBgColor(type = '') {
@@ -99,8 +99,6 @@
     }
 
     function createEvent(key, value) {
-      const { warId, clanName, startTime, playerName, playerTag } = value;
-
       return {
         id: key,
         calendarId: key,

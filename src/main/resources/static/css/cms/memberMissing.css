@@ -1,0 +1,127 @@
+body {
+  padding: 10px;
+  display: block;
+}
+
+.section-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.capital-raid {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.card {
+  height: 50px;
+  border-radius: 15px;
+  background: #1b233d;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.body {
+  position: relative;
+}
+
+.container {
+  position: relative;
+  margin-top: 10px;
+
+  .search-box {
+    max-width: unset;
+  }
+
+}
+
+.chip {
+  font-size: 0.7rem;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  .radio-container {
+    display: flex;
+    gap: 10px;
+  }
+
+  .radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    background-color: #fff;
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+
+  .radio-label input[type="radio"] {
+    display: none;
+  }
+
+  .radio-label span {
+    pointer-events: none;
+  }
+
+  .radio-label input[type="radio"]:checked + span {
+    font-weight: bold;
+    color: #007BFF;
+  }
+
+  .radio-label:hover {
+    background-color: #f9f9f9;
+    border-color: #bbb;
+  }
+
+
+  button.refresh {
+    color: white;
+
+    svg {
+      margin-left: 8px;
+    }
+  }
+
+}
+
+.button-chip {
+  display: flex;
+  align-items: center;
+}
+
+.table-tr {
+  .name, .tag {
+    vertical-align: baseline;
+  }
+}
+
+.table-tr.start {
+  .table-td {
+    border-top: 1px solid #b7b3b3;
+  }
+}
+
+.td-wrap {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

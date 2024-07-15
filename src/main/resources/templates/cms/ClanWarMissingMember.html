@@ -8,7 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
     <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/cms/raidScore.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/cms/memberMissing.css" />
 
     <script src="/static/js/common.js"></script>
     <script src="/static/js/util.js"></script>
@@ -87,9 +87,7 @@
 
             if (tag === beforeRowPlayerTag) {
                 increaseRowspan(tag, 'name');
-                increaseRowspan(tag, 'tag');
                 removeCell(tableRow, 'name');
-                removeCell(tableRow, 'tag');
             } else {
                 // 신규 플레이어
                 appendClassNewPlayer(tableRow, tag);
@@ -107,33 +105,17 @@
 
             // dataset
             tableRow.dataset.tag = playerTag;
-            let warTypeString;
-            let chipClass;
-
-            if (warType === "LEAGUE") {
-                warTypeString = "리그전";
-                chipClass = "bg-red";
-            } else if (warType === "PARALLEL") {
-                warTypeString = "병행 클랜전";
-                chipClass = "bg-orange";
-            } else {
-                warTypeString = "클랜전";
-                chipClass = "bg-green";
-            }
 
             tableRow.innerHTML = tableRow.innerHTML
                 .replace(/{NAME}/, playerName)
                 .replace(/{TAG}/, playerTag)
                 .replace(/{CLAN_NAME}/, clanName)
-                .replace(/{DATE}/, dayjs(startTime).format('YYYY년 MM월 DD일'))
-                .replace(/{WAR_TYPE}/, warTypeString);
+                .replace(/{DATE}/, dayjs(startTime).format('YYYY년 MM월 DD일'));
 
-            // chip bg 색상 변경
-            const dateChip = tableRow.querySelector('.chip.bg-green');
-            if (dateChip) {
-                dateChip.classList.remove('bg-green');
-                dateChip.classList.add(chipClass);
-            }
+            // clan chip bg 색상 변경
+            const clan = tableRow.querySelector('.clan .chip');
+            clan.classList.add(getBgColorByWarType(warType));
+
             // 테이블에 행 입력
             drawRow(tableRow, playerTag);
         }
@@ -230,85 +212,88 @@
     </script>
 </head>
 <body>
-<div class="capital-raid">
-    <div class="card caption">
-        <div class="bottom-section">
-            <span class="title">클랜전 미공 기록 조회</span>
-        </div>
-    </div>
+<div class="section-wrapper">
 
-    <div class="container">
-        <div class="buttons">
-            <div class="radio-container">
-                <label class="radio-label">
-                    <input type="radio" name="options" value="이름" checked>
-                    <span>이름</span>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="options" value="태그">
-                    <span>태그</span>
-                </label>
+    <div class="capital-raid">
+        <div class="card caption">
+            <div class="bottom-section">
+                <span class="title">클랜전 미공 기록 조회</span>
             </div>
-        </div>
-    </div>
-
-    <div class="body">
-        <div id="wifi-loader" class="display-none">
-            <svg class="circle-outer" viewBox="0 0 86 86">
-                <circle class="back" cx="43" cy="43" r="40"></circle>
-                <circle class="front" cx="43" cy="43" r="40"></circle>
-                <circle class="new" cx="43" cy="43" r="40"></circle>
-            </svg>
-            <svg class="circle-middle" viewBox="0 0 60 60">
-                <circle class="back" cx="30" cy="30" r="27"></circle>
-                <circle class="front" cx="30" cy="30" r="27"></circle>
-            </svg>
-            <svg class="circle-inner" viewBox="0 0 34 34">
-                <circle class="back" cx="17" cy="17" r="14"></circle>
-                <circle class="front" cx="17" cy="17" r="14"></circle>
-            </svg>
-            <div class="text" data-text="Searching"></div>
         </div>
 
         <div class="container">
-            <div class="search">
-                <div class="search-box">
-                    <div class="search-field">
-                        <input placeholder="입력" class="input player-search-input" type="text">
-                        <!--              <div class="search-box-icon">-->
-                        <!--                <button class="btn-icon-content" onclick="searchPlayerRaidScore(this); return false;">-->
-                        <!--                  <i class="search-icon">-->
-                        <!--                    <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>-->
-                        <!--                  </i>-->
-                        <!--                </button>-->
-                        <!--              </div>-->
-                    </div>
+            <div class="buttons">
+                <div class="radio-container">
+                    <label class="radio-label">
+                        <input type="radio" name="options" value="이름" checked>
+                        <span>이름</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="options" value="태그">
+                        <span>태그</span>
+                    </label>
                 </div>
             </div>
         </div>
 
-        <div class="container contents">
-            <table class="table">
-                <thead class="table-thead">
-                <tr class="table-tr">
-                    <th class="table-th">플레이어</th>
-                    <th class="table-th">태그</th>
-                    <th class="table-th">진행 클랜</th>
-                    <th class="table-th">날짜</th>
-                    <th class="table-th">전쟁 타입</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                    <td class="table-td" colspan="6">플레이어 정보 없음</td>
-                </tr>
-                </tbody>
-            </table>
+        <div class="body">
+            <div id="wifi-loader" class="display-none">
+                <svg class="circle-outer" viewBox="0 0 86 86">
+                    <circle class="back" cx="43" cy="43" r="40"></circle>
+                    <circle class="front" cx="43" cy="43" r="40"></circle>
+                    <circle class="new" cx="43" cy="43" r="40"></circle>
+                </svg>
+                <svg class="circle-middle" viewBox="0 0 60 60">
+                    <circle class="back" cx="30" cy="30" r="27"></circle>
+                    <circle class="front" cx="30" cy="30" r="27"></circle>
+                </svg>
+                <svg class="circle-inner" viewBox="0 0 34 34">
+                    <circle class="back" cx="17" cy="17" r="14"></circle>
+                    <circle class="front" cx="17" cy="17" r="14"></circle>
+                </svg>
+                <div class="text" data-text="Searching"></div>
+            </div>
+
+            <div class="container">
+                <div class="search">
+                    <div class="search-box">
+                        <div class="search-field">
+                            <input placeholder="입력" class="input player-search-input" type="text">
+                            <!--              <div class="search-box-icon">-->
+                            <!--                <button class="btn-icon-content" onclick="searchPlayerRaidScore(this); return false;">-->
+                            <!--                  <i class="search-icon">-->
+                            <!--                    <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>-->
+                            <!--                  </i>-->
+                            <!--                </button>-->
+                            <!--              </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container contents">
+                <table class="table">
+                    <thead class="table-thead">
+                    <tr class="table-tr">
+                        <th class="table-th">플레이어</th>
+                        <th class="table-th">진행 클랜</th>
+                        <th class="table-th">미공 날짜</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                    <tr class="table-tr">
+                        <td class="table-td" colspan="3">플레이어 정보 없음</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
     </div>
 
 </div>
+
 </body>
 <template id="loader">
     <div class="loader-circle">
@@ -328,16 +313,21 @@
 </template>
 <template id="raid-row-template">
     <tr class="table-tr">
-        <td class="table-td name" rowspan=1>{NAME}</td>
-        <td class="table-td tag" rowspan=1><span class="chip">{TAG}</span></td>
-        <td class="table-td">{CLAN_NAME}</td>
-        <td class="table-td"><span class="chip bg-green">{DATE}</span></td>
-        <td class="table-td">{WAR_TYPE}</td>
+        <td class="table-td name" rowspan=1>
+            <div class="td-wrap flex-colum justify-content-center">
+                <span>{NAME}</span>
+                <span class="chip tag m-1">{TAG}</span>
+            </div>
+        </td>
+        <td class="table-td clan">
+            <span class="chip">{CLAN_NAME}</span>
+        </td>
+        <td class="table-td">{DATE}</td>
     </tr>
 </template>
 <template id="raid-row-empty-template">
     <tr class="table-tr">
-        <td class="table-td" colspan="6">플레이어 정보 없음</td>
+        <td class="table-td" colspan="3">플레이어 정보 없음</td>
     </tr>
 </template>
 </html>

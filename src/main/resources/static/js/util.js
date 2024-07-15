@@ -274,3 +274,12 @@ function isDigit(char) {
   const charCode = char.charCodeAt(0);
   return charCode >= 0x0030 && charCode <= 0x0039; // 숫자
 }
+
+function getBgColorByWarType(type = '') {
+  switch (type.toLowerCase()) {
+    case 'none': return 'bg-green';
+    case 'league': return 'bg-crimson';
+    case 'parallel': return 'bg-orange';
+  }
+  return type;
+}

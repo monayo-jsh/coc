@@ -75,7 +75,7 @@
               // is DOM Rending to Click Event
               onClickEventWarIdSet.add(warId);
 
-              const bgColor = getBgColor(type);
+              const bgColor = getBgColorByWarType(type);
               const row = `<div class="clan war-${warId}">
                 <span>${formatTime(startTime)}</span><span class="chip ml-5 cursor-pointer ${bgColor}">${clanName}</span>
               </div>`;
@@ -85,15 +85,6 @@
             //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
             drawBody.push(`<div class="cell-wrap flex-colum flex-nowrap">${clans.join("")}</div>`);
             return drawBody.join("");
-
-            function getBgColor(type = '') {
-              switch (type.toLowerCase()) {
-                case 'none': return 'bg-green';
-                case 'league': return 'bg-crimson';
-                case 'parallel': return 'bg-orange';
-              }
-              return type;
-            }
           }
         }
       };

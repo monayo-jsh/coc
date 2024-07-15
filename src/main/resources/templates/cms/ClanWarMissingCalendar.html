@@ -74,7 +74,7 @@
             for (const player of sortedByName) {
               const { warType, playerName } = player;
 
-              const bgColor = getBgColor(warType);
+              const bgColor = getBgColorByWarType(warType);
               const playerRow = `<span class="chip m-1 ${bgColor}">${playerName}</span>`;
               players.push(playerRow);
             }
@@ -82,15 +82,6 @@
             //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
             drawBody.push(`<div class="cell-wrap">${players.join("")}</div>`);
             return drawBody.join("");
-
-            function getBgColor(type = '') {
-              switch (type.toLowerCase()) {
-                case 'none': return 'bg-green';
-                case 'league': return 'bg-crimson';
-                case 'parallel': return 'bg-orange';
-              }
-              return type;
-            }
           }
         }
       };

@@ -44,7 +44,6 @@ import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -524,10 +523,11 @@ public class ClanWarService {
 
         List<RankingHallOfFame> rankingHallOfFames;
 
+        final Integer SEARCH_LIMIT = 300;
         if (StringUtils.isEmpty(clanTag)) {
-            rankingHallOfFames = clanWarRepository.selectRankingClanWarStars(ClanWarType.LEAGUE, startTime, endTime, Pageable.unpaged());
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStars(ClanWarType.LEAGUE, startTime, endTime, PageRequest.of(0, SEARCH_LIMIT));
         } else {
-            rankingHallOfFames = clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.LEAGUE, startTime, endTime, clanTag, Pageable.unpaged());
+            rankingHallOfFames = clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.LEAGUE, startTime, endTime, clanTag, PageRequest.of(0, SEARCH_LIMIT));
         }
 
         List<ClanWarCount> leagueClanWarRounds = clanWarRepository.selectClanWarCount(ClanWarType.LEAGUE, startTime, endTime);

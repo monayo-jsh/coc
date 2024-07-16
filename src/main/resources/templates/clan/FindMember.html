@@ -597,7 +597,8 @@
 
     function refreshMember(event) {
       const playerName = event.target.value.trim();
-      if (validateString(playerName)) {
+      // if (validateString(playerName)) {
+      if (playerName && playerName.length > 0) {
         findMember(playerName);
       } else {
         drawMember([]);

@@ -195,8 +195,16 @@ function formatYYMMDate(date) {
   return `[${formattedDate}] `;
 }
 
+function formatYYMMDD(date) {
+  return dayjs(date).format('YY-MM-DD');
+}
+
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
+}
+
+function formatDD(date) {
+  return dayjs(date).format('DD');
 }
 
 function formatYYYYMMDDHHMM(date) {

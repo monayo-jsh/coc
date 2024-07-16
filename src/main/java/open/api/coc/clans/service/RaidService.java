@@ -117,13 +117,15 @@ public class RaidService {
 
     public List<RaidScoreResponse> getPlayerRaidScoreWithTag(String playerTag) {
 
-        List<RaiderEntity> raiderEntities = raiderRepository.findByTag(playerTag);
+        final Integer SEARCH_LIMIT = 4;
+        List<RaiderEntity> raiderEntities = raiderRepository.findByTag(playerTag, SEARCH_LIMIT);
 
         return getRaidScoreResponses(raiderEntities);
     }
 
     public List<RaidScoreResponse> getPlayerRaidScoreWithName(String playerName) {
-        List<RaiderEntity> raiderEntities = raiderRepository.findByName(playerName);
+        final Integer SEARCH_LIMIT = 4;
+        List<RaiderEntity> raiderEntities = raiderRepository.findByName(playerName, SEARCH_LIMIT);
 
         return getRaidScoreResponses(raiderEntities);
     }

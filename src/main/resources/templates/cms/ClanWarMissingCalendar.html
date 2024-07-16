@@ -33,12 +33,8 @@
     let calendar;
 
     function moveMonth(number) {
-      const calendarDate = getCalendarDate();
-      const { date } = calendarDate.dataset
-
-      // 캘린더 날짜 변경
+      // 캘린더 월 변경
       calendar.move(number);
-      calendarDate.dataset.date = dayjs(date).add(number, 'month');
       drawCalendar();
     }
 
@@ -46,10 +42,7 @@
       return document.querySelector('.calendar-date');
     }
 
-    function initCalendar(now) {
-      const calendarDate = getCalendarDate();
-      calendarDate.dataset.date = now;
-
+    function initCalendar() {
       const container = document.getElementById('calendar');
       const options = {
         defaultView: 'month',
@@ -91,8 +84,8 @@
 
     function createEvent(key, value) {
       return {
-        id: key,
-        calendarId: key,
+        id: `id-${key}`,
+        calendarId: `cid-${key}`,
         title: key,
         start: key,
         end: key,
@@ -131,28 +124,29 @@
       calendar.createEvents(events);
     }
 
-    async function drawCalendarEvents(date) {
-      const searchMonth = formatYYYYMMDD(date);
-      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(searchMonth);
+    async function drawCalendarEvents(startDate, endDate) {
+      const startDt = formatYYYYMMDD(startDate);
+      const endDt = formatYYYYMMDD(endDate);
+      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(startDt, endDt);
 
       renderClanWars(clanWarMissingAttackPlayers);
     }
 
     async function drawCalendar() {
-      calendar.clear();
-
       showWifiLoading('.section-wrapper');
       const calendarDate = getCalendarDate();
-      const { date } = calendarDate.dataset;
+      const date = calendar.getDate();
       calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
 
-      await drawCalendarEvents(date);
+      const calendarStartDate = calendar.getDateRangeStart();
+      const calendarEndDate = calendar.getDateRangeEnd();
+
+      await drawCalendarEvents(calendarStartDate, calendarEndDate);
       hideWifiLoading('.section-wrapper');
     }
 
     window.onload = async () => {
-      const now = dayjs();
-      initCalendar(now);
+      initCalendar();
       await drawCalendar();
     }
   </script>

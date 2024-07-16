@@ -479,9 +479,9 @@ public class ClanWarService {
                               .collect(Collectors.toList());
     }
 
-    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayers(LocalDate searchMonth) {
-        LocalDateTime startTime = getStartTime(searchMonth);
-        LocalDateTime endTime = getEndTime(searchMonth);
+    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayers(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startTime = getStartTime(startDate);
+        LocalDateTime endTime = getEndTime(endDate);
 
         return clanWarRepository.findAllMissingAttackByPeriod(startTime, endTime);
     }

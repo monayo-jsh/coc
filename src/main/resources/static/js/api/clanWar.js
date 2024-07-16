@@ -1,5 +1,5 @@
 const URI_CLAN_WARS = "/api/clan/war/period/{searchMonth}" //클랜전 목록 기간 조회
-const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = "/api/clan/war/missing/attack/period/{searchMonth}" //클랜전 미공 사용자 목록 기간 조회
+const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = "/api/clan/war/missing/attack/period" //클랜전 미공 사용자 목록 기간 조회
 const URI_CLAN_WAR_DETAIL = "/api/clan/war/{warId}" //클랜전 상세 조회
 const URI_RANKING_CLAN_WAR_STARS = "/api/clan/war/ranking/stars" //월 클랜전 획득별 순위
 
@@ -22,8 +22,8 @@ async function fetchClanWars(searchMonth) {
                     });
 }
 
-async function fetchClanWarMissingAttackPlayers(searchMonth) {
-  const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS.replace(/{searchMonth}/, encodeURIComponent(searchMonth));
+async function fetchClanWarMissingAttackPlayers(startDt, endDt) {
+  const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS + `?startDate=${encodeURIComponent(startDt)}&endDate=${encodeURIComponent(endDt)}`;
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response

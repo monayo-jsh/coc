@@ -79,7 +79,6 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN PlayerEntity player on player.playerTag = clanWarMember.id.tag"
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
         + " WHERE clanWar.type = :type "
-        + " AND clanWar.state = 'warCollected'"
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")
@@ -99,7 +98,6 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " JOIN ClanEntity clan on clan.tag = clanWar.clanTag "
         + " WHERE clanWar.type = :type "
         + " AND clanWar.clanTag = :clanTag "
-        + " AND clanWar.state = 'warCollected'"
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
         + " order by score desc, destructionPercentage desc, duration")

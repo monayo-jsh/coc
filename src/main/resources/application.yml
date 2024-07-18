@@ -22,7 +22,7 @@ spring:
     hikari:
       connection-timeout: 1000
   jpa:
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
         format_sql: false

@@ -41,6 +41,7 @@ import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepos
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
+import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
@@ -76,6 +77,8 @@ public class PlayersService {
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
+
+    private final PlayerQueryRepository playerQueryRepository;
 
     private final PlayerResponseConverter playerResponseConverter;
 
@@ -113,7 +116,7 @@ public class PlayersService {
     }
 
     public List<PlayerResponse> findAllPlayers() {
-        List<PlayerEntity> players = playerRepository.findAll();
+        List<PlayerEntity> players = playerQueryRepository.findAll();
 
         return players.stream()
                       .map(playerResponseConverter::convertAll)
@@ -121,7 +124,7 @@ public class PlayersService {
     }
 
     public List<PlayerResponse> findAllPlayersSummary() {
-        List<PlayerEntity> players = playerRepository.findAll();
+        List<PlayerEntity> players = playerQueryRepository.findAll();
 
         return players.stream()
                       .map(playerResponseConverter::convert)

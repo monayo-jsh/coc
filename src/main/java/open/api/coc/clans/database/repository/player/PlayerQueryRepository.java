@@ -7,4 +7,5 @@ public interface PlayerQueryRepository {
 
     List<PlayerEntity> findAll();
 
+    List<PlayerEntity> findAllByName(String name);
 }

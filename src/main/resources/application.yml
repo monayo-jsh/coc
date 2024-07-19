@@ -1,6 +1,13 @@
 server:
   port: 8080
 
+# jpa query log
+decorator:
+  datasource:
+    p6spy:
+      logging: slf4j
+      enable-logging: false
+
 spring:
   application:
     name: coc

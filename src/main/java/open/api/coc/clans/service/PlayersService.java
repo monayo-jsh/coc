@@ -132,7 +132,7 @@ public class PlayersService {
     }
 
     public List<PlayerResponse> findPlayersSummary(String name) {
-        List<PlayerEntity> players = playerRepository.findByName(name);
+        List<PlayerEntity> players = playerQueryRepository.findAllByName(name);
 
         return players.stream()
                       .map(playerResponseConverter::convert)

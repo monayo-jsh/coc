@@ -5,6 +5,7 @@ import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.league.QLeagueEntity.leagueEntity;
 import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
 
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,7 @@ public class PlayerQueryRepositoryImpl implements PlayerQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    @Override
-    public List<PlayerEntity> findAll() {
+    private JPAQuery<PlayerEntity> makeDefaultSelectQuery() {
         return queryFactory.select(playerEntity)
                            .from(playerEntity)
                            .leftJoin(playerEntity.league, leagueEntity)
@@ -26,7 +26,18 @@ public class PlayerQueryRepositoryImpl implements PlayerQueryRepository {
                            .leftJoin(playerEntity.clan, clanEntity)
                            .fetchJoin()
                            .leftJoin(clanEntity.badgeUrl, clanBadgeEntity)
-                           .fetchJoin()
-                           .fetch();
+                           .fetchJoin();
+    }
+
+    @Override
+    public List<PlayerEntity> findAll() {
+        return makeDefaultSelectQuery().fetch();
+    }
+
+    @Override
+    public List<PlayerEntity> findAllByName(String name) {
+        return makeDefaultSelectQuery()
+            .where(playerEntity.name.startsWith(name))
+            .fetch();
     }
 }

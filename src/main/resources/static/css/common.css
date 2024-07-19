@@ -633,3 +633,10 @@ body::before {
   }
 
 }
+
+/** toastify custom*/
+.toastify.custom {
+  border-radius: 10px;
+  font-size: 14px;
+  padding: 10px 20px;
+}

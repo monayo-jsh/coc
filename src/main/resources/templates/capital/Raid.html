@@ -22,6 +22,10 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <!-- toast-ui -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
   <title>습격전 현황</title>
 
   <script>
@@ -149,7 +153,7 @@
         // 태그 클립보드 복사 기능
         const playerTag = memberRecordElement.querySelector('.player-tag');
         playerTag.classList.add('cursor-pointer');
-        playerTag.onclick = () => copyClipboard(tag);
+        playerTag.onclick = () => copyClipboard(tag, "플레이어 태그");
 
         membersElement.appendChild(memberRecord);
       }

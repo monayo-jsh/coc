@@ -211,16 +211,60 @@ function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
 }
 
-function copyClipboard(value) {
-  if (window.isSecureContext && navigator.clipboard) {
-    window.navigator.clipboard.writeText(value).then(() => {
+function toastMessage(message){
+  if (!Toastify) return;
 
-    })
-  } else {
-    unsecuredCopyToClipboard(value);
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    gravity: "top", // `top` or `bottom`
+    position: "right", // `left`, `center` or `right`
+    stopOnFocus: true, // Prevents dismissing of toast on hover
+    className: "custom",
+    style: {
+      background: "linear-gradient(to right, #00b09b, #96c93d)",
+    },
+    onClick: function(){} // Callback after click
+  }).showToast();
+}
+function notifyMessage(message) {
+  // Let's check if the browser supports notifications
+  if (!("Notification" in window)) {
+    alert(message);
   }
 
-  function unsecuredCopyToClipboard(value) {
+  // Let's check whether notification permissions have already been granted
+  else if (Notification.permission === "granted") {
+    // If it's okay let's create a notification
+    var notification = new Notification(message);
+  }
+
+  // Otherwise, we need to ask the user for permission
+  else if (Notification.permission !== "denied") {
+    Notification.requestPermission(function (permission) {
+      // If the user accepts, let's create a notification
+      if (permission === "granted") {
+        var notification = new Notification(message);
+      }
+    });
+  }
+
+  // At last, if the user has denied notifications, and you
+  // want to be respectful there is no need to bother them any more.
+}
+
+function copyClipboard(value, toastMsg = "") {
+  toastMsg += " 복사 완료";
+  if (window.isSecureContext && navigator.clipboard) {
+    window.navigator.clipboard.writeText(value).then(() => {
+      toastMessage(toastMsg);
+    })
+  } else {
+    unsecuredCopyToClipboard(value, toastMsg);
+  }
+
+  function unsecuredCopyToClipboard(value, toastMsg) {
     //아래와 같은 document.execCommand 방식은 Deprecated 처리 되어
     //clipboard API로 대체 되었으나 해당 방식은 https 상태에서만 동작
     //http 상태에서 동작 할 수 있도록 해당 로직 사용
@@ -230,6 +274,7 @@ function copyClipboard(value) {
     textArea.select();
     try {
       document.execCommand('copy');
+      toastMessage(toastMsg);
     } catch (err) {
       console.error('Unable to copy to clipboard', err);
     }
@@ -289,5 +334,17 @@ function getBgColorByWarType(type = '') {
     case 'league': return 'bg-crimson';
     case 'parallel': return 'bg-orange';
   }
+  return type;
+}
+
+function convBattleTypeName(battleType) {
+  if (battleType === 'none') return '일반 모드';
+  return '하드 모드';
+}
+
+function convWarTypeName(type) {
+  if (type === 'NONE') return '클랜전';
+  if (type === 'LEAGUE') return '리그전';
+  if (type === 'PARALLEL') return '리그전';
   return type;
 }

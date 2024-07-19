@@ -175,18 +175,6 @@
       return state;
     }
 
-    function convBattleTypeName(battleType) {
-      if (battleType === 'none') return '일반 모드';
-      return '하드 모드';
-    }
-
-    function convTypeName(type) {
-      if (type === 'NONE') return '클랜전';
-      if (type === 'LEAGUE') return '리그전';
-      if (type === 'PARALLEL') return '리그전';
-      return type;
-    }
-
     function renderClanWarInfo(clanWar) {
       const { clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
 
@@ -195,7 +183,7 @@
       const clanWarInfoTable = clanWarInfo.querySelector('.table');
       clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
                                                    .replace(/{NAME}/, clanName)
-                                                   .replace(/{TYPE}/, convTypeName(type))
+                                                   .replace(/{TYPE}/, convWarTypeName(type))
                                                    .replace(/{BATTLE_TYPE}/, convBattleTypeName(battleType))
                                                    .replace(/{TEAM_SIZE}/, teamSize)
                                                    .replace(/{START_DATE}/, formatYYYYMMDDHHMM(dayjs(startTime)))

@@ -607,6 +607,9 @@ body::before {
   .table-tbody {
   }
 
+  .table-tr:nth-child(odd) {
+    background-color: #f9f9f9;
+  }
 
   .table-tr {
 

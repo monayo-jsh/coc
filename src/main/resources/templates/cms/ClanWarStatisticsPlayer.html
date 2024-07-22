@@ -31,6 +31,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
     <!-- Excel Lib -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
@@ -70,8 +72,9 @@
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
-                    '총 획득별': `${Number(score).toLocaleString()}`,
-                    '평균 획득별': `${Number(completeStarRatio).toFixed(1)}`,
+                    '총 공격수': Number(attackCount).toLocaleString(),
+                    '총 획득별': Number(score).toLocaleString(),
+                    '평균 획득별': Number(completeStarRatio).toFixed(1),
                     '평균 파괴율': Number(destructionPercentage).toLocaleString(),
                     '평균 완파시간': formatMinuteSecond(Number(duration))
                 }
@@ -133,6 +136,7 @@
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
+                               .replace(/{ATTACK_COUNT}/, attackCount)
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_NAME}/, clanName)
                                .replace(/{STARS}/, Number(score).toLocaleString())
@@ -144,10 +148,60 @@
         }
 
         let players = [];
+        let clanNames = new Set();
+
+        function collectClanNames(players) {
+            clanNames.clear();
+            for (const player of players) {
+                const { clanName } = player;
+                clanNames.add(clanName);
+            }
+        }
+
+        function resetFilterByClanElement() {
+            const radioInputs = document.querySelector('.radio-inputs');
+            radioInputs.innerHTML = ""; // clear
+
+            const radioItemTemplate = document.querySelector('#radio-item-template-default');
+            const radioItem = document.importNode(radioItemTemplate.content, true);
+            const radio = radioItem.querySelector('.radio.item');
+            radioInputs.appendChild(radio);
+        }
+
+        function filterByClan(clanName) {
+            if (clanName === 'all') {
+                renderClanWarStatisticsPlayers(players);
+                return;
+            }
+
+            const playersByClan = players.filter(player => player.clanName === clanName);
+            renderClanWarStatisticsPlayers(playersByClan);
+        }
+        function drawFilterClanNames() {
+            resetFilterByClanElement();
+            const sortedClanNames = Array.from(clanNames).sort((a, b) => a.localeCompare(b));
+            for (const clanName of sortedClanNames) {
+                drawFilterClanName(clanName);
+            }
+        }
+
+        function drawFilterClanName(clanName) {
+            const radioItemTemplate = document.querySelector('#radio-item-template');
+            const radioItem = document.importNode(radioItemTemplate.content, true);
+            const radio = radioItem.querySelector('.radio.item');
+
+            radio.innerHTML = radio.innerHTML.replace(/{CLAN_NAME}/g, clanName);
+
+            const radioInputs = document.querySelector('.radio-inputs');
+            radioInputs.appendChild(radio);
+        }
+
         async function fetchClanWarStatistics(searchMonth) {
             showWifiLoading('.body');
             players = await fetchRankingClanWarStars(searchMonth, '', 'ALL');
-            renderClanWarStatisticsPlayers(players)
+            collectClanNames(players);
+            renderClanWarStatisticsPlayers(players);
+            drawFilterClanNames();
             hideWifiLoading('.body');
         }
 
@@ -197,6 +251,9 @@
                         </div>
                     </div>
                 </div>
+                <div class="inner-section">
+                    <div class="radio-inputs"></div>
+                </div>
             </div>
 
             <div class="container contents">
@@ -204,6 +261,7 @@
                     <thead class="table-thead">
                     <tr class="table-tr">
                         <th class="table-th">이름</th>
+                        <th class="table-th">총 공격수</th>
                         <th class="table-th">총 획득별</th>
                         <th class="table-th">총 파괴율</th>
                         <th class="table-th">평균 완파시간</th>
@@ -211,7 +269,7 @@
                     </thead>
                     <tbody class="table-tbody">
                     <tr class="table-tr">
-                        <td class="table-td" colspan="4">데이터 없음</td>
+                        <td class="table-td" colspan="5">데이터 없음</td>
                     </tr>
                     </tbody>
                 </table>
@@ -244,9 +302,14 @@
     <tr class="table-tr">
         <td class="table-td name">
             <div class="td-wrap flex-colum flex-gap">
-                <div class="">{NAME}</div>
+                <div class="player-name">{NAME}</div>
                 <div class="chip">{TAG}</div>
                 <div class="chip bg-green">{CLAN_NAME}</div>
+            </div>
+        </td>
+        <td class="table-td">
+            <div class="td-wrap">
+                <div class="count">{ATTACK_COUNT}</div>
             </div>
         </td>
         <td class="table-td">
@@ -272,7 +335,19 @@
 </template>
 <template id="clan-war-empty-row-template">
     <tr class="table-tr">
-        <td class="table-td empty" colspan="4">데이터 없음</td>
+        <td class="table-td empty" colspan="5">데이터 없음</td>
     </tr>
+</template>
+<template id="radio-item-template-default">
+    <label class="radio item">
+        <input type="radio" name="radio-clan" onchange="filterByClan('all'); return false;" checked>
+        <span class="name">전체</span>
+    </label>
+</template>
+<template id="radio-item-template">
+    <label class="radio item">
+        <input type="radio" name="radio-clan" onchange="filterByClan('{CLAN_NAME}'); return false;">
+        <span class="name">{CLAN_NAME}</span>
+    </label>
 </template>
 </html>

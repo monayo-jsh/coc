@@ -112,7 +112,7 @@ public class PlayersService {
     }
 
     public List<PlayerEntity> findAllPlayerEntities() {
-        return playerRepository.findAll();
+        return playerQueryRepository.findAll();
     }
 
     public List<PlayerResponse> findAllPlayers() {

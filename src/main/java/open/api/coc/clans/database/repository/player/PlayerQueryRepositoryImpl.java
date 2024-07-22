@@ -18,26 +18,26 @@ public class PlayerQueryRepositoryImpl implements PlayerQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    private JPAQuery<PlayerEntity> makeDefaultSelectQuery() {
-        return queryFactory.select(playerEntity)
-                           .from(playerEntity)
-                           .leftJoin(playerEntity.league, leagueEntity)
-                           .fetchJoin()
-                           .leftJoin(playerEntity.clan, clanEntity)
-                           .fetchJoin()
-                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity)
-                           .fetchJoin();
+    private JPAQuery<PlayerEntity> createBaseQuery() {
+        return queryFactory.selectFrom(playerEntity)
+                           .leftJoin(playerEntity.league, leagueEntity).fetchJoin()
+                           .leftJoin(playerEntity.clan, clanEntity).fetchJoin()
+                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();
     }
 
     @Override
     public List<PlayerEntity> findAll() {
-        return makeDefaultSelectQuery().fetch();
+        JPAQuery<PlayerEntity> query = createBaseQuery();
+        return query.fetch();
     }
 
     @Override
     public List<PlayerEntity> findAllByName(String name) {
-        return makeDefaultSelectQuery()
-            .where(playerEntity.name.startsWith(name))
-            .fetch();
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name must not be null or empty");
+        }
+
+        JPAQuery<PlayerEntity> query = createBaseQuery().where(playerEntity.name.startsWith(name));
+        return query.fetch();
     }
 }

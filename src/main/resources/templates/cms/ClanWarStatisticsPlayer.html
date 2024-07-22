@@ -62,12 +62,15 @@
                 return a.clanName.localeCompare(b.clanName) || b.score - a.score || b.destructionPercentage - a.destructionPercentage || b.duration - a.duration
             })
                           .map((player) => {
-                const { name, tag, clanName, score, destructionPercentage, duration } = player;
+                const { name, tag, clanName, attackCount, score, destructionPercentage, duration } = player;
+                const completeStarRatio = calcCompleteStarRatio(score, attackCount);
+
                 return {
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
-                    '총 획득별': Number(score).toLocaleString(),
+                    '총 획득별': `${Number(score).toLocaleString()}`,
+                    '평균 획득별': `${Number(completeStarRatio).toFixed(1)}`,
                     '평균 파괴율': Number(destructionPercentage).toLocaleString(),
                     '평균 완파시간': formatMinuteSecond(Number(duration))
                 }
@@ -110,18 +113,29 @@
             }
         }
 
+        function calcCompleteStarRatio(score, attackCount) {
+            let completeStarRatio = 0;
+            if (score > 0 && attackCount > 0) {
+                completeStarRatio = score / (attackCount * 3) * 3;
+            }
+            return completeStarRatio;
+        }
+
         function makeRankClanWarRow(player) {
             const rankingRowTemplate = document.querySelector('#clan-war-row-template');
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
             const row = rankingRow.querySelector('.table-tr');
 
-            const { name, tag, clanName, score, destructionPercentage, duration } = player;
+            const { name, tag, clanName, attackCount, score, destructionPercentage, duration } = player;
+
+            let completeStarRatio = calcCompleteStarRatio(score, attackCount);
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_NAME}/, clanName)
-                               .replace(/{SCORE}/, Number(score).toLocaleString())
+                               .replace(/{STARS}/, Number(score).toLocaleString())
+                               .replace(/{RATIO}/, Number(completeStarRatio).toFixed(1))
                                .replace(/{DESTRUCTION_PERCENTAGE}/, Number(destructionPercentage))
                                .replace(/{DURATION}/, formatMinuteSecond(Number(duration)));
 
@@ -237,8 +251,9 @@
         <td class="table-td">
             <div class="td-wrap">
                 <i class="fa-solid fa-star color-gold"></i>
-                <div class="record">{SCORE}</div>
+                <div class="record">{STARS}</div>
             </div>
+            <div class="record">({RATIO})</div>
         </td>
         <td class="table-td">
             <div class="td-wrap">

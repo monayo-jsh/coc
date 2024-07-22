@@ -68,6 +68,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
 
     @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
         + "         max(player.name) as name, "
+        + "         count(clanWarMemberAttack.id.tag) as attackCount, "
         + "         sum(clanWarMemberAttack.stars) as score, "
         + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
         + "         avg(clanWarMemberAttack.duration) as duration, "
@@ -86,6 +87,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
 
     @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
         + "         max(player.name) as name, "
+        + "         count(clanWarMemberAttack.id.tag) as attackCount, "
         + "         sum(clanWarMemberAttack.stars) as score, "
         + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
         + "         avg(clanWarMemberAttack.duration) as duration, "

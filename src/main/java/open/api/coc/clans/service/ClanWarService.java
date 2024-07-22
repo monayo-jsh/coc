@@ -433,15 +433,26 @@ public class ClanWarService {
         }
     }
 
-    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth, String clanTag) {
+    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
         LocalDateTime startTime = getStartTime(searchMonth);
         LocalDateTime endTime = getEndTime(searchMonth);
 
+        PageRequest pageRequest = makePageRequest(searchType);
+
         if (StringUtils.isEmpty(clanTag)) {
-            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, startTime, endTime, PageRequest.of(0, hallOfFameConfig.getRanking()));
+            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, startTime, endTime, pageRequest);
         }
 
-        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, startTime, endTime, clanTag, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, startTime, endTime, clanTag, pageRequest);
+    }
+
+    private PageRequest makePageRequest(String searchType) {
+        // 임시 전체 조회 코드 설정
+        if ("ALL".equals(searchType)) {
+            return PageRequest.of(0, 1000);
+        }
+
+        return PageRequest.of(0, hallOfFameConfig.getRanking());
     }
 
     private LocalDateTime getStartTimeForLast90Days() {

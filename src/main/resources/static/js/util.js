@@ -78,11 +78,14 @@ function exportExcel(members) {
   // 이름순
   members = members.sort((a, b) => a.name.localeCompare(b.name) || b.heroTotalLevel - a.heroTotalLevel);
   const players = formattedPlayers(members);
-
-  const workbook = XLSX.utils.book_new();
-  const worksheet = XLSX.utils.json_to_sheet(players);
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
   const fileName = `클랜원_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`;
+  writeExcelFile(fileName, players)
+}
+
+function writeExcelFile(fileName, jsonData) {
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(jsonData);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
   XLSX.writeFile(workbook, fileName);
 }
 
@@ -349,4 +352,33 @@ function convWarTypeName(type) {
     case 'parallel': return '병행클랜전';
   }
   return type;
+}
+
+
+function makeMonthPickerOption(firstDayOfMonth, customOption = {
+  validRange: true
+}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    type: 'year-month-picker',
+    format: 'YYYY-MM',
+    controls: false,
+    readonly: true,
+    value: firstDayOfMonth, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+  };
+
+  // setting validRange
+  if (customOption.validRange) {
+    option.validRange = [ firstDayOfMonth ];
+  }
+
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
+  }
+  return option
 }

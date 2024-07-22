@@ -38,6 +38,12 @@ public class ViewAdminController {
         return "cms/ClanWarCalendar";
     }
 
+    /** 클랜전 월 완파 현황 */
+    @GetMapping("/clan/war/statistics/player")
+    public String clanWarStatistics() {
+        return "cms/ClanWarStatisticsPlayer";
+    }
+
     /** 클랜전 미공 캘린더 */
     @GetMapping("/clan/war/calendar/missing")
     public String clanWarMissingCalendar() {

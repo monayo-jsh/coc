@@ -80,8 +80,11 @@ async function fetchClanWarDetail(warId) {
                     });
 }
 
-async function fetchRankingClanWarStars(searchMonth, clanTag) {
-  const uri = URI_RANKING_CLAN_WAR_STARS + `?searchMonth=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
+async function fetchRankingClanWarStars(searchMonth, clanTag, searchType) {
+  let uri = URI_RANKING_CLAN_WAR_STARS + `?searchMonth=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
+  if (searchType) {
+    uri += `&searchType=${searchType}`
+  }
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response

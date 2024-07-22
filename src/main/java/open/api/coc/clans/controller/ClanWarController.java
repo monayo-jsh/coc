@@ -55,9 +55,10 @@ public class ClanWarController {
 
     @GetMapping("/ranking/stars")
     public ResponseEntity<List<RankingHallOfFame>> getRankingClanWarStars(@RequestParam LocalDate searchMonth,
-                                                                          @RequestParam String clanTag) {
+                                                                          @RequestParam String clanTag,
+                                                                          @RequestParam(defaultValue = "") String searchType) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag));
+                             .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag, searchType));
     }
 
     @GetMapping("/league/ranking/stars")

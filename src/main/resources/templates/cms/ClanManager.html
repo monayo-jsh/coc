@@ -1091,19 +1091,6 @@
         const defaultFirstDayOfMonth = getDefaultLeagueFirstDayOfMonth(monthPicker);
         jSuites.calendar(monthPicker, makeMonthPickerOption(defaultFirstDayOfMonth));
       }
-
-      function makeMonthPickerOption(firstDayOfMonth) {
-        return {
-          type: 'year-month-picker',
-          format: 'YYYY-MM',
-          validRange: [ firstDayOfMonth ],
-          controls: false,
-          readonly: true,
-          value: firstDayOfMonth, // default
-          months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-          monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-        }
-      }
     }
 
     window.onload = async () => {

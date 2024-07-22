@@ -220,6 +220,9 @@ body::before {
   cursor: pointer !important;
 }
 
+.display-flex {
+  display: flex !important;
+}
 .flex-row {
   flex-direction: row !important;
 }
@@ -229,6 +232,10 @@ body::before {
 
 .flex-colum {
   flex-direction: column !important;
+}
+
+.flex-gap {
+  gap: 3px;
 }
 
 
@@ -639,4 +646,15 @@ body::before {
   border-radius: 10px;
   font-size: 14px;
   padding: 10px 20px;
+}
+
+
+/** month-picker */
+.input-month {
+  border: 1px solid #b7b7b7;
+  border-radius: 5px;
+  width: 110px;
+  padding: 5px;
+  font-size: 14px;
+  background-position: top 45% right 5px;
 }

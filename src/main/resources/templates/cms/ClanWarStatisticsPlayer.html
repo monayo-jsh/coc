@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+
+    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarStatisticsPlayer.css" />
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script src="/static/js/api/clanWar.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- JavaScript Year and Month Picker -->
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Excel Lib -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <title>클랜전 월별 완파 통계</title>
+    <script type="text/javascript">
+        dayjs.locale('ko');
+        //dayjs duration 확장
+        dayjs.extend(dayjs_plugin_duration)
+
+        function getMonthPicker() {
+            return document.querySelector('input.input-month');
+        }
+
+        function callBackMonthPicker(monthPickerElement, selectedValue) {
+            const searchMonth = formatYYYYMMDD(selectedValue);
+            fetchClanWarStatistics(searchMonth);
+        }
+        function initMonthPicker() {
+            let defaultFirstDayOfMonth = dayjs().date(1);
+            const monthPicker = getMonthPicker();
+            const customOption = {
+                validRange: false,
+                onchange: callBackMonthPicker
+            }
+            jSuites.calendar(monthPicker, makeMonthPickerOption(formatYYYYMMDD(defaultFirstDayOfMonth), customOption));
+        }
+
+        function formatPlayer(players) {
+            return players.sort((a, b) => {
+                return a.clanName.localeCompare(b.clanName) || b.score - a.score || b.destructionPercentage - a.destructionPercentage || b.duration - a.duration
+            })
+                          .map((player) => {
+                const { name, tag, clanName, score, destructionPercentage, duration } = player;
+                return {
+                    '이름': name,
+                    '태그': tag,
+                    '클랜': clanName,
+                    '총 획득별': Number(score).toLocaleString(),
+                    '평균 파괴율': Number(destructionPercentage).toLocaleString(),
+                    '평균 완파시간': formatMinuteSecond(Number(duration))
+                }
+            });
+        }
+
+        function downloadStatisticsExcelFile() {
+            const monthPicker = getMonthPicker();
+            const monthStatistics = monthPicker.value;
+            if (!confirm(`[${monthStatistics}] 완파 통계를 다운로드받으시겠습닌가?`)) {
+                return false;
+            }
+            const fileName = `${monthStatistics} 완파 통계.xlsx`;
+            const formattedPlayers = formatPlayer(players);
+            writeExcelFile(fileName, formattedPlayers);
+        }
+
+        function emptyRankClanWarRow() {
+            const rankingRowTemplate = document.querySelector('#clan-war-empty-row-template');
+            const rankingRow = document.importNode(rankingRowTemplate.content, true);
+            return rankingRow.querySelector('.table-tr');
+        }
+
+        function renderClanWarStatisticsPlayers(players) {
+            const rankingTbody = document.querySelector(`.table-tbody`);
+
+            // clear
+            rankingTbody.innerHTML = '';
+
+            if (!players.length) {
+                rankingTbody.appendChild(emptyRankClanWarRow());
+                return;
+            }
+
+            let rank = 1;
+            for(const player of players) {
+                const row = makeRankClanWarRow(player);
+                rankingTbody.appendChild(row);
+                rank++;
+            }
+        }
+
+        function makeRankClanWarRow(player) {
+            const rankingRowTemplate = document.querySelector('#clan-war-row-template');
+            const rankingRow = document.importNode(rankingRowTemplate.content, true);
+            const row = rankingRow.querySelector('.table-tr');
+
+            const { name, tag, clanName, score, destructionPercentage, duration } = player;
+
+            row.innerHTML = row.innerHTML
+                               .replace(/{NAME}/, name)
+                               .replace(/{TAG}/, tag)
+                               .replace(/{CLAN_NAME}/, clanName)
+                               .replace(/{SCORE}/, Number(score).toLocaleString())
+                               .replace(/{DESTRUCTION_PERCENTAGE}/, Number(destructionPercentage))
+                               .replace(/{DURATION}/, formatMinuteSecond(Number(duration)));
+
+            return row;
+        }
+
+        let players = [];
+        async function fetchClanWarStatistics(searchMonth) {
+            showWifiLoading('.body');
+            players = await fetchRankingClanWarStars(searchMonth, '', 'ALL');
+            renderClanWarStatisticsPlayers(players)
+            hideWifiLoading('.body');
+        }
+
+        window.onload = async () => {
+            await initMonthPicker();
+        }
+    </script>
+</head>
+<body>
+<div class="section-wrapper">
+
+    <div class="section-item">
+        <div class="card caption">
+            <div class="bottom-section">
+                <span class="title">클랜전 월별 완파 통계</span>
+            </div>
+        </div>
+
+        <div class="body">
+            <div id="wifi-loader" class="display-none">
+                <svg class="circle-outer" viewBox="0 0 86 86">
+                    <circle class="back" cx="43" cy="43" r="40"></circle>
+                    <circle class="front" cx="43" cy="43" r="40"></circle>
+                    <circle class="new" cx="43" cy="43" r="40"></circle>
+                </svg>
+                <svg class="circle-middle" viewBox="0 0 60 60">
+                    <circle class="back" cx="30" cy="30" r="27"></circle>
+                    <circle class="front" cx="30" cy="30" r="27"></circle>
+                </svg>
+                <svg class="circle-inner" viewBox="0 0 34 34">
+                    <circle class="back" cx="17" cy="17" r="14"></circle>
+                    <circle class="front" cx="17" cy="17" r="14"></circle>
+                </svg>
+                <div class="text" data-text="Searching"></div>
+            </div>
+
+            <div class="container">
+                <div class="inner-section">
+                    <div class="picker">
+                        <input type="text" class="input-month">
+                    </div>
+                    <div class="buttons">
+                        <div class="button-chip">
+                            <button class="refresh" onclick="downloadStatisticsExcelFile(); return false;">
+                                엑셀 다운
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container contents">
+                <table class="table">
+                    <thead class="table-thead">
+                    <tr class="table-tr">
+                        <th class="table-th">이름</th>
+                        <th class="table-th">총 획득별</th>
+                        <th class="table-th">총 파괴율</th>
+                        <th class="table-th">평균 완파시간</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                    <tr class="table-tr">
+                        <td class="table-td" colspan="4">데이터 없음</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+<template id="loader">
+    <div class="loader-circle">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+    </div>
+</template>
+<template id="clan-war-row-template">
+    <tr class="table-tr">
+        <td class="table-td name">
+            <div class="td-wrap flex-colum flex-gap">
+                <div class="">{NAME}</div>
+                <div class="chip">{TAG}</div>
+                <div class="chip bg-green">{CLAN_NAME}</div>
+            </div>
+        </td>
+        <td class="table-td">
+            <div class="td-wrap">
+                <i class="fa-solid fa-star color-gold"></i>
+                <div class="record">{SCORE}</div>
+            </div>
+        </td>
+        <td class="table-td">
+            <div class="td-wrap">
+                <div class="icon-damage"></div>
+                <div class="record">{DESTRUCTION_PERCENTAGE} %</div>
+            </div>
+        </td>
+        <td class="table-td">
+            <div class="td-wrap">
+                <div class="icon-clock"></div>
+                <div class="record">{DURATION}</div>
+            </div>
+        </td>
+    </tr>
+</template>
+<template id="clan-war-empty-row-template">
+    <tr class="table-tr">
+        <td class="table-td empty" colspan="4">데이터 없음</td>
+    </tr>
+</template>
+</html>

@@ -17,6 +17,8 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Excel Lib -->
   <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
   <script>
@@ -101,6 +103,10 @@
               <p class="tip">월 캘린더</p>
               <p class="second-text">(기록)</p>
             </div>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/statistics/player'); return false;">
+              <p class="tip">월 완파 통계</p>
+              <p class="second-text">(클랜원)</p>
+            </div>
           </div>
           <div class="cards">
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/calendar/missing'); return false;">
@@ -118,7 +124,7 @@
 
           <div class="cards">
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/missing/attack'); return false;">
-              <p class="tip">미공 조회</p>
+              <p class="tip">미공 현황</p>
               <p class="second-text">(이번 시즌)</p>
             </div>
 

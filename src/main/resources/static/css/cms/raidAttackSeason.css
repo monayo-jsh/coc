@@ -84,6 +84,8 @@
   .name, .tag {
     vertical-align: baseline;
   }
+
+  background-color: transparent !important;
 }
 
 .table-tr.start {
@@ -101,6 +103,9 @@
     background-color: crimson;
   }
 
+  .table-tbody {
+    border-top: 1px crimson solid;
+  }
 }
 
 .demoted-attacked {
@@ -110,5 +115,13 @@
     border: 1px solid goldenrod;
     border-left: 3px solid goldenrod;
     background-color: goldenrod;
+  }
+
+  .table-tbody {
+    border-top: 1px goldenrod solid;
+  }
+
+  .free-tier {
+    background-color: rgba(255, 182, 0, 0.2);
   }
 }

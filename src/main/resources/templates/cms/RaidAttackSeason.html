@@ -23,23 +23,31 @@
 
   <title>습격전 미공/미달 조회</title>
   <script>
-    function getTableTbodyByClassName(targetClassName) {
-      return document.querySelector(`.${targetClassName} .table-tbody`);
+    function getHighTierTableTbodyByClassName(targetClassName) {
+      return document.querySelector(`.${targetClassName} .table-tbody.high-tier`);
+    }
+    function getFreeTierTableTbodyByClassName(targetClassName) {
+      return document.querySelector(`.${targetClassName} .table-tbody.free-tier`);
     }
 
     function clearTableBody(targetClassName) {
-      let tableTbody = getTableTbodyByClassName(targetClassName);
-      tableTbody.innerHTML = "";
+      let highTierTableTbody = getHighTierTableTbodyByClassName(targetClassName);
+      highTierTableTbody.innerHTML = "";
+
+      let freeTierTableTbody = getFreeTierTableTbodyByClassName(targetClassName);
+      freeTierTableTbody.innerHTML = "";
     }
 
     function renderEmptyRow(targetClassName) {
       const raidRowEmptyTemplate = document.querySelector('#raid-row-empty-template');
       const raidRowEmptyElement = document.importNode(raidRowEmptyTemplate.content, true);
-      let tableTbody = getTableTbodyByClassName(targetClassName);
-      tableTbody.appendChild(raidRowEmptyElement);
+
+      let highTierTableTbody = getHighTierTableTbodyByClassName(targetClassName);
+      highTierTableTbody.appendChild(raidRowEmptyElement);
     }
 
     function renderRow(targetClassName, playerRaidScore) {
+      const HIGH_TIER_CLANS = new Set(['아카데미', '아카데미 2.0', '아카데미 3.0']);
       const { name, tag, clan, resourceLooted, attacks } = playerRaidScore;
 
       const raidRowEmptyTemplate = document.querySelector('#raid-row-template');
@@ -58,7 +66,13 @@
                                    .replace(/{SCORE}/, Number(resourceLooted).toLocaleString())
                                    .replace(/{ATTACKS}/, Number(attacks).toLocaleString());
 
-      let tableTbody = getTableTbodyByClassName(targetClassName);
+      // 티어별로 별도의 table tbody write
+      let tableTbody;
+      if (HIGH_TIER_CLANS.has(displayClanName)) {
+        tableTbody = getHighTierTableTbodyByClassName(targetClassName);
+      } else {
+        tableTbody = getFreeTierTableTbodyByClassName(targetClassName);
+      }
       tableTbody.appendChild(tableRow);
     }
 
@@ -205,7 +219,12 @@
             <th class="table-th">공격수</th>
           </tr>
           </thead>
-          <tbody class="table-tbody">
+          <tbody class="table-tbody high-tier">
+          <tr class="table-tr">
+            <td class="table-td" colspan="4">미공 없음</td>
+          </tr>
+          </tbody>
+          <tbody class="table-tbody free-tier">
           <tr class="table-tr">
             <td class="table-td" colspan="4">미공 없음</td>
           </tr>
@@ -224,7 +243,13 @@
             <th class="table-th">공격수</th>
           </tr>
           </thead>
-          <tbody class="table-tbody">
+          <tbody class="table-tbody high-tier">
+          <tr class="table-tr">
+            <td class="table-td" colspan="4">미달 없음</td>
+          </tr>
+          </tbody>
+
+          <tbody class="table-tbody free-tier">
           <tr class="table-tr">
             <td class="table-td" colspan="4">미달 없음</td>
           </tr>

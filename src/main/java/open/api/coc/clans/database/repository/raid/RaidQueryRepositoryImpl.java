@@ -31,6 +31,7 @@ public class RaidQueryRepositoryImpl implements RaidQueryRepository {
                                           .join(clanEntity).on(clanEntity.tag.eq(raidEntity.clanTag))
                                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin()
                                           .where(raidEntity.startDate.eq(startDate))
+                                          .orderBy(clanEntity.order.asc())
                                           .fetch();
 
         List<RaidEntity> raidEntities = new ArrayList<>();

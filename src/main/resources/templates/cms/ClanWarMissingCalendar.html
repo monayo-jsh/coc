@@ -184,11 +184,14 @@
       }
     }
 
+    function sortedBy(map) {
+      return new Map(Array.from(map).sort((a, b) => a[0].localeCompare(b[0])));
+    }
     function copyMissingMembers(date, players) {
       const listGroupByClan = convertArrayToMapByKey(players, 'clanName', true);
       let message = [];
       let totalPlayerLength = 0;
-      for (const [clanName, players]of listGroupByClan) {
+      for (const [clanName, players]of sortedBy(listGroupByClan)) {
         const [player] = players;
         const { warState, warType } = player;
         const warStateName = warState === 'inWar' ? ' 진행중': '';

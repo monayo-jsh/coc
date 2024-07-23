@@ -6,7 +6,7 @@ decorator:
   datasource:
     p6spy:
       logging: slf4j
-      enable-logging: false
+      enable-logging: true
 
 spring:
   application:

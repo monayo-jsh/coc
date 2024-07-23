@@ -10,7 +10,7 @@
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/cms/raidMissingAttack.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/raidAttackSeason.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
@@ -21,63 +21,25 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
-  <title>습격전 미공 조회</title>
+  <title>습격전 미공/미달 조회</title>
   <script>
-    function clearTableBody() {
-      let tableTbody = document.querySelector('.table-tbody');
+    function getTableTbodyByClassName(targetClassName) {
+      return document.querySelector(`.${targetClassName} .table-tbody`);
+    }
+
+    function clearTableBody(targetClassName) {
+      let tableTbody = getTableTbodyByClassName(targetClassName);
       tableTbody.innerHTML = "";
     }
 
-    function renderEmptyRow() {
+    function renderEmptyRow(targetClassName) {
       const raidRowEmptyTemplate = document.querySelector('#raid-row-empty-template');
       const raidRowEmptyElement = document.importNode(raidRowEmptyTemplate.content, true);
-      const tableTbody = document.querySelector('.table-tbody');
+      let tableTbody = getTableTbodyByClassName(targetClassName);
       tableTbody.appendChild(raidRowEmptyElement);
     }
 
-    function increaseRowspan(playerTag, className) {
-      const firstDrawRow = document.querySelector(`.tag-${removeHashTag(playerTag)}`);
-      const targetTd = firstDrawRow.querySelector(`.${className}`);
-      const rowspan = targetTd.getAttribute('rowspan');
-      if (rowspan) {
-        targetTd.setAttribute('rowspan', Number(rowspan)+1);
-      }
-    }
-
-    function removeCell(tableRow, removeCellClassName) {
-      tableRow.querySelector(`.${removeCellClassName}`).remove();
-    }
-
-    function appendClassNewPlayer(tableRow, tag) {
-      tableRow.classList.add(`tag-${removeHashTag(tag)}`, "start");
-    }
-
-    function drawRow(tableRow, tag) {
-      const tableTbody = document.querySelector('.table-tbody');
-      const lastRow = tableTbody.children[tableTbody.children.length-1]
-      if (!lastRow) {
-        appendClassNewPlayer(tableRow, tag);
-        tableTbody.appendChild(tableRow);
-        return;
-      }
-
-      // 마지막 행이 그려야할 플레이어와 동일하면 중복 제거
-      const beforeRowPlayerTag = lastRow.dataset.tag;
-
-      if (tag === beforeRowPlayerTag) {
-        increaseRowspan(tag, 'name');
-        increaseRowspan(tag, 'tag');
-        removeCell(tableRow, 'name');
-        removeCell(tableRow, 'tag');
-      } else {
-        // 신규 플레이어
-        appendClassNewPlayer(tableRow, tag);
-      }
-
-      tableTbody.appendChild(tableRow);
-    }
-
-    function renderRow(playerRaidScore) {
+    function renderRow(targetClassName, playerRaidScore) {
       const { name, tag, clan, resourceLooted, attacks } = playerRaidScore;
 
       const raidRowEmptyTemplate = document.querySelector('#raid-row-template');
@@ -96,19 +58,19 @@
                                    .replace(/{SCORE}/, Number(resourceLooted).toLocaleString())
                                    .replace(/{ATTACKS}/, Number(attacks).toLocaleString());
 
-      // 테이블에 행 입력
-      drawRow(tableRow, tag);
+      let tableTbody = getTableTbodyByClassName(targetClassName);
+      tableTbody.appendChild(tableRow);
     }
 
-    function renderTableBody(players) {
-      clearTableBody();
+    function renderTableBody(targetClassName, players) {
+      clearTableBody(targetClassName);
       if (!players.length) {
-        renderEmptyRow();
+        renderEmptyRow(targetClassName);
         return;
       }
 
       for(const player of players) {
-        renderRow(player);
+        renderRow(targetClassName, player);
       }
     }
 
@@ -126,12 +88,46 @@
       target.classList.remove('opacity-01');
     }
 
+    function renderMissingAttack(players) {
+      const targetClassName = 'missing-attack';
+      renderTableBody(targetClassName, players)
+    }
+
+    function renderDemotedAttacked(players) {
+      const targetClassName = 'demoted-attacked';
+      renderTableBody(targetClassName, players)
+    }
+
+    function dividePlayers(raidAttackSeasonPlayers) {
+      const missingAttacks = [];
+      const demotedAttacks = [];
+      for (const player of raidAttackSeasonPlayers) {
+        const { attacks, resourceLooted } = player;
+        if (isMissingAttack(attacks)) {
+          missingAttacks.push(player);
+          continue;
+        }
+        if (isDemotedAttack(resourceLooted)) {
+          demotedAttacks.push(player);
+          continue;
+        }
+      }
+
+      return {
+        missingAttacks,
+        demotedAttacks
+      }
+    }
+
     async function searchRaidMissingAttack() {
       showLoading('.table-tbody');
-      const raidMissingAttackPlayers = await fetchRaidMissingAttackPlayers();
+      const raidAttackSeasonPlayers = await fetchRaidAttackSeasonPlayers();
       hideLoading('.table-tbody');
 
-      renderTableBody(raidMissingAttackPlayers);
+      const { missingAttacks, demotedAttacks } = dividePlayers(raidAttackSeasonPlayers);
+
+      renderMissingAttack(missingAttacks);
+      renderDemotedAttacked(demotedAttacks);
     }
 
     async function refreshClanRaidSeason() {
@@ -150,7 +146,7 @@
   <div class="capital-raid">
     <div class="card caption">
       <div class="bottom-section">
-        <span class="title">이번 시즌 미공 조회</span>
+        <span class="title">이번 시즌 미공/미달 조회</span>
       </div>
     </div>
 
@@ -199,7 +195,8 @@
       </div>
 
       <div class="container contents">
-        <table class="table">
+        <table class="table missing-attack">
+          <caption class="table-caption">미공 목록</caption>
           <thead class="table-thead">
           <tr class="table-tr">
             <th class="table-th">플레이어</th>
@@ -210,7 +207,26 @@
           </thead>
           <tbody class="table-tbody">
           <tr class="table-tr">
-            <td class="table-td" colspan="6">미공 없음</td>
+            <td class="table-td" colspan="4">미공 없음</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="container contents">
+        <table class="table demoted-attacked">
+          <caption class="table-caption bg-gold">미달 목록</caption>
+          <thead class="table-thead">
+          <tr class="table-tr">
+            <th class="table-th">플레이어</th>
+            <th class="table-th">진행 클랜</th>
+            <th class="table-th">점수</th>
+            <th class="table-th">공격수</th>
+          </tr>
+          </thead>
+          <tbody class="table-tbody">
+          <tr class="table-tr">
+            <td class="table-td" colspan="4">미달 없음</td>
           </tr>
           </tbody>
         </table>
@@ -246,7 +262,7 @@
 </template>
 <template id="raid-row-empty-template">
   <tr class="table-tr">
-    <td class="table-td" colspan="6">미공 없음</td>
+    <td class="table-td" colspan="4">미공 없음</td>
   </tr>
 </template>
 </html>

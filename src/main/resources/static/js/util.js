@@ -382,3 +382,13 @@ function makeMonthPickerOption(firstDayOfMonth, customOption = {
   }
   return option
 }
+
+function isMissingAttack(attacks) {
+  const ESSENTIAL_ATTACK_COUNT = 6;
+  return attacks < ESSENTIAL_ATTACK_COUNT;
+}
+
+function isDemotedAttack(value) {
+  const DEMOTED_ATTACK_VALUE = 20000;
+  return value < DEMOTED_ATTACK_VALUE;
+}

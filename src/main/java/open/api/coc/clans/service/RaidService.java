@@ -4,6 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -20,6 +21,7 @@ import open.api.coc.clans.database.entity.raid.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidRepository;
+import open.api.coc.clans.database.repository.raid.RaidQueryRepository;
 import open.api.coc.clans.database.repository.raid.RaiderRepository;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
@@ -48,6 +50,8 @@ public class RaidService {
 
     private final RaidRepository raidRepository;
     private final RaiderRepository raiderRepository;
+
+    private final RaidQueryRepository raiderQueryRepository;
 
     private final TimeConverter timeConverter;
 
@@ -136,11 +140,16 @@ public class RaidService {
             raiderEntity.getRaid().changeClan(clanEntity);
         }
 
+        return convertRaidScoreResponse(raiderEntities);
+    }
+
+    private List<RaidScoreResponse> convertRaidScoreResponse(List<RaiderEntity> raiderEntities) {
         return raiderEntities.stream()
-                .map(raidScoreResponseConverter::convert)
-                .sorted(Comparator.comparing(RaidScoreResponse::getTag)
-                                  .thenComparing(RaidScoreResponse::getSeasonStartDate).reversed())
-                .collect(Collectors.toList());
+                             .map(raidScoreResponseConverter::convert)
+                             .sorted(Comparator.comparing(RaidScoreResponse::getTag)
+                                               .thenComparing(RaidScoreResponse::getSeasonStartDate)
+                                               .reversed())
+                             .collect(Collectors.toList());
     }
 
     @Transactional
@@ -182,15 +191,17 @@ public class RaidService {
         return raiderRepository.getRankingByStartDatesAndLimit(averageSeasonStartDates, hallOfFameConfig.getAverage(), PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
-    public List<RaidScoreResponse> getMissingAttackPlayers() {
+    public List<RaidScoreResponse> getAttackCurrentSeason() {
         LocalDate currentSeason = raidRepository.getCurrentSeason();
         if (Objects.isNull(currentSeason)) {
             return Collections.emptyList();
         }
 
-        final Integer ESSENTIAL_ATTACK_COUNT = 6;
-        List<RaiderEntity> raiderEntities = raiderRepository.getMissingAttacks(currentSeason, ESSENTIAL_ATTACK_COUNT);
+        List<RaidEntity> raidEntities = raiderQueryRepository.findAllByStartDate(currentSeason);
 
-        return getRaidScoreResponses(raiderEntities);
+        return raidEntities.stream()
+                           .map(raid -> convertRaidScoreResponse(raid.getRaiderEntityList()))
+                           .flatMap(Collection::stream)
+                           .toList();
     }
 }

@@ -108,14 +108,14 @@
                                    .replace(/{SCORE}/, Number(resourceLooted).toLocaleString())
                                    .replace(/{ATTACKS}/, Number(attacks).toLocaleString());
 
-      if (resourceLooted < 20000) {
+      if (isDemotedAttack(resourceLooted)) {
         // 점수 미달
         const span = tableRow.querySelector('.span-score');
         span.classList.add('color-red');
 
       }
 
-      if (attacks < 6) {
+      if (isMissingAttack(attacks)) {
         // 미공
         const span = tableRow.querySelector('.span-attacks');
         span.classList.add('color-red');

@@ -57,9 +57,9 @@ public class ViewAdminController {
     }
 
     /** 습격전 위반 현황 */
-    @GetMapping("/raid/missing/attack")
+    @GetMapping("/raid/attack/season")
     public String raidMissingAttack() {
-        return "cms/RaidMissingAttack";
+        return "cms/RaidAttackSeason";
     }
 
     /** 습격전 위반 현황 */

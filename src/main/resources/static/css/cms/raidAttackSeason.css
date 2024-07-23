@@ -1,10 +1,11 @@
 .capital-raid {
+  width: 100%;
+  max-width: 650px;
   height: 100%;
   padding: 10px 0;
 }
 
 .card {
-  width: 310px;
   height: 30px;
   border-radius: 10px;
   padding: 5px;
@@ -26,6 +27,20 @@
 
 .body {
   position: relative;
+  display: flex;
+  justify-content: space-between;
+
+  @media (max-width: 620px) {
+    flex-direction: column;
+    .container.contents {
+      width: 300px;
+
+      .table-thead,
+      .table-tbody {
+        font-size: 12px;
+      }
+    }
+  }
 }
 
 .container {
@@ -36,6 +51,10 @@
     max-width: unset;
   }
 
+}
+
+.container.contents {
+  width: 320px;
 }
 
 .chip {
@@ -70,5 +89,26 @@
 .table-tr.start {
   .table-td {
 
+  }
+}
+
+.missing-attack {
+  border-color: crimson;
+
+  .table-caption {
+    border: 1px solid crimson;
+    border-left: 3px solid crimson;
+    background-color: crimson;
+  }
+
+}
+
+.demoted-attacked {
+  border-color: goldenrod;
+
+  .table-caption {
+    border: 1px solid goldenrod;
+    border-left: 3px solid goldenrod;
+    background-color: goldenrod;
   }
 }

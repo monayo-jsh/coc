@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
-import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.clans.service.ClanWarService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,15 +54,15 @@ public class ClanWarController {
     }
 
     @GetMapping("/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFame>> getRankingClanWarStars(@RequestParam LocalDate searchMonth,
-                                                                          @RequestParam String clanTag,
-                                                                          @RequestParam(defaultValue = "") String searchType) {
+    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingClanWarStars(@RequestParam LocalDate searchMonth,
+                                                                                    @RequestParam String clanTag,
+                                                                                    @RequestParam(defaultValue = "") String searchType) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag, searchType));
     }
 
     @GetMapping("/league/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFame>> getRankingLeagueClanWarStars(@RequestParam LocalDate searchMonth,
+    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingLeagueClanWarStars(@RequestParam LocalDate searchMonth,
                                                                                 @RequestParam String clanTag) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag));

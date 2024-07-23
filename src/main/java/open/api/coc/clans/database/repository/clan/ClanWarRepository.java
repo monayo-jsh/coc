@@ -7,7 +7,7 @@ import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.ranking.ClanWarCount;
-import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -69,9 +69,13 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
     @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
         + "         max(player.name) as name, "
         + "         count(clanWarMemberAttack.id.tag) as attackCount, "
-        + "         sum(clanWarMemberAttack.stars) as score, "
-        + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
-        + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         sum(clanWarMemberAttack.destructionPercentage) as totalDestructionPercentage, "
+        + "         avg(clanWarMemberAttack.duration) as avgDuration, "
+        + "         sum(clanWarMemberAttack.stars) as totalStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 3 then 1 else 0 end) as threeStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 2 then 1 else 0 end) as twoStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 1 then 1 else 0 end) as oneStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 0 then 1 else 0 end) as zeroStars, "
         + "         max(clan.tag) as clanTag, "
         + "         max(clan.name) as clanName"
         + " FROM ClanWarEntity clanWar"
@@ -82,15 +86,19 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " WHERE clanWar.type = :type "
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
-        + " order by score desc, destructionPercentage desc, duration")
-    List<RankingHallOfFame> selectRankingClanWarStars(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
+        + " order by totalStars desc, totalDestructionPercentage desc, avgDuration")
+    List<RankingHallOfFameForClanWar> selectRankingClanWarStars(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, Pageable pageable);
 
     @Query("SELECT  max(clanWarMemberAttack.id.tag) as tag, "
         + "         max(player.name) as name, "
         + "         count(clanWarMemberAttack.id.tag) as attackCount, "
-        + "         sum(clanWarMemberAttack.stars) as score, "
-        + "         sum(clanWarMemberAttack.destructionPercentage) as destructionPercentage, "
-        + "         avg(clanWarMemberAttack.duration) as duration, "
+        + "         sum(clanWarMemberAttack.destructionPercentage) as totalDestructionPercentage, "
+        + "         avg(clanWarMemberAttack.duration) as avgDuration, "
+        + "         sum(clanWarMemberAttack.stars) as totalStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 3 then 1 else 0 end) as threeStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 2 then 1 else 0 end) as twoStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 1 then 1 else 0 end) as oneStars, "
+        + "         sum(case when clanWarMemberAttack.stars = 0 then 1 else 0 end) as zeroStars, "
         + "         max(clan.tag) as clanTag, "
         + "         max(clan.name) as clanName"
         + " FROM ClanWarEntity clanWar"
@@ -102,8 +110,8 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
         + " AND clanWar.clanTag = :clanTag "
         + " AND clanWar.startTime between :startTime and :endTime"
         + " group by clanWarMemberAttack.id.tag"
-        + " order by score desc, destructionPercentage desc, duration")
-    List<RankingHallOfFame> selectRankingClanWarStarsByClanTag(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
+        + " order by totalStars desc, totalDestructionPercentage desc, avgDuration")
+    List<RankingHallOfFameForClanWar> selectRankingClanWarStarsByClanTag(ClanWarType type, LocalDateTime startTime, LocalDateTime endTime, String clanTag, Pageable pageable);
 
     @Query("select clanWar"
         + " from ClanWarEntity clanWar"

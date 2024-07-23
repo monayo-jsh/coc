@@ -62,21 +62,25 @@
 
         function formatPlayer(players) {
             return players.sort((a, b) => {
-                return a.clanName.localeCompare(b.clanName) || b.score - a.score || b.destructionPercentage - a.destructionPercentage || b.duration - a.duration
+                return a.clanName.localeCompare(b.clanName) || b.totalStars - a.totalStars || b.totalDestructionPercentage - a.totalDestructionPercentage || b.avgDuration - a.avgDuration
             })
                           .map((player) => {
-                const { name, tag, clanName, attackCount, score, destructionPercentage, duration } = player;
-                const completeStarRatio = calcCompleteStarRatio(score, attackCount);
+                const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+                const completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
 
                 return {
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
                     '총 공격수': Number(attackCount).toLocaleString(),
-                    '총 획득별': Number(score).toLocaleString(),
                     '평균 획득별': Number(completeStarRatio).toFixed(1),
-                    '평균 파괴율': Number(destructionPercentage).toLocaleString(),
-                    '평균 완파시간': formatMinuteSecond(Number(duration))
+                    '평균 파괴율': Number(totalDestructionPercentage).toLocaleString(),
+                    '평균 완파시간': formatMinuteSecond(Number(avgDuration)),
+                    '총 획득별': Number(totalStars).toLocaleString(),
+                    '총 3별': Number(threeStars).toLocaleString(),
+                    '총 2별': Number(twoStars).toLocaleString(),
+                    '총 1별': Number(oneStars).toLocaleString(),
+                    '총 0별': Number(zeroStars).toLocaleString()
                 }
             });
         }
@@ -130,19 +134,23 @@
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
             const row = rankingRow.querySelector('.table-tr');
 
-            const { name, tag, clanName, attackCount, score, destructionPercentage, duration } = player;
+            const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
 
-            let completeStarRatio = calcCompleteStarRatio(score, attackCount);
+            let completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
-                               .replace(/{ATTACK_COUNT}/, attackCount)
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_NAME}/, clanName)
-                               .replace(/{STARS}/, Number(score).toLocaleString())
+                               .replace(/{ATTACK_COUNT}/, attackCount)
                                .replace(/{RATIO}/, Number(completeStarRatio).toFixed(1))
-                               .replace(/{DESTRUCTION_PERCENTAGE}/, Number(destructionPercentage))
-                               .replace(/{DURATION}/, formatMinuteSecond(Number(duration)));
+                               .replace(/{STARS}/, Number(totalStars).toLocaleString())
+                               .replace(/{THREE_STARS}/, Number(threeStars).toLocaleString())
+                               .replace(/{TWO_STARS}/, Number(twoStars).toLocaleString())
+                               .replace(/{ONE_STARS}/, Number(oneStars).toLocaleString())
+                               .replace(/{ZERO_STARS}/, Number(zeroStars).toLocaleString())
+                               .replace(/{DESTRUCTION_PERCENTAGE}/, Number(totalDestructionPercentage))
+                               .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
 
             return row;
         }
@@ -261,7 +269,7 @@
                     <thead class="table-thead">
                     <tr class="table-tr">
                         <th class="table-th">이름</th>
-                        <th class="table-th">총 공격수</th>
+                        <th class="table-th">총 공격수<br/>(완파율)</th>
                         <th class="table-th">총 획득별</th>
                         <th class="table-th">총 파괴율</th>
                         <th class="table-th">평균 완파시간</th>
@@ -309,15 +317,26 @@
         </td>
         <td class="table-td">
             <div class="td-wrap">
-                <div class="count">{ATTACK_COUNT}</div>
+                <i class="fa-solid fa-star color-gold"></i>
+                <div class="record">{ATTACK_COUNT}</div>
             </div>
+            <div class="record">({RATIO})</div>
         </td>
         <td class="table-td">
             <div class="td-wrap">
                 <i class="fa-solid fa-star color-gold"></i>
                 <div class="record">{STARS}</div>
             </div>
-            <div class="record">({RATIO})</div>
+            <div class="td-wrap summary-box">
+                <div class="inner-wrap">
+                    <div class="count">3별: {THREE_STARS}</div>
+                    <div class="count">2별: {TWO_STARS}</div>
+                </div>
+                <div class="inner-wrap">
+                    <div class="count">1별: {ONE_STARS}</div>
+                    <div class="count">0별: {ZERO_STARS}</div>
+                </div>
+            </div>
         </td>
         <td class="table-td">
             <div class="td-wrap">

@@ -145,9 +145,9 @@
       for(const player of players) {
         const rowData = convHallOfFameRankingClanWarItem(
             rank, player.name, player.clanName,
-            Number(player.score).toLocaleString(),
-            Number(player.destructionPercentage),
-            formatMinuteSecond(Number(player.duration))
+            Number(player.totalStars).toLocaleString(),
+            Number(player.totalDestructionPercentage),
+            formatMinuteSecond(Number(player.avgDuration))
         );
         const row = makeRankClanWarRow(rowData);
         rankingTbody.appendChild(row);
@@ -224,9 +224,9 @@
       for(const player of players) {
         const rowData = convHallOfFameRankingClanWarItem(
             rank, player.name, player.clanName,
-            Number(player.score).toLocaleString(),
-            Number(player.destructionPercentage),
-            formatMinuteSecond(Number(player.duration))
+            Number(player.totalStars).toLocaleString(),
+            Number(player.totalDestructionPercentage),
+            formatMinuteSecond(Number(player.avgDuration))
         );
         const row = makeRankClanLeagueWarRow(rowData);
         rankingTbody.appendChild(row);

@@ -98,6 +98,23 @@
   align-items: center;
 }
 
+.td-wrap.summary-box {
+  width: 100%;
+  font-size: 12px;
+  margin-top: 3px;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  .inner-wrap {
+    width: 100%;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-around;
+  }
+}
+
 .record {
   margin-left: 3px;
 }

@@ -35,7 +35,7 @@ import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.ranking.ClanWarCount;
-import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
@@ -433,7 +433,7 @@ public class ClanWarService {
         }
     }
 
-    public List<RankingHallOfFame> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
+    public List<RankingHallOfFameForClanWar> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
         LocalDateTime startTime = getStartTime(searchMonth);
         LocalDateTime endTime = getEndTime(searchMonth);
 
@@ -528,11 +528,11 @@ public class ClanWarService {
         return clanWar;
     }
 
-    public List<RankingHallOfFame> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
+    public List<RankingHallOfFameForClanWar> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
         LocalDateTime startTime = getStartTime(searchMonth);
         LocalDateTime endTime = getEndTime(searchMonth);
 
-        List<RankingHallOfFame> rankingHallOfFames;
+        List<RankingHallOfFameForClanWar> rankingHallOfFames;
 
         final Integer SEARCH_LIMIT = 300;
         if (StringUtils.isEmpty(clanTag)) {
@@ -551,9 +551,9 @@ public class ClanWarService {
                                  .toList();
     }
 
-    private boolean isCompleteStars(RankingHallOfFame ranking, Map<String, Integer> clanWarCountMap) {
+    private boolean isCompleteStars(RankingHallOfFameForClanWar ranking, Map<String, Integer> clanWarCountMap) {
         Integer clanWarCount = clanWarCountMap.get(ranking.getClanTag());
         Integer completedStarCount = clanWarCount * 3;
-        return Objects.equals(ranking.getScore(), completedStarCount);
+        return Objects.equals(ranking.getTotalStars(), completedStarCount);
     }
 }

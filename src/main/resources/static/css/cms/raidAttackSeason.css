@@ -32,6 +32,8 @@
 
   @media (max-width: 620px) {
     flex-direction: column;
+    align-items: center;
+
     .container.contents {
       width: 300px;
 

@@ -7,6 +7,7 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinColumns;
 import jakarta.persistence.ManyToOne;
@@ -27,7 +28,12 @@ import org.springframework.lang.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_clan_war_member_attack")
+@Table(
+    name = "tb_clan_war_member_attack",
+    indexes = {
+        @Index(name = "CWMA_IDX_01", columnList = "war_id, tag")
+    }
+)
 public class ClanWarMemberAttackEntity implements Persistable<ClanWarMemberAttackPKEntity> {
 
     @EmbeddedId

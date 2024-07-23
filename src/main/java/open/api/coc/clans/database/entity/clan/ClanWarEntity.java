@@ -32,7 +32,8 @@ import lombok.Setter;
 @Table(
     name = "tb_clan_war",
     indexes = {
-        @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag")
+        @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag"),
+        @Index(name = "TCW_IDX_02", columnList = "clan_tag")
     }
 )
 public class ClanWarEntity {

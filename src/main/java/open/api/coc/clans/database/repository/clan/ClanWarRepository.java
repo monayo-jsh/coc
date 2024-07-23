@@ -20,7 +20,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
     List<ClanWarEntity> findAllByPeriod(LocalDateTime startTime, LocalDateTime endTime);
 
     @Query(nativeQuery = true,
-        value = "select c.name as clanName, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
+        value = "select c.name as clanName, cw.state as warState, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
             + " from tb_clan_war cw "
             + " join tb_clan c on c.tag = cw.clan_tag "
             + " join tb_clan_war_member cwm on cwm.war_id = cw.war_id"
@@ -33,7 +33,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
     List<ClanWarMissingAttackPlayer> findAllMissingAttackByPeriod(LocalDateTime startTime, LocalDateTime endTime);
 
     @Query(nativeQuery = true,
-            value = "select c.name as clanName, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
+            value = "select c.name as clanName, cw.state as warState, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
                     + " from tb_clan_war cw "
                     + " join tb_clan c on c.tag = cw.clan_tag "
                     + " join tb_clan_war_member cwm on cwm.war_id = cw.war_id"
@@ -47,7 +47,7 @@ public interface ClanWarRepository extends JpaRepository<ClanWarEntity, Long> {
     List<ClanWarMissingAttackPlayer> findAllMissingAttackByPeriodWithName(String name, LocalDateTime startTime, LocalDateTime endTime);
 
     @Query(nativeQuery = true,
-            value = "select c.name as clanName, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
+            value = "select c.name as clanName, cw.state as warState, cw.type as warType, cw.start_time as startTime, cw.war_id as warId, max(cwm.tag) as playerTag, max(cwm.name) as playerName, max(cwm.map_position) sort"
                     + " from tb_clan_war cw "
                     + " join tb_clan c on c.tag = cw.clan_tag "
                     + " join tb_clan_war_member cwm on cwm.war_id = cw.war_id"

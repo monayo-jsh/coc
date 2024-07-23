@@ -4,6 +4,7 @@ public interface ClanWarMissingAttackPlayer {
 
     Long getWarId();
     String getClanName();
+    String getWarState();
     String getWarType();
     String getStartTime();
 

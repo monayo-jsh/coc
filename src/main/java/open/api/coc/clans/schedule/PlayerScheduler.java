@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.service.PlayersService;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class PlayerScheduler {
 
     private final PlayersService playersService;
 
-//    @Scheduled(fixedDelay = 1000 * 60 * 5)
+    @Scheduled(fixedDelay = 1000 * 60 * 5)
     public void syncPlayers() {
 
         log.info("start sync players");

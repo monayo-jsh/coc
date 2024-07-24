@@ -18,7 +18,6 @@ public class ClanWarResponse {
 
     private ClanWarType type;
 
-    @Setter
     private String clanName;
 
     private String state;

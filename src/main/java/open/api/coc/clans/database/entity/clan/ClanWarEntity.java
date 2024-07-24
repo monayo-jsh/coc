@@ -88,6 +88,12 @@ public class ClanWarEntity {
         clanWarMemberEntity.changeClanWar(this);
     }
 
+    public void changeMembers(List<ClanWarMemberEntity> clanWarMemberEntities) {
+        clanWarMemberEntities.forEach(clanWarMemberEntity -> clanWarMemberEntity.changeClanWar(this));
+        this.members = clanWarMemberEntities;
+    }
+
+
     public boolean isCollected() {
         return STATE_WAR_COLLECTED.equals(this.state);
     }

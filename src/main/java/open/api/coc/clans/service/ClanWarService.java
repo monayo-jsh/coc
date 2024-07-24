@@ -29,6 +29,8 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
@@ -61,6 +63,9 @@ public class ClanWarService {
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
     private final ClanWarRepository clanWarRepository;
+
+    private final ClanWarQueryRepository clanWarQueryRepository;
+    private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
 
     private final TimeConverter timeConverter;
     private final EntityClanWarResponseConverter entityClanWarResponseConverter;
@@ -476,17 +481,13 @@ public class ClanWarService {
 
     public List<ClanWarResponse> getClanWars(LocalDate searchMonth) {
 
-        LocalDateTime startTime = getStartTime(searchMonth);
-        LocalDateTime endTime = getEndTime(searchMonth);
+        LocalDateTime fromStartTime = getStartTime(searchMonth);
+        LocalDateTime toStartTime = getEndTime(searchMonth);
 
-        List<ClanWarEntity> clanWarEntities = clanWarRepository.findAllByPeriod(startTime, endTime);
+        List<ClanWarEntity> clanWarEntities = clanWarQueryRepository.findAllByStartTimePeriod(fromStartTime, toStartTime);
 
         return clanWarEntities.stream()
-                              .map(clanWarEntity -> {
-                                  ClanWarResponse clanWar = entityClanWarResponseConverter.convertWithoutMember(clanWarEntity);
-                                  clanWar.setClanName(getClanName(clanWar.getClanTag()));
-                                  return clanWar;
-                              })
+                              .map(entityClanWarResponseConverter::convertWithoutMember)
                               .collect(Collectors.toList());
     }
 
@@ -521,11 +522,12 @@ public class ClanWarService {
     }
 
     public ClanWarResponse getClanWar(Long warId) {
-        ClanWarEntity clanWarEntity = clanWarRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
+        ClanWarEntity clanWarEntity = clanWarQueryRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
 
-        ClanWarResponse clanWar = entityClanWarResponseConverter.convertWithMember(clanWarEntity);
-        clanWar.setClanName(getClanName(clanWar.getClanTag()));
-        return clanWar;
+        List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWarEntity.getWarId());
+        clanWarEntity.changeMembers(clanWarMemberEntities);
+
+        return entityClanWarResponseConverter.convertWithMember(clanWarEntity);
     }
 
     public List<RankingHallOfFameForClanWar> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {

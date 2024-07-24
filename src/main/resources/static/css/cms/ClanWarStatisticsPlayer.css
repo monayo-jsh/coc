@@ -77,11 +77,8 @@
   line-height: 1.5;
 }
 
-.icon-damage {
-  width: 15px;
-  height: 15px;
-}
-
+.icon-sword,
+.icon-damage,
 .icon-clock {
   width: 15px;
   height: 15px;
@@ -108,6 +105,7 @@
   flex-direction: column;
 
   .inner-wrap {
+    min-width: 150px;
     width: 100%;
     font-size: 12px;
     display: flex;

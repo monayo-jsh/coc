@@ -42,6 +42,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media (max-width: 660px) {
+    align-items: unset;
+  }
 }
 
 .section-wrapper {
@@ -50,6 +54,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media (max-width: 660px) {
+    align-items: unset;
+  }
 }
 
 .card {
@@ -75,6 +83,7 @@
 }
 
 .clan-war-calendar {
+  min-width: 640px;
   max-width: 1240px;
   width: 100%;
   height: 1080px;

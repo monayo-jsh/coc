@@ -3,6 +3,7 @@ package open.api.coc.clans.domain.clans.converter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
@@ -32,9 +33,16 @@ public class EntityClanWarResponseConverter implements Converter<ClanWarEntity, 
 
     @Override
     public @NonNull ClanWarResponse convert(ClanWarEntity source) {
+        String clanName = "";
+        if (Objects.nonNull(source.getClan())) {
+            clanName = source.getClan().getName();
+        }
+
         return ClanWarResponse.builder()
                               .warId(source.getWarId())
+                              .type(source.getType())
                               .clanTag(source.getClanTag())
+                              .clanName(clanName)
                               .state(source.getState())
                               .battleType(source.getBattleType())
                               .teamSize(source.getTeamSize())

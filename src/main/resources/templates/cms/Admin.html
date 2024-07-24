@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
@@ -16,6 +18,8 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Excel Lib -->
   <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
   <script>
@@ -97,8 +101,22 @@
           <div class="title">클랜전</div>
           <div class="cards">
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/calendar'); return false;">
-              <p class="tip">캘린더</p>
-              <p class="second-text">(미공)</p>
+              <p class="tip">월 캘린더</p>
+              <p class="second-text">(기록)</p>
+            </div>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/statistics/player'); return false;">
+              <p class="tip">월 완파 통계</p>
+              <p class="second-text">(클랜원)</p>
+            </div>
+          </div>
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/calendar/missing'); return false;">
+              <p class="tip">미공 캘린더</p>
+              <p class="second-text">(클랜원)</p>
+            </div>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/member/missing'); return false;">
+              <p class="tip">미공 조회</p>
+              <p class="second-text">(클랜원)</p>
             </div>
           </div>
         <div>
@@ -106,20 +124,20 @@
           <div class="title">습격전</div>
 
           <div class="cards">
-            <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/missing/attack'); return false;">
-              <p class="tip">미공 조회</p>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/attack/season'); return false;">
+              <p class="tip">미공/미달 현황</p>
               <p class="second-text">(이번 시즌)</p>
             </div>
 
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid'); return false;">
               <p class="tip">위반 현황</p>
-              <p class="second-text">(직전 주 2만점 이하)</p>
+              <p class="second-text">(지난주 2만점 이하)</p>
             </div>
           </div>
 
           <div class="cards">
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/raid/score'); return false;">
-              <p class="tip">습격전 기록 조회</p>
+              <p class="tip">기록 조회</p>
               <p class="second-text">(클랜원)</p>
             </div>
           </div>

@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
@@ -76,9 +78,7 @@
 
       if (tag === beforeRowPlayerTag) {
         increaseRowspan(tag, 'name');
-        increaseRowspan(tag, 'tag');
         removeCell(tableRow, 'name');
-        removeCell(tableRow, 'tag');
       } else {
         // 신규 플레이어
         appendClassNewPlayer(tableRow, tag);
@@ -95,7 +95,7 @@
       const tableRow = raidRowEmptyElement.querySelector('.table-tr');
 
       const displayClanName = clan ? clan.name : '정보 없음'
-      const seasonPeriod = `${formatYYYYMMDD(seasonStartDate)} ~ ${formatYYYYMMDD(seasonEndDate)}`
+      const seasonPeriod = `${formatYYMMDD(seasonStartDate)} ~ ${formatDD(seasonEndDate)}`
 
       // dataset
       tableRow.dataset.tag = tag;
@@ -108,14 +108,14 @@
                                    .replace(/{SCORE}/, Number(resourceLooted).toLocaleString())
                                    .replace(/{ATTACKS}/, Number(attacks).toLocaleString());
 
-      if (resourceLooted < 20000) {
+      if (isDemotedAttack(resourceLooted)) {
         // 점수 미달
         const span = tableRow.querySelector('.span-score');
         span.classList.add('color-red');
 
       }
 
-      if (attacks < 6) {
+      if (isMissingAttack(attacks)) {
         // 미공
         const span = tableRow.querySelector('.span-attacks');
         span.classList.add('color-red');
@@ -316,7 +316,6 @@
           <thead class="table-thead">
           <tr class="table-tr">
             <th class="table-th">플레이어</th>
-            <th class="table-th">태그</th>
             <th class="table-th">시즌</th>
             <th class="table-th">진행 클랜</th>
             <th class="table-th">점수</th>
@@ -325,7 +324,7 @@
           </thead>
           <tbody class="table-tbody">
           <tr class="table-tr">
-            <td class="table-td" colspan="6">플레이어 정보 없음</td>
+            <td class="table-td" colspan="5">플레이어 정보 없음</td>
           </tr>
           </tbody>
         </table>
@@ -353,8 +352,12 @@
 </template>
 <template id="raid-row-template">
   <tr class="table-tr">
-    <td class="table-td name" rowspan=1>{NAME}</td>
-    <td class="table-td tag" rowspan=1><span class="chip">{TAG}</span></td>
+    <td class="table-td name" rowspan=1>
+      <div class="td-wrap flex-colum justify-content-center">
+        <span>{NAME}</span>
+        <span class="chip">{TAG}</span>
+      </div>
+    </td>
     <td class="table-td">{SEASON_PERIOD}</td>
     <td class="table-td"><span class="chip bg-green">{CLAN_NAME}</span></td>
     <td class="table-td"><span class="span-score">{SCORE}</span></td>
@@ -363,7 +366,7 @@
 </template>
 <template id="raid-row-empty-template">
   <tr class="table-tr">
-    <td class="table-td" colspan="6">플레이어 정보 없음</td>
+    <td class="table-td" colspan="5">플레이어 정보 없음</td>
   </tr>
 </template>
 </html>

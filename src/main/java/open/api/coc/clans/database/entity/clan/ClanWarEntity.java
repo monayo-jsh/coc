@@ -32,7 +32,8 @@ import lombok.Setter;
 @Table(
     name = "tb_clan_war",
     indexes = {
-        @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag")
+        @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag"),
+        @Index(name = "TCW_IDX_02", columnList = "clan_tag")
     }
 )
 public class ClanWarEntity {
@@ -86,6 +87,12 @@ public class ClanWarEntity {
         this.members.add(clanWarMemberEntity);
         clanWarMemberEntity.changeClanWar(this);
     }
+
+    public void changeMembers(List<ClanWarMemberEntity> clanWarMemberEntities) {
+        clanWarMemberEntities.forEach(clanWarMemberEntity -> clanWarMemberEntity.changeClanWar(this));
+        this.members = clanWarMemberEntities;
+    }
+
 
     public boolean isCollected() {
         return STATE_WAR_COLLECTED.equals(this.state);

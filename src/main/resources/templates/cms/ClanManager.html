@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="refresh" CONTENT="no-cache">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
@@ -1089,19 +1091,6 @@
       for (const monthPicker of monthPickers) {
         const defaultFirstDayOfMonth = getDefaultLeagueFirstDayOfMonth(monthPicker);
         jSuites.calendar(monthPicker, makeMonthPickerOption(defaultFirstDayOfMonth));
-      }
-
-      function makeMonthPickerOption(firstDayOfMonth) {
-        return {
-          type: 'year-month-picker',
-          format: 'YYYY-MM',
-          validRange: [ firstDayOfMonth ],
-          controls: false,
-          readonly: true,
-          value: firstDayOfMonth, // default
-          months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-          monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-        }
       }
     }
 

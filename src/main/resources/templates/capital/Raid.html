@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
@@ -20,6 +22,10 @@
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <!-- toast-ui -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
   <title>습격전 현황</title>
 
@@ -148,7 +154,7 @@
         // 태그 클립보드 복사 기능
         const playerTag = memberRecordElement.querySelector('.player-tag');
         playerTag.classList.add('cursor-pointer');
-        playerTag.onclick = () => copyClipboard(tag);
+        playerTag.onclick = () => copyClipboard(tag, "플레이어 태그");
 
         membersElement.appendChild(memberRecord);
       }

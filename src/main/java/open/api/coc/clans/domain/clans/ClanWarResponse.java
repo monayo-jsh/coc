@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 
 @Getter
 @Builder
@@ -15,7 +16,8 @@ public class ClanWarResponse {
 
     private String clanTag;
 
-    @Setter
+    private ClanWarType type;
+
     private String clanName;
 
     private String state;

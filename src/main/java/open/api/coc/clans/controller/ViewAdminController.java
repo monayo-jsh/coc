@@ -32,16 +32,34 @@ public class ViewAdminController {
         return "cms/ClanManager";
     }
 
-    /** 클랜전 미공 캘린더 */
+    /** 클랜전 캘린더 */
     @GetMapping("/clan/war/calendar")
-    public String clanCalendar() {
+    public String clanWarCalendar() {
         return "cms/ClanWarCalendar";
     }
 
+    /** 클랜전 월 완파 현황 */
+    @GetMapping("/clan/war/statistics/player")
+    public String clanWarStatistics() {
+        return "cms/ClanWarStatisticsPlayer";
+    }
+
+    /** 클랜전 미공 캘린더 */
+    @GetMapping("/clan/war/calendar/missing")
+    public String clanWarMissingCalendar() {
+        return "cms/ClanWarMissingCalendar";
+    }
+
+    /** 클랜전 미공 인원 검색 */
+    @GetMapping("/clan/war/member/missing")
+    public String clanWarMissingMember() {
+        return "cms/ClanWarMissingMember";
+    }
+
     /** 습격전 위반 현황 */
-    @GetMapping("/raid/missing/attack")
+    @GetMapping("/raid/attack/season")
     public String raidMissingAttack() {
-        return "cms/RaidMissingAttack";
+        return "cms/RaidAttackSeason";
     }
 
     /** 습격전 위반 현황 */

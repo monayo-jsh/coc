@@ -35,8 +35,8 @@ import org.springframework.lang.NonNull;
 @Table(
     name = "tb_clan_war_member",
     indexes = {
-    @Index(name = "CWM_IDX_01", columnList = "war_id, map_position")
-}
+        @Index(name = "CWM_IDX_01", columnList = "war_id, map_position")
+    }
 )
 public class ClanWarMemberEntity implements Persistable<ClanWarMemberPKEntity> {
 

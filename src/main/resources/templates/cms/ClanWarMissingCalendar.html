@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <title>미공 캘린더</title>
+
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarCalendar.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+
+  <!-- toast-ui -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script>
+    dayjs.locale('ko');
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+  </script>
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clanWar.js"></script>
+  <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
+  <script type="text/javascript">
+    const Calendar = tui.Calendar;
+    let calendar;
+
+    function moveMonth(number) {
+      // 캘린더 월 변경
+      calendar.move(number);
+      drawCalendar();
+    }
+
+    function getCalendarDate() {
+      return document.querySelector('.calendar-date');
+    }
+
+    function initCalendar() {
+      const container = document.getElementById('calendar');
+      const options = {
+        defaultView: 'month',
+        isReadOnly: true,
+        month: {
+          dayNames: ['일', '월', '화', '수', '목', '금', '토']
+        },
+        timezone: {
+          zones: [
+            {
+              timezoneName: 'Asia/Seoul',
+              displayLabel: 'Seoul',
+            }
+          ],
+        },
+        template: {
+          allday(event) {
+            const { title, raw } = event;
+            const drawBody = [];
+            const players = [];
+            const sortedByName = raw.sort((a, b) => a.playerName.length - b.playerName.length)
+            for (const player of sortedByName) {
+              const { warType, playerName } = player;
+
+              const bgColor = getBgColorByWarType(warType);
+              const playerRow = `<span class="chip m-1 ${bgColor}">${playerName}</span>`;
+              players.push(playerRow);
+            }
+
+            // is DOM Rending to Click Event
+            onClickEventTitleSet.add(title);
+
+            // dataset
+            calendarRawMap.set(title, raw);
+
+            //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
+            drawBody.push(`<div class="cell-wrap cursor-pointer title-${title}">${players.join("")}</div>`);
+            return drawBody.join("");
+          }
+        }
+      };
+
+      calendar = new Calendar(container, options);
+    }
+
+    const calendarRawMap = new Map();
+    // 미공 인원 클릭 이벤트 생성을 위한 Set
+    const onClickEventTitleSet = new Set();
+
+    function createEvent(key, value) {
+      return {
+        id: `id-${key}`,
+        calendarId: `cid-${key}`,
+        title: key,
+        start: key,
+        end: key,
+        isAllDay: true,
+        category: 'allday',
+        raw: value
+      }
+    }
+
+    function convArrayGroupByDate(players) {
+      const map = new Map();
+      for(const player of players) {
+        const { startTime } = player;
+        const key = formatYYYYMMDD(startTime);
+        let list = map.get(key);
+        if (!list) {
+          //init
+          list = [];
+          map.set(key, list);
+        }
+
+        list.push(player);
+      }
+      return Array.from(map);
+    }
+
+    function renderClanWars(players) {
+      calendar.clear();
+
+      const events = [];
+      const days = convArrayGroupByDate(players);
+      for (const [key, value] of days) {
+        events.push(createEvent(key, value));
+      }
+
+      calendar.createEvents(events);
+    }
+
+    async function drawCalendarEvents(startDate, endDate) {
+      const startDt = formatYYYYMMDD(startDate);
+      const endDt = formatYYYYMMDD(endDate);
+      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(startDt, endDt);
+
+      renderClanWars(clanWarMissingAttackPlayers);
+    }
+
+    async function drawCalendar() {
+      showWifiLoading('.section-wrapper');
+      const calendarDate = getCalendarDate();
+      const date = calendar.getDate();
+      calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
+
+      const calendarStartDate = calendar.getDateRangeStart();
+      const calendarEndDate = calendar.getDateRangeEnd();
+
+      await drawCalendarEvents(calendarStartDate, calendarEndDate);
+      hideWifiLoading('.section-wrapper');
+    }
+
+    function settingClickEventToCalendarTitle() {
+      const titleSet = new Set(onClickEventTitleSet);
+      for(const title of titleSet) {
+        const target = document.querySelector(`.title-${title}`);
+        if (!target) {
+          // remove
+          onClickEventTitleSet.delete(title);
+          continue;
+        }
+
+        if (target.onclick) {
+          // remove
+          onClickEventTitleSet.delete(title);
+          continue;
+        }
+
+        // setting click event
+        target.onclick = () => copyMissingMembers(title, calendarRawMap.get(title));
+
+        // remove
+        onClickEventTitleSet.delete(title);
+      }
+    }
+
+    function sortedBy(map) {
+      return new Map(Array.from(map).sort((a, b) => a[0].localeCompare(b[0])));
+    }
+    function copyMissingMembers(date, players) {
+      const listGroupByClan = convertArrayToMapByKey(players, 'clanName', true);
+      let message = [];
+      let totalPlayerLength = 0;
+      for (const [clanName, players]of sortedBy(listGroupByClan)) {
+        const [player] = players;
+        const { warState, warType } = player;
+        const warStateName = warState === 'inWar' ? ' 진행중': '';
+        const warTypeName = convWarTypeName(warType);
+        const playerNames = players.map(player => player.playerName).join(", ");
+        message.push(`[${warTypeName}${warStateName}] ${clanName} (${players.length}명)`);
+        message.push(`=> ${playerNames}\n`);
+
+        totalPlayerLength += players.length;
+      }
+
+      message.unshift(`${date} 미공 (${totalPlayerLength}명)\n`);
+      copyClipboard(message.join("\n"), "미공 목록");
+    }
+
+    window.onload = async () => {
+      initCalendar();
+      await drawCalendar();
+
+      setInterval(() => settingClickEventToCalendarTitle(), 1000);
+    }
+  </script>
+</head>
+<body>
+
+  <div class="contents">
+    <div class="card caption">
+      <div class="bottom-section">
+        <span class="title">미공 캘린더</span>
+      </div>
+    </div>
+
+    <div class="section-wrapper">
+      <div id="wifi-loader" class="display-none">
+        <svg class="circle-outer" viewBox="0 0 86 86">
+          <circle class="back" cx="43" cy="43" r="40"></circle>
+          <circle class="front" cx="43" cy="43" r="40"></circle>
+          <circle class="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg class="circle-middle" viewBox="0 0 60 60">
+          <circle class="back" cx="30" cy="30" r="27"></circle>
+          <circle class="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg class="circle-inner" viewBox="0 0 34 34">
+          <circle class="back" cx="17" cy="17" r="14"></circle>
+          <circle class="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        <div class="text" data-text="Searching"></div>
+      </div>
+
+      <div class="header">
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+          <i class="icon-arrow-line-left"></i>
+        </div>
+        <div class="calendar-date"></div>
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+          <i class="icon-arrow-line-right"></i>
+        </div>
+      </div>
+
+      <div id="calendar" class="clan-war-calendar"></div>
+    </div>
+
+  </div>
+
+</body>
+</html>

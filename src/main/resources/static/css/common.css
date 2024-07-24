@@ -130,6 +130,9 @@ body::before {
   background-position: center;
 }
 
+.m-1 {
+  margin: 1px;
+}
 .mt-5 {
   margin-top: 5px;
 }
@@ -217,12 +220,22 @@ body::before {
   cursor: pointer !important;
 }
 
+.display-flex {
+  display: flex !important;
+}
 .flex-row {
   flex-direction: row !important;
+}
+.flex-nowrap {
+  flex-wrap: nowrap !important;
 }
 
 .flex-colum {
   flex-direction: column !important;
+}
+
+.flex-gap {
+  gap: 3px;
 }
 
 
@@ -247,6 +260,7 @@ body::before {
   font-size: 0.5rem;
   font-weight: bold;
   word-break: keep-all;
+  white-space: nowrap;
   border: var(--default-border);
   padding: 3px 5px;
   border-radius: 15px;
@@ -591,6 +605,11 @@ body::before {
   }
 
   .table-tbody {
+
+    .table-tr:nth-child(odd) {
+      background-color: #f9f9f9;
+    }
+
   }
 
 
@@ -625,4 +644,22 @@ body::before {
     }
   }
 
+}
+
+/** toastify custom*/
+.toastify.custom {
+  border-radius: 10px;
+  font-size: 14px;
+  padding: 10px 20px;
+}
+
+
+/** month-picker */
+.input-month {
+  border: 1px solid #b7b7b7;
+  border-radius: 5px;
+  width: 110px;
+  padding: 5px;
+  font-size: 14px;
+  background-position: top 45% right 5px;
 }

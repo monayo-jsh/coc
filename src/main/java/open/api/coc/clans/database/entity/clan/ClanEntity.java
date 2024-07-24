@@ -1,5 +1,7 @@
 package open.api.coc.clans.database.entity.clan;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -54,7 +56,8 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "reg_date", nullable = false)
     private LocalDateTime regDate;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    // clanContent 1:1 관계 NULL 불가에 따라 Lazy 로드 가능하도록 외래키 조건 제거
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "tag")
     private ClanContentEntity clanContent;
 

@@ -32,6 +32,7 @@ import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
@@ -76,7 +77,9 @@ public class ClansService {
 
     private final ClanRepository clanRepository;
     private final ClanContentRepository clanContentRepository;
+
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
+    private final ClanAssignedPlayerQueryRepository clanAssignedPlayerQueryRepository;
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
     private final ClanLeagueWarRepository clanLeagueWarRepository;
@@ -299,10 +302,7 @@ public class ClansService {
     }
 
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {
-        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
-        if (ObjectUtils.isEmpty(latestSeasonDate)) {
-            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
+        String latestSeasonDate = clanAssignedPlayerQueryRepository.findLatestSeasonDate();
 
         List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findClanAssignedPlayersByClanTagAndSeasonDate(clanTag, latestSeasonDate);
 
@@ -365,12 +365,9 @@ public class ClansService {
 
     public ClanAssignedMemberListResponse getLatestClanAssignedMembers() {
 
-        String latestSeasonDate = clanAssignedPlayerRepository.findLatestSeasonDate();
-        if (ObjectUtils.isEmpty(latestSeasonDate)) {
-            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
+        String latestSeasonDate = clanAssignedPlayerQueryRepository.findLatestSeasonDate();
 
-        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
+        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerQueryRepository.findAllBySeasonDate(latestSeasonDate);
 
         List<PlayerResponse> players = clanAssignedPlayers.stream()
                                                           .map(playerResponseConverter::convert)

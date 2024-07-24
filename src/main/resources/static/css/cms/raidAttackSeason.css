@@ -1,0 +1,129 @@
+.capital-raid {
+  width: 100%;
+  max-width: 650px;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.card {
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  background: #1b233d;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.body {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+
+  @media (max-width: 620px) {
+    flex-direction: column;
+    align-items: center;
+
+    .container.contents {
+      width: 300px;
+
+      .table-thead,
+      .table-tbody {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.container {
+  position: relative;
+  margin-top: 10px;
+
+  .search-box {
+    max-width: unset;
+  }
+
+}
+
+.container.contents {
+  width: 320px;
+}
+
+.chip {
+  font-size: 0.7rem;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+
+  button.refresh {
+    color: white;
+
+    svg {
+      margin-left: 8px;
+    }
+  }
+
+}
+
+.button-chip {
+  display: flex;
+  align-items: center;
+}
+
+.table-tr {
+  .name, .tag {
+    vertical-align: baseline;
+  }
+
+  background-color: transparent !important;
+}
+
+.table-tr.start {
+  .table-td {
+
+  }
+}
+
+.missing-attack {
+  border-color: crimson;
+
+  .table-caption {
+    border: 1px solid crimson;
+    border-left: 3px solid crimson;
+    background-color: crimson;
+  }
+
+  .table-tbody {
+    border-top: 1px crimson solid;
+  }
+}
+
+.demoted-attacked {
+  border-color: goldenrod;
+
+  .table-caption {
+    border: 1px solid goldenrod;
+    border-left: 3px solid goldenrod;
+    background-color: goldenrod;
+  }
+
+  .table-tbody {
+    border-top: 1px goldenrod solid;
+  }
+
+  .free-tier {
+    background-color: rgba(255, 182, 0, 0.2);
+  }
+}

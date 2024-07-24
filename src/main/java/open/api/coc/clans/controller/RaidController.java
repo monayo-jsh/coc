@@ -42,9 +42,9 @@ public class RaidController {
         return ResponseEntity.ok().body(playerRaidScores);
     }
 
-    @GetMapping("/missing/attack")
-    public ResponseEntity<List<RaidScoreResponse>> getMissingAttack() {
-        List<RaidScoreResponse> playerRaidScores = raidService.getMissingAttackPlayers();
+    @GetMapping("/attack/season")
+    public ResponseEntity<List<RaidScoreResponse>> getAttackCurrentSeason() {
+        List<RaidScoreResponse> playerRaidScores = raidService.getAttackCurrentSeason();
         return ResponseEntity.ok().body(playerRaidScores);
     }
 

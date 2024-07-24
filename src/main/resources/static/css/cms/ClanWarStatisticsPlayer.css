@@ -1,0 +1,143 @@
+.section-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.section-item {
+  width: 100%;
+  max-width: 600px;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.body {
+  position: relative;
+}
+
+.container {
+  margin-top: 5px;
+}
+
+.inner-section {
+  margin-top: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.button-chip {
+  background-color: black;
+
+  button {
+    color: white;
+    font-weight: bold;
+  }
+}
+
+.contents {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  overflow: auto;
+}
+
+.card {
+  max-width: 1240px;
+  width: 100%;
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  background: #1b233d;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.player-name {
+  font-size: 13px;
+}
+
+.chip {
+  font-size: .7em;
+  line-height: 1.5;
+}
+
+.icon-sword,
+.icon-damage,
+.icon-clock {
+  width: 15px;
+  height: 15px;
+}
+
+.th-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.td-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.td-wrap.summary-box {
+  width: 100%;
+  font-size: 12px;
+  margin-top: 3px;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+
+  .inner-wrap {
+    min-width: 150px;
+    width: 100%;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-around;
+  }
+}
+
+.record {
+  margin-left: 3px;
+}
+
+.table-td {
+  border-top: 1px solid lightgray;
+}
+
+.inner-section {
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  .radio-inputs {
+    width: 100%;
+    max-width: 1240px;
+    flex-wrap: nowrap;
+
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
+}

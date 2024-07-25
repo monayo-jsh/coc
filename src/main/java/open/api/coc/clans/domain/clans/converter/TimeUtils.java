@@ -57,4 +57,14 @@ public class TimeUtils implements TimeConverter {
     public static LocalDateTime withMaxTime(LocalDate date) {
         return LocalDateTime.of(date, LocalTime.MAX.withNano(999_999_000));
     }
+
+    public static LocalDateTime getDateMinTimeDaysAgo(int daysAgo) {
+        LocalDate date = LocalDate.now().minusDays(daysAgo);
+        return withMinTime(date);
+    }
+
+    public static LocalDateTime getDateMaxTimeDaysAgo(int daysAgo) {
+        LocalDate date = LocalDate.now().minusDays(daysAgo);
+        return withMaxTime(date);
+    }
 }

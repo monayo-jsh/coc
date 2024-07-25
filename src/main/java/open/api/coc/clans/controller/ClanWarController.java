@@ -3,7 +3,6 @@ package open.api.coc.clans.controller;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
@@ -36,14 +35,17 @@ public class ClanWarController {
     }
 
     @GetMapping("/missing/attack/{playerTag}")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithTag(@PathVariable String playerTag) {
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayerWithTagForRecentDays(@PathVariable String playerTag,
+                                                                                                                 @RequestParam(value = "queryDate", defaultValue = "90") Integer queryDate) {
 
-        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithTag(playerTag));
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithTag(playerTag, queryDate));
     }
 
     @GetMapping("/missing/attack/playerName")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithName(@RequestParam String playerName) {
-        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName));
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayerWithNameForRecentDays(@RequestParam String playerName,
+                                                                                                                  @RequestParam(value = "queryDate", defaultValue = "90") Integer queryDate) {
+
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName, queryDate));
 
     }
 

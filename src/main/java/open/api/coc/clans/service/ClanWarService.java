@@ -32,7 +32,6 @@ import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarRepository;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
@@ -461,15 +460,6 @@ public class ClanWarService {
         return PageRequest.of(0, hallOfFameConfig.getRanking());
     }
 
-    private LocalDateTime getStartTimeForLast90Days() {
-        LocalDate startDate = LocalDate.now().minusDays(90);
-        return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
-    }
-
-    private LocalDateTime getEndTimeForLast90Days() {
-        return LocalDateTime.of(LocalDate.now(), LocalTime.MAX.withNano(999_999_000));
-    }
-
     private LocalDateTime getStartTime(LocalDate searchMonth) {
         LocalDate startDate = searchMonth.with(TemporalAdjusters.firstDayOfMonth());
         return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
@@ -499,17 +489,18 @@ public class ClanWarService {
         return clanWarQueryRepository.findAllMissingAttackPlayerByStartTimePeriod(fromStartTime, toStartTime);
     }
 
-    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayersWithName(String playerName) {
-        LocalDateTime startTime = getStartTimeForLast90Days();
-        LocalDateTime endTime = getEndTimeForLast90Days();
-        return clanWarRepository.findAllMissingAttackByPeriodWithName(playerName, startTime, endTime);
+    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithName(String playerName, Integer queryDate) {
+        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
+        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
+
+        return clanWarQueryRepository.findMissingAttackByNameAndStartTimePeriod(playerName, fromStartTime, toStartTime);
     }
 
-    public List<ClanWarMissingAttackPlayer> getClanWarMissingAttackPlayersWithTag(String playerTag) {
-        LocalDateTime startTime = getStartTimeForLast90Days();
-        LocalDateTime endTime = getEndTimeForLast90Days();
+    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithTag(String playerTag, Integer queryDate) {
+        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
+        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
 
-        return clanWarRepository.findAllMissingAttackByPeriodWithTag(playerTag, startTime, endTime);
+        return clanWarQueryRepository.findMissingAttackByTagAndStartTimePeriod(playerTag, fromStartTime, toStartTime);
     }
 
     public ClanWarResponse getClanWar(Long warId) {

@@ -37,6 +37,7 @@ import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
+import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.clans.domain.ranking.ClanWarCount;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -492,8 +493,8 @@ public class ClanWarService {
     }
 
     public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayers(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime fromStartTime = getStartTime(startDate);
-        LocalDateTime toStartTime = getEndTime(endDate);
+        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
+        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
 
         return clanWarQueryRepository.findAllMissingAttackPlayerByStartTimePeriod(fromStartTime, toStartTime);
     }

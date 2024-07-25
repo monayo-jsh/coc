@@ -49,4 +49,12 @@ public class TimeUtils implements TimeConverter {
     private ZonedDateTime getZonedDateTime(long epochMilli) {
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"));
     }
+
+    public static LocalDateTime withMinTime(LocalDate date) {
+        return LocalDateTime.of(date, LocalTime.MIN);
+    }
+
+    public static LocalDateTime withMaxTime(LocalDate date) {
+        return LocalDateTime.of(date, LocalTime.MAX.withNano(999_999_000));
+    }
 }

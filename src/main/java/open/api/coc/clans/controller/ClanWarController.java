@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
+import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.clans.service.ClanWarService;
@@ -28,8 +29,8 @@ public class ClanWarController {
     }
 
     @GetMapping("/missing/attack/period")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
-                                                                                           @RequestParam LocalDate endDate) {
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
+                                                                                              @RequestParam LocalDate endDate) {
         return ResponseEntity.ok()
                              .body(clanWarService.getClanWarMissingAttackPlayers(startDate, endDate));
     }

@@ -3,7 +3,11 @@ package open.api.coc.clans.database.repository.clan;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.clan.QClanWarEntity.clanWarEntity;
+import static open.api.coc.clans.database.entity.clan.QClanWarMemberAttackEntity.clanWarMemberAttackEntity;
+import static open.api.coc.clans.database.entity.clan.QClanWarMemberEntity.clanWarMemberEntity;
 
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
@@ -15,6 +19,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
+import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -60,5 +65,31 @@ public class ClanWarQueryRepository {
     private JPAQuery<ClanEntity> createClanBaseQuery() {
         return queryFactory.selectFrom(clanEntity)
                            .join(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();
+    }
+
+    public List<ClanWarMissingAttackPlayerDTO> findAllMissingAttackPlayerByStartTimePeriod(LocalDateTime from, LocalDateTime to) {
+
+        ConstructorExpression<ClanWarMissingAttackPlayerDTO> clanWarMissingAttackPlayerDTO = Projections.constructor(
+            ClanWarMissingAttackPlayerDTO.class,
+            clanEntity.name.as("clanName"),
+            clanWarEntity.warId.as("warId"),
+            clanWarEntity.type.as("warType"),
+            clanWarEntity.state.as("warState"),
+            clanWarEntity.startTime.as("startTime"),
+            clanWarMemberEntity.id.tag.as("playerTag"),
+            clanWarMemberEntity.name.as("playerName")
+        );
+
+        return queryFactory.select(clanWarMissingAttackPlayerDTO)
+                           .from(clanWarEntity)
+                           .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag))
+                           .join(clanWarEntity.members, clanWarMemberEntity)
+                           .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
+                           .where(clanWarEntity.state.ne("preparation")
+                                                     .and(clanWarEntity.startTime.between(from, to)))
+                           .groupBy(clanWarMemberEntity.id.warId, clanWarMemberEntity.id.tag)
+                           .having(clanWarMemberAttackEntity.id.order.count().lt(clanWarEntity.attacksPerMember))
+                           .orderBy(clanWarEntity.warId.asc(), clanWarMemberEntity.mapPosition.asc())
+                           .fetch();
     }
 }

@@ -439,16 +439,16 @@ public class ClanWarService {
     }
 
     public List<RankingHallOfFameForClanWar> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
-        LocalDateTime startTime = getStartTime(searchMonth);
-        LocalDateTime endTime = getEndTime(searchMonth);
+        LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
+        LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
 
         PageRequest pageRequest = makePageRequest(searchType);
 
         if (StringUtils.isEmpty(clanTag)) {
-            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, startTime, endTime, pageRequest);
+            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, fromStartTime, toStartTime, pageRequest);
         }
 
-        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, startTime, endTime, clanTag, pageRequest);
+        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, fromStartTime, toStartTime, clanTag, pageRequest);
     }
 
     private PageRequest makePageRequest(String searchType) {

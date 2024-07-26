@@ -503,7 +503,7 @@ public class ClanWarService {
         return clanWarQueryRepository.findMissingAttackByTagAndStartTimePeriod(playerTag, fromStartTime, toStartTime);
     }
 
-    public ClanWarResponse getClanWar(Long warId) {
+    public ClanWarResponse getClanWarDetail(Long warId) {
         ClanWarEntity clanWarEntity = clanWarQueryRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
 
         List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWarEntity.getWarId());

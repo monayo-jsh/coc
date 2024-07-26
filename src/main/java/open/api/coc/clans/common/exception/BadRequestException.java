@@ -15,21 +15,28 @@ public class BadRequestException extends RuntimeException {
         this.message = message;
     }
 
-    public void addExtraMessage(String message) {
+    public BadRequestException addExtraMessage(String message) {
         if (StringUtils.hasText(message)) {
             this.message += " - ";
         }
         this.message += message;
-    }
 
-    public static BadRequestException create(ExceptionCode exceptionCode, String message) {
-        BadRequestException badRequestException = new BadRequestException(exceptionCode.getCode(), exceptionCode.getMessage());
-        badRequestException.addExtraMessage(message);
-        return badRequestException;
+        return this;
     }
 
     public static BadRequestException create(String code, String message) {
         return new BadRequestException(code, message);
     }
+
+    public static BadRequestException create(ExceptionCode exceptionCode) {
+        return create(exceptionCode.getCode(), exceptionCode.getMessage());
+    }
+
+    public static BadRequestException create(ExceptionCode exceptionCode, String message) {
+        BadRequestException badRequestException = create(exceptionCode);
+        badRequestException.addExtraMessage(message);
+        return badRequestException;
+    }
+
 
 }

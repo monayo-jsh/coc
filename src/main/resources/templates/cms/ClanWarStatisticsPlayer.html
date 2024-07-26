@@ -17,6 +17,11 @@
     <script src="/static/js/api/clanWar.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
+    <!-- table withe pagination, filter library -->
+    <link rel="stylesheet" type="text/css" href="/static/lib/sortable/sortable.min.css" />
+    <script src="/static/lib/sortable/sortable.min.js"></script>
+
+
     <!-- JavaScript Year and Month Picker -->
     <script src="https://jsuites.net/v4/jsuites.js"></script>
     <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
@@ -143,14 +148,14 @@
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_NAME}/, clanName)
                                .replace(/{ATTACK_COUNT}/, attackCount)
-                               .replace(/{RATIO}/, Number(completeStarRatio).toFixed(2))
-                               .replace(/{STARS}/, Number(totalStars).toLocaleString())
+                               .replace(/{RATIO}/g, Number(completeStarRatio).toFixed(2))
+                               .replace(/{STARS}/g, Number(totalStars).toLocaleString())
                                .replace(/{THREE_STARS}/, Number(threeStars).toLocaleString())
                                .replace(/{TWO_STARS}/, Number(twoStars).toLocaleString())
                                .replace(/{ONE_STARS}/, Number(oneStars).toLocaleString())
                                .replace(/{ZERO_STARS}/, Number(zeroStars).toLocaleString())
-                               .replace(/{DESTRUCTION_PERCENTAGE}/, Number(totalDestructionPercentage))
-                               .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
+                               .replace(/{DESTRUCTION_PERCENTAGE}/g, Number(totalDestructionPercentage))
+                               .replace(/{DURATION}/g, formatMinuteSecond(Number(avgDuration)));
 
             return row;
         }
@@ -265,10 +270,10 @@
             </div>
 
             <div class="container contents">
-                <table class="table">
+                <table class="table sortable">
                     <thead class="table-thead">
                     <tr class="table-tr">
-                        <th class="table-th">이름</th>
+                        <th class="table-th no-sort">이름</th>
                         <th class="table-th">총 공격수<br/>(완파율)</th>
                         <th class="table-th">총 획득별</th>
                         <th class="table-th">총 파괴율</th>
@@ -315,14 +320,14 @@
                 <div class="chip bg-green">{CLAN_NAME}</div>
             </div>
         </td>
-        <td class="table-td">
+        <td class="table-td" data-sort="{RATIO}">
             <div class="td-wrap">
                 <div class="icon-sword"></div>
                 <div class="record">{ATTACK_COUNT}</div>
             </div>
             <div class="record">({RATIO} %)</div>
         </td>
-        <td class="table-td">
+        <td class="table-td" data-sort="{STARS}">
             <div class="td-wrap">
                 <i class="fa-solid fa-star color-gold"></i>
                 <div class="record">{STARS}</div>
@@ -336,13 +341,13 @@
                 </div>
             </div>
         </td>
-        <td class="table-td">
+        <td class="table-td" data-sort="{DESTRUCTION_PERCENTAGE}">
             <div class="td-wrap">
                 <div class="icon-damage"></div>
                 <div class="record">{DESTRUCTION_PERCENTAGE} %</div>
             </div>
         </td>
-        <td class="table-td">
+        <td class="table-td" data-sort="{DURATION}">
             <div class="td-wrap">
                 <div class="icon-clock"></div>
                 <div class="record">{DURATION}</div>

@@ -3,9 +3,9 @@ package open.api.coc.clans.controller;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.clans.service.ClanWarService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -58,15 +58,15 @@ public class ClanWarController {
     }
 
     @GetMapping("/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
-                                                                                    @RequestParam String clanTag,
-                                                                                    @RequestParam(defaultValue = "") String searchType) {
+    public ResponseEntity<List<ClanWarRecordDTO>> getRankingClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
+                                                                         @RequestParam String clanTag,
+                                                                         @RequestParam(defaultValue = "") String searchType) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag, searchType));
     }
 
     @GetMapping("/league/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingLeagueClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
+    public ResponseEntity<List<ClanWarRecordDTO>> getRankingLeagueClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
                                                                                           @RequestParam String clanTag) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag));

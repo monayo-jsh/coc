@@ -27,25 +27,23 @@ import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarRepository;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
-import open.api.coc.clans.domain.ranking.ClanWarCount;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +60,6 @@ public class ClanWarService {
 
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
-    private final ClanWarRepository clanWarRepository;
 
     private final ClanWarQueryRepository clanWarQueryRepository;
     private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
@@ -90,7 +87,8 @@ public class ClanWarService {
 
         LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
 
-        Optional<ClanWarEntity> findClanWar = clanWarRepository.findByClanTagAndStartTime(clanTag, startTime);
+        Optional<ClanWarEntity> findClanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanTag, startTime);
+
         if (findClanWar.isPresent()) {
             ClanWarEntity clanWarEntity = findClanWar.get();
 
@@ -191,7 +189,7 @@ public class ClanWarService {
                                                    .attacksPerMember(clanWar.getAttacksPerMember())
                                                    .build();
 
-        return clanWarRepository.save(clanWarEntity);
+        return clanWarQueryRepository.save(clanWarEntity);
     }
 
     private LocalDateTime getLocalDateTime(String preparationStartTime) {
@@ -226,7 +224,7 @@ public class ClanWarService {
     public void collectCurrentClanWar() {
         final String state = ClanWarEntity.STATE_WAR_COLLECTED;
         LocalDateTime now = LocalDateTime.now();
-        List<ClanWarEntity> collectClanWars = clanWarRepository.findAfterEndTimeAndNotState(now, state);
+        List<ClanWarEntity> collectClanWars = clanWarQueryRepository.findAllByEndTimeAfterAndStateNot(now, state);
 
         for (ClanWarEntity clanWarEntity : collectClanWars) {
             collectClanWar(clanWarEntity);
@@ -438,26 +436,26 @@ public class ClanWarService {
         }
     }
 
-    public List<RankingHallOfFameForClanWar> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
+    public List<ClanWarRecordDTO> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
         LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
         LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
 
-        PageRequest pageRequest = makePageRequest(searchType);
+        Pageable pageable = makePageable(searchType);
 
         if (StringUtils.isEmpty(clanTag)) {
-            return clanWarRepository.selectRankingClanWarStars(ClanWarType.NONE, fromStartTime, toStartTime, pageRequest);
+            return clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndStartTimePeriod(ClanWarType.NONE, fromStartTime, toStartTime, pageable);
         }
 
-        return clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.NONE, fromStartTime, toStartTime, clanTag, pageRequest);
+        return clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndStartTimePeriod(clanTag, ClanWarType.NONE, fromStartTime, toStartTime, pageable);
     }
 
-    private PageRequest makePageRequest(String searchType) {
+    private Pageable makePageable(String searchType) {
         // 임시 전체 조회 코드 설정
         if ("ALL".equals(searchType)) {
-            return PageRequest.of(0, 1000);
+            return Pageable.unpaged();
         }
 
-        return PageRequest.of(0, hallOfFameConfig.getRanking());
+        return Pageable.ofSize(hallOfFameConfig.getRanking());
     }
 
     private LocalDateTime getStartTime(LocalDate searchMonth) {
@@ -512,32 +510,28 @@ public class ClanWarService {
         return entityClanWarResponseConverter.convertWithMember(clanWarEntity);
     }
 
-    public List<RankingHallOfFameForClanWar> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
-        LocalDateTime startTime = getStartTime(searchMonth);
-        LocalDateTime endTime = getEndTime(searchMonth);
+    public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
+        LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
+        LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
 
-        List<RankingHallOfFameForClanWar> rankingHallOfFames;
-
-        final Integer SEARCH_LIMIT = 300;
+        List<ClanWarRecordDTO> rankingHallOfFames;
         if (StringUtils.isEmpty(clanTag)) {
-            rankingHallOfFames = clanWarRepository.selectRankingClanWarStars(ClanWarType.LEAGUE, startTime, endTime, PageRequest.of(0, SEARCH_LIMIT));
+            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
         } else {
-            rankingHallOfFames = clanWarRepository.selectRankingClanWarStarsByClanTag(ClanWarType.LEAGUE, startTime, endTime, clanTag, PageRequest.of(0, SEARCH_LIMIT));
+            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndStartTimePeriod(clanTag, ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
         }
 
-        List<ClanWarCount> leagueClanWarRounds = clanWarRepository.selectClanWarCount(ClanWarType.LEAGUE, startTime, endTime);
-        Map<String, Integer> clanWarCountMap = leagueClanWarRounds.stream()
-                                                                  .collect(Collectors.toMap(ClanWarCount::getTag, ClanWarCount::getCount));
+        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
 
         // 완파한 클랜원만 제공
         return rankingHallOfFames.stream()
-                                 .filter(ranking -> isCompleteStars(ranking, clanWarCountMap))
+                                 .filter(ranking -> isCompleteStars(ranking, leagueClanWarRoundsMap))
                                  .toList();
     }
 
-    private boolean isCompleteStars(RankingHallOfFameForClanWar ranking, Map<String, Integer> clanWarCountMap) {
-        Integer clanWarCount = clanWarCountMap.get(ranking.getClanTag());
-        Integer completedStarCount = clanWarCount * 3;
-        return Objects.equals(ranking.getTotalStars(), completedStarCount);
+    private boolean isCompleteStars(ClanWarRecordDTO ranking, Map<String, Long> clanWarCountMap) {
+        Long clanWarCount = clanWarCountMap.get(ranking.clanTag());
+        Long completedStarCount = clanWarCount * 3;
+        return Objects.equals(ranking.totalStars(), completedStarCount.intValue());
     }
 }

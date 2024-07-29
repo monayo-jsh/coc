@@ -12,7 +12,7 @@
 ```bash
 gradle clean build -x test
 ```
-step 2.
+## step 2.
 ```bash
 java -jar -DCOC_API_KEY={COC_API_KEY} -DDB_USERNAME={DB_USERNAME} -DDB_PASSWORD={DB_PASSWORD} -DADMIN_ID={ADMIN_ID} -DADMIN_PASSWORD={ADMIN_PASSWORD} build/libs/clash-of-clan.jar
 ```

@@ -3,10 +3,11 @@ package open.api.coc.clans.controller;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayer;
+import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
+import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameForClanWar;
 import open.api.coc.clans.service.ClanWarService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,21 +29,24 @@ public class ClanWarController {
     }
 
     @GetMapping("/missing/attack/period")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
-                                                                                           @RequestParam LocalDate endDate) {
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
+                                                                                              @RequestParam LocalDate endDate) {
         return ResponseEntity.ok()
                              .body(clanWarService.getClanWarMissingAttackPlayers(startDate, endDate));
     }
 
     @GetMapping("/missing/attack/{playerTag}")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithTag(@PathVariable String playerTag) {
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayerWithTagForRecentDays(@PathVariable String playerTag,
+                                                                                                                 @RequestParam(value = "queryDate", defaultValue = "90") Integer queryDate) {
 
-        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithTag(playerTag));
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithTag(playerTag, queryDate));
     }
 
     @GetMapping("/missing/attack/playerName")
-    public ResponseEntity<List<ClanWarMissingAttackPlayer>> getClanWarMissingAttackPlayerInLast90DaysWithName(@RequestParam String playerName) {
-        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName));
+    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayerWithNameForRecentDays(@RequestParam String playerName,
+                                                                                                                  @RequestParam(value = "queryDate", defaultValue = "90") Integer queryDate) {
+
+        return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName, queryDate));
 
     }
 
@@ -50,20 +54,20 @@ public class ClanWarController {
     @GetMapping("{warId}")
     public ResponseEntity<ClanWarResponse> getClanWarDetail(@PathVariable Long warId) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getClanWar(warId));
+                             .body(clanWarService.getClanWarDetail(warId));
     }
 
     @GetMapping("/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingClanWarStars(@RequestParam LocalDate searchMonth,
-                                                                                    @RequestParam String clanTag,
-                                                                                    @RequestParam(defaultValue = "") String searchType) {
+    public ResponseEntity<List<ClanWarRecordDTO>> getRankingClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
+                                                                         @RequestParam String clanTag,
+                                                                         @RequestParam(defaultValue = "") String searchType) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingClanWarStars(searchMonth, clanTag, searchType));
     }
 
     @GetMapping("/league/ranking/stars")
-    public ResponseEntity<List<RankingHallOfFameForClanWar>> getRankingLeagueClanWarStars(@RequestParam LocalDate searchMonth,
-                                                                                @RequestParam String clanTag) {
+    public ResponseEntity<List<ClanWarRecordDTO>> getRankingLeagueClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
+                                                                                          @RequestParam String clanTag) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag));
     }

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/hallOfFame.css" />
 
@@ -76,6 +77,9 @@
 
     function renderRankings(sectionClassName, players, iconClassName) {
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
+      // clear
+      rankingTbody.innerHTML = '';
+
       let rank = 1;
       for(const player of players) {
         const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
@@ -156,35 +160,53 @@
     }
 
     async function fetchRaidCurrentSeason() {
+      const targetClassName = 'raid-current-season';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingRaidCurrentSeason();
-      renderRankings('raid-current-season', rankings, 'icon-clan-capital');
+      renderRankings(targetClassName, rankings, 'icon-clan-capital');
+      hideLoaderCircle(targetClassName);
     }
 
     async function fetchRaidAverageSeason() {
+      const targetClassName = 'raid-average-season';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingRaidAverageSeason();
-      renderRankings('raid-average-season', rankings, 'icon-clan-capital');
+      renderRankings(targetClassName, rankings, 'icon-clan-capital');
+      hideLoaderCircle(targetClassName);
     }
 
     async function fetchCurrentTrophies() {
+      const targetClassName = 'current-trophies';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingPlayerTrophies();
-      renderRankings('current-trophies', rankings, 'icon trophies');
+      renderRankings(targetClassName, rankings, 'icon trophies');
+      hideLoaderCircle(targetClassName);
     }
 
     async function fetchCurrentAttackWins() {
+      const targetClassName = 'current-attack-wins';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingPlayerAttackWins();
-      renderRankings('current-attack-wins', rankings, 'icon-sword');
+      renderRankings(targetClassName, rankings, 'icon-sword');
+      hideLoaderCircle(targetClassName);
     }
 
     async function fetchThisMonthClanWarStars(clanTag) {
       const searchMonth = dayjs().format('YYYY-MM-DD');
+      const targetClassName = 'this-month-clan-war-stars';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
-      renderRankingsClanWar('this-month-clan-war-stars', rankings)
+      renderRankingsClanWar(targetClassName, rankings);
+      hideLoaderCircle(targetClassName);
     }
 
     async function fetchLastMonthClanWarStars(clanTag) {
       const searchMonth = dayjs().add(-1, 'month').format('YYYY-MM-DD');
+      const targetClassName = 'last-month-clan-war-stars';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingClanWarStars(searchMonth, clanTag);
-      renderRankingsClanWar('last-month-clan-war-stars', rankings)
+      renderRankingsClanWar(targetClassName, rankings);
+      hideLoaderCircle(targetClassName)
     }
 
 
@@ -234,10 +256,32 @@
       }
     }
 
+    function getTargetElement(targetClassName) {
+      return document.querySelector(`.${targetClassName}`);
+    }
+
+    function showLoaderCircle(targetClassName) {
+      const targetElement = getTargetElement(targetClassName);
+      const loader = targetElement.querySelector('.loader-circle');
+      loader.classList.remove('display-none');
+      const table = targetElement.querySelector('.table');
+      table.classList.add('opacity-01');
+    }
+    function hideLoaderCircle(targetClassName) {
+      const targetElement = getTargetElement(targetClassName);
+      const loader = targetElement.querySelector('.loader-circle');
+      loader.classList.add('display-none');
+      const table = targetElement.querySelector('.table');
+      table.classList.remove('opacity-01');
+    }
+
     async function fetchThisMonthClanLeagueWar(clanTag) {
       const searchMonth = dayjs().format('YYYY-MM-DD');
+      const targetClassName = 'this-month-league-war';
+      showLoaderCircle(targetClassName);
       const rankings = await fetchRankingClanLeagueWarStars(searchMonth, clanTag);
-      renderRankingsClanLeagueWar('this-month-league-war', rankings)
+      renderRankingsClanLeagueWar(targetClassName, rankings)
+      hideLoaderCircle(targetClassName);
     }
 
     function renderClan(clan) {
@@ -271,6 +315,7 @@
       if (clanTag === 'all') clanTag = '';
       fetchThisMonthClanLeagueWar(clanTag);
     }
+
     window.onload = async () => {
       //개인 기록 부문
       fetchCurrentTrophies();
@@ -310,6 +355,22 @@
             <div class="sub-title">현재 트로피 순위</div>
             <div class="rankings">
               <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
                 <thead>
                 <tr class="table-tr">
                   <th class="table-th">순위</th>
@@ -317,7 +378,11 @@
                   <th class="table-th">점수</th>
                 </tr>
                 </thead>
-                <tbody class="table-tbody"></tbody>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="3">데이터 수집중</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -326,6 +391,22 @@
             <div class="sub-title">현재 공성 순위</div>
             <div class="rankings">
               <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
                 <thead>
                 <tr class="table-tr">
                   <th class="table-th">순위</th>
@@ -333,7 +414,11 @@
                   <th class="table-th">점수</th>
                 </tr>
                 </thead>
-                <tbody class="table-tbody"></tbody>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="3">데이터 수집중</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -362,6 +447,22 @@
             <div class="sub-title">이번달 완파 순위</div>
             <div class="rankings">
               <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
                 <thead>
                 <tr class="table-tr">
                   <th class="table-th">순위</th>
@@ -370,7 +471,11 @@
                   <th class="table-th">총 파괴율<br/>평균 완파시간</th>
                 </tr>
                 </thead>
-                <tbody class="table-tbody"></tbody>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="4">데이터 수집중</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -379,6 +484,22 @@
             <div class="sub-title">지난달 완파 순위</div>
             <div class="rankings">
               <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
                 <thead>
                 <tr class="table-tr">
                   <th class="table-th">순위</th>
@@ -387,7 +508,11 @@
                   <th class="table-th">총 파괴율<br/>평균 완파시간</th>
                 </tr>
                 </thead>
-                <tbody class="table-tbody"></tbody>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="4">데이터 수집중</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -408,6 +533,22 @@
             <div class="sub-title">현재 시즌 완파 클랜원</div>
             <div class="rankings">
               <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
                 <thead>
                 <tr class="table-tr">
                   <th class="table-th">No</th>
@@ -416,7 +557,11 @@
                   <th class="table-th">평균 완파시간</th>
                 </tr>
                 </thead>
-                <tbody class="table-tbody"></tbody>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="4">데이터 수집중</td>
+                </tr>
+                </tbody>
               </table>
             </div>
           </div>
@@ -435,6 +580,22 @@
           <div class="sub-title">현재 시즌 순위</div>
           <div class="rankings">
             <table class="table">
+              <caption>
+                <div class="loader-circle display-none">
+                  <div class="bar1"></div>
+                  <div class="bar2"></div>
+                  <div class="bar3"></div>
+                  <div class="bar4"></div>
+                  <div class="bar5"></div>
+                  <div class="bar6"></div>
+                  <div class="bar7"></div>
+                  <div class="bar8"></div>
+                  <div class="bar9"></div>
+                  <div class="bar10"></div>
+                  <div class="bar11"></div>
+                  <div class="bar12"></div>
+                </div>
+              </caption>
               <thead>
               <tr class="table-tr">
                 <th class="table-th">순위</th>
@@ -442,7 +603,11 @@
                 <th class="table-th">점수</th>
               </tr>
               </thead>
-              <tbody class="table-tbody"></tbody>
+              <tbody class="table-tbody">
+              <tr class="table-tr">
+                <td class="table-td empty" colspan="3">데이터 수집중</td>
+              </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -452,6 +617,22 @@
           <div class="sub-title">최근 3주 평균 순위</div>
           <div class="rankings">
             <table class="table">
+              <caption>
+                <div class="loader-circle display-none">
+                  <div class="bar1"></div>
+                  <div class="bar2"></div>
+                  <div class="bar3"></div>
+                  <div class="bar4"></div>
+                  <div class="bar5"></div>
+                  <div class="bar6"></div>
+                  <div class="bar7"></div>
+                  <div class="bar8"></div>
+                  <div class="bar9"></div>
+                  <div class="bar10"></div>
+                  <div class="bar11"></div>
+                  <div class="bar12"></div>
+                </div>
+              </caption>
               <thead>
               <tr class="table-tr">
                 <th class="table-th">순위</th>
@@ -459,7 +640,11 @@
                 <th class="table-th">점수</th>
               </tr>
               </thead>
-              <tbody class="table-tbody"></tbody>
+              <tbody class="table-tbody">
+              <tr class="table-tr">
+                <td class="table-td empty" colspan="3">데이터 수집중</td>
+              </tr>
+              </tbody>
             </table>
           </div>
         </div>

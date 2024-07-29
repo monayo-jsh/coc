@@ -17,9 +17,24 @@
 
 .clans-wrapper {
   margin-top: 5px;
-  background-color: coral;
-  border-radius: 10px;
-  font-weight: bold;
+  white-space: nowrap;
+  overflow-x: auto;
+  width: 270px;
+
+  .radio-inputs {
+    width: 100%;
+    max-width: 1240px;
+    flex-wrap: nowrap;
+
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
 }
 
 .heroes-wrapper {

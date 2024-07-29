@@ -8,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 
@@ -48,5 +49,43 @@ public class TimeUtils implements TimeConverter {
 
     private ZonedDateTime getZonedDateTime(long epochMilli) {
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"));
+    }
+
+    public static LocalDateTime withMinTime(LocalDate date) {
+        // LocalDate 시간을 00:00:00 설정하여 반환
+        return LocalDateTime.of(date, LocalTime.MIN);
+    }
+
+    public static LocalDateTime withMaxTime(LocalDate date) {
+        // LocalDate 시간을 23:59:59.999999000 설정하여 반환
+        return LocalDateTime.of(date, LocalTime.MAX.withNano(999_999_000));
+    }
+
+    public static LocalDateTime getDateMinTimeDaysAgo(int daysAgo) {
+        LocalDate date = LocalDate.now().minusDays(daysAgo);
+        return withMinTime(date);
+    }
+
+    public static LocalDateTime getDateMaxTimeDaysAgo(int daysAgo) {
+        LocalDate date = LocalDate.now().minusDays(daysAgo);
+        return withMaxTime(date);
+    }
+
+    public static LocalDateTime toFirstDayOfMonthDateTime(LocalDate date) {
+        LocalDate firstDayOfMonthDate = toFirstDayOfMonth(date);
+        return withMinTime(firstDayOfMonthDate);
+    }
+
+    private static LocalDate toFirstDayOfMonth(LocalDate date) {
+        return date.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    public static LocalDateTime toLastDayOfMonthDateTime(LocalDate date) {
+        LocalDate lastDayOfMonth = toLastDayOfMonth(date);
+        return withMaxTime(lastDayOfMonth);
+    }
+
+    private static LocalDate toLastDayOfMonth(LocalDate date) {
+        return date.with(TemporalAdjusters.lastDayOfMonth());
     }
 }

@@ -47,6 +47,15 @@
         //dayjs duration 확장
         dayjs.extend(dayjs_plugin_duration)
 
+        let cMonthPicker;
+
+        function moveMonth(value) {
+            const movedMonth = dayjs(cMonthPicker.getValue()).add(value, 'month');
+            cMonthPicker.setValue(formatYYYYMMDD(movedMonth));
+            cMonthPicker.open();
+            cMonthPicker.close();
+        }
+
         function getMonthPicker() {
             return document.querySelector('input.input-month');
         }
@@ -62,7 +71,7 @@
                 validRange: false,
                 onchange: callBackMonthPicker
             }
-            jSuites.calendar(monthPicker, makeMonthPickerOption(formatYYYYMMDD(defaultFirstDayOfMonth), customOption));
+            cMonthPicker = jSuites.calendar(monthPicker, makeMonthPickerOption(formatYYYYMMDD(defaultFirstDayOfMonth), customOption));
         }
 
         function formatPlayer(players) {
@@ -255,6 +264,12 @@
                 <div class="inner-section">
                     <div class="picker">
                         <input type="text" class="input-month">
+                        <div class="picker-icon-wrapper cursor-pointer" onclick="moveMonth(-1);">
+                            <i class="icon-arrow-line-left"></i>
+                        </div>
+                        <div class="picker-icon-wrapper cursor-pointer" onclick="moveMonth(1);">
+                            <i class="icon-arrow-line-right"></i>
+                        </div>
                     </div>
                     <div class="buttons">
                         <div class="button-chip">

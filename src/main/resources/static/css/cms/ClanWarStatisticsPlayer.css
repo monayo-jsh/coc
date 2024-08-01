@@ -141,3 +141,17 @@
     }
   }
 }
+
+.picker {
+  display: flex;
+}
+
+.picker-icon-wrapper {
+  margin: 3px;
+  border: 1px solid #bbb;
+  border-radius: 25px;
+  padding: 3px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

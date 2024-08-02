@@ -43,7 +43,17 @@
 
 
   <script>
+    function displayAllCard() {
+      const cards = document.querySelectorAll('.card');
+      for (const card of cards) {
+        card.classList.remove('display-none');
+      }
+    }
+
     function switchFilterNotJoined(type) {
+      // 숨겨진 클랜 카드 노출 처리
+      displayAllCard();
+
       const btnCloses = document.querySelectorAll('.btn-close');
       btnCloses.forEach(ele => ele.click());
 
@@ -65,7 +75,11 @@
       const clanContent = JSON.parse(card.dataset.clanContent);
 
       // 클랜전 컨텐츠 이용 클랜이 아닌 경우
-      if (clanContent.clanWarYn !== 'Y') return;
+      if (clanContent.clanWarYn !== 'Y') {
+        //카드 숨김
+        card.classList.add('display-none');
+        return;
+      }
 
       await viewAssignedPlayer(element);
       const btnFilterNotJoined = card.querySelector('.card-assigned-player-wrapper .btn-filter-not-joined');
@@ -77,7 +91,11 @@
       const clanContent = JSON.parse(card.dataset.clanContent);
 
       // 리그전 컨텐츠 이용 클랜이 아닌 경우
-      if (clanContent.clanWarLeagueYn !== 'Y') return;
+      if (clanContent.clanWarLeagueYn !== 'Y') {
+        //카드 숨김
+        card.classList.add('display-none');
+        return;
+      }
 
       await viewLeagueAssignedPlayer(element);
       const btnFilterNotJoined = card.querySelector('.card-league-assigned-player-wrapper .btn-filter-not-joined');

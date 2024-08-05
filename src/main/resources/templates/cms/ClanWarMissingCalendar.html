@@ -47,6 +47,10 @@
       return document.querySelector('.calendar-date');
     }
 
+    function sortedByWarTypeAndPlayerName(raw) {
+      return raw.sort((a, b) => a.warType.localeCompare(b.warType)|| a.playerName.length - b.playerName.length);
+    }
+
     function initCalendar() {
       const container = document.getElementById('calendar');
       const options = {
@@ -68,8 +72,8 @@
             const { title, raw } = event;
             const drawBody = [];
             const players = [];
-            const sortedByName = raw.sort((a, b) => a.playerName.length - b.playerName.length)
-            for (const player of sortedByName) {
+            const sortedPlayers = sortedByWarTypeAndPlayerName(raw);
+            for (const player of sortedPlayers) {
               const { warType, playerName } = player;
 
               const bgColor = getBgColorByWarType(warType);
@@ -184,14 +188,20 @@
       }
     }
 
-    function sortedBy(map) {
-      return new Map(Array.from(map).sort((a, b) => a[0].localeCompare(b[0])));
+    function sortedByWarTypeAndClanOrder(map) {
+      return new Map(Array.from(map)
+                          .sort(function (a, b) {
+                            const [first] = a[1];
+                            const [second] = b[1];
+                            return first.warType.localeCompare(second.warType)
+                                || first.clanOrder - second.clanOrder;
+                          }));
     }
     function copyMissingMembers(date, players) {
       const listGroupByClan = convertArrayToMapByKey(players, 'clanName', true);
       let message = [];
       let totalPlayerLength = 0;
-      for (const [clanName, players]of sortedBy(listGroupByClan)) {
+      for (const [clanName, players]of sortedByWarTypeAndClanOrder(listGroupByClan)) {
         const [player] = players;
         const { warState, warType } = player;
         const warStateName = warState === 'inWar' ? ' 진행중': '';

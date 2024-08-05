@@ -110,6 +110,7 @@ public class ClanWarQueryRepository {
         ConstructorExpression<ClanWarMissingAttackPlayerDTO> clanWarMissingAttackPlayerDTO = Projections.constructor(
             ClanWarMissingAttackPlayerDTO.class,
             clanEntity.name.as("clanName"),
+            clanEntity.order.as("clanOrder"),
             clanWarEntity.warId.as("warId"),
             clanWarEntity.type.as("warType"),
             clanWarEntity.state.as("warState"),

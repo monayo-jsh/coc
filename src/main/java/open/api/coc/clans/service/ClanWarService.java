@@ -151,7 +151,7 @@ public class ClanWarService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void mergeClanWarMember(ClanWarEntity clanWarEntity, ClanWar clanWar) {
-        // 수집 대상 객체가 아닌 경우 warId를 전달받지 못함
+        // 이미 수집된 전쟁은 warId를 전달받지 못함
         if (ObjectUtils.isEmpty(clanWarEntity.getWarId())) return;
 
         if (clanWarEntity.isLeagueWar()) {

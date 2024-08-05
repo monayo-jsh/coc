@@ -69,7 +69,7 @@
             const { raw } = event;
             const drawBody = [];
             const clans = [];
-            const sortedByDate = raw.sort((a, b) => a.start - b.start)
+            const sortedByDate = raw.sort((a, b) => a.type.localeCompare(b.type) || a.start - b.start)
             for (const clan of sortedByDate) {
               const { warId, type, startTime, clanName } = clan;
 

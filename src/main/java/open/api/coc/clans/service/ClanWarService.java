@@ -154,6 +154,10 @@ public class ClanWarService {
         // 수집 대상 객체가 아닌 경우 warId를 전달받지 못함
         if (ObjectUtils.isEmpty(clanWarEntity.getWarId())) return;
 
+        if (clanWarEntity.isLeagueWar()) {
+            processSyncClanWarMember(clanWarEntity, clanWar);
+        }
+
         Map<String, ClanWarMemberEntity> clanWarMemberEntityMap = clanWarEntity.getMembers()
                                                                                .stream()
                                                                                .collect(Collectors.toMap(clanWarMemberEntity -> clanWarMemberEntity.getId().getTag(),
@@ -274,10 +278,7 @@ public class ClanWarService {
 
     private ClanWar getClanWar(ClanWarEntity clanWarEntity) {
         if (clanWarEntity.isLeagueWar()) {
-            ClanWar clanLeagueWar = findClanLeagueWar(clanWarEntity);
-            // 리그전의 경우 라인업에 따라 실제 전투인원이 바뀌기 때문에 수집하면서 데이터 조정해주고 있음
-            processSyncClanWarMember(clanWarEntity, clanLeagueWar);
-            return clanLeagueWar;
+            return findClanLeagueWar(clanWarEntity);
         }
 
         return findClanWar(clanWarEntity);

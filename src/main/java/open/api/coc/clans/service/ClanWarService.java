@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +32,7 @@ import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
+import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
@@ -60,6 +62,8 @@ public class ClanWarService {
 
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
+
+    private final ClanWarMemberRepository clanWarMemberRepository;
 
     private final ClanWarQueryRepository clanWarQueryRepository;
     private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
@@ -116,6 +120,33 @@ public class ClanWarService {
 
         ClanWarEntity clanWarEntity = mergeClanWar(clanWar, ClanWarType.LEAGUE);
         mergeClanWarMember(clanWarEntity, clanWar);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processSyncClanWarMember(ClanWarEntity clanWarEntity, ClanWar clanWar) {
+        // 리그전의 경우 라인업에 따라 실제 전투인원이 바뀌기 때문에 수집하면서 데이터 조정해주고 있음
+        Map<String, ClanWarMember> clanWarMemberMap = clanWar.getClan()
+                                                             .getMembers()
+                                                             .stream()
+                                                             .collect(Collectors.toMap(ClanWarMember::getTag,
+                                                                                       clanWarMemberEntity -> clanWarMemberEntity));
+
+        List<ClanWarMemberEntity> removeMemberEntities = new ArrayList<>();
+        for (ClanWarMemberEntity clanWarMemberEntity : clanWarEntity.getMembers()) {
+            ClanWarMember clanWarMember = clanWarMemberMap.get(clanWarMemberEntity.getId().getTag());
+            if (Objects.isNull(clanWarMember)) {
+                removeMemberEntities.add(clanWarMemberEntity);
+            }
+        }
+
+        if (!removeMemberEntities.isEmpty()) {
+            for (ClanWarMemberEntity removeMemberEntity : removeMemberEntities) {
+                // remove list
+                clanWarEntity.getMembers().removeIf(dbMember -> Objects.equals(dbMember.getId().getTag(), removeMemberEntity.getId().getTag()));
+
+                clanWarMemberRepository.deleteById(removeMemberEntity.getId());
+            }
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -243,7 +274,10 @@ public class ClanWarService {
 
     private ClanWar getClanWar(ClanWarEntity clanWarEntity) {
         if (clanWarEntity.isLeagueWar()) {
-            return findClanLeagueWar(clanWarEntity);
+            ClanWar clanLeagueWar = findClanLeagueWar(clanWarEntity);
+            // 리그전의 경우 라인업에 따라 실제 전투인원이 바뀌기 때문에 수집하면서 데이터 조정해주고 있음
+            processSyncClanWarMember(clanWarEntity, clanLeagueWar);
+            return clanLeagueWar;
         }
 
         return findClanWar(clanWarEntity);

@@ -203,12 +203,15 @@
       let totalPlayerLength = 0;
       for (const [clanName, players]of sortedByWarTypeAndClanOrder(listGroupByClan)) {
         const [player] = players;
-        const { warState, warType } = player;
+        const { warState, warType, endTime } = player;
         const warStateName = warState === 'inWar' ? ' 진행중': '';
         const warTypeName = convWarTypeName(warType);
         const playerNames = players.map(player => player.playerName).join(", ");
         message.push(`[${warTypeName}${warStateName}] ${clanName} (${players.length}명)`);
         message.push(`=> ${playerNames}\n`);
+        if (warStateName) {
+          message.push(`남은 시간: ${formatTime(getLeftUntilByTime(endTime), "H시간 mm분")}\n`);
+        }
 
         totalPlayerLength += players.length;
       }

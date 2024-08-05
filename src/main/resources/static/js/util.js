@@ -2,16 +2,30 @@ function removeHashTag(playerTag) {
   return playerTag.replaceAll("#", "");
 }
 
-function formatTime(time) {
+function formatTime(time, format="HH:mm") {
   // import 필수
   // <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-  return dayjs(time).format('HH:mm')
+  if (dayjs.isDayjs(time)) return time.format(format);
+  if (dayjs.isDuration(time)) return time.format(format);
+
+  return dayjs(time).format(format)
 }
 
 function formatMinuteSecond(sec) {
   // import 필수
   // <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   return dayjs.duration(sec * 1000).format('m분 ss초');
+}
+
+function getLeftUntilByTime(endTime) {
+  const now = dayjs();
+  const endDateTime = dayjs(endTime);
+
+  if (now > endDateTime) {
+    return "";
+  }
+
+  return dayjs.duration(endDateTime.diff(now));
 }
 
 function filterVillage(array, village = 'home') {

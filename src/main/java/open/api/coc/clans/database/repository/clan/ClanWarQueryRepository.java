@@ -115,6 +115,7 @@ public class ClanWarQueryRepository {
             clanWarEntity.type.as("warType"),
             clanWarEntity.state.as("warState"),
             clanWarEntity.startTime.as("startTime"),
+            clanWarEntity.endTime.as("endTime"),
             clanWarMemberEntity.id.tag.as("playerTag"),
             clanWarMemberEntity.name.as("playerName")
         );

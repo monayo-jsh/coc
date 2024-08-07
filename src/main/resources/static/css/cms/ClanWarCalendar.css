@@ -159,8 +159,40 @@
   }
 }
 
+.table-tbody {
+
+  .table-tr:nth-child(odd) {
+    background-color: unset !important;
+    border-top: 1px solid lightgray;
+  }
+
+  td.attack-info {
+    border-top: 1px solid lightgray;
+    border-left: 1px solid lightgray;
+  }
+
+}
+
 .table.missing-attack {
   max-height: 500px;
   overflow-y: auto;
   scrollbar-width: thin;
+}
+
+.row {
+
+  .chip {
+    padding: 3px 10px;
+  }
+
+  .necessary-attack-Y {
+    background-color: lightgray;
+    color: white;
+  }
+
+  .necessary-attack-N {
+    background-color: crimson;
+    color: white;
+  }
+
 }

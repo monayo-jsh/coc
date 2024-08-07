@@ -8,6 +8,7 @@ const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" /
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME = "/api/clan/war/missing/attack/playerName"
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG = "/api/clan/war/missing/attack/{playerTag}"
 
+const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = "/api/clan/war/{warId}/{playerTag}/necessary"
 
 async function fetchClanWars(searchMonth) {
   const uri = URI_CLAN_WARS.replace(/{searchMonth}/, encodeURIComponent(searchMonth));
@@ -107,4 +108,25 @@ async function fetchRankingClanLeagueWarStars(searchMonth, clanTag) {
                       console.error(error);
                       return [];
                     });
+}
+
+async function putClanWarNecessaryAttack(warId, playerTag) {
+  const URI = URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK.replace(/{warId}/, warId).replace(/{playerTag}/, encodeURIComponent(playerTag));
+  return await axios.put(URI)
+                    .then((response) => {
+                      alert('처리 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return false;
+                    })
 }

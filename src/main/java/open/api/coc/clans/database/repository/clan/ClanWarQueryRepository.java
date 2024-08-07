@@ -117,7 +117,8 @@ public class ClanWarQueryRepository {
             clanWarEntity.startTime.as("startTime"),
             clanWarEntity.endTime.as("endTime"),
             clanWarMemberEntity.id.tag.as("playerTag"),
-            clanWarMemberEntity.name.as("playerName")
+            clanWarMemberEntity.name.as("playerName"),
+            clanWarMemberEntity.necessaryAttackYn.as("necessaryAttackYn")
         );
 
         return queryFactory.select(clanWarMissingAttackPlayerDTO)

@@ -177,11 +177,14 @@
     }
 
     function renderClanWarInfo(clanWar) {
-      const { clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
+      const { warId, clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
 
       const templateClanWarInfo = document.querySelector('#template-clan-war-info');
       const clanWarInfo = document.importNode(templateClanWarInfo.content, true);
       const clanWarInfoTable = clanWarInfo.querySelector('.table');
+
+      clanWarInfoTable.dataset.warId = warId;
+
       clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
                                                    .replace(/{NAME}/, clanName)
                                                    .replace(/{TYPE}/, convWarTypeName(type))
@@ -203,7 +206,7 @@
     }
 
     function renderClanWarMember(attacksPerMember, member) {
-      const { tag, name, attacks } = member;
+      const { tag, name, necessaryAttackYn, attacks } = member;
 
       const templateAttackRow = document.querySelector('#template-member-attack-row');
 
@@ -216,22 +219,43 @@
 
         row.innerHTML = row.innerHTML
                            .replace(/{NAME}/, name)
-                           .replace(/{TAG}/, tag)
+                           .replace(/{TAG}/g, tag)
+                           .replace(/{YN}/g, necessaryAttackYn)
                            .replace(/{STAR}/, stars)
                            .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
                            .replace(/{DURATION}/, formatMinuteSecond(duration));
+
+        if (rows.length) {
+          // 공격 기록 있으면 두번째 행부터는 계정 정보 제거
+          row.querySelector('.user-info').remove();
+        }
 
         rows.push(row);
       }
 
       // append missing attack row
       for (let i=0; i<attacksPerMember - attacks.length; i++) {
-        const templateAttackRow = document.querySelector('#template-member-missing-attack-row');
         const attackRow = document.importNode(templateAttackRow.content, true);
         const row = attackRow.querySelector('.row');
-        row.innerHTML = row.innerHTML
-                           .replace(/{NAME}/, name)
-                           .replace(/{TAG}/, tag);
+
+        const templateMissingAttackRow = document.querySelector('#template-member-missing-attack-info');
+        const missingAttackRow = document.importNode(templateMissingAttackRow.content, true);
+        const missingAttack = missingAttackRow.querySelector('.attack-info');
+
+        if (!rows.length) {
+          // 공격 기록 없으면 첫 행 표기
+          row.innerHTML = row.innerHTML
+                             .replace(/{NAME}/, name)
+                             .replace(/{TAG}/g, tag)
+                             .replace(/{YN}/g, necessaryAttackYn);
+          // 공격 셀 제거
+          row.querySelectorAll('.attack-info').forEach(ele => ele.remove());
+        } else {
+          row.innerHTML = "";
+        }
+
+        row.appendChild(missingAttack);
+
         rows.push(row);
       }
 
@@ -252,6 +276,22 @@
           for (const row of rows)
             tableTbody.appendChild(row);
         }
+      }
+    }
+
+    async function updateClanWarNecessaryAttack(playerTag) {
+      if (!confirm("클랜전 강참 처리를 변경하시겠습니까?")) {
+        return;
+      }
+
+      //강참 설정 처리
+      const clanWarInfoTable = document.querySelector('.clan-war-info .war-info');
+      const { warId } = clanWarInfoTable.dataset;
+      if (!warId) console.error("war id is not found", playerTag);
+
+      const isResult = await putClanWarNecessaryAttack(warId, playerTag);
+      if (isResult) {
+        renderClanWarDetail(warId);
       }
     }
 
@@ -369,7 +409,7 @@
   </div>
 </body>
 <template id="template-clan-war-info">
-  <table class="table">
+  <table class="table war-info">
     <tr>
       <th class="th-wrap">클랜명</th>
       <td>{NAME}</td>
@@ -402,34 +442,27 @@
 </template>
 <template id="template-member-attack-row">
   <tr class="table-tr row">
-    <td>
+    <td class="user-info" rowspan="2">
       <div class="td-wrap justify-content-left">
         <div class="name">{NAME}</div>
         <div class="chip ml-5">{TAG}</div>
+        <div class="chip ml-5 cursor-pointer necessary-attack-{YN}" onclick="updateClanWarNecessaryAttack('{TAG}')">강참 설정</div>
       </div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{STAR}</div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{DESTRUCTION_PERCENTAGE}</div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{DURATION}</div>
     </td>
   </tr>
 </template>
-<template id="template-member-missing-attack-row">
-  <tr class="table-tr row">
-    <td>
-      <div class="td-wrap justify-content-left">
-        <div class="name">{NAME}</div>
-        <div class="chip ml-5">{TAG}</div>
-      </div>
-    </td>
-    <td colspan="3">
-      <div class="td-wrap">공격 기록 없음</div>
-    </td>
-  </tr>
+<template id="template-member-missing-attack-info">
+  <td class="attack-info" colspan="3">
+    <div class="td-wrap">공격 기록 없음</div>
+  </td>
 </template>
 </html>

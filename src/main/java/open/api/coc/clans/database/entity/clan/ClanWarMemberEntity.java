@@ -56,7 +56,8 @@ public class ClanWarMemberEntity implements Persistable<ClanWarMemberPKEntity> {
     @Enumerated(EnumType.STRING)
     @Column(name = "necessary_attack_yn", length = 1, nullable = false)
     @ColumnDefault("'Y'")
-    private YnType necessaryAttackYn;
+    @Builder.Default
+    private YnType necessaryAttackYn = YnType.Y;
 
     @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "clanWarMember", cascade = CascadeType.ALL)

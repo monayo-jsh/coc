@@ -507,10 +507,10 @@ public class ClanWarService {
         return LocalDateTime.of(endDate, LocalTime.MAX.withNano(999_999_000));
     }
 
-    public List<ClanWarResponse> getClanWars(LocalDate searchMonth) {
+    public List<ClanWarResponse> getClanWars(LocalDate startDate, LocalDate endDate) {
 
-        LocalDateTime fromStartTime = getStartTime(searchMonth);
-        LocalDateTime toStartTime = getEndTime(searchMonth);
+        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
+        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
 
         List<ClanWarEntity> clanWarEntities = clanWarQueryRepository.findAllByStartTimePeriod(fromStartTime, toStartTime);
 

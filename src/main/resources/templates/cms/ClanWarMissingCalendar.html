@@ -157,14 +157,17 @@
 
     async function drawCalendar() {
       showWifiLoading('.section-wrapper');
-      const calendarDate = getCalendarDate();
+
       const date = calendar.getDate();
+
+      const calendarDate = getCalendarDate();
       calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
 
       const calendarStartDate = calendar.getDateRangeStart();
       const calendarEndDate = calendar.getDateRangeEnd();
 
       await drawCalendarEvents(calendarStartDate, calendarEndDate);
+
       hideWifiLoading('.section-wrapper');
     }
 

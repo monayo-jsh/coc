@@ -24,10 +24,11 @@ public class ClanWarController {
 
     private final ClanWarService clanWarService;
 
-    @GetMapping("/period/{searchMonth}")
-    public ResponseEntity<List<ClanWarResponse>> getClanWars(@PathVariable LocalDate searchMonth) {
+    @GetMapping("/period")
+    public ResponseEntity<List<ClanWarResponse>> getClanWars(@RequestParam LocalDate startDate,
+                                                             @RequestParam LocalDate endDate) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getClanWars(searchMonth));
+                             .body(clanWarService.getClanWars(startDate, endDate));
     }
 
     @GetMapping("/missing/attack/period")

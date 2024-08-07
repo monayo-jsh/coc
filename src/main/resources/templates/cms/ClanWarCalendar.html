@@ -215,7 +215,9 @@
 
         const { stars, destructionPercentage, duration } = attack;
 
+        row.classList.add("first");
         row.innerHTML = row.innerHTML
+                           .replace(/{ATTACK_TOTAL_COUNT}/, attacksPerMember)
                            .replace(/{NAME}/, name)
                            .replace(/{TAG}/g, tag)
                            .replace(/{YN}/g, necessaryAttackYn)
@@ -226,6 +228,7 @@
         if (rows.length) {
           // 공격 기록 있으면 두번째 행부터는 계정 정보 제거
           row.querySelector('.user-info').remove();
+          row.classList.remove("first");
         }
 
         rows.push(row);
@@ -242,7 +245,9 @@
 
         if (!rows.length) {
           // 공격 기록 없으면 첫 행 표기
+          row.classList.add("first");
           row.innerHTML = row.innerHTML
+                             .replace(/{ATTACK_TOTAL_COUNT}/, attacksPerMember)
                              .replace(/{NAME}/, name)
                              .replace(/{TAG}/g, tag)
                              .replace(/{YN}/g, necessaryAttackYn);
@@ -466,7 +471,7 @@
 </template>
 <template id="template-member-attack-row">
   <tr class="table-tr row">
-    <td class="user-info" rowspan="2">
+    <td class="user-info" rowspan="{ATTACK_TOTAL_COUNT}">
       <div class="td-wrap justify-content-left">
         <div class="name">{NAME}</div>
         <div class="chip ml-5">{TAG}</div>

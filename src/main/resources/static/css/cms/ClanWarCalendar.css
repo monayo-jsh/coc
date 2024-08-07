@@ -161,7 +161,7 @@
 
 .table-tbody {
 
-  .table-tr:nth-child(odd) {
+  .table-tr.first {
     background-color: unset !important;
     border-top: 1px solid lightgray;
   }

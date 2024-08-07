@@ -1,3 +1,4 @@
+### Local
 HELP.md
 .DS_STORE
 .gradle
@@ -8,6 +9,7 @@ build/
 docs
 war-league
 clan-war
+spy.log
 
 ### STS ###
 .apt_generated

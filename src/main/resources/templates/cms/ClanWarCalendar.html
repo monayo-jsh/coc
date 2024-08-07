@@ -24,6 +24,7 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
 
+  <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/clanWar.js"></script>
   <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
@@ -45,10 +46,7 @@
       return document.querySelector('.calendar-date');
     }
 
-    function initCalendar(now) {
-      const calendarDate = getCalendarDate();
-      calendarDate.dataset.date = now;
-
+    function initCalendar() {
       const container = document.getElementById('calendar');
       const options = {
         defaultView: 'month',
@@ -69,7 +67,7 @@
             const { raw } = event;
             const drawBody = [];
             const clans = [];
-            const sortedByDate = raw.sort((a, b) => a.start - b.start)
+            const sortedByDate = raw.sort((a, b) => a.type.localeCompare(b.type) || a.start - b.start)
             for (const clan of sortedByDate) {
               const { warId, type, startTime, clanName } = clan;
 
@@ -177,11 +175,14 @@
     }
 
     function renderClanWarInfo(clanWar) {
-      const { clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
+      const { warId, clanName, type, state, startTime, endTime, battleType, teamSize } = clanWar;
 
       const templateClanWarInfo = document.querySelector('#template-clan-war-info');
       const clanWarInfo = document.importNode(templateClanWarInfo.content, true);
       const clanWarInfoTable = clanWarInfo.querySelector('.table');
+
+      clanWarInfoTable.dataset.warId = warId;
+
       clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
                                                    .replace(/{NAME}/, clanName)
                                                    .replace(/{TYPE}/, convWarTypeName(type))
@@ -203,7 +204,7 @@
     }
 
     function renderClanWarMember(attacksPerMember, member) {
-      const { tag, name, attacks } = member;
+      const { tag, name, necessaryAttackYn, attacks } = member;
 
       const templateAttackRow = document.querySelector('#template-member-attack-row');
 
@@ -214,24 +215,50 @@
 
         const { stars, destructionPercentage, duration } = attack;
 
+        row.classList.add("first");
         row.innerHTML = row.innerHTML
+                           .replace(/{ATTACK_TOTAL_COUNT}/, attacksPerMember)
                            .replace(/{NAME}/, name)
-                           .replace(/{TAG}/, tag)
+                           .replace(/{TAG}/g, tag)
+                           .replace(/{YN}/g, necessaryAttackYn)
                            .replace(/{STAR}/, stars)
                            .replace(/{DESTRUCTION_PERCENTAGE}/, destructionPercentage)
                            .replace(/{DURATION}/, formatMinuteSecond(duration));
+
+        if (rows.length) {
+          // 공격 기록 있으면 두번째 행부터는 계정 정보 제거
+          row.querySelector('.user-info').remove();
+          row.classList.remove("first");
+        }
 
         rows.push(row);
       }
 
       // append missing attack row
       for (let i=0; i<attacksPerMember - attacks.length; i++) {
-        const templateAttackRow = document.querySelector('#template-member-missing-attack-row');
         const attackRow = document.importNode(templateAttackRow.content, true);
         const row = attackRow.querySelector('.row');
-        row.innerHTML = row.innerHTML
-                           .replace(/{NAME}/, name)
-                           .replace(/{TAG}/, tag);
+
+        const templateMissingAttackRow = document.querySelector('#template-member-missing-attack-info');
+        const missingAttackRow = document.importNode(templateMissingAttackRow.content, true);
+        const missingAttack = missingAttackRow.querySelector('.attack-info');
+
+        if (!rows.length) {
+          // 공격 기록 없으면 첫 행 표기
+          row.classList.add("first");
+          row.innerHTML = row.innerHTML
+                             .replace(/{ATTACK_TOTAL_COUNT}/, attacksPerMember)
+                             .replace(/{NAME}/, name)
+                             .replace(/{TAG}/g, tag)
+                             .replace(/{YN}/g, necessaryAttackYn);
+          // 공격 셀 제거
+          row.querySelectorAll('.attack-info').forEach(ele => ele.remove());
+        } else {
+          row.innerHTML = "";
+        }
+
+        row.appendChild(missingAttack);
+
         rows.push(row);
       }
 
@@ -255,6 +282,22 @@
       }
     }
 
+    async function updateClanWarNecessaryAttack(playerTag) {
+      if (!confirm("클랜전 강참 처리를 변경하시겠습니까?")) {
+        return;
+      }
+
+      //강참 설정 처리
+      const clanWarInfoTable = document.querySelector('.clan-war-info .war-info');
+      const { warId } = clanWarInfoTable.dataset;
+      if (!warId) console.error("war id is not found", playerTag);
+
+      const isResult = await putClanWarNecessaryAttack(warId, playerTag);
+      if (isResult) {
+        renderClanWarDetail(warId);
+      }
+    }
+
     function drawClanWarDetail(clanWar) {
 
       renderClanWarInfo(clanWar);
@@ -263,21 +306,29 @@
       showClanWarDetail();
     }
 
-    async function drawCalendarEvents(date) {
-      const searchMonth = formatYYYYMMDD(date);
-      const clanWars = await fetchClanWars(searchMonth);
+    async function drawCalendarEvents(startDate, endDate) {
+      const startDt = formatYYYYMMDD(startDate);
+      const endDt = formatYYYYMMDD(endDate);
+
+      const clanWars = await fetchClanWars(startDt, endDt);
 
       renderClanWars(clanWars);
     }
 
     async function drawCalendar() {
-      calendar.clear();
+      showWifiLoading('.section-wrapper');
+
+      const date = calendar.getDate();
 
       const calendarDate = getCalendarDate();
-      const { date } = calendarDate.dataset;
       calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
 
-      await drawCalendarEvents(date);
+      const calendarStartDate = calendar.getDateRangeStart();
+      const calendarEndDate = calendar.getDateRangeEnd();
+
+      await drawCalendarEvents(calendarStartDate, calendarEndDate);
+
+      hideWifiLoading('.section-wrapper');
     }
 
     function settingClickEventToClanWar() {
@@ -308,8 +359,7 @@
     let onClickEventWarIdSet = new Set();
 
     window.onload = async () => {
-      const now = dayjs();
-      initCalendar(now);
+      initCalendar();
       await drawCalendar();
 
       setInterval(() => settingClickEventToClanWar(), 1000);
@@ -324,23 +374,41 @@
       </div>
     </div>
 
-    <div class="header">
-      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
-        <i class="icon-arrow-line-left"></i>
+    <div class="section-wrapper">
+      <div id="wifi-loader" class="display-none">
+        <svg class="circle-outer" viewBox="0 0 86 86">
+          <circle class="back" cx="43" cy="43" r="40"></circle>
+          <circle class="front" cx="43" cy="43" r="40"></circle>
+          <circle class="new" cx="43" cy="43" r="40"></circle>
+        </svg>
+        <svg class="circle-middle" viewBox="0 0 60 60">
+          <circle class="back" cx="30" cy="30" r="27"></circle>
+          <circle class="front" cx="30" cy="30" r="27"></circle>
+        </svg>
+        <svg class="circle-inner" viewBox="0 0 34 34">
+          <circle class="back" cx="17" cy="17" r="14"></circle>
+          <circle class="front" cx="17" cy="17" r="14"></circle>
+        </svg>
+        <div class="text" data-text="Searching"></div>
       </div>
-      <div class="calendar-date"></div>
-      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
-        <i class="icon-arrow-line-right"></i>
+
+      <div class="header">
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+          <i class="icon-arrow-line-left"></i>
+        </div>
+        <div class="calendar-date"></div>
+        <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+          <i class="icon-arrow-line-right"></i>
+        </div>
       </div>
-    </div>
-    <div id="calendar" class="clan-war-calendar"></div>
-    <div id="clan-war-detail" class="clan-war-detail-wrap display-none">
+      <div id="calendar" class="clan-war-calendar"></div>
+      <div id="clan-war-detail" class="clan-war-detail-wrap display-none">
 
-      <div class="table mt-5 clan-war-info"></div>
+        <div class="table mt-5 clan-war-info"></div>
 
-      <div class="table mt-5 member-attack">
-        <table class="table">
-          <thead>
+        <div class="table mt-5 member-attack">
+          <table class="table">
+            <thead>
             <tr class="table-tr">
               <th class="table-th">플레이어 (태그)</th>
               <th class="table-th">
@@ -359,17 +427,18 @@
                 </div>
               </th>
             </tr>
-          </thead>
-          <tbody class="table-tbody"></tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody class="table-tbody"></tbody>
+          </table>
+        </div>
 
+      </div>
     </div>
 
   </div>
 </body>
 <template id="template-clan-war-info">
-  <table class="table">
+  <table class="table war-info">
     <tr>
       <th class="th-wrap">클랜명</th>
       <td>{NAME}</td>
@@ -402,34 +471,27 @@
 </template>
 <template id="template-member-attack-row">
   <tr class="table-tr row">
-    <td>
+    <td class="user-info" rowspan="{ATTACK_TOTAL_COUNT}">
       <div class="td-wrap justify-content-left">
         <div class="name">{NAME}</div>
         <div class="chip ml-5">{TAG}</div>
+        <div class="chip ml-5 cursor-pointer necessary-attack-{YN}" onclick="updateClanWarNecessaryAttack('{TAG}')">강참 설정</div>
       </div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{STAR}</div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{DESTRUCTION_PERCENTAGE}</div>
     </td>
-    <td>
+    <td class="attack-info">
       <div class="td-wrap">{DURATION}</div>
     </td>
   </tr>
 </template>
-<template id="template-member-missing-attack-row">
-  <tr class="table-tr row">
-    <td>
-      <div class="td-wrap justify-content-left">
-        <div class="name">{NAME}</div>
-        <div class="chip ml-5">{TAG}</div>
-      </div>
-    </td>
-    <td colspan="3">
-      <div class="td-wrap">공격 기록 없음</div>
-    </td>
-  </tr>
+<template id="template-member-missing-attack-info">
+  <td class="attack-info" colspan="3">
+    <div class="td-wrap">공격 기록 없음</div>
+  </td>
 </template>
 </html>

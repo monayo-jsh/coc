@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
+import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.service.ClanWarService;
@@ -11,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,10 +24,11 @@ public class ClanWarController {
 
     private final ClanWarService clanWarService;
 
-    @GetMapping("/period/{searchMonth}")
-    public ResponseEntity<List<ClanWarResponse>> getClanWars(@PathVariable LocalDate searchMonth) {
+    @GetMapping("/period")
+    public ResponseEntity<List<ClanWarResponse>> getClanWars(@RequestParam LocalDate startDate,
+                                                             @RequestParam LocalDate endDate) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getClanWars(searchMonth));
+                             .body(clanWarService.getClanWars(startDate, endDate));
     }
 
     @GetMapping("/missing/attack/period")
@@ -70,5 +73,12 @@ public class ClanWarController {
                                                                                           @RequestParam String clanTag) {
         return ResponseEntity.ok()
                              .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag));
+    }
+
+    @PutMapping("/{warId}/{playerTag}/necessary")
+    public ResponseEntity<ClanWarMemberResponse> updateClanWarMemberAttackNecessaryAttack(@PathVariable Long warId,
+                                                                                          @PathVariable String playerTag) {
+        return ResponseEntity.ok()
+                             .body(clanWarService.updateClanWarMemberAttackNecessaryAttack(warId, playerTag));
     }
 }

@@ -19,7 +19,9 @@ public class ClanWarRecordConditionBuilder {
 
         builder = new BooleanBuilder();
         builder.and(clanWarEntity.type.eq(warType))
-               .and(clanWarEntity.startTime.between(from, to));
+               .and(clanWarEntity.startTime.between(from, to))
+               //전쟁 준비중은 집계 대상에서 제외
+               .and(clanWarEntity.state.ne("preparation"));
     }
 
     public ClanWarRecordConditionBuilder withClanTag(String clanTag) {

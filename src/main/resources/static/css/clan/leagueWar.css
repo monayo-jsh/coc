@@ -106,6 +106,7 @@
 
     .rank {
       margin-left: 5px;
+      white-space: nowrap;
     }
 
     .badge {
@@ -480,10 +481,12 @@
 
       .rank {
         margin-left: 5px;
+        white-space: nowrap;
       }
 
       .stars {
         margin-left: 10px;
+        white-space: nowrap;
       }
 
       .destruction-percentage {

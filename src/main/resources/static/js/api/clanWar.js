@@ -1,4 +1,4 @@
-const URI_CLAN_WARS = "/api/clan/war/period/{searchMonth}" //클랜전 목록 기간 조회
+const URI_CLAN_WARS = "/api/clan/war/period" //클랜전 목록 기간 조회
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = "/api/clan/war/missing/attack/period" //클랜전 미공 사용자 목록 기간 조회
 const URI_CLAN_WAR_DETAIL = "/api/clan/war/{warId}" //클랜전 상세 조회
 const URI_RANKING_CLAN_WAR_STARS = "/api/clan/war/ranking/stars" //월 클랜전 획득별 순위
@@ -8,9 +8,10 @@ const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" /
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME = "/api/clan/war/missing/attack/playerName"
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG = "/api/clan/war/missing/attack/{playerTag}"
 
+const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = "/api/clan/war/{warId}/{playerTag}/necessary"
 
-async function fetchClanWars(searchMonth) {
-  const uri = URI_CLAN_WARS.replace(/{searchMonth}/, encodeURIComponent(searchMonth));
+async function fetchClanWars(startDt, endDt) {
+  const uri = URI_CLAN_WARS + `?startDate=${encodeURIComponent(startDt)}&endDate=${encodeURIComponent(endDt)}`;
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
@@ -107,4 +108,25 @@ async function fetchRankingClanLeagueWarStars(searchMonth, clanTag) {
                       console.error(error);
                       return [];
                     });
+}
+
+async function putClanWarNecessaryAttack(warId, playerTag) {
+  const URI = URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK.replace(/{warId}/, warId).replace(/{playerTag}/, encodeURIComponent(playerTag));
+  return await axios.put(URI)
+                    .then((response) => {
+                      alert('처리 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return false;
+                    })
 }

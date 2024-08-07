@@ -389,20 +389,23 @@
       return clanLabel;
     }
 
-    function renderAssignedClan(playerLabels, assignedClan) {
+    function renderAssignedClan(playerLabels, assignedClan, currentClan) {
       if (!assignedClan) return;
 
-      const { seasonDate, name } = assignedClan;
+      const currentClanTag = currentClan?.tag;
+      const { seasonDate, name, tag } = assignedClan;
+      const joinedStatusName = `이동 ${currentClanTag === tag ? '완료' : '필요'}`;
       const formattedSeasonDate = formatYYMMDate(seasonDate);
-      const assignedClanLabel = createPlayerLabel(name, `${formattedSeasonDate} 배정 클랜`);
+      const assignedClanLabel = createPlayerLabel(name, `${formattedSeasonDate} 배정 클랜 ${joinedStatusName}`);
       assignedClanLabel.classList.add('bg-green');
       playerLabels.appendChild(assignedClanLabel);
     }
 
-    function renderAssignedLeague(playerLabels, assignedLeague) {
+    function renderAssignedLeague(playerLabels, assignedLeague, currentClan) {
       if (!assignedLeague) return;
 
-      const { seasonDate, name } = assignedLeague;
+      const currentClanTag = currentClan?.tag;
+      const { seasonDate, name, tag } = assignedLeague;
 
       const now = dayjs();
       const assignedDate = dayjs(seasonDate);
@@ -415,8 +418,9 @@
         if (now.month() >= assignedDate.month()) return;
       }
 
+      const joinedStatusName = `이동 ${currentClanTag === tag ? '완료' : '필요'}`;
       const formattedSeasonDate = formatYYMMDate(seasonDate);
-      const assignedLeagueLabel = createPlayerLabel(name, `${formattedSeasonDate} 리그 배정 클랜`);
+      const assignedLeagueLabel = createPlayerLabel(name, `${formattedSeasonDate} 리그 배정 클랜 ${joinedStatusName}`);
       assignedLeagueLabel.classList.add('bg-crimson');
       playerLabels.appendChild(assignedLeagueLabel);
     }
@@ -439,8 +443,8 @@
       tagLabel.onclick = () => copyClipboard(tag, "플레이어 태그");
       playerLabels.appendChild(tagLabel);
 
-      renderAssignedClan(playerLabels, assignedClan);
-      renderAssignedLeague(playerLabels, assignedLeague);
+      renderAssignedClan(playerLabels, assignedClan, clan);
+      renderAssignedLeague(playerLabels, assignedLeague, clan);
       renderSupportLabel(playerLabels, supportYn);
 
       // if (clan) {
@@ -571,34 +575,6 @@
       return members.filter((member) => {
         return regexp.test(member.name);
       });
-      //               .map((member) => {
-      //   const displayName = member.name;
-      //   member.displayName = displayName.replace(regexp, (match, ...groups) => {
-      //     const letters = groups.slice(0, match.length);
-      //     let lastIndex = 0;
-      //     let highlighted = [];
-      //     for(let i=0,l=letters.length; i < l; i++) {
-      //       const idx = match.indexOf(letters[i], lastIndex);
-      //       highlighted.push(match.substring(lastIndex, idx));
-      //       highlighted.push(`<mark>${letters[i]}</mark>`);
-      //       lastIndex = idx + 1;
-      //     }
-      //     return highlighted.join('');
-      //   })
-      //   return member;
-      // })
-    }
-
-    function refreshRenderingMembers() {
-      const sortElement = document.querySelector('input[class=radio-button]:checked');
-      switch (sortElement.id) {
-        case 'hero-level-sum':
-          rederMemberSortByHeroLevelSum(members, false);
-          return;
-        default:
-          renderMemberSortByTrophies(members, false);
-          return;
-      }
     }
 
     function refreshMember(event) {

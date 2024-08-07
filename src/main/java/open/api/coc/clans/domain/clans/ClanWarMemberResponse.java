@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import open.api.coc.clans.database.entity.common.YnType;
 
 @Getter
 @Builder
@@ -18,6 +19,8 @@ public class ClanWarMemberResponse {
     private String tag;
 
     private String name;
+
+    private YnType necessaryAttackYn;
 
     @Builder.Default
     private List<ClanWarMemberAttackResponse> attacks = new ArrayList<>();

@@ -7,6 +7,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
@@ -24,6 +26,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import open.api.coc.clans.database.entity.common.YnType;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.domain.Persistable;
 import org.springframework.lang.NonNull;
 
@@ -48,6 +52,12 @@ public class ClanWarMemberEntity implements Persistable<ClanWarMemberPKEntity> {
 
     @Column(name = "name")
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "necessary_attack_yn", length = 1, nullable = false)
+    @ColumnDefault("'Y'")
+    @Builder.Default
+    private YnType necessaryAttackYn = YnType.Y;
 
     @Builder.Default
     @OneToMany(fetch = LAZY, mappedBy = "clanWarMember", cascade = CascadeType.ALL)
@@ -81,5 +91,9 @@ public class ClanWarMemberEntity implements Persistable<ClanWarMemberPKEntity> {
     public void addAttacks(ClanWarMemberAttackEntity clanWarMemberAttackEntity) {
         this.attacks.add(clanWarMemberAttackEntity);
         clanWarMemberAttackEntity.changeClanWarMember(this);
+    }
+
+    public void changeNecessaryAttack(YnType necessaryAttackYn) {
+        this.necessaryAttackYn = necessaryAttackYn;
     }
 }

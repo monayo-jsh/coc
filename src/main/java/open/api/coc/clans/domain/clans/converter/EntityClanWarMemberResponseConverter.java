@@ -25,6 +25,7 @@ public class EntityClanWarMemberResponseConverter implements Converter<ClanWarMe
                                     .mapPosition(source.getMapPosition())
                                     .tag(source.getId().getTag())
                                     .name(source.getName())
+                                    .necessaryAttackYn(source.getNecessaryAttackYn())
                                     .attacks(makeAttacks(source.getAttacks()))
                                     .build();
     }

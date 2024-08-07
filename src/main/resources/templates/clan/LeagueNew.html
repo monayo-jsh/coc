@@ -294,10 +294,11 @@
       cardContents.classList.remove('opacity-0');
     }
 
-    function initLeagueClan(leagueClanMap, warLeague, clans) {
+    function initLeagueClan(leagueClanMap, warLeague, clans, roundSize) {
       for(const clan of clans) {
         // 라운드 별 dataset
         clan.rounds = [];
+        clan.roundSize = roundSize;
         clan.leagueClanCount = clans.length;
         clan.warLeague = _.cloneDeep(warLeague);
         leagueClanMap.set(clan.tag, clan);
@@ -461,6 +462,8 @@
         value.rank = rank;
 
         convPromotedOrDemotedOrStay(row, warLeague, rank, leagueClanCount);
+
+        row.dataset.tag = tag;
 
         row.innerHTML = row.innerHTML
                            .replace(/{RANK}/, rank)
@@ -742,8 +745,9 @@
 
     const clanLeagueInfoMap = new Map();
 
+
+    const leagueClanMap = new Map();
     async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name, warLeague) {
-      const leagueClanMap = new Map();
       const clanWarLeague = await fetchClanWarLeague(tag);
       const { state, season, clans, rounds } = clanWarLeague;
       if (!state) {
@@ -758,7 +762,7 @@
         return;
       }
 
-      initLeagueClan(leagueClanMap, warLeague, clans);
+      initLeagueClan(leagueClanMap, warLeague, clans, rounds.length);
 
       //dataset
       clanLeagueInfoMap.set(tag, leagueClanMap.get(tag));
@@ -768,14 +772,15 @@
       leagueClanMap.forEach(calcLeagueWarResult)
 
       const clanWarLeagueInfo = leagueClanMap.get(tag);
-      clanWarLeagueInfo.roundSize = rounds.length;
 
       let drawRound = findDrawRound(clanWarLeagueInfo);
       drawLeagueWarRound(leagueWarClanContents, drawRound);
 
-      drawLeagueDashboard(leagueWarClanContents, season, leagueClanMap, tag);
+      const drawClansMap = clans.reduce((map, row) => map.set(row.tag, leagueClanMap.get(row.tag)), new Map());
+
+      drawLeagueDashboard(leagueWarClanContents, season, drawClansMap, tag);
       drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo);
-      drawLeagueMemberRecord(leagueWarClanContents, leagueClanMap, tag);
+      drawLeagueMemberRecord(leagueWarClanContents, drawClansMap, tag);
     }
 
     function showElement(element) {
@@ -1174,6 +1179,39 @@
       return clan;
     }
 
+    function showClanRoundRecord(buttonElement) {
+      const clanRow = buttonElement.closest('.row');
+      const { tag } = clanRow.dataset;
+      const drawLeagueClanMap = leagueClanMap.get(tag);
+
+      const leagueDashboard = clanRow.closest('.league-dashboard');
+      const className = `clan-${removeHashTag(tag)}-round-record`;
+      let clanRoundRecordElement = leagueDashboard.querySelector(`.${className}`);
+      if (!clanRoundRecordElement) {
+        const templateLeagueClanRoundRecord = document.querySelector('#league-clan-round-record');
+        const leagueClanRoundRecord = document.importNode(templateLeagueClanRoundRecord.content, true);
+        const record = leagueClanRoundRecord.querySelector('.league-clan-round-record');
+        record.classList.add(className);
+
+        clanRoundRecordElement = record;
+
+        leagueDashboard.insertBefore(clanRoundRecordElement, clanRow.nextSibling);
+        drawLeagueClanRecord(clanRoundRecordElement, drawLeagueClanMap);
+
+        const leagueClanRecord = clanRoundRecordElement.querySelector('.league-clan-record');
+        leagueClanRecord.classList.add('expand');
+        return;
+      }
+
+      const leagueClanRecord = clanRoundRecordElement.querySelector('.league-clan-record');
+      const { classList } = leagueClanRecord;
+      if (classList.contains('expand')) {
+        classList.remove('expand');
+      } else {
+        classList.add('expand');
+      }
+    }
+
     const isLoadedMap = new Map();
     function initLeagueMemberRank(leagueClans) {
       for(const clan of leagueClans) {
@@ -1443,10 +1481,10 @@
               <span class="name">조 순위</span>
             </label>
 
-            <label class="radio">
-              <input type="radio" name="radio-{CLAN_TAG}" onchange="showClanRecord(this); return false;">
-              <span class="name">라운드 기록</span>
-            </label>
+<!--            <label class="radio">-->
+<!--              <input type="radio" name="radio-{CLAN_TAG}" onchange="showClanRecord(this); return false;">-->
+<!--              <span class="name">라운드 기록</span>-->
+<!--            </label>-->
 
             <label class="radio">
               <input type="radio" name="radio-{CLAN_TAG}" onchange="showMemberRecord(this); return false;">
@@ -1548,6 +1586,9 @@
       <img>
     </div>
     <div class="destruction-percentage">{DESTRUCTION_PERCENTAGE}</div>
+    <div class="buttons cursor-pointer" onclick="showClanRoundRecord(this)">
+      <i class="fa-solid fa-ellipsis"></i>
+    </div>
   </div>
 </template>
 
@@ -1656,6 +1697,13 @@
   </div>
 </template>
 
+<template id="league-clan-round-record">
+  <div class="league-clan-round-record">
+    <div class="league-clan-record">
+      <div class="round-result"></div>
+    </div>
+  </div>
+</template>
 <template id="wl-icon-promoted">
   <div class="icon promoted"></div>
 </template>

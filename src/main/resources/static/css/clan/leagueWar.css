@@ -149,6 +149,13 @@
       background-color: black;
     }
 
+    .buttons {
+      padding: 4px 8px;
+      margin-left: 5px;
+      border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
     @media (max-width: 620px) {
       .stars {
         width: 120px;
@@ -254,6 +261,7 @@
           }
           .count {
             margin-top: 2px;
+            white-space: nowrap;
           }
         }
 

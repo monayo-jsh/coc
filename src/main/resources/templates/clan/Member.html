@@ -290,6 +290,8 @@
       const icons = document.importNode(iconsTemplate.content, true);
       const imgIconElement = icons.querySelector('.img-icon');
 
+      imgIconElement.dataset.name = 'coming soon';
+
       let equipmentIconClassName = name.toLowerCase()
                                        .replace(/\s/g, "_")
                                        .replace(/\./g, "");
@@ -305,6 +307,7 @@
 
       if (koreanName) {
         settingTooltip(imgIconElement, koreanName);
+        imgIconElement.dataset.name = koreanName;
       }
 
       contentsElement.appendChild(imgIconElement);

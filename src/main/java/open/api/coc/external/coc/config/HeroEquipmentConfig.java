@@ -28,6 +28,7 @@ public enum HeroEquipmentConfig {
     HEALER_PUPPET(ARCHER_QUEEN, 203, "normal", "Healer Puppet", "치유사 인형"),
 
     FROZEN_ARROW(ARCHER_QUEEN, 220, "epic", "Frozen Arrow", "얼음 화살"),
+    MAGIC_MIRROR(ARCHER_QUEEN, 221, "epic", "Magic Mirror", "마법 반사경"),
 
     // 그랜드 워든
     LIFE_GEM(GRAND_WARDEN, 300, "normal", "Life Gem", "생명의 보석"),

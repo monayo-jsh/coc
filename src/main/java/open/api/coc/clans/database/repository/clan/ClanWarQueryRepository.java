@@ -156,7 +156,7 @@ public class ClanWarQueryRepository {
             ClanWarRecordDTO.class,
             clanEntity.tag.max().as("clanTag"),
             clanEntity.name.max().as("clanName"),
-            clanEntity.order.min().as("clanOrder"),
+            clanEntity.order.max().as("clanOrder"),
             playerEntity.playerTag.max().as("tag"),
             playerEntity.name.max().as("name"),
             clanWarMemberAttackEntity.id.tag.count().as("attackCount"),

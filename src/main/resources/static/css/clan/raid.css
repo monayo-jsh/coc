@@ -230,3 +230,15 @@ i {
   transition: 0.3s;
   transform: rotate(180deg);
 }
+
+.radio-inputs {
+
+  .radio {
+
+    .name {
+      color: white;
+    }
+
+  }
+
+}

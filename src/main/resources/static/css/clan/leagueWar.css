@@ -70,6 +70,11 @@
   margin-top: 5px;
 
   .radio-inputs {
+
+    .name {
+      color: white;
+    }
+
     input:checked + .name {
       color: white;
       background-color: #6a0000;

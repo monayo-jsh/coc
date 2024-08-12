@@ -549,7 +549,7 @@ public class ClanWarService {
         return entityClanWarResponseConverter.convertWithMember(clanWarEntity);
     }
 
-    public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag) {
+    public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
         LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
         LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
 
@@ -561,6 +561,10 @@ public class ClanWarService {
         }
 
         Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
+
+        if ("ALL".equalsIgnoreCase(searchType)) {
+            return rankingHallOfFames;
+        }
 
         // 완파한 클랜원만 제공
         return rankingHallOfFames.stream()

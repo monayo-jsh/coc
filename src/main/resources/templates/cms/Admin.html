@@ -98,15 +98,11 @@
         <div class="title">컨텐츠 관리</div>
 
         <div class="card-inner-group">
-          <div class="title">클랜전</div>
+          <div class="title">클랜전/리그전</div>
           <div class="cards">
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/calendar'); return false;">
               <p class="tip">월 캘린더</p>
               <p class="second-text">(기록)</p>
-            </div>
-            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/statistics/player'); return false;">
-              <p class="tip">월 완파 통계</p>
-              <p class="second-text">(클랜원)</p>
             </div>
           </div>
           <div class="cards">
@@ -117,6 +113,16 @@
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/member/missing'); return false;">
               <p class="tip">미공 조회</p>
               <p class="second-text">(클랜원)</p>
+            </div>
+          </div>
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/statistics/player?type=clan-war'); return false;">
+              <p class="tip">클랜전 통계</p>
+              <p class="second-text">(월 완파)</p>
+            </div>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/war/statistics/player?type=league-war'); return false;">
+              <p class="tip">리그전 통계</p>
+              <p class="second-text">(월 완파)</p>
             </div>
           </div>
         <div>

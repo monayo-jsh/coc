@@ -70,9 +70,10 @@ public class ClanWarController {
 
     @GetMapping("/league/ranking/stars")
     public ResponseEntity<List<ClanWarRecordDTO>> getRankingLeagueClanWarStars(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate searchMonth,
-                                                                                          @RequestParam String clanTag) {
+                                                                               @RequestParam String clanTag,
+                                                                               @RequestParam(defaultValue = "") String searchType) {
         return ResponseEntity.ok()
-                             .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag));
+                             .body(clanWarService.getRankingLeagueClanWarStars(searchMonth, clanTag, searchType));
     }
 
     @PutMapping("/{warId}/{playerTag}/necessary")

@@ -482,10 +482,10 @@ public class ClanWarService {
         Pageable pageable = makePageable(searchType);
 
         if (StringUtils.isEmpty(clanTag)) {
-            return clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndStartTimePeriod(ClanWarType.NONE, fromStartTime, toStartTime, pageable);
+            return clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.NONE, fromStartTime, toStartTime, pageable);
         }
 
-        return clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndStartTimePeriod(clanTag, ClanWarType.NONE, fromStartTime, toStartTime, pageable);
+        return clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(clanTag, ClanWarType.NONE, fromStartTime, toStartTime, pageable);
     }
 
     private Pageable makePageable(String searchType) {
@@ -555,12 +555,12 @@ public class ClanWarService {
 
         List<ClanWarRecordDTO> rankingHallOfFames;
         if (StringUtils.isEmpty(clanTag)) {
-            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
+            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
         } else {
-            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndStartTimePeriod(clanTag, ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
+            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(clanTag, ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
         }
 
-        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
+        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
 
         if ("ALL".equalsIgnoreCase(searchType)) {
             return rankingHallOfFames;

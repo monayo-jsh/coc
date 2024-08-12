@@ -540,7 +540,31 @@
       return cell;
     }
 
-    function drawLeagueRoundRow(element) {
+    function showRoundDetail(roundResultElement, row, roundNo) {
+      // 라운드 표기 선택 해제
+      const roundResultRounds = roundResultElement.querySelectorAll('.round-result .round');
+      roundResultRounds.forEach(row => row.classList.remove('selected'));
+
+      // 선택된 라운드 선택 표기
+      row.classList.add('selected');
+
+      // 라운드 상세 정보 숨김
+      const roundRows = roundResultElement.querySelectorAll('.row');
+
+      // 선택된 라운드 상세 정보 노출
+      if (roundNo === 'all') {
+        // 전체 표기
+        roundRows.forEach(row => row.classList.remove('display-none'));
+      } else {
+        // 선택된 라운드 표기
+        roundRows.forEach(row => row.classList.add('display-none'));
+
+        const roundRow = roundResultElement.querySelector(`.row.round-${roundNo}`);
+        roundRow.classList.remove('display-none');
+      }
+    }
+
+    function drawLeagueRoundRow(element, isToggle = false) {
       const leagueRoundRow = document.querySelector('#league-round-row');
       const roundRow = document.importNode(leagueRoundRow.content, true);
       const row = roundRow.querySelector('.round');
@@ -552,8 +576,15 @@
         roundResult.innerHTML = "";
       }
 
+      // 진행 라운드 표기시 상세 정보 기능 제공 시 커서 표기
+      if (isToggle) {
+        row.classList.add("cursor-pointer");
+        row.onclick = () => showRoundDetail(element, row, round-1);
+      }
+
       row.innerHTML = row.innerHTML
                          .replace(/{ROUND}/, round);
+
       roundResult.appendChild(row);
       return row;
     }
@@ -586,17 +617,21 @@
 
       const leagueRoundRows = [];
       for (let i=0; i<roundSize; i++) {
-        leagueRoundRows.push(drawLeagueRoundRow(leagueClanRecord));
+        leagueRoundRows.push(drawLeagueRoundRow(leagueClanRecord, true));
       }
 
       let roundIndex = -1;
       for(const round of rounds) {
+        let isInWarRoundOrLastRound = false; //전쟁중인 라운드 또는 마지막 라운드 여부
+
         roundIndex++;
 
         const { state, clan, opponent } = round;
 
         //준비중인 라운드는 제외
         if (state === 'preparation') continue;
+
+        const leagueRoundRow = leagueRoundRows[roundIndex];
 
         const isResult = isClanWarResult(clan, opponent);
 
@@ -606,20 +641,47 @@
         let stateName = convWarResultName(isResult);
         if (state === 'inWar') {
           stateName = '진행중';
+          isInWarRoundOrLastRound = true;
+        } else {
+
+          // 마지막 라운드
+          if ((rounds.length-1) === roundIndex) {
+            isInWarRoundOrLastRound = true;
+          }
+
         }
-        convertStateAndDisplay(leagueRoundRows[roundIndex], isResult, stateName);
+
+        if (isInWarRoundOrLastRound) {
+          leagueRoundRow.classList.add('selected');
+        }
+
+        convertStateAndDisplay(leagueRoundRow, isResult, stateName);
 
         const clanCell = makeClanRecordCell(clan);
         const opponentCell = makeClanRecordCell(opponent);
         opponentCell.classList.add('opponent');
 
         const row = document.createElement('div');
-        row.classList.add('row', isResult);
+        row.classList.add('row', isResult, `round-${roundIndex}`);
+        if (!isInWarRoundOrLastRound) {
+          // 진행중인 라운드 또는 마지막 라운드가 아니면 숨김
+          row.classList.add('display-none');
+        }
+
         row.appendChild(clanCell);
         row.appendChild(opponentCell)
 
         leagueClanRecord.appendChild(row);
       }
+
+
+      // 전체 라운드 표기용 버튼 추가
+      const roundResultElement = leagueWarClanContents.querySelector('.round-result');
+      const leagueRoundRowTotal = document.querySelector('#league-round-row-total');
+      const roundRowTotal = document.importNode(leagueRoundRowTotal.content, true);
+      const row = roundRowTotal.querySelector('.round.total');
+      row.onclick = () => showRoundDetail(leagueClanRecord, row, 'all');
+      roundResultElement.prepend(roundRowTotal);
     }
 
     function initRecord(leagueMemberMap) {
@@ -1592,6 +1654,12 @@
   </div>
 </template>
 
+<template id="league-round-row-total">
+  <div class="round cursor-pointer total">
+    <span class="label">전체</span>
+    <span class="label">라운드</span>
+  </div>
+</template>
 <template id="league-round-row">
   <div class="round">
     <span class="label">{ROUND}</span>

@@ -433,6 +433,16 @@
   font-size: 12px;
   font-weight: bold;
 
+  .round.selected {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  .round.total {
+    justify-content: center;
+  }
+
   .round {
     display: flex;
     flex-direction: column;

@@ -237,6 +237,8 @@
 
     function fetchFailed(clanWarContentsElement) {
       clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                               .replace(/{BATTLE_TYPE_COLOR}/g, "")
+                                                               .replace(/{BATTLE_TYPE}/g, "")
                                                                .replace(/{TEAM_SIZE}/g, 0)
                                                                .replace(/{TOTAL_STAR_COUNT}/g, 0)
                                                                .replace(/{CLAN_STAR_COUNT}/, 0)
@@ -312,12 +314,14 @@
       await axios.get(uri)
                  .then((response) => {
                    const { data } = response;
-                   const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+                   const { clan, opponent, startTime, endTime, state, battleModifier, teamSize, attacksPerMember } = data
 
                    const totalTownhallCount = teamSize * 1;
                    const totalStarCount = teamSize * 3;
 
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                                            .replace(/{BATTLE_TYPE_COLOR}/g, getBgColorByBattleType(battleModifier))
+                                                                            .replace(/{BATTLE_TYPE}/g, convBattleTypeName(battleModifier))
                                                                             .replace(/{TEAM_SIZE}/g, teamSize)
                                                                             .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
                                                                             .replace(/{CLAN_STAR_COUNT}/, clan.stars)
@@ -612,6 +616,9 @@
           </div>
 
           <div class="war-info">
+            <div class="battle-type {BATTLE_TYPE_COLOR}">
+              {BATTLE_TYPE}
+            </div>
             <div class="clan-icon">
               <img class="clan" alt="" />
               <img class="opponent" alt="" />

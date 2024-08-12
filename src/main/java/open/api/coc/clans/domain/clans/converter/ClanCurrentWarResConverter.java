@@ -17,6 +17,7 @@ public class ClanCurrentWarResConverter implements Converter<ClanWar, ClanCurren
     public ClanCurrentWarResponse convert(ClanWar source) {
         return ClanCurrentWarResponse.builder()
                                      .state(source.getState())
+                                     .battleModifier(source.getBattleModifier())
                                      .teamSize(source.getTeamSize())
                                      .attacksPerMember(source.getAttacksPerMember())
                                      .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))

@@ -102,6 +102,7 @@
 
 .clan-war-detail-wrap {
   width: 100%;
+  max-width: 530px;
 }
 
 .icon-damage {
@@ -123,6 +124,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  white-space: nowrap;
 }
 
 .header {
@@ -191,7 +193,7 @@
   }
 
   .necessary-attack-N {
-    background-color: crimson;
+    background-color: #ff9700;
     color: white;
   }
 

@@ -139,7 +139,16 @@ body {
   flex-direction: column;
   align-items: center;
   font-weight: bolder;
+  gap: 1px;
   color: #fefe46;
+
+  .battle-type {
+    font-size: 13px;
+  }
+  .battle-type.bg-orange {
+    background-color: unset;
+    color: orange;
+  }
 
   .team-size {
     color: #fff;
@@ -153,7 +162,7 @@ body {
     align-items: center;
 
     img {
-      min-width: 35px;
+      width: 35px;
     }
   }
 

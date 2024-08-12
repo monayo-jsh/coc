@@ -111,7 +111,7 @@
         const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
         const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
         attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                .replace(/{ATTACK_NO}/, `공격${no++}`);
+                                                       .replace(/{ATTACK_NO}/, `공격${no++}`);
 
         attackListElement.appendChild(attackInfoElement);
       }
@@ -258,6 +258,54 @@
                                                                .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
     }
 
+    function drawReportClanWarMissingAttack(clanWar) {
+
+      const drawState = new Set(Array.from(['inWar', 'warEnded']));
+
+      const { clan, endTime, state, attacksPerMember } = clanWar;
+
+      // 전쟁중 또는 전쟁 종료 시에만 미공 목록 표기
+      if (!drawState.has(state)) return;
+
+      const targetTableTbody = document.querySelector('.section.missing-attack .table .table-tbody');
+
+      let formattedRemainTime = getLeftUntilByTime(endTime);
+      if (!formattedRemainTime) formattedRemainTime = '전쟁 종료';
+
+      for (const member of clan.members) {
+        const { tag, name, attacks } = member;
+
+        if (attacks.length < attacksPerMember) {
+          const row = appendMissingAttack({
+            clan_name: clan.name,
+            player_tag: tag,
+            player_name: name,
+            remain_time: formattedRemainTime
+          });
+
+          targetTableTbody.appendChild(row);
+
+          const emptyRow = targetTableTbody.querySelector('.table-tr.empty');
+          if (emptyRow) emptyRow.remove();
+        }
+      }
+    }
+
+    function appendMissingAttack(row) {
+      const memberNotAttackRowTemplate = copyTemplateById('member-not-attack-row-template');
+      const memberNotAttackRow = memberNotAttackRowTemplate.querySelector('.row');
+
+      const { clan_name, player_tag, player_name, remain_time } = row;
+
+      memberNotAttackRow.innerHTML = memberNotAttackRow.innerHTML
+                                                       .replace(/{NAME}/, player_name)
+                                                       .replace(/{TAG}/, player_tag)
+                                                       .replace(/{CLAN_NAME}/, clan_name)
+                                                       .replace(/{REMAIN_TIME}/, remain_time);
+
+      return memberNotAttackRow;
+    }
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
@@ -305,8 +353,9 @@
                    memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
 
-
                    settingTooltips(clanWarContentsElement);
+
+                   drawReportClanWarMissingAttack(data);
                  })
                  .catch((error) => {
                    console.error(error);
@@ -412,6 +461,16 @@
         }
     }
 
+    function displayView(type) {
+      const sectionWrapper = document.querySelector('.section-wrapper');
+      const sections = sectionWrapper.querySelectorAll('.section');
+      sections.forEach(ele => ele.classList.add('display-none'));
+
+      const displayElement = sectionWrapper.querySelector(`.section.${type}`);
+      if (displayElement)
+        displayElement.classList.remove('display-none');
+    }
+
     window.onload = async () => {
       await getClans();
     }
@@ -442,7 +501,38 @@
 
   <div class="card-container">
     <div class="card-title">클랜전 현황</div>
-    <div class="carousel"></div>
+    <div class="support-area">
+      <div class="radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('progress-status'); return false;" checked>
+          <span class="name">진행 현황</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('missing-attack'); return false;">
+          <span class="name">미공 현황</span>
+        </label>
+      </div>
+    </div>
+    <div class="section-wrapper">
+      <div class="section carousel progress-status"></div>
+      <div class="section missing-attack display-none">
+        <table class="table">
+          <caption class="table-caption">미공 목록</caption>
+          <thead class="table-thead">
+          <tr class="table-tr">
+            <th class="table-th">닉네임</th>
+            <th class="table-th">참여 클랜</th>
+            <th class="table-th">남은 시간</th>
+          </tr>
+          </thead>
+          <tbody class="table-tbody">
+          <tr class="table-tr empty">
+            <td class="table-td" colspan="3">미공 없음</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </section>
 </body>
@@ -638,5 +728,13 @@
     <div class="name">{ATTACK_NO}</div>
     <div class="message">사용 안함</div>
   </div>
+</template>
+
+<template id="member-not-attack-row-template">
+  <tr class="table-tr row">
+    <td class="table-td name" rowspan=1>{NAME}<br/><span class="chip border-none">{TAG}</span></td>
+    <td class="table-td"><span class="chip bg-green">{CLAN_NAME}</span></td>
+    <td class="table-td">{REMAIN_TIME}</td>
+  </tr>
 </template>
 </html>

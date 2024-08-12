@@ -406,3 +406,8 @@ function isDemotedAttack(value) {
   const DEMOTED_ATTACK_VALUE = 20000;
   return value < DEMOTED_ATTACK_VALUE;
 }
+
+function copyTemplateById(templateId) {
+  const template = document.querySelector(`#${templateId}`);
+  return document.importNode(template.content, true);
+}

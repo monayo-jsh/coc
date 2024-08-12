@@ -442,3 +442,30 @@ body {
 
   }
 }
+
+.support-area {
+  margin-top: 5px;
+}
+
+.missing-attack {
+
+  table {
+    margin-top: 5px;
+    border-color: crimson;
+
+    .table-caption {
+      border: 1px solid crimson;
+      border-left: 3px solid crimson;
+      background-color: crimson;
+    }
+
+    .table-tbody {
+      border-top: 1px crimson solid;
+
+      .chip {
+        font-size: 0.9em;
+      }
+    }
+  }
+
+}

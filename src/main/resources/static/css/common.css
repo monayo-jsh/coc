@@ -669,3 +669,7 @@ body::before {
   font-size: 14px;
   background-position: top 45% right 5px;
 }
+
+.border-none {
+  border: none;
+}

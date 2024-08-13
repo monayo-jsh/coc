@@ -286,6 +286,11 @@ body::before {
   padding: 0 2px;
 }
 
+.bg-gray {
+  background-color: gray;
+  color: white;
+}
+
 .bg-lightgray {
   background-color: lightgray;
   color: white;

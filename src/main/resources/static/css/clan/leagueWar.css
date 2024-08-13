@@ -45,6 +45,9 @@
 
 .clan-war.expand {
 
+  .additional-info {
+    display: flex;
+  }
   .detail-filter-wrapper {
     display: block;
   }
@@ -61,6 +64,34 @@
     display: block;
   }
 
+}
+
+.round-record-summary {
+  margin-left: 5px;
+
+  .chip {
+    border: none;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+}
+
+.additional-info {
+  display: none;
+  justify-content: center;
+  margin-top: 5px;
+  width: 100%;
+  font-size: 13px;
+
+  .bonus-medal {
+    border-radius: 5px;
+    background-color: black;
+    font-weight: bold;
+    color: gold;
+    padding: 5px 10px;
+  }
 }
 
 .detail-filter-wrapper {

@@ -294,6 +294,45 @@
       cardContents.classList.remove('opacity-0');
     }
 
+    function getDefaultMedalBonusQuantity(warLeagueName) {
+        const convWarLeagueName = warLeagueName.replace(/\s/g, "");
+        switch (convWarLeagueName) {
+
+          case 'BronzeLeagueIII':
+          case 'BronzeLeagueII':
+          case 'BronzeLeagueI':
+          case 'SilverLeagueIII':
+          case 'SilverLeagueII':
+          case 'SilverLeagueI': {
+            return 1;
+          }
+
+          case 'GoldLeagueIII':
+          case 'GoldLeagueII':
+          case 'GoldLeagueI':
+          case 'CrystalLeagueIII':
+          case 'CrystalLeagueII':
+          case 'CrystalLeagueI': {
+            return 2;
+          }
+
+          case 'MasterLeagueIII':
+          case 'MasterLeagueII':
+          case 'MasterLeagueI': {
+            return 3;
+          }
+
+          case 'ChampionLeagueIII':
+          case 'ChampionLeagueII':
+          case 'ChampionLeagueI': {
+            return 4;
+          }
+
+        }
+
+        return 0;
+    }
+
     function initLeagueClan(leagueClanMap, warLeague, clans, roundSize) {
       for(const clan of clans) {
         // 라운드 별 dataset
@@ -412,6 +451,12 @@
     function calcLeagueWarResult(leagueClan) {
       const { rounds } = leagueClan;
 
+      leagueClan.medalBonusQuantity = getDefaultMedalBonusQuantity(leagueClan.warLeague.name);
+      leagueClan.count = {
+        win: 0,
+        lose: 0,
+        tie: 0
+      }
       leagueClan.totalStars = 0;
       leagueClan.totalDestructionPercentage = 0;
 
@@ -427,7 +472,12 @@
           if (isWarResult === 'win') {
             //승리했다면 10개 보너스
             leagueClan.totalStars += 10;
+
+            //승리했다면 메달 보상 인원 +1
+            leagueClan.medalBonusQuantity += 1;
           }
+
+          leagueClan.count[isWarResult] += 1;
         }
 
         for (const member of members) {
@@ -809,6 +859,7 @@
 
 
     const leagueClanMap = new Map();
+
     async function renderingLeagueWarClanDetail(leagueWarClanContents, tag, name, warLeague) {
       const clanWarLeague = await fetchClanWarLeague(tag);
       const { state, season, clans, rounds } = clanWarLeague;
@@ -843,6 +894,14 @@
       drawLeagueDashboard(leagueWarClanContents, season, drawClansMap, tag);
       drawLeagueClanRecord(leagueWarClanContents, clanWarLeagueInfo);
       drawLeagueMemberRecord(leagueWarClanContents, drawClansMap, tag);
+
+      drawMedalBonusQuantity(leagueWarClanContents, clanWarLeagueInfo);
+    }
+
+    function drawMedalBonusQuantity(leagueWarClanContents, clanWarLeagueInfo) {
+      console.log(clanWarLeagueInfo);
+      const medalBonusQuantity = leagueWarClanContents.querySelector('.additional-info .bonus-medal .count');
+      medalBonusQuantity.innerHTML = clanWarLeagueInfo.medalBonusQuantity;
     }
 
     function showElement(element) {
@@ -1009,7 +1068,7 @@
     function drawClanRank(clanTag) {
       const clan = clanLeagueInfoMap.get(clanTag);
 
-      const { tag, badgeUrls, warLeague, rank, leagueClanCount, totalStars, totalDestructionPercentage } = clan;
+      const { tag, badgeUrls, warLeague, rank, leagueClanCount, totalStars, totalDestructionPercentage, count } = clan;
 
       const clanRankElement = document.querySelector(`.league-rank .tag-${removeHashTag(tag)}`);
 
@@ -1021,9 +1080,22 @@
       clanRankElement.innerHTML = clanRankElement.innerHTML
                                                  .replace(/{RANK}/, `${rank}위`)
                                                  .replace(/{TOTAL_STAR_COUNT}/, totalStars)
-                                                 .replace(/{DESTRUCTION_PERCENTAGE}/, Number(totalDestructionPercentage).toLocaleString());
+                                                 .replace(/{DESTRUCTION_PERCENTAGE}/, Number(totalDestructionPercentage).toLocaleString())
+                                                 .replace(/{WIN_COUNT}/, count.win)
+                                                 .replace(/{LOSE_COUNT}/, count.lose)
+                                                 .replace(/{TIE_COUNT}/, count.tie);
+
+      settingTooltip(clanRankElement.querySelector('.win-count'), '승');
+      settingTooltip(clanRankElement.querySelector('.lose-count'), '패');
+      settingTooltip(clanRankElement.querySelector('.tie-count'), '무');
+
+      if (!count.tie) {
+        //무승부 기록 없으면 제거
+        clanRankElement.querySelector('.tie-count').remove();
+      }
 
       clanRankElement.classList.remove('display-none');
+
     }
 
     function convNumberToString(summaryStar) {
@@ -1387,6 +1459,11 @@
       </div>
       <div class="name">{CLAN_NAME}</div>
     </div>
+    <div class="round-record-summary">
+      <span class="chip bg-green win-count">{WIN_COUNT}</span>
+      <span class="chip bg-crimson lose-count">{LOSE_COUNT}</span>
+      <span class="chip bg-gray tie-count">{TIE_COUNT}</span>
+    </div>
   </div>
 </template>
 
@@ -1536,6 +1613,9 @@
 
         </div>
 
+        <div class="additional-info">
+          <span class="bonus-medal">보너스메달: <span class="count">0</span> 명</span>
+        </div>
         <div class="detail-filter-wrapper">
           <div class="radio-inputs filter">
             <label class="radio">

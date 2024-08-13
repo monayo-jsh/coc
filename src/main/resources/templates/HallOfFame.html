@@ -335,6 +335,18 @@
       fetchLastMonthClanLeagueWar(clanTag);
     }
 
+    function swipeSection() {
+      const flipCards = document.querySelector('.flip-cards');
+      const swipeSection = document.querySelector('.section-wrapper.swipe:last-child');
+      flipCards.prepend(swipeSection);
+    }
+
+    function intervalSwipeSection() {
+      setInterval(() => {
+        swipeSection();
+      }, 5000)
+    }
+
     window.onload = async () => {
       //개인 기록 부문
       fetchCurrentTrophies();
@@ -351,6 +363,9 @@
       //습격전 부문
       fetchRaidCurrentSeason();
       fetchRaidAverageSeason();
+
+      // 각 부문 순서 변경
+      //intervalSwipeSection();
     }
   </script>
 
@@ -363,15 +378,279 @@
       <i class="fa-solid fa-medal"></i>
     </div>
 
-    <div class="section-wrapper">
+    <div class="flip-cards">
 
-      <div class="section-wrapper">
-        <div class="section-title">개인 기록 부문</div>
+      <div class="section-wrapper swipe">
+
+        <div class="section-wrapper">
+          <div class="section-title">개인 기록 부문</div>
+
+          <div class="section-contents">
+
+            <div class="section current-trophies">
+              <div class="sub-title">현재 트로피 순위</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">점수</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="3">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="section current-attack-wins">
+              <div class="sub-title">현재 공성 순위</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">점수</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="3">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-wrapper swipe">
+
+        <div class="section-wrapper">
+          <div class="section-title">클랜전 부문</div>
+          <div class="support-area">
+            <div class="radio-inputs">
+              <label class="radio item">
+                <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+                <span class="name">전체</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="section-contents">
+
+            <div class="section this-month-clan-war-stars">
+              <div class="sub-title">[<span class="season-date">이번달</span>] 완파 순위</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">총 획득별</th>
+                    <th class="table-th">총 파괴율<br/>평균 완파시간</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="4">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="section last-month-clan-war-stars">
+              <div class="sub-title">[<span class="season-date">지난달</span>] 완파 순위</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">총 획득별</th>
+                    <th class="table-th">총 파괴율<br/>평균 완파시간</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="4">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-wrapper swipe">
+
+        <div class="section-wrapper">
+          <div class="section-title">리그전 부문</div>
+
+          <div class="section-contents">
+
+            <div class="section this-month-league-war">
+              <div class="sub-title">[<span class="season-date">현재 시즌</span>] 완파 클랜원</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">No</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">클랜</th>
+                    <th class="table-th">평균 완파시간</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="4">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="section last-month-league-war">
+              <div class="sub-title">[<span class="season-date">지난 시즌</span>] 완파 클랜원</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">No</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">클랜</th>
+                    <th class="table-th">평균 완파시간</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="4">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <div class="section-wrapper swipe">
+        <div class="section-title">습격전 부문</div>
 
         <div class="section-contents">
 
-          <div class="section current-trophies">
-            <div class="sub-title">현재 트로피 순위</div>
+          <div class="section raid-current-season">
+            <div class="sub-title">현재 시즌 순위</div>
             <div class="rankings">
               <table class="table">
                 <caption>
@@ -406,8 +685,9 @@
             </div>
           </div>
 
-          <div class="section current-attack-wins">
-            <div class="sub-title">현재 공성 순위</div>
+
+          <div class="section raid-average-season">
+            <div class="sub-title">최근 3주 평균 순위</div>
             <div class="rankings">
               <table class="table">
                 <caption>
@@ -445,267 +725,6 @@
         </div>
       </div>
 
-    </div>
-
-    <div class="section-wrapper">
-
-      <div class="section-wrapper">
-        <div class="section-title">클랜전 부문</div>
-        <div class="support-area">
-          <div class="radio-inputs">
-            <label class="radio item">
-              <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
-              <span class="name">전체</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="section-contents">
-
-          <div class="section this-month-clan-war-stars">
-            <div class="sub-title">[<span class="season-date">이번달</span>] 완파 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">총 획득별</th>
-                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="4">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="section last-month-clan-war-stars">
-            <div class="sub-title">[<span class="season-date">지난달</span>] 완파 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">총 획득별</th>
-                  <th class="table-th">총 파괴율<br/>평균 완파시간</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="4">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <div class="section-wrapper">
-
-      <div class="section-wrapper">
-        <div class="section-title">리그전 부문</div>
-
-        <div class="section-contents">
-
-          <div class="section this-month-league-war">
-            <div class="sub-title">[<span class="season-date">현재 시즌</span>] 완파 클랜원</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">No</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">클랜</th>
-                  <th class="table-th">평균 완파시간</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="4">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div class="section last-month-league-war">
-            <div class="sub-title">[<span class="season-date">지난 시즌</span>] 완파 클랜원</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">No</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">클랜</th>
-                  <th class="table-th">평균 완파시간</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="4">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-    </div>
-
-    <div class="section-wrapper">
-      <div class="section-title">습격전 부문</div>
-
-      <div class="section-contents">
-
-        <div class="section raid-current-season">
-          <div class="sub-title">현재 시즌 순위</div>
-          <div class="rankings">
-            <table class="table">
-              <caption>
-                <div class="loader-circle display-none">
-                  <div class="bar1"></div>
-                  <div class="bar2"></div>
-                  <div class="bar3"></div>
-                  <div class="bar4"></div>
-                  <div class="bar5"></div>
-                  <div class="bar6"></div>
-                  <div class="bar7"></div>
-                  <div class="bar8"></div>
-                  <div class="bar9"></div>
-                  <div class="bar10"></div>
-                  <div class="bar11"></div>
-                  <div class="bar12"></div>
-                </div>
-              </caption>
-              <thead>
-              <tr class="table-tr">
-                <th class="table-th">순위</th>
-                <th class="table-th">이름</th>
-                <th class="table-th">점수</th>
-              </tr>
-              </thead>
-              <tbody class="table-tbody">
-              <tr class="table-tr">
-                <td class="table-td empty" colspan="3">데이터 수집중</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-
-        <div class="section raid-average-season">
-          <div class="sub-title">최근 3주 평균 순위</div>
-          <div class="rankings">
-            <table class="table">
-              <caption>
-                <div class="loader-circle display-none">
-                  <div class="bar1"></div>
-                  <div class="bar2"></div>
-                  <div class="bar3"></div>
-                  <div class="bar4"></div>
-                  <div class="bar5"></div>
-                  <div class="bar6"></div>
-                  <div class="bar7"></div>
-                  <div class="bar8"></div>
-                  <div class="bar9"></div>
-                  <div class="bar10"></div>
-                  <div class="bar11"></div>
-                  <div class="bar12"></div>
-                </div>
-              </caption>
-              <thead>
-              <tr class="table-tr">
-                <th class="table-th">순위</th>
-                <th class="table-th">이름</th>
-                <th class="table-th">점수</th>
-              </tr>
-              </thead>
-              <tbody class="table-tbody">
-              <tr class="table-tr">
-                <td class="table-td empty" colspan="3">데이터 수집중</td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </div>
     </div>
 
 </body>

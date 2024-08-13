@@ -37,6 +37,7 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
+import open.api.coc.clans.database.repository.clan.ClanQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
@@ -76,6 +77,7 @@ public class ClansService {
     private final ClanWarService clanWarService;
 
     private final ClanRepository clanRepository;
+    private final ClanQueryRepository clanQueryRepository;
     private final ClanContentRepository clanContentRepository;
 
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
@@ -170,7 +172,7 @@ public class ClansService {
     }
 
     public List<ClanResponse> getClanCaptialList() {
-        List<ClanEntity> clanCapitalList = clanRepository.findCapitalClanList();
+        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllCapitalClan();
 
         return clanCapitalList.stream()
                               .map(clanResponseConverter::convert)

@@ -32,7 +32,7 @@ public class ClanQueryRepository {
 
     private BooleanBuilder createSelectClanBaseConditionBuilder() {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(clanEntity.visibleYn.eq(YnType.Y))
+        builder.and(clanEntity.visibleYn.stringValue().eq(YnType.Y.name()))
                .and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));
 
         return builder;

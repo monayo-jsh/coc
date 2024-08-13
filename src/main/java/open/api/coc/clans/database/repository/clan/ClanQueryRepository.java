@@ -5,6 +5,7 @@ import static open.api.coc.clans.database.entity.clan.QClanContentEntity.clanCon
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +19,33 @@ public class ClanQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanEntity> findAllCapitalClan() {
-        BooleanBuilder builder = createSelectClanBaseConditionBuilder();
+    public List<ClanEntity> findAllActiveClans() {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
 
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
+
+    public List<ClanEntity> findAllActiveCapitalClans() {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        condition.and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
+
+    private JPAQuery<ClanEntity> createSelectClanBaseQuery() {
         return queryFactory.select(clanEntity)
                            .from(clanEntity)
                            .join(clanEntity.clanContent, clanContentEntity).fetchJoin()
-                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin()
-                           .where(builder)
-                           .orderBy(clanEntity.order.asc())
-                           .fetch();
+                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();
     }
 
     private BooleanBuilder createSelectClanBaseConditionBuilder() {
         BooleanBuilder builder = new BooleanBuilder();
-        builder.and(clanEntity.visibleYn.eq(YnType.Y))
-               .and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));
-
+        builder.and(clanEntity.visibleYn.eq(YnType.Y));
         return builder;
     }
 

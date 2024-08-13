@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -146,12 +145,11 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(leagueWar);
     }
 
-    public List<ClanResponse> getClanList() {
-        List<ClanEntity> clans = clanRepository.findAll();
+    public List<ClanResponse> getActiveClans() {
+        List<ClanEntity> clans = clanQueryRepository.findAllActiveClans();
 
         return clans.stream()
                     .map(clanResponseConverter::convert)
-                    .sorted(Comparator.comparing(ClanResponse::getOrder))
                     .collect(Collectors.toList());
     }
 
@@ -171,8 +169,8 @@ public class ClansService {
                                   .collect(Collectors.toList());
     }
 
-    public List<ClanResponse> getClanCaptialList() {
-        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllCapitalClan();
+    public List<ClanResponse> getActiveCapitalClans() {
+        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllActiveCapitalClans();
 
         return clanCapitalList.stream()
                               .map(clanResponseConverter::convert)

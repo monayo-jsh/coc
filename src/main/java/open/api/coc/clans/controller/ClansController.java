@@ -39,7 +39,7 @@ public class ClansController {
     @GetMapping("")
     public ResponseEntity<List<ClanResponse>> getClans() {
         return ResponseEntity.ok()
-                             .body(clansService.getClanList());
+                             .body(clansService.getActiveClans());
     }
 
     @PostMapping("{clanTag}")
@@ -93,7 +93,7 @@ public class ClansController {
     @GetMapping("/capital")
     public ResponseEntity<List<ClanResponse>> getClansCapital() {
         return ResponseEntity.ok()
-                             .body(clansService.getClanCaptialList());
+                             .body(clansService.getActiveCapitalClans());
     }
 
     @GetMapping("/detail")

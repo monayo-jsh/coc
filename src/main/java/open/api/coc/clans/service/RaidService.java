@@ -62,7 +62,7 @@ public class RaidService {
 
     @Transactional
     public void collectClanCapitalRaidSeason() {
-        List<ClanResponse> clanList = clansService.getClanCaptialList();
+        List<ClanResponse> clanList = clansService.getActiveCapitalClans();
         for (ClanResponse clan : clanList) {
             ClanCapitalRaidSeasonResponse clanCapitalRaidAttacker = findClanCapitalRaidSeason(clan.getTag());
             mergeRaidResult(clan.getTag(), clanCapitalRaidAttacker);

@@ -43,10 +43,10 @@ import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanCreateCommand;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
@@ -259,32 +259,35 @@ public class ClansService {
     }
 
     @Transactional
-    public ClanResponse registerClan(ClanRequest clanRequest) {
-        clanRequest.validate();
+    public ClanResponse registerClan(ClanCreateCommand command) {
 
-        Clan clan = clanApiService.findClanByClanTag(clanRequest.getTag())
-                                  .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanRequest.getTag())));
+        Clan clanResponse = clanApiService.findClanByClanTag(command.getTag())
+                                          .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(command.getTag())));
 
-        Optional<ClanEntity> clanEntity = clanRepository.findById(clanRequest.getTag());
-        if (clanEntity.isPresent()) {
-            ClanEntity updateClanEntity = clanEntity.get();
-            updateClanEntity.setWarLeague(clan.getWarLeagueName());
-            updateClanEntity.setVisibleYn(YnType.Y);
-            ClanEntity resultClan = clanRepository.save(updateClanEntity);
-            return clanResponseConverter.convert(resultClan);
-        }
+        return clanQueryRepository.findById(command.getTag())
+                                  .map(clan -> updateExistingClan(clan, clanResponse))
+                                  .orElseGet(() -> createClan(command, clanResponse));
+    }
 
-        Integer clanMaxOrders = clanRepository.selectMaxOrders();
-        if (Objects.isNull(clanMaxOrders)) {
-            clanMaxOrders = 0;
-        }
+    private ClanResponse updateExistingClan(ClanEntity clan, Clan clanResponse) {
+        clan.setWarLeague(clanResponse.getWarLeagueName());
+        clan.setVisibleYn(YnType.Y);
 
-        ClanEntity createClan = createClanEntity(clan, clanMaxOrders);
-        createClan.changeClanContent(ClanContentEntity.empty(clanRequest.getTag()));
+        clanRepository.save(clan);
+
+        return clanResponseConverter.convert(clan);
+    }
+
+    private ClanResponse createClan(ClanCreateCommand command, Clan clanResponse) {
+        Integer clanMaxOrders = Optional.ofNullable(clanRepository.selectMaxOrders()).orElse(0);
+
+        ClanEntity createClan = createClanEntity(clanResponse, clanMaxOrders);
+        createClan.changeClanContent(ClanContentEntity.empty(command.getTag()));
         createClan.changeBadgeUrl(ClanBadgeEntity.builder()
-                                                 .tag(clanRequest.getTag())
-                                                 .iconUrl(iconUrlEntityConverter.convert(clanRequest.getBadgeUrl()))
+                                                 .tag(command.getTag())
+                                                 .iconUrl(iconUrlEntityConverter.convert(command.getBadgeUrl()))
                                                  .build());
+
         clanRepository.save(createClan);
 
         return clanResponseConverter.convert(createClan);

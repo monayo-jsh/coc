@@ -1,6 +1,7 @@
 
 package open.api.coc.clans.controller;
 
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +10,11 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanContent;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
+import open.api.coc.clans.domain.clans.ClanCreateCommand;
+import open.api.coc.clans.domain.clans.ClanCreateRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
@@ -44,8 +46,11 @@ public class ClansController {
 
     @PostMapping("{clanTag}")
     public ResponseEntity<ClanResponse> registerClan(@PathVariable String clanTag,
-                                                     @RequestBody ClanRequest clanRequest) {
-        ClanResponse clan = clansService.registerClan(clanRequest);
+                                                     @Valid @RequestBody ClanCreateRequest request) {
+
+        ClanCreateCommand command = ClanCreateCommand.create(clanTag, request);
+        ClanResponse clan = clansService.registerClan(command);
+
         return ResponseEntity.ok()
                              .body(clan);
     }

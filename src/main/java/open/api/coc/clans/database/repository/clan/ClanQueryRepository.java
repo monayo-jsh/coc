@@ -8,6 +8,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.YnType;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class ClanQueryRepository {
 
+    private final ClanRepository clanRepository;
     private final JPAQueryFactory queryFactory;
 
     public List<ClanEntity> findAllActiveClans() {
@@ -49,4 +51,7 @@ public class ClanQueryRepository {
         return builder;
     }
 
+    public Optional<ClanEntity> findById(String clanTag) {
+        return clanRepository.findById(clanTag);
+    }
 }

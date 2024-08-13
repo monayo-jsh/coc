@@ -27,7 +27,7 @@ public class ClanCreateCommand {
         try {
             badgeUrl.validateNotEmptyFields();
         } catch (BadRequestException e) {
-            e.addExtraMessage("badge_url fields empty.");
+            e.addExtraMessage("badge_url fields can not be empty.");
             throw e;
         }
     }

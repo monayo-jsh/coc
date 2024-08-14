@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Tag(name= "리그", description = "리그 관련")
+@Tag(name= "리그", description = "리그 기능 관련")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/leagues")

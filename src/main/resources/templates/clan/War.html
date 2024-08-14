@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <script src="/static/js/api/clanWar.js"></script>
   <script src="/static/js/util.js"></script>
   <script type="text/javascript">
 
@@ -260,22 +261,35 @@
                                                                .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
     }
 
-    function drawReportClanWarMissingAttack(clanWar) {
+    async function drawReportClanWarMissingAttack(clanWar) {
 
       const drawState = new Set(Array.from(['inWar', 'warEnded']));
 
-      const { clan, endTime, state, attacksPerMember } = clanWar;
+      const { clan, startTime, endTime, state, attacksPerMember } = clanWar;
 
       // 전쟁중 또는 전쟁 종료 시에만 미공 목록 표기
       if (!drawState.has(state)) return;
 
-      const targetTableTbody = document.querySelector('.section.missing-attack .table .table-tbody');
-
       let formattedRemainTime = getLeftUntilByTime(endTime);
-      if (!formattedRemainTime) formattedRemainTime = '전쟁 종료';
+      if (!formattedRemainTime) {
+        formattedRemainTime = '전쟁 종료';
+      } else {
+        formattedRemainTime = formatTime(formattedRemainTime, "H시 mm분");
+      }
+
+      const clanData = ClanWarMap.get(clan.tag);
+      const forcedParticipatePlayers = await fetchClanWarMembers(clan.tag, startTime, 'N');
+      const forcedParticipatePlayersSet = new Set(forcedParticipatePlayers.map(player => player.tag))
+
+      const tableTbodyTemplate = copyTemplateById('table-tbody-template');
+      const tableTbody = tableTbodyTemplate.querySelector('.table-tbody');
+
+      tableTbody.dataset.name = clanData.name;
+      tableTbody.dataset.order = clanData.order;
 
       for (const member of clan.members) {
         const { tag, name, attacks } = member;
+        const isForcedParticipatePlayer = forcedParticipatePlayersSet.has(tag);
 
         if (attacks.length < attacksPerMember) {
           const row = appendMissingAttack({
@@ -285,12 +299,44 @@
             remain_time: formattedRemainTime
           });
 
-          targetTableTbody.appendChild(row);
-
-          const emptyRow = targetTableTbody.querySelector('.table-tr.empty');
-          if (emptyRow) emptyRow.remove();
+          if (!isForcedParticipatePlayer) {
+            row.querySelector('.chip.forced-participate').remove();
+          }
+          tableTbody.appendChild(row);
         }
       }
+
+      if (tableTbody.children.length) {
+        const targetTable = document.querySelector('.section.missing-attack .table');
+        targetTable.appendChild(tableTbody);
+
+        const tableTbodyEmpty = targetTable.querySelector('.table-tbody.empty');
+        tableTbodyEmpty.classList.add('display-none');
+      }
+
+    }
+
+    function sortedMissingAttackTableTbody() {
+      const table = document.querySelector('.section.missing-attack .table');
+      const tBodies = Array.from(table.tBodies);
+
+      tBodies.sort((a, b) => {
+        const aOrder = a.dataset.order;
+        const bOrder = b.dataset.order;
+
+        return aOrder - bOrder;
+      });
+
+      // 기존 구성 삭제
+      for (const tbody of table.tBodies) {
+        table.removeChild(tbody);
+      }
+
+      // 추가
+      for (let i=0; i<tBodies.length; i++) {
+        table.appendChild(tBodies[i]);
+      }
+
     }
 
     function appendMissingAttack(row) {
@@ -394,6 +440,11 @@
       return `/clans/war?view=${viewType}`;
     }
 
+    let clanWarSize = -1;
+    const complatedDrawClanWarSet = new Set(); // 그리기 완료된 클랜 전쟁 셋
+
+    const ClanWarMap = new Map();
+
     function getClans() {
       showWifiLoading('.card-container');
 
@@ -411,6 +462,10 @@
                return;
              }
 
+             clanWarSize = data.length;
+
+             data.forEach(clan => ClanWarMap.set(clan.tag, clan));
+
              const carousel = document.querySelector(".carousel");
              for (let index = 0; index<data.length; index++) {
                const { tag, name } = data[index];
@@ -424,7 +479,10 @@
                                                           .replace(/{CLAN_NAME}/g, name);
 
                settingClanWar(clanWarContents, tag)
-               .then(() => clanWarContents.classList.remove('display-none'));
+               .then(() => {
+                 clanWarContents.classList.remove('display-none');
+                 complatedDrawClanWarSet.add(tag);
+               });
 
                carousel.appendChild(templateClanWar);
              }
@@ -475,8 +533,21 @@
         displayElement.classList.remove('display-none');
     }
 
+    let intervalSortMissingAttack;
+    function setIntervalSortMissingAttack() {
+      intervalSortMissingAttack = setInterval(() => {
+        if (clanWarSize === complatedDrawClanWarSet.size) {
+          clearInterval(intervalSortMissingAttack);
+
+          // 모든 클랜 그리기가 종료되었으면 정렬
+          sortedMissingAttackTableTbody();
+        }
+      }, 1000);
+    }
+
     window.onload = async () => {
       await getClans();
+      setIntervalSortMissingAttack();
     }
   </script>
   <title>클랜전 현황</title>
@@ -529,8 +600,8 @@
             <th class="table-th">남은 시간</th>
           </tr>
           </thead>
-          <tbody class="table-tbody">
-          <tr class="table-tr empty">
+          <tbody class="table-tbody empty" data-order="0">
+          <tr class="table-tr">
             <td class="table-td" colspan="3">미공 없음</td>
           </tr>
           </tbody>
@@ -737,10 +808,20 @@
   </div>
 </template>
 
+<template id="table-tbody-template">
+  <tbody class="table-tbody"></tbody>
+</template>
 <template id="member-not-attack-row-template">
   <tr class="table-tr row">
-    <td class="table-td name" rowspan=1>{NAME}<br/><span class="chip border-none">{TAG}</span></td>
-    <td class="table-td"><span class="chip bg-green">{CLAN_NAME}</span></td>
+    <td class="table-td name" rowspan=1>
+      {NAME}
+      <br/>
+      <div class="chips">
+        <span class="chip border-none">{TAG}</span>
+        <span class="forced-participate chip border-none bg-orange">강참</span>
+      </div>
+    </td>
+    <td class="table-td"><span class="chip bg-green border-none">{CLAN_NAME}</span></td>
     <td class="table-td">{REMAIN_TIME}</td>
   </tr>
 </template>

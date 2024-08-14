@@ -14,7 +14,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoggerInterceptor())
-                .excludePathPatterns("/static/**");
+                .excludePathPatterns("/static/**", "/clan/cms/docs/**");
     }
 
     @Override

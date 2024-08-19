@@ -10,6 +10,7 @@ const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
 
 const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
 const URI_PLAYERS_SUPPORT = '/players/{playerTag}/support'; //지원 등록/해제
+const URI_PLAYERS_SUPPORT_BULK = '/players/support/bulk'; //지원계정 일괄 등록
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
 const URI_PLAYERS_RANKING_CURRENT_TROPHIES = "/players/ranking/trophies/current" //현재 트로피 순위
@@ -135,6 +136,24 @@ async function updatePlayerSupportYn(playerTag, supportYn) {
               .then(response => {
                 const { data } = response
                 let message = `지원계정 ${supportYn === 'Y' ? '등록' : '해제'} 되었습니다.`
+                alert(message);
+                return true;
+              })
+              .catch((error) => {
+                console.error(error);
+                return false;
+              });
+}
+
+async function insertSupportPlayerBulk(playerTags) {
+  const requestBody = {
+    player_tags: playerTags
+  }
+
+  return axios.post(URI_PLAYERS_SUPPORT_BULK, requestBody)
+              .then(response => {
+                const { data } = response
+                let message = `지원계정 일괄 등록 되었습니다.`
                 alert(message);
                 return true;
               })

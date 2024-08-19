@@ -26,6 +26,12 @@ public class ViewAdminController {
         return "cms/MemberManager";
     }
 
+    /** 지원계정 관리 */
+    @GetMapping("/member/support/manager")
+    public String memberSupportManager() {
+        return "cms/MemberSupportManager";
+    }
+
     /** 클랜 관리 */
     @GetMapping("/clan/manager")
     public String clanManager() {

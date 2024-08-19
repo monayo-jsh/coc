@@ -579,14 +579,6 @@
       cardAssignedPlayerWrapper.querySelector('.btn-filter-all').click();
     }
 
-    function isWarPreferenceIn(warPreference) {
-      return warPreference === 'in';
-    }
-
-    function convWarPreferenceName(warPreference) {
-      return isWarPreferenceIn(warPreference) ? '참가' : '불참';
-    }
-
     function makeLabelChip(tag) {
       const playerInfoAdditionalTemplate = document.querySelector('#player-info-additional-template');
       const playerInfoAdditional = document.importNode(playerInfoAdditionalTemplate.content, true);

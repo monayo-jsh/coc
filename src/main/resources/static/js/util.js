@@ -419,3 +419,11 @@ function copyTemplateById(templateId) {
   const template = document.querySelector(`#${templateId}`);
   return document.importNode(template.content, true);
 }
+
+function isWarPreferenceIn(warPreference) {
+  return warPreference === 'in';
+}
+
+function convWarPreferenceName(warPreference) {
+  return isWarPreferenceIn(warPreference) ? '참가' : '불참';
+}

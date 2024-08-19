@@ -31,6 +31,7 @@ public class PlayerClanResponseConverter implements Converter<PlayerClan, Player
         return PlayerClanResponse.builder()
                                  .name(source.getName())
                                  .tag(source.getTag())
+                                 .order(source.getOrder())
                                  .badgeUrls(makeIconUrlResponse(source.getBadgeUrl()))
                                  .build();
     }

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/townhall.css" />
+    <link rel="stylesheet" type="text/css" href="/static/css/cms/memberSupport.css" />
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/util.js"></script>
+    <script src="/static/js/api/player.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Excel Lib -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <title>지원계정 관리</title>
+
+    <script type="text/javascript">
+
+        async function removeSupportPlayer(element) {
+            const playerRow = element.closest('.table-tr.row');
+            const { tag } = playerRow.dataset;
+            if (!tag) {
+                alert('tag is not found.');
+                return;
+            }
+
+            const isResult = await updatePlayerSupportYn(tag, 'N');
+            if (!isResult) {
+                alert('지원계정 삭제 요청에 실패했습니다.');
+                return;
+            }
+
+            //refresh list
+            drawSupportPlayers();
+        }
+
+        function removeLabel(row, className) {
+            row.querySelector(`.${className}`).remove();
+        }
+
+        function createPlayerRow(player) {
+
+            const { name, tag, townHallLevel, clan, warPreference } = player
+
+            const templateRow = copyTemplateById("template-support-player-row");
+            const row = templateRow.querySelector('.row');
+
+            row.dataset.tag = tag;
+
+            row.innerHTML = row.innerHTML
+                               .replace(/{TOWNHALL_LEVEL}/, townHallLevel)
+                               .replace(/{NAME}/, name)
+                               .replace(/{TAG}/, tag)
+                               .replace(/{WAR_PREFERENCE}/, convWarPreferenceName(warPreference));
+
+            if (warPreference && isWarPreferenceIn(warPreference)) {
+                const bgColor = 'bg-crimson';
+
+                const warPreferenceElement = row.querySelector(".war-preference");
+                warPreferenceElement.classList.add(bgColor);
+            } else {
+                removeLabel(row, 'war-preference');
+            }
+
+            return row;
+        }
+
+        function sortByClanOrder(players) {
+            return players.sort((a, b) => {
+                const aClanOrder = a.clan ? a.clan.order : Number.MAX_VALUE;
+                const bClanOrder = b.clan ? b.clan.order : Number.MAX_VALUE;
+
+                return aClanOrder - bClanOrder;
+            });
+        }
+
+        function convertArrayToMapByClan(array) {
+            return array.reduce((map, row) => {
+                const { clan } = row;
+                let groupKey = clan ? clan.name : 'unknown'
+
+                if (!map.get(groupKey)) {
+                    map.set(groupKey, []);
+                }
+
+                map.get(groupKey).push(row);
+                return map;
+            }, new Map());
+        }
+
+        function createTableTbody(name) {
+            const templateTableTbody = copyTemplateById("template-table-tbody");
+            const tableTbody = templateTableTbody.querySelector('.table-tbody');
+            tableTbody.innerHTML = tableTbody.innerHTML.replace(/{CLAN_NAME}/, name === 'unknown' ? "" : name);
+            return tableTbody;
+        }
+
+        function renderPlayers(players) {
+            if (!players || !players.length) return;
+
+            const targetTable = document.querySelector('.table.support-player');
+
+            //clear
+            const tBodies = Array.from(targetTable.tBodies);
+            tBodies.forEach(tbody => targetTable.removeChild(tbody));
+
+            const sortedPlayersByClan = sortByClanOrder(players);
+            const playersGroupByClan = convertArrayToMapByClan(sortedPlayersByClan);
+
+            for (const [key, value] of playersGroupByClan) {
+
+                const tableTbody = createTableTbody(key);
+
+                for(const player of value) {
+                    const row = createPlayerRow(player);
+                    tableTbody.appendChild(row);
+                }
+
+                targetTable.appendChild(tableTbody);
+            }
+        }
+
+        async function drawSupportPlayers() {
+
+            const supportPlayers = await fetchSupportPlayers();
+            renderPlayers(supportPlayers);
+
+        }
+
+        window.onload = async() => {
+
+            await drawSupportPlayers();
+
+        }
+    </script>
+</head>
+<body>
+<div class="section-wrapper">
+
+    <div class="section-item">
+        <div class="card caption">
+            <div class="bottom-section">
+                <span class="title">지원계정 등록/삭제</span>
+            </div>
+        </div>
+
+        <div class="body">
+            <div id="wifi-loader" class="display-none">
+                <svg class="circle-outer" viewBox="0 0 86 86">
+                    <circle class="back" cx="43" cy="43" r="40"></circle>
+                    <circle class="front" cx="43" cy="43" r="40"></circle>
+                    <circle class="new" cx="43" cy="43" r="40"></circle>
+                </svg>
+                <svg class="circle-middle" viewBox="0 0 60 60">
+                    <circle class="back" cx="30" cy="30" r="27"></circle>
+                    <circle class="front" cx="30" cy="30" r="27"></circle>
+                </svg>
+                <svg class="circle-inner" viewBox="0 0 34 34">
+                    <circle class="back" cx="17" cy="17" r="14"></circle>
+                    <circle class="front" cx="17" cy="17" r="14"></circle>
+                </svg>
+                <div class="text" data-text="Searching"></div>
+            </div>
+
+            <div class="container">
+                <table class="table support-player">
+                    <colgroup>
+                        <col />
+                        <col style="width: 80px;">
+                        <col style="width: 60px;">
+                    </colgroup>
+                    <tbody class="table-tbody">
+                    <tr class="table-tr">
+                        <td class="table-td" colspan="3">지원계정 없음</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+<template id="template-table-tbody">
+    <tbody class="table-tbody">
+    <tr class="table-tr tr-title">
+        <td class="table-td" colspan="3">
+            <div class="td-wrap">{CLAN_NAME} 지원 계정</div>
+        </td>
+    </tr>
+    </tbody>
+</template>
+<template id="template-support-player-row">
+    <tr class="table-tr row">
+        <td class="table-td">
+            <div class="td-wrap flex-colum">
+                <div class="td-wrap">
+                    <div class="town-hall th{TOWNHALL_LEVEL}"></div>
+                    <div class="name">{NAME}</div>
+                </div>
+            </div>
+        </td>
+        <td class="table-td">
+            <div class="td-wrap">
+                <div class="chip">{TAG}</div>
+                <div class="chip war-preference">{WAR_PREFERENCE}</div>
+            </div>
+        </td>
+        <td class="table-td">
+            <i class="fa-solid fa-trash cursor-pointer" onclick="removeSupportPlayer(this);"></i>
+        </td>
+    </tr>
+</template>
+
+</html>

@@ -74,22 +74,36 @@
       <div class="card-group">
         <div class="title">클랜 관리</div>
 
-        <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('/clan/cms/member/manager'); return false;">
-            <p class="tip">클랜원 관리</p>
-            <p class="second-text">(클랜원 등록/삭제)</p>
+        <div class="card-inner-group">
+          <div class="title">계정</div>
+
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/member/manager'); return false;">
+              <p class="tip">클랜원 관리</p>
+              <p class="second-text">(클랜원 등록/삭제)</p>
+            </div>
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/member/support/manager'); return false;">
+              <p class="tip">지원계정 관리</p>
+              <p class="second-text">(등록/삭제)</p>
+            </div>
           </div>
 
-          <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/manager'); return false;">
-            <p class="tip">클랜 관리</p>
-            <p class="second-text">(클랜 등록/삭제)</p>
+          <div class="cards">
+            <div class="card bg-black-2" onclick="downloadAllClanMembers(); return false;">
+              <p class="tip">전체 클랜원</p>
+              <p class="second-text">(엑셀 다운)</p>
+            </div>
           </div>
         </div>
 
-        <div class="cards">
-          <div class="card bg-black-2" onclick="downloadAllClanMembers(); return false;">
-            <p class="tip">전체 클랜원</p>
-            <p class="second-text">(엑셀 다운)</p>
+        <div class="card-inner-group">
+          <div class="title">클랜/배정</div>
+
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/clan/manager'); return false;">
+              <p class="tip">클랜 관리</p>
+              <p class="second-text">(클랜 등록/삭제)</p>
+            </div>
           </div>
         </div>
       </div>

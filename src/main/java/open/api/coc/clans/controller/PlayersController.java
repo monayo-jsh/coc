@@ -1,5 +1,6 @@
 package open.api.coc.clans.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.players.PlayerModify;
@@ -94,7 +95,7 @@ public class PlayersController {
 
     @PutMapping("/{playerTag}/support")
     public ResponseEntity<?> updatePlayerSupport(@PathVariable String playerTag,
-                                                 @RequestBody PlayerModifyRequest request) {
+                                                 @Valid @RequestBody PlayerModifyRequest request) {
 
         PlayerModify playerModify = PlayerModify.create(playerTag, request);
         playersService.changePlayerSupport(playerModify);

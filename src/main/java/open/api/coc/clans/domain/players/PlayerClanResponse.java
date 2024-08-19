@@ -14,6 +14,8 @@ public class PlayerClanResponse {
     private String name;
     private Integer clanLevel;
 
+    private Integer order;
+
     private IconUrlResponse badgeUrls;
 
 }

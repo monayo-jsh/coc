@@ -13,7 +13,7 @@
   padding: 10px 0;
 }
 
-.body {
+.container {
   margin-top: 5px;
 }
 
@@ -71,4 +71,33 @@
 
 .town-hall {
   width: 25px;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.buttons {
+  display: flex;
+  justify-content: right;
+  gap: 5px;
+}
+
+.form {
+  margin-top: 5px;
+}
+
+.support-player-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.support-player-input {
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 6px;
+  width: 60%;
 }

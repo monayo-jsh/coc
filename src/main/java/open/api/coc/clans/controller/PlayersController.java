@@ -7,6 +7,7 @@ import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
+import open.api.coc.clans.domain.players.SupportPlayerBulkRequest;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
@@ -91,6 +92,14 @@ public class PlayersController {
     public ResponseEntity<List<PlayerResponse>> getAllSupportPlayer() {
         return ResponseEntity.ok()
                              .body(playersService.findAllSupportPlayers());
+    }
+
+    @PostMapping("/support/bulk")
+    public ResponseEntity<?> registerSupportPlayerBulk(@Valid @RequestBody SupportPlayerBulkRequest request) {
+
+        playersService.registerSupportPlayerBulk(request.getPlayerTags());
+
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{playerTag}/support")

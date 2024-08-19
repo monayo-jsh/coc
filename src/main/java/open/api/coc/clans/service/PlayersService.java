@@ -36,12 +36,13 @@ import open.api.coc.clans.database.entity.player.converter.PlayerHeroEntityConve
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEquipmentEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerSpellEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerTroopEntityConverter;
+import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
-import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
+import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
@@ -74,6 +75,8 @@ public class PlayersService {
 
     private final ClanRepository clanRepository;
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
+    private final ClanAssignedPlayerQueryRepository clanAssignedPlayerQueryRepository;
+
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
@@ -155,6 +158,13 @@ public class PlayersService {
             throw createBadRequestException(ExceptionCode.ALREADY_DATA.getCode(), "이미 등록된 클랜원");
         }
 
+        PlayerEntity playerEntity = createPlayerEntity(playerTag);
+
+        PlayerEntity createdPlayer = playerRepository.save(playerEntity);
+        return playerResponseConverter.convert(createdPlayer);
+    }
+
+    private PlayerEntity createPlayerEntity(String playerTag) {
         Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
@@ -167,9 +177,7 @@ public class PlayersService {
 
         createLeague(playerEntity, player);
         createClan(playerEntity, player);
-
-        PlayerEntity createdPlayer = playerRepository.save(playerEntity);
-        return playerResponseConverter.convert(createdPlayer);
+        return playerEntity;
     }
 
     private void createClan(PlayerEntity playerEntity, Player player) {
@@ -481,7 +489,7 @@ public class PlayersService {
     public void changePlayerSupport(PlayerModify playerModify) {
 
         PlayerEntity player = playerRepository.findById(playerModify.getPlayerTag())
-                                              .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerModify.getPlayerTag())));
+                                              .orElseGet(() -> createPlayerEntity(playerModify.getPlayerTag()));
 
         player.changeSupportYn(playerModify.getSupportYn());
         playerRepository.save(player);
@@ -529,4 +537,42 @@ public class PlayersService {
         return playerRepository.selectRankingAttackWins(PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
+    @Transactional
+    public void registerSupportPlayerBulk(List<String> supportPlayerTags) {
+        if (CollectionUtils.isEmpty(supportPlayerTags)) return;
+
+        // step1. 기존 지원계정 초기화
+        long clearSupportPlayerCount = playerQueryRepository.resetSupportPlayers();
+        log.info("clear support player count: {}", clearSupportPlayerCount);
+
+        // step2. 지원계정 설정
+        long updatedSupportPlayerCount = playerQueryRepository.updateSupportPlayers(supportPlayerTags);
+
+        // step3. 지원계정 전환 시 배정된 클랜 제거
+        long exceptPlayerCount = processExceptAssignedClan(supportPlayerTags);
+        log.info("except assigned clan player count: {}", exceptPlayerCount);
+
+        // step4. 요청한 계정 재설정이 완료된 경우
+        if (updatedSupportPlayerCount == supportPlayerTags.size()) return;
+
+        // step5. 그렇지 않은 경우 신규 계정 등록 및 지원계정 설정
+        List<String> missingPlayerTags = playerQueryRepository.findAllNotExistsByPlayerTags(supportPlayerTags);
+
+        for (String playerTag : missingPlayerTags) {
+            try {
+                PlayerEntity playerEntity = createPlayerEntity(playerTag);
+                playerEntity.changeSupportYn(YnType.Y); //지원계정 설정
+
+                playerQueryRepository.save(playerEntity);
+            } catch (Exception e) {
+                log.error("[not registered player] tag: {}, reason: {}", playerTag, e.getMessage());
+            }
+        }
+    }
+
+    private long processExceptAssignedClan(List<String> playerTags) {
+        // 현재 배정월 기준 배정클랜 제거
+        String seasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+        return clanAssignedPlayerQueryRepository.deleteBySeasonDateAndPlayerTags(seasonDate, playerTags);
+    }
 }

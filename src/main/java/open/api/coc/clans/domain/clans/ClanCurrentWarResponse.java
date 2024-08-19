@@ -10,6 +10,7 @@ import lombok.Getter;
 public class ClanCurrentWarResponse {
 
     private String state;
+    private String battleModifier;
     private Integer teamSize;
     private Integer attacksPerMember;
 

@@ -288,6 +288,23 @@
 }
 
 /** filter css */
+.radio-inputs {
+
+  .radio {
+
+    .name {
+      color: white;
+    }
+
+    input:checked + .name {
+      color: black;
+      background-color: white;
+    }
+
+  }
+
+}
+
 .radio-group-wrapper {
   width: 270px;
   height: 60px;

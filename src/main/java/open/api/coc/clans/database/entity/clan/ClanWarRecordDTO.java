@@ -3,6 +3,7 @@ package open.api.coc.clans.database.entity.clan;
 public record ClanWarRecordDTO(
     String clanTag,
     String clanName,
+    Integer clanOrder,
     String tag,
     String name,
     Long attackCount,

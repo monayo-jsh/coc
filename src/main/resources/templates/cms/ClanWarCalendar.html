@@ -186,7 +186,9 @@
       clanWarInfoTable.innerHTML = clanWarInfoTable.innerHTML
                                                    .replace(/{NAME}/, clanName)
                                                    .replace(/{TYPE}/, convWarTypeName(type))
+                                                   .replace(/{WAR_TYPE_COLOR}/, getBgColorByWarType(type))
                                                    .replace(/{BATTLE_TYPE}/, convBattleTypeName(battleType))
+                                                   .replace(/{BATTLE_TYPE_COLOR}/, getBgColorByBattleType(battleType))
                                                    .replace(/{TEAM_SIZE}/, teamSize)
                                                    .replace(/{START_DATE}/, formatYYYYMMDDHHMM(dayjs(startTime)))
                                                    .replace(/{END_DATE}/, formatYYYYMMDDHHMM(dayjs(endTime)))
@@ -413,17 +415,17 @@
               <th class="table-th">플레이어 (태그)</th>
               <th class="table-th">
                 <div class="th-wrap">
-                  <i class="fa-solid fa-star color-gold"></i>
+                  획득별
                 </div>
               </th>
               <th class="table-th">
                 <div class="th-wrap">
-                  <div class="icon-damage"></div>
+                  파괴율
                 </div>
               </th>
               <th class="table-th">
                 <div class="th-wrap">
-                  <div class="icon-clock"></div>
+                  공격시간
                 </div>
               </th>
             </tr>
@@ -441,7 +443,7 @@
   <table class="table war-info">
     <tr>
       <th class="th-wrap">클랜명</th>
-      <td>{NAME}</td>
+      <td><div class="chip bg-green">{NAME}</div></td>
     </tr>
     <tr>
       <th class="th-wrap">인원</th>
@@ -449,11 +451,11 @@
     </tr>
     <tr>
       <th class="th-wrap">유형</th>
-      <td>{TYPE}</td>
+      <td><div class="chip {WAR_TYPE_COLOR}">{TYPE}</div></td>
     </tr>
     <tr>
       <th class="th-wrap">전투</th>
-      <td>{BATTLE_TYPE}</td>
+      <td><div class="chip {BATTLE_TYPE_COLOR}">{BATTLE_TYPE}</div></td>
     </tr>
     <tr>
       <th class="th-wrap">전투 시작</th>
@@ -472,20 +474,20 @@
 <template id="template-member-attack-row">
   <tr class="table-tr row">
     <td class="user-info" rowspan="{ATTACK_TOTAL_COUNT}">
-      <div class="td-wrap justify-content-left">
+      <div class="td-wrap flex-colum flex-gap">
         <div class="name">{NAME}</div>
-        <div class="chip ml-5">{TAG}</div>
-        <div class="chip ml-5 cursor-pointer necessary-attack-{YN}" onclick="updateClanWarNecessaryAttack('{TAG}')">강참 설정</div>
+        <div class="chip">{TAG}</div>
+        <div class="chip cursor-pointer necessary-attack-{YN}" onclick="updateClanWarNecessaryAttack('{TAG}')">강참 설정</div>
       </div>
     </td>
     <td class="attack-info">
-      <div class="td-wrap">{STAR}</div>
+      <div class="td-wrap"><i class="fa-solid fa-star color-gold"></i><span class="ml-5">{STAR}</span></div>
     </td>
     <td class="attack-info">
-      <div class="td-wrap">{DESTRUCTION_PERCENTAGE}</div>
+      <div class="td-wrap"><div class="icon-damage"></div><span class="ml-5">{DESTRUCTION_PERCENTAGE}</span></div>
     </td>
     <td class="attack-info">
-      <div class="td-wrap">{DURATION}</div>
+      <div class="td-wrap"><div class="icon-clock"></div><span class="ml-5">{DURATION}</span></div>
     </td>
   </tr>
 </template>

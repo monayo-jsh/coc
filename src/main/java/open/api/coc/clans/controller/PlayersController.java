@@ -1,11 +1,13 @@
 package open.api.coc.clans.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
+import open.api.coc.clans.domain.players.SupportPlayerBulkRequest;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
@@ -92,9 +94,17 @@ public class PlayersController {
                              .body(playersService.findAllSupportPlayers());
     }
 
+    @PostMapping("/support/bulk")
+    public ResponseEntity<?> registerSupportPlayerBulk(@Valid @RequestBody SupportPlayerBulkRequest request) {
+
+        playersService.registerSupportPlayerBulk(request.getPlayerTags());
+
+        return ResponseEntity.ok().build();
+    }
+
     @PutMapping("/{playerTag}/support")
     public ResponseEntity<?> updatePlayerSupport(@PathVariable String playerTag,
-                                                 @RequestBody PlayerModifyRequest request) {
+                                                 @Valid @RequestBody PlayerModifyRequest request) {
 
         PlayerModify playerModify = PlayerModify.create(playerTag, request);
         playersService.changePlayerSupport(playerModify);

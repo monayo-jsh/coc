@@ -9,7 +9,7 @@
 
 /** 이미지 리소스 없을 경우 표기 */
 .img-icon:before {
-  content: 'comming soon';
+  content: attr(data-name);
   font-size: 4px;
   display: flex;
   justify-content: center;
@@ -71,7 +71,10 @@
   background-image: url("/static/images/hero/equipment/Healer_Puppet.png");
   color: rgba(0, 0, 0, 0);
 }
-
+.img-icon.magic_mirror {
+  background-image: url("/static/images/hero/equipment/Magic_Mirror.png");
+  color: rgba(0, 0, 0, 0);
+}
 
 .img-icon.life_gem {
   background-image: url("/static/images/hero/equipment/Life_Gem.png");

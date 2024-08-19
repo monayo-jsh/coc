@@ -64,6 +64,7 @@ body::before {
       url(/static/images/hero/equipment/Vampstache.png);
       url(/static/images/hero/equipment/Spiky_Ball.png);
       url(/static/images/hero/equipment/Rocket_Spear.png);
+      url("/static/images/hero/equipment/Magic_Mirror.png");
 
       url(/static/images/etc/trophies.png);
       url(/static/images/etc/max_level.png);
@@ -283,6 +284,11 @@ body::before {
 .chip-label {
   margin-left: 5px;
   padding: 0 2px;
+}
+
+.bg-gray {
+  background-color: gray;
+  color: white;
 }
 
 .bg-lightgray {
@@ -667,4 +673,8 @@ body::before {
   padding: 5px;
   font-size: 14px;
   background-position: top 45% right 5px;
+}
+
+.border-none {
+  border: none;
 }

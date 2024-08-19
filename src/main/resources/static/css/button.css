@@ -383,7 +383,7 @@ button.refresh:hover svg {
       border-radius: 0.5rem;
       border: none;
       padding: 5px 12px;
-      color: #fff;
+      color: black;
       transition: all .15s ease-in-out;
     }
 
@@ -392,8 +392,8 @@ button.refresh:hover svg {
     }
 
     input:checked + .name {
-      color: black;
-      background-color: #fff;
+      color: white;
+      background-color: #808080;
       font-weight: 600;
     }
   }

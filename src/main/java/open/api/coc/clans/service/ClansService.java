@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -37,16 +36,17 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
+import open.api.coc.clans.database.repository.clan.ClanQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanCreateCommand;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanRequest;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
@@ -76,6 +76,7 @@ public class ClansService {
     private final ClanWarService clanWarService;
 
     private final ClanRepository clanRepository;
+    private final ClanQueryRepository clanQueryRepository;
     private final ClanContentRepository clanContentRepository;
 
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
@@ -144,12 +145,11 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(leagueWar);
     }
 
-    public List<ClanResponse> getClanList() {
-        List<ClanEntity> clans = clanRepository.findAll();
+    public List<ClanResponse> getActiveClans() {
+        List<ClanEntity> clans = clanQueryRepository.findAllActiveClans();
 
         return clans.stream()
                     .map(clanResponseConverter::convert)
-                    .sorted(Comparator.comparing(ClanResponse::getOrder))
                     .collect(Collectors.toList());
     }
 
@@ -169,8 +169,8 @@ public class ClansService {
                                   .collect(Collectors.toList());
     }
 
-    public List<ClanResponse> getClanCaptialList() {
-        List<ClanEntity> clanCapitalList = clanRepository.findCapitalClanList();
+    public List<ClanResponse> getActiveCapitalClans() {
+        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllActiveCapitalClans();
 
         return clanCapitalList.stream()
                               .map(clanResponseConverter::convert)
@@ -259,32 +259,35 @@ public class ClansService {
     }
 
     @Transactional
-    public ClanResponse registerClan(ClanRequest clanRequest) {
-        clanRequest.validate();
+    public ClanResponse registerClan(ClanCreateCommand command) {
 
-        Clan clan = clanApiService.findClanByClanTag(clanRequest.getTag())
-                                  .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanRequest.getTag())));
+        Clan clanResponse = clanApiService.findClanByClanTag(command.getTag())
+                                          .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(command.getTag())));
 
-        Optional<ClanEntity> clanEntity = clanRepository.findById(clanRequest.getTag());
-        if (clanEntity.isPresent()) {
-            ClanEntity updateClanEntity = clanEntity.get();
-            updateClanEntity.setWarLeague(clan.getWarLeagueName());
-            updateClanEntity.setVisibleYn(YnType.Y);
-            ClanEntity resultClan = clanRepository.save(updateClanEntity);
-            return clanResponseConverter.convert(resultClan);
-        }
+        return clanQueryRepository.findById(command.getTag())
+                                  .map(clan -> updateExistingClan(clan, clanResponse))
+                                  .orElseGet(() -> createClan(command, clanResponse));
+    }
 
-        Integer clanMaxOrders = clanRepository.selectMaxOrders();
-        if (Objects.isNull(clanMaxOrders)) {
-            clanMaxOrders = 0;
-        }
+    private ClanResponse updateExistingClan(ClanEntity clan, Clan clanResponse) {
+        clan.setWarLeague(clanResponse.getWarLeagueName());
+        clan.setVisibleYn(YnType.Y);
 
-        ClanEntity createClan = createClanEntity(clan, clanMaxOrders);
-        createClan.changeClanContent(ClanContentEntity.empty(clanRequest.getTag()));
+        clanRepository.save(clan);
+
+        return clanResponseConverter.convert(clan);
+    }
+
+    private ClanResponse createClan(ClanCreateCommand command, Clan clanResponse) {
+        Integer clanMaxOrders = Optional.ofNullable(clanRepository.selectMaxOrders()).orElse(0);
+
+        ClanEntity createClan = createClanEntity(clanResponse, clanMaxOrders);
+        createClan.changeClanContent(ClanContentEntity.empty(command.getTag()));
         createClan.changeBadgeUrl(ClanBadgeEntity.builder()
-                                                 .tag(clanRequest.getTag())
-                                                 .iconUrl(iconUrlEntityConverter.convert(clanRequest.getBadgeUrl()))
+                                                 .tag(command.getTag())
+                                                 .iconUrl(iconUrlEntityConverter.convert(command.getBadgeUrl()))
                                                  .build());
+
         clanRepository.save(createClan);
 
         return clanResponseConverter.convert(createClan);

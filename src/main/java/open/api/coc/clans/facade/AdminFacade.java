@@ -1,7 +1,6 @@
 package open.api.coc.clans.facade;
 
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.raid.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.domain.admin.AdminRaidResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
@@ -20,7 +19,7 @@ public class AdminFacade {
     private final RaidService raidService;
 
     public AdminRaidResponse getCapitalRaidClanWithRecentWeekWarningMember(int point) {
-        List<ClanResponse> clanResponses = clansService.getClanCaptialList();
+        List<ClanResponse> clanResponses = clansService.getActiveCapitalClans();
         List<RaiderEntity> raiderEntityList = raidService.getRaiderWithLessThanPoints(clanResponses.size(), point);
         return AdminRaidResponse.toResponse(clanResponses, raiderEntityList);
     }

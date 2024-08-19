@@ -133,12 +133,12 @@ public class ClanWarQueryRepository {
                            .orderBy(clanWarEntity.warId.asc(), clanWarMemberEntity.mapPosition.asc());
     }
 
-    public List<ClanWarRecordDTO> findClanWarRecordsByClanWarTypeAndStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
+    public List<ClanWarRecordDTO> findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
         return fetchClanWarRecords(pageable, builder);
     }
 
-    public List<ClanWarRecordDTO> findClanWarRecordsByClanTagAndClanWarTypeAndStartTimePeriod(String clanTag, ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
+    public List<ClanWarRecordDTO> findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(String clanTag, ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
         builder.withClanTag(clanTag);
         return fetchClanWarRecords(pageable, builder);
@@ -156,6 +156,7 @@ public class ClanWarQueryRepository {
             ClanWarRecordDTO.class,
             clanEntity.tag.max().as("clanTag"),
             clanEntity.name.max().as("clanName"),
+            clanEntity.order.max().as("clanOrder"),
             playerEntity.playerTag.max().as("tag"),
             playerEntity.name.max().as("name"),
             clanWarMemberAttackEntity.id.tag.count().as("attackCount"),
@@ -199,7 +200,7 @@ public class ClanWarQueryRepository {
     }
 
 
-    public Map<String, Long> findClanWarCountByClanWarTypeAndStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to) {
+    public Map<String, Long> findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to) {
 
         ConstructorExpression<ClanWarCountDTO> clanWarCountDTO = Projections.constructor(
             ClanWarCountDTO.class,
@@ -209,7 +210,7 @@ public class ClanWarQueryRepository {
 
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(clanWarEntity.type.eq(warType))
-                 .and(clanWarEntity.startTime.between(from, to));
+                 .and(clanWarEntity.preparationStartTime.between(from, to));
 
         List<ClanWarCountDTO> results = queryFactory.select(clanWarCountDTO)
                                                     .from(clanWarEntity)

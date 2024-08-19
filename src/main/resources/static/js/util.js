@@ -354,7 +354,15 @@ function getBgColorByWarType(type = '') {
   return type;
 }
 
-function convBattleTypeName(battleType) {
+function getBgColorByBattleType(type = '') {
+  switch (type.toLowerCase()) {
+    case 'none': return '';
+    case 'hardmode': return 'bg-orange';
+  }
+  return type;
+}
+
+function convBattleTypeName(battleType = 'none') {
   if (battleType === 'none') return '일반 모드';
   return '하드 모드';
 }
@@ -405,4 +413,17 @@ function isMissingAttack(attacks) {
 function isDemotedAttack(value) {
   const DEMOTED_ATTACK_VALUE = 20000;
   return value < DEMOTED_ATTACK_VALUE;
+}
+
+function copyTemplateById(templateId) {
+  const template = document.querySelector(`#${templateId}`);
+  return document.importNode(template.content, true);
+}
+
+function isWarPreferenceIn(warPreference) {
+  return warPreference === 'in';
+}
+
+function convWarPreferenceName(warPreference) {
+  return isWarPreferenceIn(warPreference) ? '참가' : '불참';
 }

@@ -41,7 +41,7 @@
     <!-- Excel Lib -->
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 
-    <title>클랜전 월별 완파 통계</title>
+    <title>월별 완파 통계</title>
     <script type="text/javascript">
         dayjs.locale('ko');
         //dayjs duration 확장
@@ -76,8 +76,11 @@
 
         function formatPlayer(players) {
             return players.sort((a, b) => {
-                return a.clanName.localeCompare(b.clanName) || b.totalStars - a.totalStars || b.totalDestructionPercentage - a.totalDestructionPercentage || b.avgDuration - a.avgDuration
-            })
+                                return a.clanOrder - b.clanOrder
+                                    || b.totalStars - a.totalStars
+                                    || b.totalDestructionPercentage - a.totalDestructionPercentage
+                                    || b.avgDuration - a.avgDuration
+                          })
                           .map((player) => {
                 const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
                 const completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
@@ -100,12 +103,14 @@
         }
 
         function downloadStatisticsExcelFile() {
+            const statisticsName = isPageTypeClanWar() ? '클랜전' : '리그전'
+
             const monthPicker = getMonthPicker();
             const monthStatistics = monthPicker.value;
-            if (!confirm(`[${monthStatistics}] 완파 통계를 다운로드받으시겠습닌가?`)) {
+            if (!confirm(`[${monthStatistics}] ${statisticsName} 완파 통계를 다운로드받으시겠습닌가?`)) {
                 return false;
             }
-            const fileName = `${monthStatistics} 완파 통계.xlsx`;
+            const fileName = `${monthStatistics} ${statisticsName} 완파 통계.xlsx`;
             const formattedPlayers = formatPlayer(players);
             writeExcelFile(fileName, formattedPlayers);
         }
@@ -155,6 +160,7 @@
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
                                .replace(/{TAG}/, tag)
+                               .replace(/{CLAN_TAG_COLOR}/, isPageTypeClanWar() ? 'bg-green' : 'bg-crimson')
                                .replace(/{CLAN_NAME}/, clanName)
                                .replace(/{ATTACK_COUNT}/, attackCount)
                                .replace(/{RATIO}/g, Number(completeStarRatio).toFixed(2))
@@ -174,7 +180,8 @@
 
         function collectClanNames(players) {
             clanNames.clear();
-            for (const player of players) {
+            const sortedPlayerByClanOrder = players.sort((a, b) => a.clanOrder - b.clanOrder)
+            for (const player of sortedPlayerByClanOrder) {
                 const { clanName } = player;
                 clanNames.add(clanName);
             }
@@ -201,8 +208,7 @@
         }
         function drawFilterClanNames() {
             resetFilterByClanElement();
-            const sortedClanNames = Array.from(clanNames).sort((a, b) => a.localeCompare(b));
-            for (const clanName of sortedClanNames) {
+            for (const clanName of clanNames) {
                 drawFilterClanName(clanName);
             }
         }
@@ -218,16 +224,40 @@
             radioInputs.appendChild(radio);
         }
 
+        function isPageTypeClanWar() {
+            const pageType = getPageType();
+            return pageType === 'clan-war'
+        }
+
+        async function fetchWarRecord(searchMonth) {
+            if (isPageTypeClanWar()) {
+                return fetchRankingClanWarStars(searchMonth, '', 'ALL');
+            }
+
+            return fetchRankingClanLeagueWarStars(searchMonth, '', 'ALL');
+        }
+
         async function fetchClanWarStatistics(searchMonth) {
             showWifiLoading('.body');
-            players = await fetchRankingClanWarStars(searchMonth, '', 'ALL');
+            players = await fetchWarRecord(searchMonth);
             collectClanNames(players);
             renderClanWarStatisticsPlayers(players);
             drawFilterClanNames();
             hideWifiLoading('.body');
         }
 
+        function getPageType() {
+            const urlSearchParams = new URLSearchParams(location.search);
+            return urlSearchParams.get('type');
+        }
+
+        function initPageType() {
+            const pageName = document.querySelector('.page-name');
+            pageName.innerHTML = isPageTypeClanWar() ? '클랜' : '리그'
+        }
+
         window.onload = async () => {
+            await initPageType();
             await initMonthPicker();
         }
     </script>
@@ -238,7 +268,7 @@
     <div class="section-item">
         <div class="card caption">
             <div class="bottom-section">
-                <span class="title">클랜전 월별 완파 통계</span>
+                <span class="title"><span class="page-name">클랜</span>전 월별 완파 통계</span>
             </div>
         </div>
 
@@ -332,7 +362,7 @@
             <div class="td-wrap flex-colum flex-gap">
                 <div class="player-name">{NAME}</div>
                 <div class="chip">{TAG}</div>
-                <div class="chip bg-green">{CLAN_NAME}</div>
+                <div class="chip {CLAN_TAG_COLOR}">{CLAN_NAME}</div>
             </div>
         </td>
         <td class="table-td" data-sort="{RATIO}">

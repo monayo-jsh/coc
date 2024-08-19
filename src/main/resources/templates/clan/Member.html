@@ -290,6 +290,8 @@
       const icons = document.importNode(iconsTemplate.content, true);
       const imgIconElement = icons.querySelector('.img-icon');
 
+      imgIconElement.dataset.name = 'coming soon';
+
       let equipmentIconClassName = name.toLowerCase()
                                        .replace(/\s/g, "_")
                                        .replace(/\./g, "");
@@ -305,6 +307,7 @@
 
       if (koreanName) {
         settingTooltip(imgIconElement, koreanName);
+        imgIconElement.dataset.name = koreanName;
       }
 
       contentsElement.appendChild(imgIconElement);
@@ -396,10 +399,17 @@
 
       const currentClanTag = currentClan?.tag;
       const { seasonDate, name, tag } = assignedClan;
-      const joinedStatusName = `이동 ${currentClanTag === tag ? '완료' : '필요'}`;
+      const isJoinedStatus = currentClanTag === tag;
+
+      const joinedStatusName = `이동 ${isJoinedStatus ? '완료' : '필요'}`;
       const formattedSeasonDate = formatYYMMDate(seasonDate);
       const assignedClanLabel = createPlayerLabel(name, `${formattedSeasonDate} 배정 클랜 ${joinedStatusName}`);
       assignedClanLabel.classList.add('bg-green');
+
+      if (!isJoinedStatus) {
+        assignedClanLabel.classList.add('dim');
+      }
+
       playerLabels.appendChild(assignedClanLabel);
     }
 
@@ -420,10 +430,17 @@
         if (now.month() >= assignedDate.month()) return;
       }
 
-      const joinedStatusName = `이동 ${currentClanTag === tag ? '완료' : '필요'}`;
+      const isJoinedStatus = currentClanTag === tag;
+
+      const joinedStatusName = `이동 ${isJoinedStatus ? '완료' : '필요'}`;
       const formattedSeasonDate = formatYYMMDate(seasonDate);
       const assignedLeagueLabel = createPlayerLabel(name, `${formattedSeasonDate} 리그 배정 클랜 ${joinedStatusName}`);
       assignedLeagueLabel.classList.add('bg-crimson');
+
+      if (!isJoinedStatus) {
+        assignedLeagueLabel.classList.add('dim');
+      }
+
       playerLabels.appendChild(assignedLeagueLabel);
     }
 

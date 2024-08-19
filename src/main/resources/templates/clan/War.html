@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <script src="/static/js/api/clanWar.js"></script>
   <script src="/static/js/util.js"></script>
   <script type="text/javascript">
 
@@ -111,7 +112,7 @@
         const memberNotAttackHtml = document.importNode(templateMemberNotAttack.content, true);
         const attackInfoElement = memberNotAttackHtml.querySelector('.attack-info');
         attackInfoElement.innerHTML = attackInfoElement.innerHTML
-                .replace(/{ATTACK_NO}/, `공격${no++}`);
+                                                       .replace(/{ATTACK_NO}/, `공격${no++}`);
 
         attackListElement.appendChild(attackInfoElement);
       }
@@ -237,6 +238,8 @@
 
     function fetchFailed(clanWarContentsElement) {
       clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                               .replace(/{BATTLE_TYPE_COLOR}/g, "")
+                                                               .replace(/{BATTLE_TYPE}/g, "")
                                                                .replace(/{TEAM_SIZE}/g, 0)
                                                                .replace(/{TOTAL_STAR_COUNT}/g, 0)
                                                                .replace(/{CLAN_STAR_COUNT}/, 0)
@@ -258,18 +261,113 @@
                                                                .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
     }
 
+    async function drawReportClanWarMissingAttack(clanWar) {
+
+      const drawState = new Set(Array.from(['inWar', 'warEnded']));
+
+      const { clan, startTime, endTime, state, attacksPerMember } = clanWar;
+
+      // 전쟁중 또는 전쟁 종료 시에만 미공 목록 표기
+      if (!drawState.has(state)) return;
+
+      let formattedRemainTime = getLeftUntilByTime(endTime);
+      if (!formattedRemainTime) {
+        formattedRemainTime = '전쟁 종료';
+      } else {
+        formattedRemainTime = formatTime(formattedRemainTime, "H시 mm분");
+      }
+
+      const clanData = ClanWarMap.get(clan.tag);
+      const forcedParticipatePlayers = await fetchClanWarMembers(clan.tag, startTime, 'N');
+      const forcedParticipatePlayersSet = new Set(forcedParticipatePlayers.map(player => player.tag))
+
+      const tableTbodyTemplate = copyTemplateById('table-tbody-template');
+      const tableTbody = tableTbodyTemplate.querySelector('.table-tbody');
+
+      tableTbody.dataset.name = clanData.name;
+      tableTbody.dataset.order = clanData.order;
+
+      for (const member of clan.members) {
+        const { tag, name, attacks } = member;
+        const isForcedParticipatePlayer = forcedParticipatePlayersSet.has(tag);
+
+        if (attacks.length < attacksPerMember) {
+          const row = appendMissingAttack({
+            clan_name: clan.name,
+            player_tag: tag,
+            player_name: name,
+            remain_time: formattedRemainTime
+          });
+
+          if (!isForcedParticipatePlayer) {
+            row.querySelector('.chip.forced-participate').remove();
+          }
+          tableTbody.appendChild(row);
+        }
+      }
+
+      if (tableTbody.children.length) {
+        const targetTable = document.querySelector('.section.missing-attack .table');
+        targetTable.appendChild(tableTbody);
+
+        const tableTbodyEmpty = targetTable.querySelector('.table-tbody.empty');
+        tableTbodyEmpty.classList.add('display-none');
+      }
+
+    }
+
+    function sortedMissingAttackTableTbody() {
+      const table = document.querySelector('.section.missing-attack .table');
+      const tBodies = Array.from(table.tBodies);
+
+      tBodies.sort((a, b) => {
+        const aOrder = a.dataset.order;
+        const bOrder = b.dataset.order;
+
+        return aOrder - bOrder;
+      });
+
+      // 기존 구성 삭제
+      for (const tbody of table.tBodies) {
+        table.removeChild(tbody);
+      }
+
+      // 추가
+      for (let i=0; i<tBodies.length; i++) {
+        table.appendChild(tBodies[i]);
+      }
+
+    }
+
+    function appendMissingAttack(row) {
+      const memberNotAttackRowTemplate = copyTemplateById('member-not-attack-row-template');
+      const memberNotAttackRow = memberNotAttackRowTemplate.querySelector('.row');
+
+      const { clan_name, player_tag, player_name, remain_time } = row;
+
+      memberNotAttackRow.innerHTML = memberNotAttackRow.innerHTML
+                                                       .replace(/{NAME}/, player_name)
+                                                       .replace(/{TAG}/, player_tag)
+                                                       .replace(/{CLAN_NAME}/, clan_name)
+                                                       .replace(/{REMAIN_TIME}/, remain_time);
+
+      return memberNotAttackRow;
+    }
+
     async function settingClanWar(clanWarContentsElement, clanTag) {
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
       await axios.get(uri)
                  .then((response) => {
                    const { data } = response;
-                   const { clan, opponent, startTime, endTime, state, teamSize, attacksPerMember } = data
+                   const { clan, opponent, startTime, endTime, state, battleModifier, teamSize, attacksPerMember } = data
 
                    const totalTownhallCount = teamSize * 1;
                    const totalStarCount = teamSize * 3;
 
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
+                                                                            .replace(/{BATTLE_TYPE_COLOR}/g, getBgColorByBattleType(battleModifier))
+                                                                            .replace(/{BATTLE_TYPE}/g, convBattleTypeName(battleModifier))
                                                                             .replace(/{TEAM_SIZE}/g, teamSize)
                                                                             .replace(/{TOTAL_STAR_COUNT}/g, totalStarCount)
                                                                             .replace(/{CLAN_STAR_COUNT}/, clan.stars)
@@ -305,8 +403,9 @@
                    memberAttackHtml.dataset.attacksPerMember = attacksPerMember;
                    settingMemberAttack(memberAttackHtml, sortByMapPosition(clan.members), opponent.members, attacksPerMember);
 
-
                    settingTooltips(clanWarContentsElement);
+
+                   drawReportClanWarMissingAttack(data);
                  })
                  .catch((error) => {
                    console.error(error);
@@ -341,6 +440,11 @@
       return `/clans/war?view=${viewType}`;
     }
 
+    let clanWarSize = -1;
+    const complatedDrawClanWarSet = new Set(); // 그리기 완료된 클랜 전쟁 셋
+
+    const ClanWarMap = new Map();
+
     function getClans() {
       showWifiLoading('.card-container');
 
@@ -358,6 +462,10 @@
                return;
              }
 
+             clanWarSize = data.length;
+
+             data.forEach(clan => ClanWarMap.set(clan.tag, clan));
+
              const carousel = document.querySelector(".carousel");
              for (let index = 0; index<data.length; index++) {
                const { tag, name } = data[index];
@@ -371,7 +479,10 @@
                                                           .replace(/{CLAN_NAME}/g, name);
 
                settingClanWar(clanWarContents, tag)
-               .then(() => clanWarContents.classList.remove('display-none'));
+               .then(() => {
+                 clanWarContents.classList.remove('display-none');
+                 complatedDrawClanWarSet.add(tag);
+               });
 
                carousel.appendChild(templateClanWar);
              }
@@ -412,8 +523,31 @@
         }
     }
 
+    function displayView(type) {
+      const sectionWrapper = document.querySelector('.section-wrapper');
+      const sections = sectionWrapper.querySelectorAll('.section');
+      sections.forEach(ele => ele.classList.add('display-none'));
+
+      const displayElement = sectionWrapper.querySelector(`.section.${type}`);
+      if (displayElement)
+        displayElement.classList.remove('display-none');
+    }
+
+    let intervalSortMissingAttack;
+    function setIntervalSortMissingAttack() {
+      intervalSortMissingAttack = setInterval(() => {
+        if (clanWarSize === complatedDrawClanWarSet.size) {
+          clearInterval(intervalSortMissingAttack);
+
+          // 모든 클랜 그리기가 종료되었으면 정렬
+          sortedMissingAttackTableTbody();
+        }
+      }, 1000);
+    }
+
     window.onload = async () => {
       await getClans();
+      setIntervalSortMissingAttack();
     }
   </script>
   <title>클랜전 현황</title>
@@ -442,7 +576,38 @@
 
   <div class="card-container">
     <div class="card-title">클랜전 현황</div>
-    <div class="carousel"></div>
+    <div class="support-area">
+      <div class="radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('progress-status'); return false;" checked>
+          <span class="name">진행 현황</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displayView('missing-attack'); return false;">
+          <span class="name">미공 현황</span>
+        </label>
+      </div>
+    </div>
+    <div class="section-wrapper">
+      <div class="section carousel progress-status"></div>
+      <div class="section missing-attack display-none">
+        <table class="table">
+          <caption class="table-caption">미공 목록</caption>
+          <thead class="table-thead">
+          <tr class="table-tr">
+            <th class="table-th">이름</th>
+            <th class="table-th">참여 클랜</th>
+            <th class="table-th">남은 시간</th>
+          </tr>
+          </thead>
+          <tbody class="table-tbody empty" data-order="0">
+          <tr class="table-tr">
+            <td class="table-td" colspan="3">미공 없음</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </section>
 </body>
@@ -522,6 +687,9 @@
           </div>
 
           <div class="war-info">
+            <div class="battle-type {BATTLE_TYPE_COLOR}">
+              {BATTLE_TYPE}
+            </div>
             <div class="clan-icon">
               <img class="clan" alt="" />
               <img class="opponent" alt="" />
@@ -638,5 +806,23 @@
     <div class="name">{ATTACK_NO}</div>
     <div class="message">사용 안함</div>
   </div>
+</template>
+
+<template id="table-tbody-template">
+  <tbody class="table-tbody"></tbody>
+</template>
+<template id="member-not-attack-row-template">
+  <tr class="table-tr row">
+    <td class="table-td name" rowspan=1>
+      {NAME}
+      <br/>
+      <div class="chips">
+        <span class="chip border-none">{TAG}</span>
+        <span class="forced-participate chip border-none bg-orange">강참</span>
+      </div>
+    </td>
+    <td class="table-td"><span class="chip bg-green border-none">{CLAN_NAME}</span></td>
+    <td class="table-td">{REMAIN_TIME}</td>
+  </tr>
 </template>
 </html>

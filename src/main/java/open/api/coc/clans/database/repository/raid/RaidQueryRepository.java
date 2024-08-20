@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.raid.RaidEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -50,4 +51,17 @@ public class RaidQueryRepository {
                            .fetchOne();
     }
 
+    public List<LocalDate> findLatestSeasonByPage(Pageable page) {
+        if (page == null) {
+            throw new IllegalArgumentException("page is not null");
+        }
+
+        return queryFactory.select(raidEntity.startDate)
+                           .from(raidEntity)
+                           .groupBy(raidEntity.startDate)
+                           .orderBy(raidEntity.startDate.desc())
+                           .offset(page.getOffset())
+                           .limit(page.getPageSize())
+                           .fetch();
+    }
 }

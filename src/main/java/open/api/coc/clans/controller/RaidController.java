@@ -12,7 +12,6 @@ import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.domain.raid.query.RaiderScoreQuery;
 import open.api.coc.clans.domain.raid.query.RaiderScoreQueryFactory;
-import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.clans.service.RaidService;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +79,7 @@ public class RaidController {
 
     @Operation(
         summary = "클랜 캐피탈 현재 시즌 기록 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 현재 시즌 기록 조회 API<br>서버에 수집된 데이터 기반"
+        description = "클랜 캐피탈 현재 시즌 기록 조회 API<br><small>서버에 수집된 데이터 기반</small>"
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RaidScoreResponse.class))),
@@ -93,8 +92,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "클랜 캐피탈 현재 시즌 랭킹 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 현재 시즌 랭킹 조회 API<br>서버에 수집된 데이터 기반"
+        summary = "클랜 캐피탈 현재 시즌 랭킹(획득 점수) 조회 API, version: 1.00, Last Update: 24.08.20",
+        description = "클랜 캐피탈 현재 시즌 랭킹(획득 점수) 조회 API<br><small>서버에 수집된 데이터 기반</small>"
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RankingHallOfFameDTO.class))),
@@ -106,9 +105,17 @@ public class RaidController {
                              .body(raidService.getRankingCurrentSeason());
     }
 
+    @Operation(
+        summary = "클랜 캐피탈 최근 시즌 랭킹(평균 점수) 조회 API, version: 1.00, Last Update: 24.08.20",
+        description = "클랜 캐피탈 최근 3주 시즌 랭킹(평균 점수) 조회 API<br><small>서버에 수집된 데이터 기반</small>"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RankingHallOfFameDTO.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @GetMapping("/ranking/average/season")
-    public ResponseEntity<List<RankingHallOfFame>> rankingAverageSeason() {
-        List<RankingHallOfFame> rankingCurrentSeasons = raidService.getRankingAverageSeason();
-        return ResponseEntity.ok().body(rankingCurrentSeasons);
+    public ResponseEntity<List<RankingHallOfFameDTO>> rankingAverageSeason() {
+        return ResponseEntity.ok()
+                             .body(raidService.getRankingAverageSeason());
     }
 }

@@ -1,11 +1,19 @@
 package open.api.coc.clans.database.repository.raid;
 
+import static open.api.coc.clans.database.entity.raid.QRaidEntity.raidEntity;
+import static open.api.coc.clans.database.entity.raid.QRaiderEntity.raiderEntity;
+
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -28,5 +36,23 @@ public class RaiderQueryRepository {
             throw CustomRuntimeException.create(ExceptionCode.INTERNAL_ERROR, "playerName can not be empty");
 
         return raiderRepository.findByName(playerName, limit);
+    }
+
+    public List<RankingHallOfFameDTO> findRankingByStartDateAndPage(LocalDate currentSeason, Pageable page) {
+
+        ConstructorExpression<RankingHallOfFameDTO> rankingHallOfFameDTO = Projections.constructor(RankingHallOfFameDTO.class,
+                                                                                                   raiderEntity.tag.as("tag"),
+                                                                                                   raiderEntity.name.as("name"),
+                                                                                                   raiderEntity.resourceLooted.as("score"));
+
+        return queryFactory.select(rankingHallOfFameDTO)
+                           .from(raiderEntity)
+                           .leftJoin(raiderEntity.raid, raidEntity)
+                           .where(raidEntity.startDate.eq(currentSeason))
+                           .orderBy(raiderEntity.resourceLooted.desc())
+                           .offset(page.getOffset())
+                           .limit(page.getPageSize())
+                           .fetch();
+
     }
 }

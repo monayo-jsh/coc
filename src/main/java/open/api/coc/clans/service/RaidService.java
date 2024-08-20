@@ -20,18 +20,19 @@ import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.raid.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
-import open.api.coc.clans.database.repository.raid.RaidRepository;
 import open.api.coc.clans.database.repository.raid.RaidQueryRepository;
+import open.api.coc.clans.database.repository.raid.RaidRepository;
 import open.api.coc.clans.database.repository.raid.RaiderQueryRepository;
 import open.api.coc.clans.database.repository.raid.RaiderRepository;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
-import open.api.coc.clans.domain.raid.query.RaiderScoreQuery;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
+import open.api.coc.clans.domain.raid.query.RaiderScoreQuery;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeason;
 import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
@@ -168,13 +169,13 @@ public class RaidService {
         return clanCapitalRaidSeasonResponseConverter.convert(clanCapitalRaidSeason);
     }
 
-    public List<RankingHallOfFame> getRankingCurrentSeason() {
-        LocalDate currentSeason = raidRepository.getCurrentSeason();
+    public List<RankingHallOfFameDTO> getRankingCurrentSeason() {
+        LocalDate currentSeason = raidQueryRepository.getCurrentSeason();
         if (Objects.isNull(currentSeason)) {
             return Collections.emptyList();
         }
 
-        return raiderRepository.getRankingByStartDateAndLimit(currentSeason, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        return raiderQueryRepository.findRankingByStartDateAndPage(currentSeason, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
     public List<RankingHallOfFame> getRankingAverageSeason() {
@@ -187,7 +188,7 @@ public class RaidService {
     }
 
     public List<RaidScoreResponse> getAttackCurrentSeason() {
-        LocalDate currentSeason = raidRepository.getCurrentSeason();
+        LocalDate currentSeason = raidQueryRepository.getCurrentSeason();
         if (Objects.isNull(currentSeason)) {
             return Collections.emptyList();
         }

@@ -2,15 +2,16 @@ package open.api.coc.clans.domain.ranking;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-public interface RankingHallOfFame {
-
-    @Schema(description = "이름")
-    String getName();
+public record RankingHallOfFameDTO(
 
     @Schema(description = "태그")
-    String getTag();
+    String tag,
+
+    @Schema(description = "이름")
+    String name,
 
     @Schema(description = "점수")
-    Integer getScore();
+    Integer score
 
+) {
 }

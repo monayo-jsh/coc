@@ -48,12 +48,6 @@ public interface RaiderRepository extends JpaRepository<RaiderEntity, Long> {
     )
     List<RaiderEntity> findByName(String playerName, Integer Limit);
 
-    @Query("select raider"
-        + " from RaiderEntity raider "
-        + " join RaidEntity raid on raid.id = raider.raid.id "
-        + " where raid.startDate = :startDate ")
-    List<RaiderEntity> getMissingAttacks(LocalDate startDate);
-
     @Query("select raider.tag as tag, raider.name as name, raider.resourceLooted as score "
         + " from RaiderEntity raider "
         + " join fetch RaidEntity raid on raid.startDate in :startDate and raid.id = raider.raid.id"

@@ -10,10 +10,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ClanCapitalRaidSeasonMemberResponse {
 
-    @Schema(description = "태그")
+    @Schema(description = "사용자 태그")
     private String tag;
 
-    @Schema(description = "이름")
+    @Schema(description = "사용자 이름")
     private String name;
 
     @Schema(description = "현재 진행 공격수")

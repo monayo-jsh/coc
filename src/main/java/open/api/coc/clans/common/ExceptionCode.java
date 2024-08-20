@@ -10,6 +10,7 @@ public enum ExceptionCode {
 
     ERROR_NOT_FOUND("I4040", "정보 없음"),
 
+    INTERNAL_ERROR("I5000", "내부 처리 오류"),
     EXTERNAL_ERROR("E5000", "외부 연동 오류");
 
     private final String code;

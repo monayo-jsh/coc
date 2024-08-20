@@ -22,10 +22,12 @@ import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidRepository;
 import open.api.coc.clans.database.repository.raid.RaidQueryRepository;
+import open.api.coc.clans.database.repository.raid.RaiderQueryRepository;
 import open.api.coc.clans.database.repository.raid.RaiderRepository;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
+import open.api.coc.clans.domain.raid.query.RaiderScoreQuery;
 import open.api.coc.clans.domain.raid.RaidScoreResponse;
 import open.api.coc.clans.domain.raid.conveter.ClanCapitalRaidSeasonResponseConverter;
 import open.api.coc.clans.domain.raid.conveter.RaidScoreResponseConverter;
@@ -49,9 +51,11 @@ public class RaidService {
     private final ClansService clansService;
 
     private final RaidRepository raidRepository;
-    private final RaiderRepository raiderRepository;
+    private final RaidQueryRepository raidQueryRepository;
 
-    private final RaidQueryRepository raiderQueryRepository;
+    private final RaiderRepository raiderRepository;
+    private final RaiderQueryRepository raiderQueryRepository;
+
 
     private final TimeConverter timeConverter;
 
@@ -119,18 +123,9 @@ public class RaidService {
         return result;
     }
 
-    public List<RaidScoreResponse> getPlayerRaidScoreWithTag(String playerTag) {
-
-        final Integer SEARCH_LIMIT = 4;
-        List<RaiderEntity> raiderEntities = raiderRepository.findByTag(playerTag, SEARCH_LIMIT);
-
-        return getRaidScoreResponses(raiderEntities);
-    }
-
-    public List<RaidScoreResponse> getPlayerRaidScoreWithName(String playerName) {
-        final Integer SEARCH_LIMIT = 4;
-        List<RaiderEntity> raiderEntities = raiderRepository.findByName(playerName, SEARCH_LIMIT);
-
+    private static final Integer PLAYER_RAID_SCORE_SEARCH_LIMIT = 4;
+    public List<RaidScoreResponse> getPlayerRaidScore(RaiderScoreQuery query) {
+        List<RaiderEntity> raiderEntities = query.getStrategy().execute(raiderQueryRepository, query.getCriteria(), PLAYER_RAID_SCORE_SEARCH_LIMIT);
         return getRaidScoreResponses(raiderEntities);
     }
 
@@ -197,7 +192,7 @@ public class RaidService {
             return Collections.emptyList();
         }
 
-        List<RaidEntity> raidEntities = raiderQueryRepository.findAllByStartDate(currentSeason);
+        List<RaidEntity> raidEntities = raidQueryRepository.findAllByStartDate(currentSeason);
 
         return raidEntities.stream()
                            .map(raid -> convertRaidScoreResponse(raid.getRaiderEntityList()))

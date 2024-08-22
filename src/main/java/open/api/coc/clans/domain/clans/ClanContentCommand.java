@@ -9,41 +9,37 @@ import org.springframework.util.ObjectUtils;
 
 @Getter
 @Builder
-public class ClanContent {
+public class ClanContentCommand {
 
-    private final String tag;
+    private final String clanTag;
     private final String clanWarYn;
     private final String clanWarLeagueYn;
     private final String clanCapitalYn;
     private final String clanWarParallelYn;
 
-    private ClanContent(String tag, String clanWarYn, String clanWarLeagueYn, String clanCapitalYn,
-                        String clanWarParallelYn) {
-        this.tag = tag;
+    private ClanContentCommand(String clanTag, String clanWarYn, String clanWarLeagueYn, String clanCapitalYn,
+                               String clanWarParallelYn) {
+        this.clanTag = clanTag;
         this.clanWarYn = clanWarYn;
         this.clanWarLeagueYn = clanWarLeagueYn;
         this.clanCapitalYn = clanCapitalYn;
         this.clanWarParallelYn = clanWarParallelYn;
     }
 
-    public static ClanContent create(ClanContentRequest clanContentRequest) {
-        ClanContent clanContent = ClanContent.builder()
-                                             .tag(clanContentRequest.getTag())
-                                             .clanWarYn(clanContentRequest.getClanWarYn())
-                                             .clanWarLeagueYn(clanContentRequest.getClanWarLeagueYn())
-                                             .clanCapitalYn(clanContentRequest.getClanCapitalYn())
-                                             .clanWarParallelYn(clanContentRequest.getClanWarParallelYn())
-                                             .build();
+    public static ClanContentCommand create(String clanTag, ClanContentRequest clanContentRequest) {
+        ClanContentCommand clanContent = ClanContentCommand.builder()
+                                                           .clanTag(clanTag)
+                                                           .clanWarYn(clanContentRequest.getClanWarYn())
+                                                           .clanWarLeagueYn(clanContentRequest.getClanWarLeagueYn())
+                                                           .clanCapitalYn(clanContentRequest.getClanCapitalYn())
+                                                           .clanWarParallelYn(clanContentRequest.getClanWarParallelYn())
+                                                           .build();
 
         clanContent.validate();
         return clanContent;
     }
 
     private void validate() {
-        if (isEmpty(tag)) {
-            throw BadRequestException.create(ExceptionCode.INVALID_PARAMETER, "태그 미입력");
-        }
-
         if (validateYn(clanWarYn)) return;
         if (validateYn(clanWarLeagueYn)) return;
         if (validateYn(clanCapitalYn)) return;

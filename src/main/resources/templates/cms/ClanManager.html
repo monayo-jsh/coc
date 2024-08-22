@@ -316,10 +316,9 @@
 
       const changeYn = yn === 'Y' ? 'N' : 'Y';
       const requestBody = {}
-      requestBody.tag = clanTag;
       requestBody[menuName] = changeYn;
 
-      const result = await updateClanContent(requestBody);
+      const result = await updateClanContent(clanTag, requestBody);
       if (result) {
         // 성공 처리
         element.dataset.yn = changeYn;

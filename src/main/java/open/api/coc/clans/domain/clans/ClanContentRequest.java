@@ -8,9 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ClanContentRequest {
 
-    @JsonProperty("tag")
-    private final String tag;
-
     @JsonProperty("clan_war_yn")
     private final String clanWarYn;
 

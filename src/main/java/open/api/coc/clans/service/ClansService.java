@@ -42,7 +42,7 @@ import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
-import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanContentCommand;
 import open.api.coc.clans.domain.clans.ClanCreateCommand;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
@@ -220,28 +220,28 @@ public class ClansService {
     }
 
     @Transactional
-    public void updateClanContentStatus(ClanContent request) {
+    public void updateClanContentStatus(ClanContentCommand command) {
 
-        ClanContentEntity clanContent = clanContentRepository.findById(request.getTag())
-                                                             .orElseThrow(() -> createNotFoundException("클랜[%s] 컨텐츠 정보".formatted(request.getTag())));
+        ClanContentEntity clanContent = clanContentRepository.findById(command.getClanTag())
+                                                             .orElseThrow(() -> createNotFoundException("클랜[%s] 컨텐츠 정보".formatted(command.getClanTag())));
 
-        if (StringUtils.hasText(request.getClanWarYn())) {
-            clanContent.setClanWarYn(request.getClanWarYn());
+        if (StringUtils.hasText(command.getClanWarYn())) {
+            clanContent.setClanWarYn(command.getClanWarYn());
         }
 
-        if (StringUtils.hasText(request.getClanWarLeagueYn())) {
-            clanContent.setWarLeagueYn(request.getClanWarLeagueYn());
+        if (StringUtils.hasText(command.getClanWarLeagueYn())) {
+            clanContent.setWarLeagueYn(command.getClanWarLeagueYn());
         }
 
-        if (StringUtils.hasText(request.getClanCapitalYn())) {
-            clanContent.setClanCapitalYn(request.getClanCapitalYn());
+        if (StringUtils.hasText(command.getClanCapitalYn())) {
+            clanContent.setClanCapitalYn(command.getClanCapitalYn());
         }
 
-        if (StringUtils.hasText(request.getClanWarParallelYn())) {
-            clanContent.setClanWarParallelYn(request.getClanWarParallelYn());
+        if (StringUtils.hasText(command.getClanWarParallelYn())) {
+            clanContent.setClanWarParallelYn(command.getClanWarParallelYn());
         }
 
-        clanContentRepository.save(clanContent);
+         clanContentRepository.save(clanContent);
     }
 
     @Transactional
@@ -250,7 +250,7 @@ public class ClansService {
                                         .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanTag)));
 
         clan.setVisibleYn(YnType.N);
-        // clanRepository.save(clan); // 변경 감지에 따라 JPA 가 Query 수행 호출하거나 안하거나 동일한 동작
+        clanRepository.save(clan);
     }
 
     @Transactional

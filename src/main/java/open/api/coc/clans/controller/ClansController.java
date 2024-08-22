@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
-import open.api.coc.clans.domain.clans.ClanContent;
+import open.api.coc.clans.domain.clans.ClanContentCommand;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCreateCommand;
 import open.api.coc.clans.domain.clans.ClanCreateRequest;
@@ -82,7 +82,7 @@ public class ClansController {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @PostMapping("{clanTag}")
+    @PostMapping("/{clanTag}")
     public ResponseEntity<ClanResponse> registerClan(@PathVariable String clanTag,
                                                      @Valid @RequestBody ClanCreateRequest request) {
 
@@ -101,23 +101,42 @@ public class ClansController {
         @Parameter(name = "clanTag", description = "클랜 태그", required = true)
     })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body"),
+        @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @DeleteMapping("{clanTag}")
+    @DeleteMapping("/{clanTag}")
     public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
         clansService.deactivateClan(clanTag);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("content")
-    public ResponseEntity<ClanContentRequest> putContent(@RequestBody ClanContentRequest clanContentRequest) {
+    @Operation(
+        summary = "클랜의 컨텐츠 정보를 수정합니다. version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 클랜의 컨텐츠 정보를 업데이트합니다. <br/>클랜 태그를 기반으로 해당 클랜의 다양한 컨텐츠 설정을 수정할 수 있습니다.",
+        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "클랜 컨텐츠 수정 객체",
+            required = true,
+            content = @Content(
+                mediaType = MediaType.APPLICATION_JSON_VALUE,
+                schema = @Schema(implementation = ClanContentRequest.class)
+            )
+        )
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PutMapping("/{clanTag}/content")
+    public ResponseEntity<Void> putContent(@PathVariable String clanTag,
+                                                         @RequestBody ClanContentRequest clanContentRequest) {
 
-        ClanContent clanContent = ClanContent.create(clanContentRequest);
-        clansService.updateClanContentStatus(clanContent);
+        ClanContentCommand command = ClanContentCommand.create(clanTag, clanContentRequest);
+        clansService.updateClanContentStatus(command);
 
-        return ResponseEntity.ok()
-                             .body(clanContentRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/war")

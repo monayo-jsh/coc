@@ -1,3 +1,5 @@
+const PREFIX_CLAN_API = '/api/clans'; // 클랜 API
+
 const URI_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
 const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
 
@@ -21,7 +23,7 @@ const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/membe
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //리그 일괄 배정
 
-const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
+const URI_CLAN_CONTENT_STATUS = `/clans/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
 function divideClanArray(array, size) {
   if (array.length === 1) return [array];
@@ -92,8 +94,10 @@ async function deleteClan(clanTag) {
                     });
 }
 
-async function updateClanContent(requestBody) {
-  return await axios.put(URI_CLAN_CONTENT, requestBody)
+async function updateClanContent(clanTag, requestBody) {
+  const uri = URI_CLAN_CONTENT_STATUS.replace(/{clanTag}/, encodeURIComponent(clanTag))
+
+  return await axios.put(uri, requestBody)
                     .then((response) => {
                       alert('처리 되었습니다.');
                       return true;

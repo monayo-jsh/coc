@@ -160,7 +160,7 @@ public class ClansService {
                               .collect(Collectors.toList());
     }
 
-    public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
+    private ClanMemberListRes getClanMembersExternalByClanTag(String clanTag) {
         ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag);
 
         ClanMemberListRes clanMemberListRes = clanMemberListResConverter.convert(clanMemberList);
@@ -173,7 +173,7 @@ public class ClansService {
         List<String> uniqueClanTags = clanTags.stream().distinct().toList();
 
         return uniqueClanTags.stream()
-                             .map(this::findClanMembersByClanTag)
+                             .map(this::getClanMembersExternalByClanTag)
                              .collect(Collectors.toList());
     }
 

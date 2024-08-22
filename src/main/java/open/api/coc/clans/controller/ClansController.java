@@ -215,12 +215,6 @@ public class ClansController {
         return ResponseEntity.ok().body(clan);
     }
 
-    @GetMapping("/{clanTag}/members")
-    public ResponseEntity<ClanMemberListRes> getClanMembers(@PathVariable String clanTag) {
-        ClanMemberListRes clanMemberList = clansService.findClanMembersByClanTag(clanTag);
-        return ResponseEntity.ok().body(clanMemberList);
-    }
-
     @GetMapping("/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestClanAssignedMembers() {
         ClanAssignedMemberListResponse clanAssignedMemberList = clansService.getLatestClanAssignedMembers();

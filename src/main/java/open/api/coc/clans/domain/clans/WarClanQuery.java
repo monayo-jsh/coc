@@ -28,4 +28,7 @@ public class WarClanQuery {
         return "parallel".equalsIgnoreCase(type);
     }
 
+    public boolean isLeaugeWar() {
+        return "league".equalsIgnoreCase(type);
+    }
 }

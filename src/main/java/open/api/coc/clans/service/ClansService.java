@@ -2,7 +2,6 @@ package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -75,6 +74,7 @@ public class ClansService {
 
     private final ClanApiService clanApiService;
     private final ClanWarService clanWarService;
+    private final LeagueWarService leagueWarService;
 
     private final ClanRepository clanRepository;
     private final ClanQueryRepository clanQueryRepository;
@@ -97,7 +97,6 @@ public class ClansService {
 
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
     public ClanResponse findClanByClanTag(String clanTag) {
         Clan clan = clanApiService.findClanByClanTag(clanTag)
                                   .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 조회 실패"));
@@ -536,24 +535,6 @@ public class ClansService {
         return clanRepository.findById(clanTag);
     }
 
-    public List<ClanResponse> getWarLeagueClanResList() {
-        List<ClanEntity> clanWarLeagueList = clanRepository.findWarLeagueClanList();
-
-        changeCurrentSeasonWarLeague(clanWarLeagueList);
-
-        return clanWarLeagueList.stream()
-                                .map(clanResponseConverter::convert)
-                                .collect(Collectors.toList());
-    }
-
-    private void changeCurrentSeasonWarLeague(List<ClanEntity> clanWarLeagueList) {
-        String season = getCurrentSeason();
-        for (ClanEntity clanEntity : clanWarLeagueList) {
-            Optional<ClanLeagueWarEntity> findClanLeagueWarEntity = clanLeagueWarRepository.findByClanTagAndSeason(clanEntity.getTag(), season);
-            findClanLeagueWarEntity.ifPresent(clanLeagueWarEntity -> clanEntity.changeWarLeague(clanLeagueWarEntity.getWarLeague()));
-        }
-    }
-
     @Transactional
     public ClanCurrentWarLeagueGroupResponse getClanCurrentWarLeagueGroup(String clanTag) {
         String season = getCurrentSeason();
@@ -577,7 +558,7 @@ public class ClansService {
         return clanCurrentWarLeagueGroupResponseConverter.convert(clanCurrentWarLeagueGroup);
     }
 
-    private static String getCurrentSeason() {
+    private String getCurrentSeason() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
     }
 
@@ -638,13 +619,25 @@ public class ClansService {
 
     @Transactional(readOnly = true)
     public List<ClanResponse> getWarClans(String warType) {
-
         WarClanQuery query = WarClanQuery.create(warType);
-        List<ClanEntity> clans = clanQueryRepository.findWarClanBy(query);
+        List<ClanEntity> clans = clanQueryRepository.findActiveWarClanBy(query);
 
         return clans.stream()
                     .map(clanResponseConverter::convert)
                     .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanResponse> getLeagueWarClans() {
+        WarClanQuery query = WarClanQuery.create("league");
+        List<ClanEntity> leagueWarClans = clanQueryRepository.findActiveWarClanBy(query);
+
+        // 현재 시즌 리그전 정보 설정
+        leagueWarService.assignCurrentSeasonLeagueInfo(leagueWarClans);
+
+        return leagueWarClans.stream()
+                             .map(clanResponseConverter::convert)
+                             .collect(Collectors.toList());
     }
 
 }

@@ -56,7 +56,7 @@ public class ClanQueryRepository {
         return clanRepository.findById(clanTag);
     }
 
-    public List<ClanEntity> findWarClanBy(WarClanQuery query) {
+    public List<ClanEntity> findActiveWarClanBy(WarClanQuery query) {
         BooleanBuilder condition = createSelectClanBaseConditionBuilder();
         if (query.isClanWar()) {
             condition.and(clanContentEntity.clanWarYn.eq(YnType.Y.name()));
@@ -64,9 +64,13 @@ public class ClanQueryRepository {
         if (query.isParallelClanWar()) {
             condition.and(clanContentEntity.clanWarParallelYn.eq(YnType.Y.name()));
         }
+        if (query.isLeaugeWar()) {
+            condition.and(clanContentEntity.warLeagueYn.eq(YnType.Y.name()));
+        }
 
         return createSelectClanBaseQuery().where(condition)
                                           .orderBy(clanEntity.order.asc())
                                           .fetch();
     }
+
 }

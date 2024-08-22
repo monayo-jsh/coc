@@ -140,8 +140,8 @@ public class ClansController {
     }
 
     @Operation(
-        summary = "전쟁 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 조회 유형에 따라 전쟁 클랜 목록을 반환합니다. 'normal'은 클랜전, 'parallel'은 병행클랜전을 조회합니다."
+        summary = "전쟁 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 조회 유형에 따라 전쟁 활성화 클랜 목록을 반환합니다. 'normal'은 클랜전, 'parallel'은 병행클랜전을 조회합니다."
     )
     @Parameters(value = {
         @Parameter(name = "warType", description = "조회 유형 (normal: 클랜전, parallel: 병행클랜전)", example = "normal")
@@ -157,12 +157,18 @@ public class ClansController {
                              .body(clansService.getWarClans(warType));
     }
 
+    @Operation(
+        summary = "리그전 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 리그전 활성화 클랜 목록을 반환합니다.<br>현재 시즌 참여한 리그전 정보로 반환합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @GetMapping("/war/league")
-    public ResponseEntity<List<ClanResponse>> getWarLeagueClans() {
-
-        List<ClanResponse> clanWarLeagueList = clansService.getWarLeagueClanResList();
+    public ResponseEntity<List<ClanResponse>> getLeagueWarClans() {
         return ResponseEntity.ok()
-                             .body(clanWarLeagueList);
+                             .body(clansService.getLeagueWarClans());
     }
 
     @GetMapping("/league/{clanTag}")

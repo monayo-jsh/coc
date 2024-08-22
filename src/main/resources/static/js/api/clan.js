@@ -1,9 +1,8 @@
 const PREFIX_CLAN_API = '/api/clans'; // 클랜 API
 
-const URI_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
+const URI_WAR_CLANS = "/clans/war"; // 진행 클랜 목록 조회 warType - none: 클랜전, parallel: 병행클랜전, league: 리그전
 const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
 
-const URL_WAR_LEAGUE_CLANS = "/clans/war/league"; //리그전 진행 클랜 목록 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
@@ -373,8 +372,14 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
                     });
 }
 
-async function fetchWarClans() {
-  return await axios.get(URI_WAR_CLANS)
+async function fetchWarClans(warType = "none") {
+  const option = {
+    params: {
+      warType
+    }
+  }
+
+  return await axios.get(URI_WAR_CLANS, option)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -395,18 +400,6 @@ async function fetchCapitalClans() {
                       console.error(error)
                       return [];
                     });
-}
-
-async function fetchWarLeagueClans() {
-  return axios.get(URL_WAR_LEAGUE_CLANS)
-              .then((response) => {
-                const { data } = response
-                return data;
-              })
-              .catch((error) => {
-                console.error(error)
-                return [];
-              });
 }
 
 async function fetchClanWarLeague(clanTag) {

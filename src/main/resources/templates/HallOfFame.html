@@ -353,7 +353,7 @@
       fetchCurrentAttackWins();
 
       //클랜전 부문
-      const warClans = await fetchWarClans();
+      const warClans = await fetchWarClans('none');
       await renderClans(warClans);
       fetchClanWarStars('all');
 

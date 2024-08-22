@@ -1356,7 +1356,7 @@
     async function getClansForLeague() {
       showWifiLoading('.card-container');
       await loadLeagues();
-      const warLeagueClans = await fetchWarLeagueClans();
+      const warLeagueClans = await fetchWarClans('league');
       hideWifiLoading('.card-container');
 
       const sortedLeagueClans = sortByLeague(warLeagueClans);

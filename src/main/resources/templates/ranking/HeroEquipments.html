@@ -107,7 +107,7 @@
     }
 
     window.onload = async () => {
-      const warClans = await fetchWarClans();
+      const warClans = await fetchWarClans('none');
       await renderClans(warClans);
 
       const radioInputs = document.querySelector('.radio-inputs');

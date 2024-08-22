@@ -622,22 +622,14 @@ public class ClansService {
         WarClanQuery query = WarClanQuery.create(warType);
         List<ClanEntity> clans = clanQueryRepository.findActiveWarClanBy(query);
 
+        if (query.isLeagueWar()) {
+            // 리그전 클랜 목록 조회 시 리그전 정보는 현재 시즌 리그전 정보로 설정
+            leagueWarService.assignCurrentSeasonLeagueInfo(clans);
+        }
+
         return clans.stream()
                     .map(clanResponseConverter::convert)
                     .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanResponse> getLeagueWarClans() {
-        WarClanQuery query = WarClanQuery.create("league");
-        List<ClanEntity> leagueWarClans = clanQueryRepository.findActiveWarClanBy(query);
-
-        // 현재 시즌 리그전 정보 설정
-        leagueWarService.assignCurrentSeasonLeagueInfo(leagueWarClans);
-
-        return leagueWarClans.stream()
-                             .map(clanResponseConverter::convert)
-                             .collect(Collectors.toList());
     }
 
 }

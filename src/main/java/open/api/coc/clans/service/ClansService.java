@@ -188,27 +188,14 @@ public class ClansService {
     @Transactional
     public List<ClanResponse> getClanDetailByClanTags(List<String> clanTags) {
         // 요청된 클랜 태그 중 서버에 저장된 목록 획득
-        Map<String, ClanEntity> clanEntities = clanQueryRepository.findAllByID(clanTags)
-                                                                  .stream()
-                                                                  .collect(Collectors.toMap(ClanEntity::getTag, entity -> entity));
+        Map<String, ClanEntity> clanEntityMap = getClanEntityMap(clanTags);
 
-        // 클랜 상세 정보 실시간 조회
-        List<Clan> clans = clanTags.stream()
-                                  .parallel()
-                                  .map(clanApiService::findClanByClanTag)
-                                  .filter(Optional::isPresent)
-                                  .map(Optional::get)
-                                  .toList();
+        // 클랜 상세 정보 실시간 연동 조회
+        List<Clan> clans = getClansByExternal(clanTags);
 
         // 클랜 리그전 정보 현행화
         List<ClanEntity> toUpdateEntities = clans.stream()
-                                                 .map(clan -> {
-                                                     ClanEntity clanEntity = clanEntities.get(clan.getTag());
-                                                     if (Objects.nonNull(clanEntity)) {
-                                                         clanEntity.setWarLeague(clan.getWarLeagueName());
-                                                     }
-                                                     return clanEntity;
-                                                 })
+                                                 .map(clan -> changeClanWarLeagueName(clan, clanEntityMap))
                                                  .filter(Objects::nonNull)
                                                  .toList();
 
@@ -219,10 +206,28 @@ public class ClansService {
                     .collect(Collectors.toList());
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void mergeClan(Clan clan) {
-        Optional<ClanEntity> findClan = clanRepository.findById(clan.getTag());
-        findClan.ifPresent(clanEntity -> clanEntity.setWarLeague(clan.getWarLeagueName()));
+    private ClanEntity changeClanWarLeagueName(Clan clan, Map<String, ClanEntity> clanEntityMap) {
+        ClanEntity clanEntity = clanEntityMap.get(clan.getTag());
+        if (Objects.nonNull(clanEntity)) {
+            clanEntity.setWarLeague(clan.getWarLeagueName());
+        }
+
+        return clanEntity;
+    }
+
+    private List<Clan> getClansByExternal(List<String> clanTags) {
+        return clanTags.stream()
+                       .parallel()
+                       .map(clanApiService::findClanByClanTag)
+                       .filter(Optional::isPresent)
+                       .map(Optional::get)
+                       .toList();
+    }
+
+    private Map<String, ClanEntity> getClanEntityMap(List<String> clanTags) {
+        return clanQueryRepository.findAllByID(clanTags)
+                                  .stream()
+                                  .collect(Collectors.toMap(ClanEntity::getTag, entity -> entity));
     }
 
     @Transactional

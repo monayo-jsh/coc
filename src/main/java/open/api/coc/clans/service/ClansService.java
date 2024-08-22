@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -48,11 +49,11 @@ import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
-import open.api.coc.clans.domain.clans.query.WarClanQuery;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
+import open.api.coc.clans.domain.clans.query.WarClanQuery;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -185,16 +186,37 @@ public class ClansService {
     }
 
     @Transactional
-    public List<ClanResponse> findClanByClanTags(List<String> clanTags) {
-        return clanTags.stream()
-                       .map(clanApiService::findClanByClanTag)
-                       .filter(Optional::isPresent)
-                       .map(findClan -> {
-                           Clan clan =findClan.get();
-                           mergeClan(clan);
-                           return clanResponseConverter.convert(clan);
-                       })
-                       .collect(Collectors.toList());
+    public List<ClanResponse> getClanDetailByClanTags(List<String> clanTags) {
+        // 요청된 클랜 태그 중 서버에 저장된 목록 획득
+        Map<String, ClanEntity> clanEntities = clanQueryRepository.findAllByID(clanTags)
+                                                                  .stream()
+                                                                  .collect(Collectors.toMap(ClanEntity::getTag, entity -> entity));
+
+        // 클랜 상세 정보 실시간 조회
+        List<Clan> clans = clanTags.stream()
+                                  .parallel()
+                                  .map(clanApiService::findClanByClanTag)
+                                  .filter(Optional::isPresent)
+                                  .map(Optional::get)
+                                  .toList();
+
+        // 클랜 리그전 정보 현행화
+        List<ClanEntity> toUpdateEntities = clans.stream()
+                                                 .map(clan -> {
+                                                     ClanEntity clanEntity = clanEntities.get(clan.getTag());
+                                                     if (Objects.nonNull(clanEntity)) {
+                                                         clanEntity.setWarLeague(clan.getWarLeagueName());
+                                                     }
+                                                     return clanEntity;
+                                                 })
+                                                 .filter(Objects::nonNull)
+                                                 .toList();
+
+        clanQueryRepository.saveAll(toUpdateEntities);
+
+        return clans.stream()
+                    .map(clanResponseConverter::convert)
+                    .collect(Collectors.toList());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

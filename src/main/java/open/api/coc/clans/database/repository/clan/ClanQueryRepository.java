@@ -53,7 +53,17 @@ public class ClanQueryRepository {
     }
 
     public Optional<ClanEntity> findById(String clanTag) {
-        return clanRepository.findById(clanTag);
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanEntity.tag.eq(clanTag));
+
+        return Optional.ofNullable(createSelectClanBaseQuery().where(condition)
+                                                              .fetchOne());
+    }
+
+    public List<ClanEntity> findAllByID(List<String> clanTags) {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanEntity.tag.in(clanTags));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .fetch();
     }
 
     public List<ClanEntity> findActiveWarClanBy(WarClanQuery query) {
@@ -64,4 +74,7 @@ public class ClanQueryRepository {
                                           .fetch();
     }
 
+    public void saveAll(List<ClanEntity> clanEntities) {
+        clanRepository.saveAll(clanEntities);
+    }
 }

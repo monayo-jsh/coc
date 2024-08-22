@@ -31,8 +31,8 @@ public class RaidController {
     private final RaidService raidService;
 
     @Operation(
-        summary = "클랜의 현재 시즌 캐피탈 조회 API (실시간 연동), version: 1.00, Last Update: 24.08.20",
-        description = "클랜의 현재 시즌 캐피탈 조회 API (실시간 연동)"
+        summary = "클랜의 현재 시즌 캐피탈 정보를 조회(실시간 연동)합니다. version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 클랜의 현재 시즌 캐피탈 정보를 실시간 연동하여 제공합니다.<br>연동 결과는 서버에 저장합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanCapitalRaidSeasonResponse.class))),
@@ -45,8 +45,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "클랜 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 기록 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 기록 조회 API<br><small>서버에 수집된 데이터 기반</small>"
+        summary = "현재 시즌 캐피탈 공격 기록 정보를 조회합니다. version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 서버에 수집된 현재 시즌 캐피탈 공격 기록 정보를 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RaidScoreResponse.class))),
@@ -59,8 +59,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "클랜 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터 수집용 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터 수집용 API"
+        summary = "캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터 수집을 수행합니다., version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터를 연동 후 서버에 수집합니다,"
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = String.class))),
@@ -73,8 +73,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "클랜 캐피탈 현재 시즌 랭킹(획득 점수) 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 현재 시즌 랭킹(획득 점수) 조회 API<br><small>서버에 수집된 데이터 기반</small>"
+        summary = "클랜 캐피탈 현재 시즌 획득 점수 랭킹을 조회합니다. version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 서버에 수집된 현재 시즌 획득 점수 데이터를 기반으로 랭킹을 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RankingHallOfFameDTO.class))),
@@ -87,8 +87,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "클랜 캐피탈 최근 시즌 랭킹(평균 점수) 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "클랜 캐피탈 최근 3주 시즌 랭킹(평균 점수) 조회 API<br><small>서버에 수집된 데이터 기반</small>"
+        summary = "클랜 캐피탈 평균 점수 랭킹을 조회합니다. version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 서버에 수집된 최근 3주간의 획득 점수 데이터를 기반으로 랭킹을 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RankingHallOfFameDTO.class))),
@@ -101,8 +101,8 @@ public class RaidController {
     }
 
     @Operation(
-        summary = "플레어이의 클랜 캐피탈 점수 조회 API, version: 1.00, Last Update: 24.08.20",
-        description = "플레이어의 클랜 캐피탈 점수 조회 API<br>서버에 수집된 데이터를 기반으로 최대 4주간 점수 제공"
+        summary = "플레어이의 캐피탈 점수를 조회합니다. version: 1.00, Last Update: 24.08.20",
+        description = "이 API는 서버에 수집된 데이터를 기반으로 최근 4주간의 정보를 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = RaidScoreResponse.class))),

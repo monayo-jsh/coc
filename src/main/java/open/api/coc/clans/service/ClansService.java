@@ -49,6 +49,7 @@ import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LeagueClanRes;
+import open.api.coc.clans.domain.clans.WarClanQuery;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
@@ -151,22 +152,6 @@ public class ClansService {
         return clans.stream()
                     .map(clanResponseConverter::convert)
                     .collect(Collectors.toList());
-    }
-
-    public List<ClanResponse> getWarClanResList() {
-        List<ClanEntity> clanWarList = clanRepository.findWarClanList();
-
-        return clanWarList.stream()
-                          .map(clanResponseConverter::convert)
-                          .collect(Collectors.toList());
-    }
-
-    public List<ClanResponse> getWarParallelClanResList() {
-        List<ClanEntity> clanWarParallelList = clanRepository.findClanWarParallelList();
-
-        return clanWarParallelList.stream()
-                                  .map(clanResponseConverter::convert)
-                                  .collect(Collectors.toList());
     }
 
     public List<ClanResponse> getActiveCapitalClans() {
@@ -650,4 +635,16 @@ public class ClansService {
             }
         }
     }
+
+    @Transactional(readOnly = true)
+    public List<ClanResponse> getWarClans(String warType) {
+
+        WarClanQuery query = WarClanQuery.create(warType);
+        List<ClanEntity> clans = clanQueryRepository.findWarClanBy(query);
+
+        return clans.stream()
+                    .map(clanResponseConverter::convert)
+                    .collect(Collectors.toList());
+    }
+
 }

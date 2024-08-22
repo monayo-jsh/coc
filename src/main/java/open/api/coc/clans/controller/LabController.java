@@ -25,8 +25,8 @@ public class LabController {
     private final LabRepository labRepository;
 
     @Operation(
-        summary = "연구소 목록 조회 API, version: 1.00, Last Update: 24.08.19",
-        description = "연구소 목록 조회 API"
+        summary = "연구소 방 목록을 조회합니다., version: 1.00, Last Update: 24.08.19",
+        description = "이 API는 연구소 방 목록을 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LabEntity.class)))),

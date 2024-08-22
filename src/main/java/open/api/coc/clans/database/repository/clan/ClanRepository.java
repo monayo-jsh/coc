@@ -9,23 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ClanRepository extends JpaRepository<ClanEntity, String> {
 
-    @Override
-    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' order by c.order")
-    List<ClanEntity> findAll();
-
     @Query("select max(c.order) from ClanEntity c")
     Integer selectMaxOrders();
 
-    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarYn = 'Y' order by c.order")
-    List<ClanEntity> findWarClanList();
-
-    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanCapitalYn = 'Y' order by c.order")
-    List<ClanEntity> findCapitalClanList();
-
     @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.warLeagueYn = 'Y' order by c.order")
     List<ClanEntity> findWarLeagueClanList();
-
-    @Query("select c from ClanEntity c join fetch c.clanContent where c.visibleYn = 'Y' and c.clanContent.clanWarParallelYn = 'Y' order by c.order")
-    List<ClanEntity> findClanWarParallelList();
 
 }

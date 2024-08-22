@@ -436,8 +436,8 @@
 
     function getUriForClanWarViewType() {
       const urlSearchParams = new URLSearchParams(location.search);
-      const viewType = urlSearchParams.get('type');
-      return `/clans/war?view=${viewType}`;
+      const warType = urlSearchParams.get('type');
+      return `/clans/war?warType=${warType}`;
     }
 
     let clanWarSize = -1;

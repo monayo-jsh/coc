@@ -50,8 +50,8 @@ public class ClansController {
     private final ClanWarLeagueScheduler scheduler;
 
     @Operation(
-        summary = "클랜 목록 조회 API, version: 1.00, Last Update: 24.08.14",
-        description = "클랜 목록 조회 API"
+        summary = "클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.14",
+        description = "이 API는 클랜 목록을 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
@@ -64,8 +64,8 @@ public class ClansController {
     }
 
     @Operation(
-        summary = "클랜 등록 API, version: 1.00, Last Update: 24.08.14",
-        description = "클랜 등록 API",
+        summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.08.14",
+        description = "이 API는 클랜 정보를 등록합니다.",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
             description = "클랜 등록 객체",
             required = true,
@@ -94,8 +94,8 @@ public class ClansController {
     }
 
     @Operation(
-        summary = "클랜 삭제 API, version: 1.00, Last Update: 24.08.22",
-        description = "클랜 삭제 API"
+        summary = "클랜 정보를 삭제합니다., version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 클랜 정보를 삭제합니다."
     )
     @Parameters(value = {
         @Parameter(name = "clanTag", description = "클랜 태그", required = true)
@@ -139,15 +139,22 @@ public class ClansController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(
+        summary = "전쟁 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 조회 유형에 따라 전쟁 클랜 목록을 반환합니다. 'normal'은 클랜전, 'parallel'은 병행클랜전을 조회합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "warType", description = "조회 유형 (normal: 클랜전, parallel: 병행클랜전)", example = "normal")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @GetMapping("/war")
-    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "normal") String view) {
-
-        List<ClanResponse> clanWarList = clansService.getWarClanResList();
-        if ("parallel".equals(view)) {
-            clanWarList = clansService.getWarParallelClanResList();
-        }
+    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "normal") String warType) {
         return ResponseEntity.ok()
-                             .body(clanWarList);
+                             .body(clansService.getWarClans(warType));
     }
 
     @GetMapping("/war/league")

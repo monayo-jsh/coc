@@ -12,6 +12,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.YnType;
+import open.api.coc.clans.domain.clans.WarClanQuery;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -53,5 +54,19 @@ public class ClanQueryRepository {
 
     public Optional<ClanEntity> findById(String clanTag) {
         return clanRepository.findById(clanTag);
+    }
+
+    public List<ClanEntity> findWarClanBy(WarClanQuery query) {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        if (query.isClanWar()) {
+            condition.and(clanContentEntity.clanWarYn.eq(YnType.Y.name()));
+        }
+        if (query.isParallelClanWar()) {
+            condition.and(clanContentEntity.clanWarParallelYn.eq(YnType.Y.name()));
+        }
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
     }
 }

@@ -159,11 +159,6 @@ public class ClansController {
                              .body(clansService.getWarClans(warType));
     }
 
-    @GetMapping("/league/{clanTag}")
-    public ResponseEntity<LeagueClanRes> getClansLeagueWar(@PathVariable String clanTag) throws IOException {
-        return ResponseEntity.ok(clansService.getLeagueClan(clanTag));
-    }
-
     @GetMapping("/capital")
     public ResponseEntity<List<ClanResponse>> getClansCapital() {
         return ResponseEntity.ok()

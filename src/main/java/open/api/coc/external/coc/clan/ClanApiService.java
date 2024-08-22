@@ -20,7 +20,7 @@ public interface ClanApiService {
 
     Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag);
 
-    Optional<ClanMemberList> findClanMembersByClanTag(String clanTag);
+    ClanMemberList findClanMembersByClanTag(String clanTag);
 
     Optional<Player> findPlayerBy(String playerTag);
 

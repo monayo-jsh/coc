@@ -2,10 +2,10 @@ package open.api.coc.clans.service;
 
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.common.AcademeClan;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
@@ -48,7 +47,6 @@ import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
-import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
@@ -162,31 +160,26 @@ public class ClansService {
                               .collect(Collectors.toList());
     }
 
-
-    public LeagueClanRes getLeagueClan(String clanTag) throws IOException {
-        AcademeClan clan = AcademeClan.findByTag(clanTag);
-        return LeagueClanRes.create(clan);
-    }
-
-
     public ClanMemberListRes findClanMembersByClanTag(String clanTag) {
-        ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag)
-                                                      .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 사용자 조회 실패"));
+        ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag);
 
         ClanMemberListRes clanMemberListRes = clanMemberListResConverter.convert(clanMemberList);
         clanMemberListRes.setClanTag(clanTag);
         return clanMemberListRes;
     }
 
-    public List<ClanMemberListRes> findClanMembersByClanTags(List<String> clanTags) {
+    public List<ClanMemberListRes> getClanMembersByClanTags(List<String> clanTags) {
+        if (clanTags.isEmpty()) return Collections.emptyList();
+
         return clanTags.stream()
-                       .parallel()
                        .map(this::findClanMembersByClanTag)
                        .collect(Collectors.toList());
     }
 
     @Transactional
     public List<ClanResponse> getClanDetailByClanTags(List<String> clanTags) {
+        if (clanTags.isEmpty()) return Collections.emptyList();
+
         // 요청된 클랜 태그 중 서버에 저장된 목록 획득
         Map<String, ClanEntity> clanEntityMap = getClanEntityMap(clanTags);
 

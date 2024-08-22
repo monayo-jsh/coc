@@ -187,15 +187,26 @@ public class ClansController {
     })
     @GetMapping("/detail")
     public ResponseEntity<List<ClanResponse>> getClanDetail(@RequestParam List<String> clanTags) {
-        List<ClanResponse> clans = clansService.getClanDetailByClanTags(clanTags);
         return ResponseEntity.ok()
-                             .body(clans);
+                             .body(clansService.getClanDetailByClanTags(clanTags));
     }
 
+    @Operation(
+        summary = "클랜의 가입중인 플레이어 목록을 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 클랜의 가입중인 플레이어 목록을 실시간 연동 결과로 반환합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTags", description = "클랜 태그 목록")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanMemberListRes.class)))),
+        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @GetMapping("/members")
     public ResponseEntity<List<ClanMemberListRes>> getClanMembersByClanTags(@RequestParam List<String> clanTags) {
-        List<ClanMemberListRes> clanMemberLists = clansService.findClanMembersByClanTags(clanTags);
-        return ResponseEntity.ok().body(clanMemberLists);
+        return ResponseEntity.ok()
+                             .body(clansService.getClanMembersByClanTags(clanTags));
     }
 
     @GetMapping("/{clanTag}")

@@ -54,11 +54,11 @@ public class ClanApiServiceImpl implements ClanApiService {
     }
 
     @Override
-    public Optional<ClanMemberList> findClanMembersByClanTag(String clanTag) {
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getClansClanMembersUri(), clanTag)
-                                             .retrieve()
-                                             .body(ClanMemberList.class));
+    public ClanMemberList findClanMembersByClanTag(String clanTag) {
+        return restClient.get()
+                         .uri(clashOfClanConfig.getClansClanMembersUri(), clanTag)
+                         .retrieve()
+                         .body(ClanMemberList.class);
     }
 
     @Override

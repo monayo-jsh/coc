@@ -72,8 +72,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpClientErrorException.class)
     public ResponseEntity<String> httpClientErrorException(HttpClientErrorException e) {
-        return ResponseEntity.status(e.getStatusCode())
-                             .body(e.getResponseBodyAsString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("[code]: %s, [error]: %s".formatted(e.getStatusCode(), e.getResponseBodyAsString()));
     }
 
     private String formatMessage(String name, String message) {

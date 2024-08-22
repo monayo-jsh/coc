@@ -25,7 +25,6 @@ import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
-import open.api.coc.clans.domain.clans.LeagueClanRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.MediaType;
@@ -159,6 +158,14 @@ public class ClansController {
                              .body(clansService.getWarClans(warType));
     }
 
+    @Operation(
+        summary = "캐피탈 활성화된 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
+        description = "이 API는 캐피탈 활성화된 클랜 목록을 반환합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @GetMapping("/capital")
     public ResponseEntity<List<ClanResponse>> getClansCapital() {
         return ResponseEntity.ok()

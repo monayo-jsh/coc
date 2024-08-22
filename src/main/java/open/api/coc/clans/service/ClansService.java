@@ -170,21 +170,23 @@ public class ClansService {
 
     public List<ClanMemberListRes> getClanMembersByClanTags(List<String> clanTags) {
         if (clanTags.isEmpty()) return Collections.emptyList();
+        List<String> uniqueClanTags = clanTags.stream().distinct().toList();
 
-        return clanTags.stream()
-                       .map(this::findClanMembersByClanTag)
-                       .collect(Collectors.toList());
+        return uniqueClanTags.stream()
+                             .map(this::findClanMembersByClanTag)
+                             .collect(Collectors.toList());
     }
 
     @Transactional
     public List<ClanResponse> getClanDetailByClanTags(List<String> clanTags) {
         if (clanTags.isEmpty()) return Collections.emptyList();
+        List<String> uniqueClanTags = clanTags.stream().distinct().toList();
 
         // 요청된 클랜 태그 중 서버에 저장된 목록 획득
-        Map<String, ClanEntity> clanEntityMap = getClanEntityMap(clanTags);
+        Map<String, ClanEntity> clanEntityMap = getClanEntityMap(uniqueClanTags);
 
         // 클랜 상세 정보 실시간 연동 조회
-        List<Clan> clans = getClansByExternal(clanTags);
+        List<Clan> clans = getClansByExternal(uniqueClanTags);
 
         // 클랜 리그전 정보 현행화
         List<ClanEntity> toUpdateEntities = clans.stream()

@@ -93,10 +93,21 @@ public class ClansController {
                              .body(clan);
     }
 
+    @Operation(
+        summary = "클랜 삭제 API, version: 1.00, Last Update: 24.08.22",
+        description = "클랜 삭제 API"
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @DeleteMapping("{clanTag}")
-    public ResponseEntity<?> deleteClan(@PathVariable String clanTag) {
+    public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
         clansService.deleteClan(clanTag);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("content")

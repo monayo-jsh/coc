@@ -106,7 +106,7 @@ public class ClansController {
     })
     @DeleteMapping("{clanTag}")
     public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
-        clansService.deleteClan(clanTag);
+        clansService.deactivateClan(clanTag);
         return ResponseEntity.noContent().build();
     }
 

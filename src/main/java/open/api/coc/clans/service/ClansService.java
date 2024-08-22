@@ -245,17 +245,12 @@ public class ClansService {
     }
 
     @Transactional
-    public void deleteClan(String clanTag) {
+    public void deactivateClan(String clanTag) {
         ClanEntity clan = clanRepository.findById(clanTag)
-                                        .orElse(null);
-
-        if (ObjectUtils.isEmpty(clan)) {
-            // 클랜 없는 경우 성공
-            return;
-        }
+                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanTag)));
 
         clan.setVisibleYn(YnType.N);
-        clanRepository.save(clan);
+        // clanRepository.save(clan); // 변경 감지에 따라 JPA 가 Query 수행 호출하거나 안하거나 동일한 동작
     }
 
     @Transactional

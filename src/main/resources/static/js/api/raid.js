@@ -1,15 +1,19 @@
-const URI_RAID_CLAN_CAPITAL_SEASON_COLLECT = '/raid/collect/seasons'; //클랜 습격전 최근 시즌 데이터 수집
+const PREFIX_RAID_API = '/api/raid'
 
-const URI_RAID_CLAN_CAPITAL_SEASON = '/raid/{clanTag}/seasons'; //클랜 습격전 최근 시즌 조회
-const URI_RAID_SCORE = '/raid/score'; //멤버 습격전 기록 조회
+// 현재 시즌 관련 엔드포인트
+const URI_RAID_SEASON = `${PREFIX_RAID_API}/{clanTag}/seasons/current`; // 특정 클랜 캐피탈 이번 시즌 조회
+const URI_RAID_SEASON_ATTACKS = `${PREFIX_RAID_API}/seasons/current/attacks`; // 클랜 캐피탈 이번 시즌 공격 기록 조회
+const URI_RAID_SEASON_COLLECT = `${PREFIX_RAID_API}/seasons/current/collect`; //클랜 캐피탈 이번 시즌 데이터 수집 요청
 
-const URI_RAID_ATTACK_SEASON_PLAYERS = '/raid/attack/season'; // 이번 시즌 기록 조회
+// 플레이어 기록 관련 엔드포인트
+const URI_RAID_SCORE_PLAYER = `${PREFIX_RAID_API}/score`; // 클랜 캐피탈 플레이어 기록 조회
 
-const URI_RAID_RANKING_CURRENT_SEASON = '/raid/ranking/current/season'; // 습격전 현재 시즌 랭킹
-const URI_RAID_RANKING_AVERAGE_SEASON = '/raid/ranking/average/season'; // 습격전 시즌 평균 랭킹
+// 랭킹 관련 엔드포인트
+const URI_RAID_SEASON_CURRENT_RANKING = `${PREFIX_RAID_API}/seasons/current/ranking`; // 클랜 캐피탈 현재 시즌 랭킹
+const URI_RAID_SEASON_AVERAGE_RANKING = `${PREFIX_RAID_API}/seasons/average/ranking`; // 클랜 캐피탈 시즌 평균 랭킹
 
 async function collectRaidSeason() {
-  return axios.post(URI_RAID_CLAN_CAPITAL_SEASON_COLLECT)
+  return axios.post(URI_RAID_SEASON_COLLECT)
               .then((response) => {
                 return response;
               })
@@ -25,7 +29,7 @@ async function fetchPlayerRaidScoreWithPlayerTag(playerTag) {
     }
   }
 
-  return await axios.get(URI_RAID_SCORE, option)
+  return await axios.get(URI_RAID_SCORE_PLAYER, option)
                     .then((response) => {
                       const { data } = response;
                       return data;
@@ -42,7 +46,7 @@ async function fetchPlayerRaidScoreWithPlayerName(playerName) {
       playerName
     }
   }
-  return await axios.get(URI_RAID_SCORE, option)
+  return await axios.get(URI_RAID_SCORE_PLAYER, option)
                     .then((response) => {
                       const { data } = response;
                       return data;
@@ -54,7 +58,7 @@ async function fetchPlayerRaidScoreWithPlayerName(playerName) {
 }
 
 async function fetchClanCapitalRaidSeason(clanTag) {
-  const uri = URI_RAID_CLAN_CAPITAL_SEASON.replace(/{clanTag}/, encodeURIComponent(clanTag));
+  const uri = URI_RAID_SEASON.replace(/{clanTag}/, encodeURIComponent(clanTag));
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
@@ -73,7 +77,7 @@ async function fetchClanCapitalRaidSeason(clanTag) {
 }
 
 async function fetchRaidAttackSeasonPlayers() {
-  return await axios.get(URI_RAID_ATTACK_SEASON_PLAYERS)
+  return await axios.get(URI_RAID_SEASON_ATTACKS)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -85,7 +89,7 @@ async function fetchRaidAttackSeasonPlayers() {
 }
 
 async function fetchRankingRaidCurrentSeason() {
-  return await axios.get(URI_RAID_RANKING_CURRENT_SEASON)
+  return await axios.get(URI_RAID_SEASON_CURRENT_RANKING)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -97,7 +101,7 @@ async function fetchRankingRaidCurrentSeason() {
 }
 
 async function fetchRankingRaidAverageSeason() {
-  return await axios.get(URI_RAID_RANKING_AVERAGE_SEASON)
+  return await axios.get(URI_RAID_SEASON_AVERAGE_RANKING)
                     .then((response) => {
                       const { data } = response
                       return data;

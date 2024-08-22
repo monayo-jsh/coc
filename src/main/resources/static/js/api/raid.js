@@ -1,4 +1,4 @@
-const PREFIX_RAID_API = '/api/raid'
+const PREFIX_RAID_API = '/api/raid' // 클랜 캐피탈 API
 
 // 현재 시즌 관련 엔드포인트
 const URI_RAID_SEASON = `${PREFIX_RAID_API}/{clanTag}/seasons/current`; // 특정 클랜 캐피탈 이번 시즌 조회

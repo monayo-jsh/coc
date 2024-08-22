@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "연구소", description = "연구소 관련 기능")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/lab")
+@RequestMapping("/api/lab")
 public class LabController {
 
     private final LabRepository labRepository;
@@ -32,7 +32,7 @@ public class LabController {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LabEntity.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @GetMapping("/link/all")
+    @GetMapping("/links")
     public ResponseEntity<List<LabEntity>> getLinks() {
         return ResponseEntity.ok()
                              .body(labRepository.findAll());

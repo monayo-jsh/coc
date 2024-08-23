@@ -4,6 +4,7 @@ import static open.api.coc.clans.common.exception.handler.ExceptionHandler.creat
 import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +26,7 @@ import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.league.LeagueEntity;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
+import open.api.coc.clans.database.entity.player.PlayerDonationStatEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
@@ -41,6 +43,7 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.common.LeagueRepository;
+import open.api.coc.clans.database.repository.player.PlayerDonationStatQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
@@ -56,6 +59,7 @@ import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.external.coc.clan.domain.common.PlayerClan;
 import open.api.coc.external.coc.clan.domain.common.Troops;
 import open.api.coc.external.coc.clan.domain.player.Player;
+import open.api.coc.util.SeasonUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -80,8 +84,9 @@ public class PlayersService {
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
     private final PlayerRepository playerRepository;
-
     private final PlayerQueryRepository playerQueryRepository;
+
+    private final PlayerDonationStatQueryRepository playerDonationStatQueryRepository;
 
     private final PlayerResponseConverter playerResponseConverter;
 
@@ -289,6 +294,14 @@ public class PlayersService {
         Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
+        try {
+            // 마지막 지원/지원 받은 유닛 수 통계 누적을 위해 선행 호출
+            collectPlayerDonationStat(playerEntity, player);
+        } catch (Exception e) {
+            // 상황 인지를 위해 로그 트래킹
+            log.error("%s 처리 중 통계 누적 동시성 예외 발생 : {}", e.getMessage(), e);
+        }
+
         modifyPlayer(playerEntity, player);
         modifyPlayerHero(playerEntity, player.getHeroes());
         modifyPlayerHeroEquipment(playerEntity, player);
@@ -301,6 +314,47 @@ public class PlayersService {
         playerRepository.save(playerEntity);
 
         return true;
+    }
+
+    private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {
+        // 시즌 구하기
+        String season = getSeason();
+
+        // find
+        Optional<PlayerDonationStatEntity> findPlayerDonationStatEntity = playerDonationStatQueryRepository.findByPlayerTagAndSeason(playerEntity.getPlayerTag(), season);
+
+        // 플레이어 지원/지원 받은 유닛 수 수집
+        PlayerDonationStatEntity playerDonationStatEntity = PlayerDonationStatEntity.create(playerEntity.getPlayerTag(),
+                                                                                            season,
+                                                                                            playerEntity.getDonations(),
+                                                                                            playerEntity.getDonationsReceived(),
+                                                                                            player.getDonations(),
+                                                                                            player.getDonationsReceived());
+
+        if (findPlayerDonationStatEntity.isEmpty()) {
+            // 신규 통계 생성
+            playerDonationStatQueryRepository.save(playerDonationStatEntity);
+            return;
+        }
+
+        // 기존 통계에 지원/지원 받은 유닛 수 누적
+        PlayerDonationStatEntity existingPlayerDonationStatEntity = findPlayerDonationStatEntity.get();
+        existingPlayerDonationStatEntity.addDonationsDelta(playerDonationStatEntity.getDonationsDelta());
+        existingPlayerDonationStatEntity.addDonationsReceivedDelta(playerDonationStatEntity.getDonationsReceivedDelta());
+
+        playerDonationStatQueryRepository.save(existingPlayerDonationStatEntity);
+    }
+
+    private String getSeason() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime seasonEndTime = SeasonUtils.getSeasonEndTime(now.getYear(), now.getMonthValue());
+
+        if (!now.isBefore(seasonEndTime)) {
+            // 현재 시간 기준으로 이번달 시즌 종료 이후에는 다음달 시즌 종료일로 조정
+            seasonEndTime = seasonEndTime.plusMonths(1);
+        }
+
+        return seasonEndTime.format(DateTimeFormatter.ofPattern("yyyy-MM"));
     }
 
     private void modifyClan(PlayerEntity player, PlayerClan playerClan) {

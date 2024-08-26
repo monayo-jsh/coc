@@ -79,4 +79,5 @@ public class PlayerDonationStatEntity {
     public void addDonationsReceivedDelta(int donationsReceivedDelta) {
         this.donationsReceivedDelta += donationsReceivedDelta;
     }
+
 }

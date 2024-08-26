@@ -295,7 +295,7 @@ public class PlayersService {
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         try {
-            // 마지막 지원/지원 받은 유닛 수 통계 누적을 위해 선행 호출
+            // 마지막 지원/지원 받은 유닛 수 통계 누적을 위해 사용자 정보 갱신보다 선행 처리
             collectPlayerDonationStat(playerEntity, player);
         } catch (Exception e) {
             // 상황 인지를 위해 로그 트래킹

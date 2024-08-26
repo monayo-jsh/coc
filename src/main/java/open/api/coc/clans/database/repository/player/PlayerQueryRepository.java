@@ -74,4 +74,11 @@ public class PlayerQueryRepository {
     public PlayerEntity save(PlayerEntity playerEntity) {
         return playerRepository.save(playerEntity);
     }
+
+    public long resetAllPlayerDonations() {
+        return queryFactory.update(playerEntity)
+                           .set(playerEntity.donations, 0)
+                           .set(playerEntity.donationsReceived, 0)
+                           .execute();
+    }
 }

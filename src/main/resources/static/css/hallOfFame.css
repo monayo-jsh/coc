@@ -47,6 +47,8 @@ body {
 
   .radio-inputs {
     flex-wrap: nowrap;
+    max-width: 610px;
+
     .name {
       color: black;
     }
@@ -57,6 +59,7 @@ body {
     }
   }
 }
+
 .section-wrapper {
   margin-top: 10px;
   display: flex;
@@ -154,6 +157,14 @@ div.icon-clan-capital {
   margin-right: 5px;
   width: 18px;
   height: 16px;
+}
+
+div.icon-caret-up {
+  filter: invert(19%) sepia(70%) saturate(5244%) hue-rotate(113deg) brightness(96%) contrast(104%);
+}
+
+div.icon-caret-up.color-blue {
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg);
 }
 
 i.first-place {

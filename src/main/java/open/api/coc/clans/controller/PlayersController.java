@@ -9,6 +9,8 @@ import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.SupportPlayerBulkRequest;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -128,5 +130,17 @@ public class PlayersController {
     public ResponseEntity<List<RankingHallOfFame>> getRankingAttackWins() {
         return ResponseEntity.ok()
                              .body(playersService.getRankingAttackWins());
+    }
+
+    @GetMapping("/ranking/donations")
+    public ResponseEntity<List<RankingHallOfFameDonationDTO>> getRankingDonations() {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingDonations());
+    }
+
+    @GetMapping("/ranking/donations/received")
+    public ResponseEntity<List<RankingHallOfFameDTO>> getRankingDonationsReceived() {
+        return ResponseEntity.ok()
+                             .body(playersService.getRankingDonationsReceived());
     }
 }

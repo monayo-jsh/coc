@@ -15,6 +15,10 @@ const URI_PLAYERS_SUPPORT_BULK = '/players/support/bulk'; //지원계정 일괄 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
 const URI_PLAYERS_RANKING_CURRENT_TROPHIES = "/players/ranking/trophies/current" //현재 트로피 순위
 const URI_PLAYERS_RANKING_ATTACK_WINS = "/players/ranking/attack/wins" //현재 공성 순위
+
+const URI_PLAYERS_RANKING_DONATIONS = "/players/ranking/donations" //현재 지원 순위
+const URI_PLAYERS_RANKING_DONATIONS_RECEIVED = "/players/ranking/donations/received" //현재 지원 받은 순위
+
 async function findPlayer(playerTag) {
   const uri = URI_PLAYERS_REALTIME.replace(/{playerTag}/, encodeURIComponent(playerTag));
   return await axios.get(uri)
@@ -190,6 +194,30 @@ async function fetchRankingPlayerTrophies() {
 
 async function fetchRankingPlayerAttackWins() {
   return await axios.get(URI_PLAYERS_RANKING_ATTACK_WINS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingPlayerDonations() {
+  return await axios.get(URI_PLAYERS_RANKING_DONATIONS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingPlayerDonationsReceived() {
+  return await axios.get(URI_PLAYERS_RANKING_DONATIONS_RECEIVED)
                     .then((response) => {
                       const { data } = response
                       return data;

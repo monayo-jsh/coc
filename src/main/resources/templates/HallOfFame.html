@@ -89,6 +89,26 @@
       }
     }
 
+    function renderRankingsDonations(sectionClassName, players, iconClassName) {
+      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
+      // clear
+      rankingTbody.innerHTML = '';
+
+      let rank = 1;
+      for(const player of players) {
+        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
+        const row = makeRankRow(rowData);
+
+        if (player.supportYn === 'Y') {
+          const nameElement = row.querySelector('.name');
+          nameElement.classList.add('color-deeppink');
+        }
+
+        rankingTbody.appendChild(row);
+        rank++;
+      }
+    }
+
     function makeRankClanWarRow(rowData) {
       const rankingRowTemplate = document.querySelector('#ranking-clan-war-row-template');
       const rankingRow = document.importNode(rankingRowTemplate.content, true);
@@ -191,6 +211,22 @@
       hideLoaderCircle(targetClassName);
     }
 
+    async function fetchCurrentDonations() {
+      const targetClassName = 'current-donations';
+      showLoaderCircle(targetClassName);
+      const rankings = await fetchRankingPlayerDonations();
+      renderRankingsDonations(targetClassName, rankings, 'icon-caret-up');
+      hideLoaderCircle(targetClassName);
+    }
+
+    async function fetchCurrentDonationsReceived() {
+      const targetClassName = 'current-donations-received';
+      showLoaderCircle(targetClassName);
+      const rankings = await fetchRankingPlayerDonationsReceived();
+      renderRankings(targetClassName, rankings, 'icon-caret-up color-blue');
+      hideLoaderCircle(targetClassName);
+    }
+
     async function fetchThisMonthClanWarStars(clanTag) {
       const baseMonth = dayjs();
       const targetClassName = 'this-month-clan-war-stars';
@@ -277,6 +313,11 @@
       table.classList.remove('opacity-01');
     }
 
+    function replaceCount(targetClassName, count) {
+      const seasonDateElement = document.querySelector(`.${targetClassName} .count`);
+      seasonDateElement.innerHTML = count;
+    }
+
     async function fetchThisMonthClanLeagueWar(clanTag) {
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
@@ -284,6 +325,7 @@
       const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
       renderRankingsClanLeagueWar(targetClassName, rankings);
       replaceSeasonDate(targetClassName, baseMonth);
+      replaceCount(targetClassName, rankings.length);
       hideLoaderCircle(targetClassName);
     }
 
@@ -299,25 +341,40 @@
       const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
       renderRankingsClanLeagueWar(targetClassName, rankings);
       replaceSeasonDate(targetClassName, baseMonth);
+      replaceCount(targetClassName, rankings.length);
       hideLoaderCircle(targetClassName);
     }
 
-    function renderClan(clan) {
+    function renderClan(clan, type = 'clan') {
       const { tag, name } = clan;
-      const radioItemTemplate = document.querySelector('#radio-item-template');
-      const radioItem = document.importNode(radioItemTemplate.content, true);
+      const radioItem = getRadioItemTemplateByType();
       const radio = radioItem.querySelector('.radio.item');
 
       radio.innerHTML = radio.innerHTML
+                             .replace(/{TYPE}/, type)
                              .replace(/{CLAN_TAG}/, tag)
                              .replace(/{CLAN_NAME}/, name);
 
-      const radioInputs = document.querySelector('.radio-inputs');
+      const radioInputs = getRadioInputsByType();
       radioInputs.appendChild(radio);
+
+      function getRadioItemTemplateByType() {
+        if (type === 'clan')
+          return copyTemplateById('clan-war-radio-item-template');
+
+        return copyTemplateById('league-war-radio-item-template');
+      }
+
+      function getRadioInputsByType() {
+        if (type === 'clan')
+          return document.querySelector('.clan-list.radio-inputs');
+
+        return document.querySelector('.league-clan-list.radio-inputs');
+      }
     }
-    function renderClans(clans) {
+    function renderClans(clans, type) {
       for(const clan of clans) {
-        renderClan(clan);
+        renderClan(clan, type);
       }
     }
 
@@ -335,11 +392,28 @@
       fetchLastMonthClanLeagueWar(clanTag);
     }
 
+    function displaySections(targetClassName) {
+      const flipCards = document.querySelector('.flip-cards');
+      const sections = flipCards.querySelectorAll('.section-wrapper.sections');
+      sections.forEach(section => section.classList.add('display-none'));
+
+      if (targetClassName === 'all') {
+        sections.forEach(section => section.classList.remove('display-none'));
+        return;
+      }
+
+      const targetSection = flipCards.querySelector(`.${targetClassName}`);
+      if (targetSection) {
+        targetSection.classList.remove('display-none');
+      }
+    }
+
     function swipeSection() {
       const flipCards = document.querySelector('.flip-cards');
       const swipeSection = document.querySelector('.section-wrapper.swipe:last-child');
       flipCards.prepend(swipeSection);
     }
+
 
     function intervalSwipeSection() {
       setInterval(() => {
@@ -351,13 +425,17 @@
       //개인 기록 부문
       fetchCurrentTrophies();
       fetchCurrentAttackWins();
+      fetchCurrentDonations();
+      fetchCurrentDonationsReceived();
 
       //클랜전 부문
       const warClans = await fetchWarClans('none');
-      await renderClans(warClans);
+      await renderClans(warClans, 'clan');
       fetchClanWarStars('all');
 
       //리그전 부문
+      const leagueWarClans = await fetchWarClans('league');
+      renderClans(leagueWarClans, 'league')
       fetchClanLeagueWar('all');
 
       //습격전 부문
@@ -378,9 +456,34 @@
       <i class="fa-solid fa-medal"></i>
     </div>
 
+    <div class="support-area">
+      <div class="section-filter radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('all'); return false;" checked>
+          <span class="name">전체</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('player'); return false;">
+          <span class="name">개인</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('capital'); return false;">
+          <span class="name">습격전</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('clan-war'); return false;">
+          <span class="name">클랜전</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('league-war'); return false;">
+          <span class="name">리그전</span>
+        </label>
+      </div>
+    </div>
+
     <div class="flip-cards">
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections player swipe">
 
         <div class="section-wrapper">
           <div class="section-title">개인 기록 부문</div>
@@ -460,18 +563,175 @@
             </div>
 
           </div>
+
+          <div class="section-contents">
+
+            <div class="section current-donations">
+              <div class="sub-title">현재 지원왕</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">지원한 수</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="3">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="section current-donations-received">
+              <div class="sub-title">현재 수혜왕</div>
+              <div class="rankings">
+                <table class="table">
+                  <caption>
+                    <div class="loader-circle display-none">
+                      <div class="bar1"></div>
+                      <div class="bar2"></div>
+                      <div class="bar3"></div>
+                      <div class="bar4"></div>
+                      <div class="bar5"></div>
+                      <div class="bar6"></div>
+                      <div class="bar7"></div>
+                      <div class="bar8"></div>
+                      <div class="bar9"></div>
+                      <div class="bar10"></div>
+                      <div class="bar11"></div>
+                      <div class="bar12"></div>
+                    </div>
+                  </caption>
+                  <thead>
+                  <tr class="table-tr">
+                    <th class="table-th">순위</th>
+                    <th class="table-th">이름</th>
+                    <th class="table-th">지원 받은수</th>
+                  </tr>
+                  </thead>
+                  <tbody class="table-tbody">
+                  <tr class="table-tr">
+                    <td class="table-td empty" colspan="3">데이터 수집중</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </div>
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections capital swipe">
+        <div class="section-title">습격전 부문</div>
+
+        <div class="section-contents">
+
+          <div class="section raid-current-season">
+            <div class="sub-title">현재 시즌 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="3">데이터 수집중</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+          <div class="section raid-average-season">
+            <div class="sub-title">최근 3주 평균 순위</div>
+            <div class="rankings">
+              <table class="table">
+                <caption>
+                  <div class="loader-circle display-none">
+                    <div class="bar1"></div>
+                    <div class="bar2"></div>
+                    <div class="bar3"></div>
+                    <div class="bar4"></div>
+                    <div class="bar5"></div>
+                    <div class="bar6"></div>
+                    <div class="bar7"></div>
+                    <div class="bar8"></div>
+                    <div class="bar9"></div>
+                    <div class="bar10"></div>
+                    <div class="bar11"></div>
+                    <div class="bar12"></div>
+                  </div>
+                </caption>
+                <thead>
+                <tr class="table-tr">
+                  <th class="table-th">순위</th>
+                  <th class="table-th">이름</th>
+                  <th class="table-th">점수</th>
+                </tr>
+                </thead>
+                <tbody class="table-tbody">
+                <tr class="table-tr">
+                  <td class="table-td empty" colspan="3">데이터 수집중</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section-wrapper sections clan-war swipe">
 
         <div class="section-wrapper">
           <div class="section-title">클랜전 부문</div>
           <div class="support-area">
-            <div class="radio-inputs">
+            <div class="clan-list radio-inputs">
               <label class="radio item">
-                <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+                <input type="radio" name="clan-radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
                 <span class="name">전체</span>
               </label>
             </div>
@@ -558,15 +818,23 @@
 
       </div>
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections league-war swipe">
 
         <div class="section-wrapper">
           <div class="section-title">리그전 부문</div>
+          <div class="support-area">
+            <div class="league-clan-list radio-inputs">
+              <label class="radio item">
+                <input type="radio" name="league-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
+                <span class="name">전체</span>
+              </label>
+            </div>
+          </div>
 
           <div class="section-contents">
 
             <div class="section this-month-league-war">
-              <div class="sub-title">[<span class="season-date">현재 시즌</span>] 완파 클랜원</div>
+              <div class="sub-title">[<span class="season-date">현재 시즌</span>] 완파 클랜원 (총: <span class="count">0</span> 명)</div>
               <div class="rankings">
                 <table class="table">
                   <caption>
@@ -603,7 +871,7 @@
             </div>
 
             <div class="section last-month-league-war">
-              <div class="sub-title">[<span class="season-date">지난 시즌</span>] 완파 클랜원</div>
+              <div class="sub-title">[<span class="season-date">지난 시즌</span>] 완파 클랜원 (총: <span class="count">0</span> 명)</div>
               <div class="rankings">
                 <table class="table">
                   <caption>
@@ -642,87 +910,6 @@
           </div>
         </div>
 
-      </div>
-
-      <div class="section-wrapper swipe">
-        <div class="section-title">습격전 부문</div>
-
-        <div class="section-contents">
-
-          <div class="section raid-current-season">
-            <div class="sub-title">현재 시즌 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">점수</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="3">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-
-          <div class="section raid-average-season">
-            <div class="sub-title">최근 3주 평균 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">점수</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="3">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-        </div>
       </div>
 
     </div>
@@ -770,9 +957,15 @@
     <td class="table-td"><div class="td-wrap"><div class="icon-clock"></div>{DURATION}</div></td>
   </tr>
 </template>
-<template id="radio-item-template">
+<template id="clan-war-radio-item-template">
   <label class="radio item">
-    <input type="radio" name="radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
+    <input type="radio" name="{TYPE}-radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
+</template>
+<template id="league-war-radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="{TYPE}-radio-clan" onchange="fetchClanLeagueWar('{CLAN_TAG}'); return false;">
     <span class="name">{CLAN_NAME}</span>
   </label>
 </template>

@@ -52,6 +52,8 @@ import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.clans.domain.players.converter.RankingHeroEquipmentResponseConverter;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
+import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -318,7 +320,7 @@ public class PlayersService {
 
     private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {
         // 시즌 구하기
-        String season = getSeason();
+        String season = getLeagueSeason();
 
         // find
         Optional<PlayerDonationStatEntity> findPlayerDonationStatEntity = playerDonationStatQueryRepository.findByPlayerTagAndSeason(playerEntity.getPlayerTag(), season);
@@ -345,7 +347,7 @@ public class PlayersService {
         playerDonationStatQueryRepository.save(existingPlayerDonationStatEntity);
     }
 
-    private String getSeason() {
+    private String getLeagueSeason() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime seasonEndTime = SeasonUtils.getSeasonEndTime(now.getYear(), now.getMonthValue());
 
@@ -628,5 +630,17 @@ public class PlayersService {
         // 현재 배정월 기준 배정클랜 제거
         String seasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         return clanAssignedPlayerQueryRepository.deleteBySeasonDateAndPlayerTags(seasonDate, playerTags);
+    }
+
+    public List<RankingHallOfFameDonationDTO> getRankingDonations() {
+        // 현재 시즌
+        String season = getLeagueSeason();
+        return playerDonationStatQueryRepository.findRankingDonationsBySeasonAndPage(season, PageRequest.of(0, hallOfFameConfig.getRanking()));
+    }
+
+    public List<RankingHallOfFameDTO> getRankingDonationsReceived() {
+        // 현재 시즌
+        String season = getLeagueSeason();
+        return playerDonationStatQueryRepository.findRankingDonationsReceivedBySeasonAndPage(season, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 }

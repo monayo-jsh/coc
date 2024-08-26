@@ -216,6 +216,9 @@ body::before {
 .color-red {
   color: red !important;
 }
+.color-deeppink {
+  color: deeppink !important;
+}
 
 .cursor-pointer {
   cursor: pointer !important;
@@ -544,7 +547,23 @@ body::before {
   background-position: center;
 }
 
+.icon-caret-up {
+  width: 15px;
+  height: 15px;
+  background-image: url("/static/images/etc/caret-up-solid.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
+.icon-caret-down {
+  width: 15px;
+  height: 15px;
+  background-image: url("/static/images/etc/caret-down-solid.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
 .file-upload-form {
   width: 185px;

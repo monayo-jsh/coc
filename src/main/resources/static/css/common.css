@@ -697,3 +697,11 @@ body::before {
 .border-none {
   border: none;
 }
+
+.w-25 {
+  width: 25px !important;
+}
+
+.h-25 {
+  height: 25px !important;
+}

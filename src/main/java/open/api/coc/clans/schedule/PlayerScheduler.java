@@ -27,7 +27,7 @@ public class PlayerScheduler {
     /**
      * 매달 4번째 주 월요일에 시즌 초기화.
      */
-    @Scheduled(cron = "0 0 2 ? * MON")  // 매주 월요일 2시에 실행
+    @Scheduled(cron = "0 0 14 ? * MON")  // 매주 월요일 14시에 실행
     @Transactional
     public void resetSeasonData() {
         LocalDate now = LocalDate.now();
@@ -84,15 +84,16 @@ public class PlayerScheduler {
     private boolean isNotCollectionTime() {
         // 시즌 초기화는 매달 4번째주 월요일 초기화를 기준으로 함.
         LocalDate now = LocalDate.now();
+        LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
 
-        if (!now.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            // 월요일이 아니면 수집 진행
+        if (!now.isEqual(fourthMonday)) {
+            // 4번째주 월요일이 아니면 수집 진행
             return false;
         }
 
         LocalTime time = LocalTime.now();
         LocalTime startTime = LocalTime.of(14, 0, 0); // 수집 제외 시작 시간
-        LocalTime endTime = LocalTime.of(14, 2, 0); // 수집 제외 종료 시간
+        LocalTime endTime = LocalTime.of(15, 0, 0); // 수집 제외 종료 시간
 
         // 수집 시간이 아닌 경우 (지정된 시간 범위 내에 있으면 수집 제외)
         if (isWithTimeRange(time, startTime, endTime)) {

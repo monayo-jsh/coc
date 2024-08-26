@@ -42,18 +42,32 @@
 
       const clanWarContent = cardContentsElement.querySelector('.clan-war');
 
+      const { clanTag, clanName } = clanWarContent.dataset
       const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
       const clanWarContents = templateClanWar.querySelector('.card-contents');
 
       clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                 .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                 .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+                                                 .replace(/{CLAN_TAG}/, clanTag)
+                                                 .replace(/{CLAN_NAME}/g, clanName);
 
-      settingClanWar(clanWarContents, clanWarContent.dataset.clanTag)
+      const missingAttackTable = document.querySelector('.section.missing-attack .table');
+      // 갱신 대상 클랜 미공 현황 제거
+      for (const tbody of missingAttackTable.tBodies) {
+        const { tag } = tbody.dataset;
+        if (tag === clanTag) {
+          missingAttackTable.removeChild(tbody);
+          break;
+        }
+      }
+
+      settingClanWar(clanWarContents, clanTag)
       .then(() => {
         cardContentsElement.innerHTML = clanWarContents.innerHTML;
         loader.classList.add('display-none');
         cardContentsElement.classList.remove('opacity-01');
+
+        // 미공 현황 재정렬
+        sortedMissingAttackTableTbody();
       });
 
     }
@@ -284,11 +298,12 @@
       const tableTbodyTemplate = copyTemplateById('table-tbody-template');
       const tableTbody = tableTbodyTemplate.querySelector('.table-tbody');
 
+      tableTbody.dataset.tag = clanData.tag;
       tableTbody.dataset.name = clanData.name;
       tableTbody.dataset.order = clanData.order;
 
       for (const member of clan.members) {
-        const { tag, name, attacks } = member;
+        const { tag, name, townHallLevel, attacks } = member;
         const isForcedParticipatePlayer = forcedParticipatePlayersSet.has(tag);
 
         if (attacks.length < attacksPerMember) {
@@ -296,7 +311,8 @@
             clan_name: clan.name,
             player_tag: tag,
             player_name: name,
-            remain_time: formattedRemainTime
+            remain_time: formattedRemainTime,
+            town_hall_level: townHallLevel,
           });
 
           if (!isForcedParticipatePlayer) {
@@ -343,9 +359,10 @@
       const memberNotAttackRowTemplate = copyTemplateById('member-not-attack-row-template');
       const memberNotAttackRow = memberNotAttackRowTemplate.querySelector('.row');
 
-      const { clan_name, player_tag, player_name, remain_time } = row;
+      const { clan_name, player_tag, player_name, remain_time, town_hall_level } = row;
 
       memberNotAttackRow.innerHTML = memberNotAttackRow.innerHTML
+                                                       .replace(/{TOWN_HALL_LEVEL}/, town_hall_level)
                                                        .replace(/{NAME}/, player_name)
                                                        .replace(/{TAG}/, player_tag)
                                                        .replace(/{CLAN_NAME}/, clan_name)
@@ -358,7 +375,7 @@
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
       await axios.get(uri)
-                 .then((response) => {
+                 .then(async (response) => {
                    const { data } = response;
                    const { clan, opponent, startTime, endTime, state, battleModifier, teamSize, attacksPerMember } = data
 
@@ -405,7 +422,7 @@
 
                    settingTooltips(clanWarContentsElement);
 
-                   drawReportClanWarMissingAttack(data);
+                   await drawReportClanWarMissingAttack(data);
                  })
                  .catch((error) => {
                    console.error(error);
@@ -814,9 +831,11 @@
 <template id="member-not-attack-row-template">
   <tr class="table-tr row">
     <td class="table-td name" rowspan=1>
-      {NAME}
-      <br/>
-      <div class="chips">
+      <div class="td-wrap display-flex align-items-center justify-content-center">
+        <div class="town-hall th{TOWN_HALL_LEVEL} w-25 h-25"></div>
+        {NAME}
+      </div>
+      <div class="chips mt-5">
         <span class="chip border-none">{TAG}</span>
         <span class="forced-participate chip border-none bg-orange">강참</span>
       </div>

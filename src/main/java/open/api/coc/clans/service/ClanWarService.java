@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,7 @@ import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
+import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
 import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
 import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
@@ -66,6 +68,8 @@ public class ClanWarService {
 
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
+
+    private final ClanWarWhitelistQueryRepository clanWarWhitelistQueryRepository;
 
     private final ClanWarMemberRepository clanWarMemberRepository;
 
@@ -168,6 +172,7 @@ public class ClanWarService {
                                                                                .collect(Collectors.toMap(clanWarMemberEntity -> clanWarMemberEntity.getId().getTag(),
                                                                                                          clanWarMemberEntity -> clanWarMemberEntity));
 
+        Set<String> clanWarWhitelist = clanWarWhitelistQueryRepository.findAll();
         for (ClanWarMember clanWarMember : clanWar.getClan().getMembers()) {
             ClanWarMemberEntity clanWarMemberEntity = clanWarMemberEntityMap.get(clanWarMember.getTag());
             if (ObjectUtils.isEmpty(clanWarMemberEntity)) {
@@ -181,6 +186,13 @@ public class ClanWarService {
                                                          .build();
 
                 clanWarEntity.addMember(clanWarMemberEntity);
+            }
+
+            if (!clanWarEntity.isLeagueWar()) {
+                // 리그전이 아닌 경우 화이트리스트에 등록된 계정은 강참 설정으로 전환을 기본 정책으로 설정
+                if (clanWarWhitelist.contains(clanWarMemberEntity.getId().getTag())) {
+                    clanWarMemberEntity.changeNecessaryAttack(YnType.N);
+                }
             }
 
             mergeClanWarMemberAttacks(clanWarMemberEntity, clanWarMember);

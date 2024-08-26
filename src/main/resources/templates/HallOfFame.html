@@ -76,6 +76,8 @@
     }
 
     function renderRankings(sectionClassName, players, iconClassName) {
+      if (!players || !players.length) return;
+
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
       // clear
       rankingTbody.innerHTML = '';
@@ -90,6 +92,8 @@
     }
 
     function renderRankingsDonations(sectionClassName, players, iconClassName) {
+      if (!players || !players.length) return;
+
       const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
       // clear
       rankingTbody.innerHTML = '';

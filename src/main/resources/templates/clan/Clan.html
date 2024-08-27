@@ -567,8 +567,10 @@
       clans.forEach(clan => {
         // 객체 병합
         const clanDetail = clanDetailMap[clan.tag];
-        clanDetail.order = clan.order;
-        clanDetail.clanContent = clan.clanContent;
+        if (clanDetail) {
+          clanDetail.order = clan.order;
+          clanDetail.clanContent = clan.clanContent;
+        }
         clanList.push(clanDetail);
       });
 

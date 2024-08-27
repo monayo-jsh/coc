@@ -12,8 +12,11 @@ import org.springframework.stereotype.Component;
 public class RaidScheduler {
     private final RaidService raidService;
 
-    @Scheduled(cron = "0 0 12 ? * FRI")
+    @Scheduled(cron = "0 0,5,10 16 ? * MON")
     public void raidScheduling() {
+        log.info("clan capital auto collection start");
         raidService.collectClanCapitalRaidSeason();
+        log.info("clan capital auto collection ended");
     }
+
 }

@@ -138,26 +138,26 @@ function makeClanDetailRequest(clans) {
 }
 
 async function fetchClansFromExternal(clans) {
-  const requests = divideClanArray(clans, clans.length/3).map(makeClanDetailRequest);
+  const requests = divideClanArray(clans, 1).map(makeClanDetailRequest);
 
   let results = [];
+
   // 클랜 상세 조회
-  return axios.all(requests)
-              .then((responses) => {
-                responses.forEach((response) => {
+  await axios.all(requests)
+             .then((responses) => {
+               responses.forEach((response) => {
 
-                  const { data } = response;
-                  data.forEach((response) => {
-                    results = results.concat(response);
-                  })
-                });
+                 const { data } = response;
+                 data.forEach((response) => {
+                   results = results.concat(response);
+                 })
+               });
+             })
+             .catch((error) => {
+               console.error(error);
+             });
 
-                return results;
-              })
-              .catch((error) => {
-                console.error(error);
-                return clans;
-              });
+  return results
 }
 
 function makeClanMemberRequest(clans) {

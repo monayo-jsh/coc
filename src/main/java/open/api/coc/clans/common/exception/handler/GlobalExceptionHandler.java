@@ -76,6 +76,12 @@ public class GlobalExceptionHandler {
                              .body("[code]: %s, [error]: %s".formatted(e.getStatusCode(), e.getResponseBodyAsString()));
     }
 
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<String> exception(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("[error]: %s".formatted(e.getMessage()));
+    }
+
     private String formatMessage(String name, String message) {
         return "[%s] %s".formatted(name, message);
     }

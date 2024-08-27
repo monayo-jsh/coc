@@ -212,7 +212,6 @@ public class ClansService {
 
     private List<Clan> getClansByExternal(List<String> clanTags) {
         return clanTags.stream()
-                       .parallel()
                        .map(clanApiService::findClanByClanTag)
                        .filter(Optional::isPresent)
                        .map(Optional::get)

@@ -445,8 +445,7 @@
     }
 
     function renderClan(clan, targetElement) {
-      const clanCardTemplate = document.querySelector("#clan-card");
-      const clanCard = document.importNode(clanCardTemplate.content, true);
+      const clanCard = copyTemplateById('clan-card');
       const card = clanCard.querySelector('.card');
 
       const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanCapitalPoints, labels, clanContent } = clan;
@@ -520,12 +519,14 @@
       clans.forEach(clan => {
         // 객체 병합
         const clanDetail = clanDetailMap[clan.tag];
-        clanDetail.order = clan.order;
-        clanDetail.clanContent = clan.clanContent;
-        resultClans.push(clanDetail);
+        if (clanDetail) {
+          clanDetail.order = clan.order;
+          clanDetail.clanContent = clan.clanContent;
+          resultClans.push(clanDetail);
+        }
       });
 
-      renderClans(resultClans)
+      renderClans(resultClans);
 
       hideWifiLoading('.clan-manager');
     }

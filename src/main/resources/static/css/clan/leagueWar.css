@@ -39,7 +39,7 @@
 }
 
 .clan-icon {
-  margin-top: 3px;
+  margin-top: 4px;
   width: 35px;
 }
 
@@ -157,6 +157,7 @@
 
     .name {
       flex: 100%;
+      margin-left: 5px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -476,13 +477,19 @@
   }
 
   .round.total {
+    color: coral;
     justify-content: center;
+
+    .label {
+      width: 40px;
+    }
   }
 
   .round {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 3px;
     color: #ffc251;
 
     .label {
@@ -525,7 +532,7 @@
     }
 
     .clan-rank {
-      margin-left: 3px;
+      margin-left: 15px;
       margin-top: 10px;
       width: 100%;
       display: flex;
@@ -539,7 +546,7 @@
       }
 
       .stars {
-        margin-left: 10px;
+        margin-left: 5px;
         white-space: nowrap;
       }
 
@@ -560,7 +567,6 @@
     }
 
     .clan-info {
-      margin-top: 2px;
       margin-left: 5px;
       display: flex;
       align-items: center;

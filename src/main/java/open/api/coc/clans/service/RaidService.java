@@ -178,12 +178,14 @@ public class RaidService {
     }
 
     public List<RankingHallOfFameDTO> getRankingAverageSeason() {
-        List<LocalDate> averageSeasonStartDates = raidQueryRepository.findLatestSeasonByPage(PageRequest.of(0, hallOfFameConfig.getAverage()));
-        if (CollectionUtils.isEmpty(averageSeasonStartDates)) {
+        List<LocalDate> latestSeasonStartDates = raidQueryRepository.findLatestSeasonByPage(PageRequest.of(0, hallOfFameConfig.getAverage() + 1));
+        if (CollectionUtils.isEmpty(latestSeasonStartDates)) {
             return Collections.emptyList();
         }
 
-        return raiderQueryRepository.findAverageRankingByStartDatesAndPage(averageSeasonStartDates, PageRequest.of(0, hallOfFameConfig.getRanking()));
+        List<LocalDate> lastThreeWeeks = latestSeasonStartDates.subList(1, latestSeasonStartDates.size());
+
+        return raiderQueryRepository.findAverageRankingByStartDatesAndPage(lastThreeWeeks, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
 
     public List<RaidScoreResponse> getAttackCurrentSeason() {

@@ -105,12 +105,16 @@ public class ClanWarService {
         if (findClanWar.isPresent()) {
             ClanWarEntity clanWarEntity = findClanWar.get();
 
-            // 이미 수집된 경우
-            if (clanWarEntity.isCollected()) { return ClanWarEntity.empty(); }
+            LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
+            // 점검 등으로 종료일시가 변경된 경우 갱신
+            if (!getLocalDateTime(clanWar.getEndTime()).isEqual(clanWarEntity.getEndTime())) {
+                clanWarEntity.setEndTime(endTime);
+            } else if (clanWarEntity.isCollected()) {
+                // 이미 수집된 경우
+                return ClanWarEntity.empty();
+            }
 
             clanWarEntity.setState(clanWar.getState());
-            LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
-            clanWarEntity.setEndTime(endTime);
 
             return clanWarEntity;
         }

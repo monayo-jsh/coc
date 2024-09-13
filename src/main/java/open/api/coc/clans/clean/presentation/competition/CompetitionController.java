@@ -1,5 +1,12 @@
 package open.api.coc.clans.clean.presentation.competition;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.CompetitionUseCase;
@@ -17,11 +24,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/competition")
+@Tag(name = "대회", description = "대회 관리")
 public class CompetitionController {
 
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
     private final CompetitionUseCase competitionUseCase;
 
+    @Operation(
+        summary = "대회를 등록합니다. version: 1.00, Last Update: 24.09.13",
+        description = "이 API는 대회를 등록합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CompetitionResponse.class)))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
     @PostMapping("")
     public ResponseEntity<CompetitionResponse> postCompetition(@Valid @RequestBody CompetitionCreateRequest request) {
 
@@ -31,6 +48,5 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.CREATED)
                              .body(competition);
     }
-
 
 }

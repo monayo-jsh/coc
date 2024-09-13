@@ -1,9 +1,13 @@
 package open.api.coc.clans.clean.domain.competition.exception;
 
-public class CompetitionAlreadyExistsException extends RuntimeException {
+import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.exception.BadRequestException;
+
+public class CompetitionAlreadyExistsException extends BadRequestException {
 
     public CompetitionAlreadyExistsException(String message) {
-        super("이미 등록된 대회가 존재합니다. (%s)".formatted(message));
+        super(ExceptionCode.ALREADY_DATA);
+        addExtraMessage(message);
     }
 
 }

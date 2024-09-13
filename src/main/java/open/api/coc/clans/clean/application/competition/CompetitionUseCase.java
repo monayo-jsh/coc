@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.application.competition;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
@@ -16,6 +17,26 @@ public class CompetitionUseCase {
 
     private final CompetitionService competitionService;
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
+
+    @Transactional(readOnly = true)
+    public List<CompetitionResponse> getCompetitions() {
+        // 1. 등록된 대회 목록을 조회한다.
+        List<Competition> competitions = competitionService.findAll();
+
+        // 2. 응답
+        return competitions.stream()
+                           .map(competitionUseCaseMapper::toResponse)
+                           .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public CompetitionResponse getCompetition(Long competitionId) {
+        // 1. 대회 정보를 조회한다.
+        Competition competition = competitionService.findById(competitionId);
+
+        // 2. 응답
+        return competitionUseCaseMapper.toResponse(competition);
+    }
 
     @Transactional
     public CompetitionResponse create(CompetitionCreateCommand command) {
@@ -55,4 +76,5 @@ public class CompetitionUseCase {
 
         competitionService.update(competition);
     }
+
 }

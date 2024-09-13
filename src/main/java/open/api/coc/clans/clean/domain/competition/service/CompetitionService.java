@@ -1,13 +1,14 @@
 package open.api.coc.clans.clean.domain.competition.service;
 
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionNotExistsException;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.repository.CompetitionRepository;
-import open.api.coc.clans.clean.infrastructure.competition.persistence.mapper.CompetitionMapper;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionEntity;
+import open.api.coc.clans.clean.infrastructure.competition.persistence.mapper.CompetitionMapper;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,13 @@ public class CompetitionService {
 
     private final CompetitionRepository competitionRepository;
     private final CompetitionMapper competitionMapper;
+
+    public List<Competition> findAll() {
+        List<CompetitionEntity> competitionEntities = competitionRepository.findAll();
+        return competitionEntities.stream()
+                                  .map(competitionMapper::toDomain)
+                                  .toList();
+    }
 
     public void validateExists(String name, LocalDate startDate, LocalDate endDate) {
         if (competitionRepository.exists(name, startDate, endDate)) {
@@ -45,4 +53,5 @@ public class CompetitionService {
         CompetitionEntity competitionEntity = competitionMapper.toEntity(competition);
         competitionRepository.save(competitionEntity);
     }
+
 }

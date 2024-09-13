@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.CompetitionUseCase;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
@@ -105,4 +106,26 @@ public class CompetitionController {
         return ResponseEntity.status(HttpStatus.OK)
                              .build();
     }
+
+    @Operation(
+        summary = "대회에 참가 신청합니다. version: 1.00, Last Update: 24.09.13",
+        description = "이 API는 대회에 참가 신청합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "성공 응답 - 대회 참가 고유 키", content = @Content(schema = @Schema(implementation = Long.class))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "404", description = "대회 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{competitionId}/participate/{clanTag}")
+    public ResponseEntity<Long> postCompetitionParticipate(@PathVariable Long competitionId,
+                                                           @PathVariable String clanTag) {
+
+        CompetitionParticipateCreateCommand command = competitionUseCaseMapper.toParticipateCreateCommand(competitionId, clanTag);
+        Long participateId = competitionUseCase.participate(command);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(participateId);
+    }
+
 }

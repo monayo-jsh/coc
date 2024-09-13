@@ -36,7 +36,7 @@ import org.springframework.data.domain.Persistable;
 public class ClanEntity implements Persistable<String> {
 
     @Id
-    @Column(name = "tag", length = 100)
+    @Column(name = "tag", nullable = false, length = 100)
     private String tag;
 
     @Column(name = "name", nullable = false, length = 100)

@@ -1,13 +1,18 @@
 package open.api.coc.clans.clean.infrastructure.competition.persistence.entity;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,5 +70,10 @@ public class CompetitionEntity {
     @Comment("메모")
     @Column(name = "remarks", nullable = true, length = 4000)
     private String remarks;
+
+    @Comment("대회 참가 목록")
+    @OneToMany(fetch = LAZY, mappedBy = "competition")
+    @Builder.Default
+    private List<CompetitionClanEntity> participantClans = new ArrayList<>();
 
 }

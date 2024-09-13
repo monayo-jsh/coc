@@ -1,6 +1,8 @@
 package open.api.coc.clans.clean.domain.competition.model;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,6 +35,10 @@ public class Competition {
     private String restrictions;
     // 메모
     private String remarks;
+
+    // 참가 클랜 목록
+    @Builder.Default
+    private List<CompetitionClan> participantClans = new ArrayList<>();
 
     public static Competition createNew(String name, LocalDate startDate, LocalDate endDate,
                                         String discordUrl, String ruleBookUrl,
@@ -77,5 +83,13 @@ public class Competition {
         if (StringUtils.hasText(remarks)) {
             this.remarks = remarks;
         }
+    }
+
+    public boolean isParticipated(String clanTag) {
+        return this.participantClans.stream().anyMatch(clan -> Objects.equals(clan.getClanTag(), clanTag));
+    }
+
+    public void participate(CompetitionClan competitionClan) {
+        this.participantClans.add(competitionClan);
     }
 }

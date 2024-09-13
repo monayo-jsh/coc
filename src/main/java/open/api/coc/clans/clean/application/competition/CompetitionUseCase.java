@@ -104,5 +104,5 @@ public class CompetitionUseCase {
         // 5. 응답
         return participateCompetitionClan.getId();
     }
-    
+
 }

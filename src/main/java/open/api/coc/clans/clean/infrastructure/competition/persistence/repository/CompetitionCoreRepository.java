@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 public class CompetitionCoreRepository implements CompetitionRepository {
 
     private final JpaCompetitionRepository jpaCompetitionRepository;
-
+    private final JpaCompetitionCustomRepository jpaCompetitionCustomRepository;
     @Override
     public CompetitionEntity save(CompetitionEntity competitionEntity) {
         return jpaCompetitionRepository.save(competitionEntity);
@@ -21,7 +21,11 @@ public class CompetitionCoreRepository implements CompetitionRepository {
 
     @Override
     public Optional<CompetitionEntity> findById(Long id) {
-        return jpaCompetitionRepository.findById(id);
+        if (id == null) {
+            throw new IllegalArgumentException("id can not be null");
+        }
+
+        return jpaCompetitionCustomRepository.findById(id);
     }
 
     @Override

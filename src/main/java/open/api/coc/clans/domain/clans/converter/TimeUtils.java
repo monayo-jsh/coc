@@ -88,4 +88,8 @@ public class TimeUtils implements TimeConverter {
     private static LocalDate toLastDayOfMonth(LocalDate date) {
         return date.with(TemporalAdjusters.lastDayOfMonth());
     }
+
+    public static String formattedISODate(LocalDate date) {
+        return date.format(DateTimeFormatter.ISO_DATE);
+    }
 }

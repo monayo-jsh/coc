@@ -69,7 +69,7 @@ public class CompetitionUseCase {
 
     @Transactional
     public void update(CompetitionUpdateCommand command) {
-        // 1. 등록된 대회 검증
+        // 1. 대회 조회
         Competition competition = competitionService.findById(command.id());
 
         // 2. 대회 수정

@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
 import org.springframework.util.StringUtils;
 
 @Getter
@@ -85,11 +87,13 @@ public class Competition {
         }
     }
 
-    public boolean isParticipated(String clanTag) {
-        return this.participantClans.stream().anyMatch(clan -> Objects.equals(clan.getClanTag(), clanTag));
+    public void validateAlreadyParticipated(Clan clan) {
+        if (this.isParticipated(clan.getTag())) {
+            throw new CompetitionAlreadyExistsException("이미 대회 참가 클랜(%s)".formatted(clan.getName()));
+        }
     }
 
-    public void participate(CompetitionClan competitionClan) {
-        this.participantClans.add(competitionClan);
+    private boolean isParticipated(String clanTag) {
+        return this.participantClans.stream().anyMatch(participantClan -> Objects.equals(participantClan.getClanTag(), clanTag));
     }
 }

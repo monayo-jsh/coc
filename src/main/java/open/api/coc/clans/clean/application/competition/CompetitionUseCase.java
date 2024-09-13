@@ -6,8 +6,8 @@ import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCas
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
+import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
-import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
@@ -85,17 +85,15 @@ public class CompetitionUseCase {
         competitionService.update(competition);
     }
 
+    @Transactional
     public Long participate(CompetitionParticipateCreateCommand command) {
-        // 1. 등록된 대회 검증
+        // 1. 대회 조회
         Competition competition = competitionService.findById(command.competitionId());
+        // 2. 클랜 조회
+        Clan clan = clanService.findById(command.clanTag());
 
-        // 2. 등록된 클랜 검증
-        clanService.validateExists(command.clanTag());
-
-        // 3. 클랜 대회 참여 검증
-        if (competition.isParticipated(command.clanTag())) {
-            throw new CompetitionAlreadyExistsException("이미 대회 참가 클랜(%s)".formatted(command.clanTag()));
-        }
+        // 3. 대회 참여 상태 검증
+        competition.validateAlreadyParticipated(clan);
 
         // 4. 대회 참가
         CompetitionClan competitionClan = CompetitionClan.createNew(competition.getId(), command.clanTag());

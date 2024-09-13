@@ -1,11 +1,13 @@
 package open.api.coc.clans.clean.domain.competition.model;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,5 +47,35 @@ public class Competition {
                           .restrictions(restrictions)
                           .remarks(remarks)
                           .build();
+    }
+
+    public void changeCompetition(String name, LocalDate startDate, LocalDate endDate,
+                                  String discordUrl, String ruleBookUrl,
+                                  Integer roasterSize, String restrictions, String remarks) {
+
+        if (StringUtils.hasText(name)) {
+            this.name = name;
+        }
+        if (Objects.nonNull(startDate)) {
+            this.startDate = startDate;
+        }
+        if (Objects.nonNull(endDate)) {
+            this.endDate = endDate;
+        }
+        if (StringUtils.hasText(discordUrl)) {
+            this.discordUrl = discordUrl;
+        }
+        if (StringUtils.hasText(ruleBookUrl)) {
+            this.ruleBookUrl = ruleBookUrl;
+        }
+        if (Objects.nonNull(roasterSize)) {
+            this.roasterSize =roasterSize;
+        }
+        if (StringUtils.hasText(restrictions)) {
+            this.restrictions = restrictions;
+        }
+        if (StringUtils.hasText(remarks)) {
+            this.remarks = remarks;
+        }
     }
 }

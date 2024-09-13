@@ -2,6 +2,7 @@ package open.api.coc.clans.common.exception.handler;
 
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
+import open.api.coc.clans.common.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> badRequestException(BadRequestException e) {
         String responseBody = formatMessage(e.getCode(), e.getMessage());
         return ResponseEntity.badRequest()
+                             .body(responseBody);
+    }
+
+    @ExceptionHandler(value = NotFoundException.class)
+    public ResponseEntity<String> notFoundException(NotFoundException e) {
+        String responseBody = formatMessage(e.getCode(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
                              .body(responseBody);
     }
 

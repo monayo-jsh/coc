@@ -1,9 +1,11 @@
 package open.api.coc.clans.clean.application.competition.mapper;
 
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
+import open.api.coc.clans.clean.presentation.competition.dto.CompetitionUpdateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -14,6 +16,8 @@ import org.mapstruct.ReportingPolicy;
 public interface CompetitionUseCaseMapper {
 
     CompetitionCreateCommand toCreateCommand(CompetitionCreateRequest request);
+
+    CompetitionUpdateCommand toUpdateCommand(Long id, CompetitionUpdateRequest request);
 
     CompetitionResponse toResponse(Competition competition);
 

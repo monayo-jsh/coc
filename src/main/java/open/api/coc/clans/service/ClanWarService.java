@@ -100,27 +100,35 @@ public class ClanWarService {
 
         LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
 
-        Optional<ClanWarEntity> findClanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanTag, startTime);
-
-        if (findClanWar.isPresent()) {
-            ClanWarEntity clanWarEntity = findClanWar.get();
-
-            LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
-            // 점검 등으로 종료일시가 변경된 경우 갱신
-            if (!getLocalDateTime(clanWar.getEndTime()).isEqual(clanWarEntity.getEndTime())) {
-                clanWarEntity.setEndTime(endTime);
-            } else if (clanWarEntity.isCollected()) {
-                // 이미 수집된 경우
-                return ClanWarEntity.empty();
-            }
-
-            clanWarEntity.setState(clanWar.getState());
-
-            return clanWarEntity;
+        Optional<ClanWarEntity> findClanWar;
+        if (ClanWarType.LEAGUE.equals(clanWarType)) {
+            // 리그전의 경우 리그 전쟁 태그로 유일 데이터 판단
+            findClanWar = clanWarQueryRepository.findByClanWarTag(clanWar.getWarTag());
+        } else {
+            // 일반 클랜전의 경우 클랜태그와 시작 시간으로 유일 데이터 판단
+            findClanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanTag, startTime);
         }
 
-        // 클랜전 기록 생성
-        return saveClanWar(clanWar, clanWarType);
+        // 클랜전 신규 기록 생성
+        if (findClanWar.isEmpty()) {
+            return saveClanWar(clanWar, clanWarType);
+        }
+
+        // 기존에 기록된 클랜전 정보 현행화
+        ClanWarEntity clanWarEntity = findClanWar.get();
+
+        LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
+        // 점검 등으로 종료일시가 변경된 경우 갱신
+        if (!getLocalDateTime(clanWar.getEndTime()).isEqual(clanWarEntity.getEndTime())) {
+            clanWarEntity.setEndTime(endTime);
+        } else if (clanWarEntity.isCollected()) {
+            // 이미 수집된 경우
+            return ClanWarEntity.empty();
+        }
+
+        clanWarEntity.setState(clanWar.getState());
+
+        return clanWarEntity;
     }
 
     @Transactional

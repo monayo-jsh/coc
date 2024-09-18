@@ -248,4 +248,14 @@ public class ClanWarQueryRepository {
     public ClanWarEntity save(ClanWarEntity clanWarEntity) {
         return clanWarRepository.save(clanWarEntity);
     }
+
+    public Optional<ClanWarEntity> findByClanWarTag(String warTag) {
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.warTag.eq(warTag));
+
+        ClanWarEntity clanWar = queryFactory.selectFrom(clanWarEntity)
+                                            .where(condition)
+                                            .fetchOne();
+        return Optional.ofNullable(clanWar);
+    }
 }

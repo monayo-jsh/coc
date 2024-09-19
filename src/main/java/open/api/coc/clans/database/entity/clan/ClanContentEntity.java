@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import open.api.coc.clans.database.entity.common.YnType;
+import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.domain.Persistable;
 
 @Builder
@@ -41,6 +42,10 @@ public class ClanContentEntity implements Persistable<String> {
     @Column(name = "clan_war_parallel_yn", nullable = false, length = 1)
     private String clanWarParallelYn;
 
+    @Column(name = "clan_competition_yn", nullable = false, length = 1)
+    @ColumnDefault("'N'")
+    private String clanCompetitionYn;
+
     @Transient
     @Builder.Default
     private boolean isNew = true;
@@ -63,6 +68,7 @@ public class ClanContentEntity implements Persistable<String> {
                                 .warLeagueYn(YnType.N.name())
                                 .clanCapitalYn(YnType.N.name())
                                 .clanWarParallelYn(YnType.N.name())
+                                .clanCompetitionYn(YnType.N.name())
                                 .build();
     }
 

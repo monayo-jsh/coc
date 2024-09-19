@@ -16,6 +16,7 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionCreateC
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
+import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionUpdateRequest;
 import org.springframework.http.HttpStatus;
@@ -46,8 +47,8 @@ public class CompetitionController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("")
-    public ResponseEntity<List<CompetitionResponse>> getCompetitions() {
-        List<CompetitionResponse> competitions = competitionUseCase.getCompetitions();
+    public ResponseEntity<List<CompetitionDetailResponse>> getCompetitions() {
+        List<CompetitionDetailResponse> competitions = competitionUseCase.getCompetitions();
         return ResponseEntity.status(HttpStatus.OK)
                              .body(competitions);
     }

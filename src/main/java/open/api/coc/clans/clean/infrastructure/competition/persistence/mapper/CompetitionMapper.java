@@ -16,6 +16,7 @@ public interface CompetitionMapper {
     @Mapping(target = "participantClans", ignore = true)
     CompetitionEntity toEntity(Competition competition);
 
+    @Mapping(target = "participantClans", ignore = true)
     Competition toDomain(CompetitionEntity competitionEntity);
 
 }

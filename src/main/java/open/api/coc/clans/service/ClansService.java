@@ -653,4 +653,11 @@ public class ClansService {
                     .collect(Collectors.toList());
     }
 
+    public List<ClanResponse> getActiveCompetitionClans() {
+        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllActiveCompetitionClans();
+
+        return clanCapitalList.stream()
+                              .map(clanResponseConverter::convert)
+                              .collect(Collectors.toList());
+    }
 }

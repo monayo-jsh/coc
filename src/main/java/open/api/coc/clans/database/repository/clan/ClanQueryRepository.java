@@ -77,4 +77,13 @@ public class ClanQueryRepository {
     public void saveAll(List<ClanEntity> clanEntities) {
         clanRepository.saveAll(clanEntities);
     }
+
+    public List<ClanEntity> findAllActiveCompetitionClans() {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        condition.and(clanContentEntity.clanCompetitionYn.eq(YnType.Y.name()));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
 }

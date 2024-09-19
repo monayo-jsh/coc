@@ -28,7 +28,7 @@ import org.hibernate.annotations.Comment;
 @Table(
     name = "tb_comp_clan",
     indexes = {
-        @Index(name = "idx_comp_clan_clan_tag", columnList = "clan_tag", unique = true)
+        @Index(name = "idx_comp_clan_clan_tag", columnList = "clan_tag")
     }
 )
 @Comment("대회 참여 클랜 테이블")

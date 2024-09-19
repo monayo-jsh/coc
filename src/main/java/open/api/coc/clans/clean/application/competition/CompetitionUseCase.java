@@ -12,6 +12,7 @@ import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionService;
+import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +28,16 @@ public class CompetitionUseCase {
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
 
     @Transactional(readOnly = true)
-    public List<CompetitionResponse> getCompetitions() {
+    public List<CompetitionDetailResponse> getCompetitions() {
         // 1. 등록된 대회 목록을 조회한다.
         List<Competition> competitions = competitionService.findAll();
 
-        // 2. 응답
+        // 2. 대회 참여 클랜을 조회한다.
+        competitions.forEach(competition -> competition.loadParticipantClans(competitionParticipateService));
+
+        // 3. 응답
         return competitions.stream()
-                           .map(competitionUseCaseMapper::toResponse)
+                           .map(competitionUseCaseMapper::toDetailResponse)
                            .toList();
     }
 

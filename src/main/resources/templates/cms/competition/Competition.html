@@ -31,7 +31,11 @@
 
 
   <script>
-    function registerCompetition() {
+    function renderGoogleSheet() {
+
+    }
+
+  function registerCompetition() {
       const registerForm = document.querySelector('form.register-form');
       const formData = new FormData(registerForm);
 
@@ -58,6 +62,9 @@
     }
 
     async function participant(ele, compId, clanTag) {
+      const clan = competitionClanMap.get(clanTag);
+      if (!confirm(`"${clan.name}" 클랜을 대회 참가 등록하시겠습니까?\n\n- 대회 참가 멤버 등록, 대회 일정 설정은 일정 관리 메뉴에서 설정 가능합니다.`)) return;
+
       participantCompetition(compId, clanTag)
       .then(() => {
         location.reload();
@@ -88,7 +95,7 @@
 
     }
 
-    function linkedUrl(competitionCardElement, className, url) {
+    function linkedUrl(competitionCardElement, className, url, tooltip) {
       const targetTag = competitionCardElement.querySelector(`.${className}`);
       if (!targetTag) return;
 
@@ -99,6 +106,8 @@
       }
 
       targetTag.href = url;
+
+      settingTooltip(targetTag, tooltip);
     }
 
     function getUnParticipantClans(participantClans) {
@@ -148,6 +157,9 @@
       const competitionCardTemplate = copyTemplateById('competition-card-template');
       const card = competitionCardTemplate.querySelector('.card');
 
+      // dataset
+      card.dataset.competition = JSON.stringify(competition);
+
       const competitionPeriod = `${startDate ? startDate : ''} ~ ${endDate ? endDate : ''}`;
       const rule = restrictions ? `밴: ${restrictions}` : '';
       card.innerHTML = card.innerHTML
@@ -162,8 +174,8 @@
       }
 
       drawParticipantClans(card, participantClans);
-      linkedUrl(card, 'url-discord', discordUrl);
-      linkedUrl(card, 'url-rulebook', ruleBookUrl);
+      linkedUrl(card, 'url-discord', discordUrl, "디스코드");
+      linkedUrl(card, 'url-rulebook', ruleBookUrl, "룰북");
 
       drawUnParticipantClans(card, id, participantClans);
 
@@ -228,6 +240,7 @@
   <div class="support-area">
     <div class="buttons">
       <div class="chip bg-gray cursor-pointer" onclick="displayRegisterForm();">대회 등록</div>
+      <a target="_blank" href="https://docs.google.com/spreadsheets/d/18Uaf6juWbZJKOgZ72_rFM-gQwe0ReUi0l2XJBIBUloA/edit?gid=0#gid=0" class="chip bg-green cursor-pointer" onclick="renderGoogleSheet();">구글시트 바로가기</a>
     </div>
     <div class="support-register-form-wrapper display-none">
       <form class="register-form">

@@ -1,34 +1,38 @@
 package open.api.coc.clans.clean.presentation.competition.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 
 public record CompetitionResponse(
 
-    // 대회 고유키
+    @Schema(description = "대회 고유키")
     Long id,
 
-    // 대회 이름
+    @Schema(description = "대회 이름")
     String name,
 
-    // 대회 시작일
+    @Schema(description = "대회 시작일")
     LocalDate startDate,
 
-    // 대회 종료일
+    @Schema(description = "대회 종료일")
     LocalDate endDate,
 
-    // 대회 디스코드 URL
+    @Schema(description = "대회 디스코드 URL")
     String discordUrl,
 
-    // 대회 룰북 URL
+    @Schema(description = "대회 룰북 URL")
     String ruleBookUrl,
 
-    // 최대 등록 멤버수
+    @Schema(description = "최대 등록 멤버수")
     Integer roasterSize,
 
-    // 제한사항
+    @Schema(description = "제한사항")
     String restrictions,
 
-    // 메모
+    @Schema(description = "대회 색상")
+    String bgColor,
+
+    @Schema(description = "메모")
     String remarks
 
 ) {

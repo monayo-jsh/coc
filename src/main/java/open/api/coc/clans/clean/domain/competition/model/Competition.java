@@ -35,6 +35,8 @@ public class Competition {
     private Integer roasterSize;
     // 제한사항
     private String restrictions;
+    // 대회 색상
+    private String bgColor;
     // 메모
     private String remarks;
 

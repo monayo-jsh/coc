@@ -67,6 +67,10 @@ public class CompetitionEntity {
     @Column(name = "restrictions", nullable = true, length = 500)
     private String restrictions;
 
+    @Comment("대회 색상")
+    @Column(name = "bg_color", nullable = true, length = 20)
+    private String bgColor;
+
     @Comment("메모")
     @Column(name = "remarks", nullable = true, length = 4000)
     private String remarks;

@@ -2,38 +2,42 @@ package open.api.coc.clans.clean.presentation.competition.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-public record CompetitionResponse(
+@NoArgsConstructor
+@Setter @Getter
+public class CompetitionResponse {
 
     @Schema(description = "대회 고유키")
-    Long id,
+    private Long id;
 
     @Schema(description = "대회 이름")
-    String name,
+    private String name;
 
     @Schema(description = "대회 시작일")
-    LocalDate startDate,
+    private LocalDate startDate;
 
     @Schema(description = "대회 종료일")
-    LocalDate endDate,
+    private LocalDate endDate;
 
     @Schema(description = "대회 디스코드 URL")
-    String discordUrl,
+    private String discordUrl;
 
     @Schema(description = "대회 룰북 URL")
-    String ruleBookUrl,
+    private String ruleBookUrl;
 
     @Schema(description = "최대 등록 멤버수")
-    Integer roasterSize,
+    private Integer roasterSize;
 
     @Schema(description = "제한사항")
-    String restrictions,
+    private String restrictions;
 
     @Schema(description = "대회 색상")
-    String bgColor,
+    private String bgColor;
 
     @Schema(description = "메모")
-    String remarks
+    private String remarks;
 
-) {
 }

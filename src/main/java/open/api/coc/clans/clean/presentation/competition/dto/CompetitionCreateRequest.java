@@ -30,6 +30,9 @@ public record CompetitionCreateRequest(
     // 제한사항
     String restrictions,
 
+    // 대회 색상
+    String bgColor,
+
     // 메모
     String remarks
 

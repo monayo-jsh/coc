@@ -42,8 +42,11 @@ public class CompetitionUseCase {
         // 1. 대회 정보를 조회한다.
         Competition competition = competitionService.findById(competitionId);
 
-        // 2. 응답
-        return competitionUseCaseMapper.toResponse(competition);
+        // 2. 대회 참여 클랜을 조회한다.
+        competition.loadParticipantClans(competitionParticipateService);
+
+        // 3. 응답
+        return competitionUseCaseMapper.toDetailResponse(competition);
     }
 
     @Transactional
@@ -59,6 +62,7 @@ public class CompetitionUseCase {
                                                         command.ruleBookUrl(),
                                                         command.roasterSize(),
                                                         command.restrictions(),
+                                                        command.bgColor(),
                                                         command.remarks());
 
         Competition createdCompetition = competitionService.create(competition);
@@ -80,6 +84,7 @@ public class CompetitionUseCase {
                                       command.ruleBookUrl(),
                                       command.roasterSize(),
                                       command.restrictions(),
+                                      command.bgColor(),
                                       command.remarks());
 
         competitionService.update(competition);

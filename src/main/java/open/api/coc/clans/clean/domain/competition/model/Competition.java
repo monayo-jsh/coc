@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import org.springframework.util.StringUtils;
 
 @Getter
@@ -46,7 +47,9 @@ public class Competition {
 
     public static Competition createNew(String name, LocalDate startDate, LocalDate endDate,
                                         String discordUrl, String ruleBookUrl,
-                                        Integer roasterSize, String restrictions, String remarks) {
+                                        Integer roasterSize, String restrictions,
+                                        String bgColor, String remarks) {
+
         return Competition.builder()
                           .name(name)
                           .startDate(startDate)
@@ -55,13 +58,15 @@ public class Competition {
                           .ruleBookUrl(ruleBookUrl)
                           .roasterSize(roasterSize)
                           .restrictions(restrictions)
+                          .bgColor(bgColor)
                           .remarks(remarks)
                           .build();
     }
 
     public void changeCompetition(String name, LocalDate startDate, LocalDate endDate,
                                   String discordUrl, String ruleBookUrl,
-                                  Integer roasterSize, String restrictions, String remarks) {
+                                  Integer roasterSize, String restrictions,
+                                  String bgColor, String remarks) {
 
         if (StringUtils.hasText(name)) {
             this.name = name;
@@ -84,6 +89,9 @@ public class Competition {
         if (StringUtils.hasText(restrictions)) {
             this.restrictions = restrictions;
         }
+        if (StringUtils.hasText(bgColor)) {
+            this.bgColor = bgColor;
+        }
         if (StringUtils.hasText(remarks)) {
             this.remarks = remarks;
         }
@@ -96,6 +104,12 @@ public class Competition {
     }
 
     private boolean isParticipated(String clanTag) {
-        return this.participantClans.stream().anyMatch(participantClan -> Objects.equals(participantClan.getClanTag(), clanTag));
+        return this.participantClans.stream().anyMatch(participantClan -> Objects.equals(participantClan.getTag(), clanTag));
+    }
+
+    public void loadParticipantClans(CompetitionParticipateService competitionParticipateService) {
+        List<CompetitionClan> competitionClans = competitionParticipateService.findWithClanNameByCompId(this.id);
+        participantClans.clear();
+        participantClans.addAll(competitionClans);
     }
 }

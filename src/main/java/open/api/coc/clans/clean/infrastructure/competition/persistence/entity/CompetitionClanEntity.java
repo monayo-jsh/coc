@@ -48,6 +48,10 @@ public class CompetitionClanEntity {
     @Column(name = "clan_tag", nullable = false, length = 100)
     private String clanTag;
 
+    @Comment("대회 참여 상태")
+    @Column(name = "status", nullable = true, length = 20)
+    private String status;
+
     // 전체 등록 멤버의 라이프 사이클은 대회 참여 클랜 엔티티에서 관리
     @Comment("전체 등록 멤버")
     @OneToMany(fetch = LAZY, mappedBy = "competitionClan", cascade = CascadeType.ALL, orphanRemoval = true)

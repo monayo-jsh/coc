@@ -17,12 +17,16 @@ public class CompetitionClan {
     // 대회 고유키
     private Long compId;
     // 대회 참여 클랜 태그
-    private String clanTag;
+    private String tag;
+    // 대회 참여 클랜 이름
+    private String name;
+    // 대회 참여 상태
+    private String status;
 
     public static CompetitionClan createNew(Long compId, String clanTag) {
         return CompetitionClan.builder()
                               .compId(compId)
-                              .clanTag(clanTag)
+                              .tag(clanTag)
                               .build();
     }
 }

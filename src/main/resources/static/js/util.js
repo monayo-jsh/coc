@@ -377,6 +377,28 @@ function convWarTypeName(type) {
 }
 
 
+function makeDatePickerOption(defaultDate, customOption = {
+}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    type: 'default',
+    format: 'YYYY-MM-DD', // default
+    controls: false,
+    readonly: true,
+    value: defaultDate, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+  };
+
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
+  }
+  return option
+}
+
 function makeMonthPickerOption(firstDayOfMonth, customOption = {
   validRange: true
 }) {
@@ -426,4 +448,13 @@ function isWarPreferenceIn(warPreference) {
 
 function convWarPreferenceName(warPreference) {
   return isWarPreferenceIn(warPreference) ? '참가' : '불참';
+}
+
+function toggleDisplay(classList) {
+  if (classList.contains('display-none')) {
+    classList.remove('display-none');
+  }
+  else {
+    classList.add('display-none');
+  }
 }

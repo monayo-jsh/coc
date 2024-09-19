@@ -7,15 +7,15 @@ import java.time.LocalDate;
 public record CompetitionCreateRequest(
 
     // 대회 이름
-    @NotEmpty
+    @NotEmpty(message = "대회 이름을 입력해주세요.")
     String name,
 
     // 대회 시작일
-    @NotNull
+    @NotNull(message = "대회 시작 일정을 입력해주세요.")
     LocalDate startDate,
 
     // 대회 종료일
-    @NotNull
+    @NotNull(message = "대회 종료 일정을 입력해주세요.")
     LocalDate endDate,
 
     // 대회 디스코드 URL

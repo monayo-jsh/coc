@@ -683,6 +683,15 @@ body::before {
   padding: 10px 20px;
 }
 
+/** date-picker */
+.input-date {
+  border: 1px solid #b7b7b7;
+  border-radius: 5px;
+  width: 115px;
+  padding: 5px;
+  font-size: 12px;
+  background-position: top 45% right 5px;
+}
 
 /** month-picker */
 .input-month {

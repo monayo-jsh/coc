@@ -25,6 +25,27 @@
   }
 }
 
+.support-area {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+
+  .chip {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .table {
+    margin-top: 5px;
+
+    .td-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+}
+
 .container {
   margin-top: 5px;
 }
@@ -138,4 +159,9 @@
   background: black;
   color: white;
   cursor: pointer;
+}
+
+.input {
+  border-bottom: 1px darkgray solid;
+  width: 100%;
 }

@@ -20,6 +20,10 @@
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- JavaScript Year and Month Picker -->
+  <script src="https://jsuites.net/v4/jsuites.js"></script>
+  <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
@@ -27,6 +31,32 @@
 
 
   <script>
+    function registerCompetition() {
+      const registerForm = document.querySelector('form.register-form');
+      const formData = new FormData(registerForm);
+
+      const requestBody = {}
+      for (let pair of formData.entries()) {
+        const key = pair[0];
+        const value = pair[1];
+        requestBody[key] = value;
+      }
+
+      createCompetition(requestBody)
+      .then((isResult) => {
+        if (isResult) {
+          location.reload();
+        }
+      });
+    }
+
+    function displayRegisterForm() {
+      const registerForm = document.querySelector('.support-register-form-wrapper');
+
+      const { classList } = registerForm;
+      toggleDisplay(classList);
+    }
+
     async function participant(ele, compId, clanTag) {
       participantCompetition(compId, clanTag)
       .then(() => {
@@ -169,7 +199,17 @@
       }
     }
 
+    function initDatePicker() {
+      let defaultDateValue = dayjs();
+      const datePickers = document.querySelectorAll('.input-date');
+
+      datePickers.forEach(datePicker => {
+        jSuites.calendar(datePicker, makeDatePickerOption(formatYYYYMMDD(defaultDateValue)));
+      })
+    }
+
     window.onload = async () => {
+      initDatePicker();
       await loadCompetitionClans();
       await renderCompetition();
     }
@@ -185,6 +225,87 @@
     </div>
   </div>
 
+  <div class="support-area">
+    <div class="buttons">
+      <div class="chip bg-gray cursor-pointer" onclick="displayRegisterForm();">대회 등록</div>
+    </div>
+    <div class="support-register-form-wrapper display-none">
+      <form class="register-form">
+        <table class="table">
+          <caption class="table-caption">대회 등록 양식</caption>
+          <tbody class="table-tbody">
+          <tr class="table-tr">
+            <th class="table-th">대회명</th>
+            <td class="table-td">
+              <input class="input" name="name" type="text">
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">대회일정</th>
+            <td class="table-td">
+              <div class="td-wrap">
+                <div class="picker">
+                  <input type="text" name="startDate" class="input-date start">
+                </div>
+                ~
+                <div class="picker">
+                  <input type="text" name="endDate" class="input-date end">
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">일정 표기 색상</th>
+            <td class="table-td">
+              <div class="display-flex justify-content-left">
+                <input type="color" name="bgColor">
+              </div>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">엔트리</th>
+            <td class="table-td">
+              <input class="input" type="number" name="roasterSize" value="0" min="0">
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">디스코드 경로</th>
+            <td class="table-td">
+              <input class="input" type="url" name="discordUrl" placeholder="https://discord.com">
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">룰북 경로</th>
+            <td class="table-td">
+              <input class="input" type="url" name="ruleBookUrl" placeholder="https://rule-book.com">
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">밴</th>
+            <td class="table-td">
+              <input class="input" type="text" name="restrictions">
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">메모</th>
+            <td class="table-td">
+              <input class="input" type="text" name="remarks">
+            </td>
+          </tr>
+          </tbody>
+          <tfoot>
+          <tr class="table-tr">
+            <td class="table-td" colspan="2">
+              <div class="td-wrap justify-content-center">
+                <div class="button-chip" onclick="registerCompetition()">등록하기</div>
+              </div>
+            </td>
+          </tr>
+          </tfoot>
+        </table>
+      </form>
+    </div>
+  </div>
   <div class="container">
 
     <div class="competition-list"></div>

@@ -15,6 +15,25 @@ async function fetchCompetitions() {
                     });
 }
 
+async function createCompetition(requestBody) {
+  return axios.post(URI_COMPETITIONS, requestBody)
+              .then(response => {
+                const { data } = response
+                let message = `대회 정보를 등록했습니다.`
+                alert(message);
+                return true;
+              })
+              .catch((error) => {
+                console.error(error);
+
+                const { status, response } = error
+                if (status === 400) {
+                  alert(response.data);
+                }
+                return false;
+              });
+}
+
 async function participantCompetition(competitionId, clanTag) {
   const uri = URI_COMPETITION_PARTICIPANT.replace(/{COMPETITION_ID}/, competitionId)
                                          .replace(/{CLAN_TAG}/, encodeURIComponent(clanTag))

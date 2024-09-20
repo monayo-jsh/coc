@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
+import open.api.coc.clans.clean.domain.competition.exception.CompetitionParticipantNotExistsException;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import org.springframework.util.StringUtils;
 
@@ -111,5 +112,12 @@ public class Competition {
         List<CompetitionClan> competitionClans = competitionParticipateService.findWithClanNameByCompId(this.id);
         participantClans.clear();
         participantClans.addAll(competitionClans);
+    }
+
+    public CompetitionClan findParticipantClan(String clanTag) {
+        return this.participantClans.stream()
+                                    .filter(participantClan -> participantClan.isEqualsClanTag(clanTag))
+                                    .findFirst()
+                                    .orElseThrow(() -> new CompetitionParticipantNotExistsException(clanTag));
     }
 }

@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -32,9 +31,8 @@ public class CompetitionClanRoasterEntity implements Persistable<CompetitionClan
     private CompetitionClanRoasterPK id;
 
     // 단순 조회용
-    @MapsId(value = "compClanId")
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)) // 외래키 제약조건 설정하지 않음
+    @JoinColumn(name = "comp_clan_id", insertable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT)) // 외래키 제약조건 설정하지 않음
     private CompetitionClanEntity competitionClan;
 
     @Transient

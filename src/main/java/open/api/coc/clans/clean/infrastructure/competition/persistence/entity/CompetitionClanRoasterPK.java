@@ -30,4 +30,11 @@ public class CompetitionClanRoasterPK implements Serializable {
         this.playerTag = playerTag;
     }
 
+    public static CompetitionClanRoasterPK create(Long compClanId, String playerTag) {
+        return CompetitionClanRoasterPK.builder()
+                                       .compClanId(compClanId)
+                                       .playerTag(playerTag)
+                                       .build();
+    }
+
 }

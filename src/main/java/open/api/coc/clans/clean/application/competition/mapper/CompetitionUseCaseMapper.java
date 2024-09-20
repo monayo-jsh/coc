@@ -1,6 +1,8 @@
 package open.api.coc.clans.clean.application.competition.mapper;
 
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
@@ -33,4 +35,11 @@ public interface CompetitionUseCaseMapper {
 
     // 대회 참가 신청 커맨드
     CompetitionParticipateCreateCommand toParticipateCreateCommand(Long competitionId, String clanTag);
+
+    // 대회 참가 클랜 멤버 등록 커맨드
+    CompetitionParticipateClanPlayerCreateCommand toParticipateClanPlayerCreateCommand(Long competitionId, String clanTag, String playerTag);
+
+    // 대회 참가 클랜 멤버 삭제 커맨드
+    CompetitionParticipateClanPlayerDeleteCommand toParticipateClanPlayerDeleteCommand(Long competitionId, String clanTag, String playerTag);
+
 }

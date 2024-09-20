@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionClanRoasterAlreadyExistsException;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionClanScheduleDuplicateException;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
-import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateClanService;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionClanRoasterService;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -33,7 +33,7 @@ public class CompetitionClan {
 
     // 대회 참여 클랜 등록 멤버
     @Builder.Default
-    private List<String> playerTags = new ArrayList<>();
+    private List<CompetitionClanRoaster> roasters = new ArrayList<>();
 
     @Builder.Default
     private List<CompetitionClanSchedule> schedules = new ArrayList<>();
@@ -49,20 +49,10 @@ public class CompetitionClan {
         return Objects.equals(tag, clanTag);
     }
 
-    public void loadRoaster(CompetitionParticipateClanService competitionParticipateClanService) {
+    public void loadRoaster(CompetitionClanRoasterService competitionParticipateClanService) {
         List<CompetitionClanRoaster> roasters = competitionParticipateClanService.findAllByCompClanId(this.id);
-        this.playerTags.clear();
-        this.playerTags.addAll(roasters.stream().map(CompetitionClanRoaster::getPlayerTag).toList());
-    }
-
-    public void validateAlreadyRegistered(String playerTag) {
-        if (isRegistered(playerTag)) {
-            throw new CompetitionClanRoasterAlreadyExistsException(playerTag);
-        }
-    }
-
-    private boolean isRegistered(String targetPlayerTag) {
-        return this.playerTags.stream().anyMatch(playerTag -> Objects.equals(playerTag, targetPlayerTag));
+        this.roasters.clear();
+        this.roasters.addAll(roasters);
     }
 
     public void loadSchedules(CompetitionClanScheduleService competitionClanScheduleService) {
@@ -71,7 +61,14 @@ public class CompetitionClan {
         this.schedules.addAll(schedules);
     }
 
-    public void validateDuplicatedSchedule(LocalDate startDate) {
+    public void addSchedule(CompetitionClanSchedule clanSchedule) {
+        // 기존 일정과 중복 검증
+        validateDuplicatedSchedule(clanSchedule.getStartDate());
+
+        this.schedules.add(clanSchedule);
+    }
+
+    private void validateDuplicatedSchedule(LocalDate startDate) {
         if (isExistsStartDate(startDate)) {
             throw new CompetitionClanScheduleDuplicateException(startDate);
         }
@@ -80,5 +77,22 @@ public class CompetitionClan {
     private boolean isExistsStartDate(LocalDate startDate) {
         return this.schedules.stream()
                              .anyMatch(schedule -> startDate.isEqual(schedule.getStartDate()));
+    }
+
+    public void addRoaster(CompetitionClanRoaster clanRoaster) {
+        // 기존에 등록된 멤버 검증
+        validateAlreadyRegistered(clanRoaster);
+
+        this.roasters.add(clanRoaster);
+    }
+
+    private void validateAlreadyRegistered(CompetitionClanRoaster roaster) {
+        if (isRegistered(roaster)) {
+            throw new CompetitionClanRoasterAlreadyExistsException(roaster.getPlayerTag());
+        }
+    }
+
+    private boolean isRegistered(CompetitionClanRoaster checkRoaster) {
+        return this.roasters.stream().anyMatch(roaster -> roaster.isEquals(checkRoaster));
     }
 }

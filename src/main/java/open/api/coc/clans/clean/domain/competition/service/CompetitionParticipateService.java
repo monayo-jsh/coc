@@ -8,6 +8,8 @@ import open.api.coc.clans.clean.infrastructure.competition.persistence.dto.Compe
 import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionClanEntity;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.mapper.CompetitionClanMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +24,11 @@ public class CompetitionParticipateService {
         return competitionClanMapper.toDomain(saveEntity);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public List<CompetitionClan> findWithClanNameByCompId(Long compId) {
         List<CompetitionClanDTO> competitionClanEntities = competitionClanRepository.findWithClanNameByCompId(compId);
         return competitionClanEntities.stream()
                                       .map(competitionClanMapper::toDomain)
                                       .toList();
     }
-
 }

@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.application.competition.mapper;
 
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -50,4 +51,7 @@ public interface CompetitionUseCaseMapper {
     @Mapping(target = "startDate", source = "request.startDate")
     @Mapping(target = "endDate", source = "request.endDate")
     CompetitionClanScheduleCreateCommand toCompetitionClanScheduleCreateCommand(Long competitionId, String clanTag, CompetitionClanScheduleCreateRequest request);
+
+    // 대회 참가 클랜 라운드 일정 삭제 커맨드
+    CompetitionClanScheduleDeleteCommand toCompetitionClanScheduleDeleteCommand(Long competitionId, String clanTag, Long clanScheduleId);
 }

@@ -2,14 +2,15 @@ package open.api.coc.clans.clean.infrastructure.competition.persistence.reposito
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.clean.domain.competition.repository.CompetitionParticipateClanRoasterRepository;
+import open.api.coc.clans.clean.domain.competition.repository.CompetitionClanRoasterRepository;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionClanRoasterEntity;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionClanRoasterPK;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class CompetitionParticipateClanRoasterCoreRepository implements CompetitionParticipateClanRoasterRepository {
+public class CompetitionParticipateClanRoasterCoreRepository implements
+    CompetitionClanRoasterRepository {
 
     private final JpaCompetitionClanRoasterRepository jpaCompetitionClanRoasterRepository;
 

@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -16,7 +17,7 @@ import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanRoaster;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanSchedule;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
-import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateClanService;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionClanRoasterService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionService;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
@@ -32,7 +33,7 @@ public class CompetitionUseCase {
 
     private final CompetitionService competitionService;
     private final CompetitionParticipateService competitionParticipateService;
-    private final CompetitionParticipateClanService competitionParticipateClanService;
+    private final CompetitionClanRoasterService competitionParticipateClanService;
     private final CompetitionClanScheduleService competitionClanScheduleService;
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
 
@@ -67,7 +68,7 @@ public class CompetitionUseCase {
         // 1. 등록된 대회 검증
         competitionService.validateExists(command.name(), command.startDate(), command.endDate());
 
-        // 2. 대회 생성
+        // 2. 대회 모델 생성
         Competition competition = Competition.createNew(command.name(),
                                                         command.startDate(),
                                                         command.endDate(),
@@ -78,9 +79,10 @@ public class CompetitionUseCase {
                                                         command.bgColor(),
                                                         command.remarks());
 
+        // 3. 대회 저장
         Competition createdCompetition = competitionService.create(competition);
 
-        // 3. 응답
+        // 4. 응답
         return competitionUseCaseMapper.toResponse(createdCompetition);
     }
 
@@ -89,7 +91,7 @@ public class CompetitionUseCase {
         // 1. 대회 조회
         Competition competition = competitionService.findById(command.id());
 
-        // 2. 대회 수정
+        // 2. 대회 모델 수정
         competition.changeCompetition(command.name(),
                                       command.startDate(),
                                       command.endDate(),
@@ -100,6 +102,7 @@ public class CompetitionUseCase {
                                       command.bgColor(),
                                       command.remarks());
 
+        // 3. 대회 수정
         competitionService.update(competition);
     }
 
@@ -113,11 +116,13 @@ public class CompetitionUseCase {
         // 3. 대회 참여 클랜 목록 조회
         competition.loadParticipantClans(competitionParticipateService);
 
-        // 4. 대회 참여 상태 검증
-        competition.validateAlreadyParticipated(clan);
+        // 4. 참여 클랜 모델 생성
+        CompetitionClan competitionClan = CompetitionClan.createNew(competition.getId(), clan.getTag());
 
-        // 5. 대회 참가
-        CompetitionClan competitionClan = CompetitionClan.createNew(competition.getId(), command.clanTag());
+        // 5. 대회 참여 클랜 등록 및 검증
+        competition.participateClan(competitionClan);
+
+        // 5. 대회 저장
         CompetitionClan participateCompetitionClan = competitionParticipateService.save(competitionClan);
 
         // 6. 응답
@@ -138,12 +143,14 @@ public class CompetitionUseCase {
         // 4. 등록 멤버 조회
         participantClan.loadRoaster(competitionParticipateClanService);
 
-        // 5. 등록된 멤버 검증
-        participantClan.validateAlreadyRegistered(command.playerTag());
+        // 5. 멤버 모델 생성
+        CompetitionClanRoaster clanRoaster = CompetitionClanRoaster.createNew(participantClan.getId(), command.playerTag());
 
-        // 6. 멤버 등록
-        CompetitionClanRoaster competitionClanRoaster = CompetitionClanRoaster.createNew(participantClan.getId(), command.playerTag());
-        competitionParticipateClanService.create(competitionClanRoaster);
+        // 6. 멤버 등록 및 검증
+        participantClan.addRoaster(clanRoaster);
+
+        // 7. 멤버 저장
+        competitionParticipateClanService.create(clanRoaster);
     }
 
     @Transactional
@@ -175,14 +182,31 @@ public class CompetitionUseCase {
         // 4. 대회 참여 클랜 라운드 일정 조회
         participantClan.loadSchedules(competitionClanScheduleService);
 
-        // 5. 동일한 라운드 시작 일정이 존재하는지 검증
-        participantClan.validateDuplicatedSchedule(command.startDate());
+        // 5. 일정 모델 생성
+        CompetitionClanSchedule clanSchedule = CompetitionClanSchedule.createNew(participantClan.getId(),
+                                                                                 command.description(),
+                                                                                 command.startDate(),
+                                                                                 command.endDate());
 
-        // 6. 일정 등록
-        CompetitionClanSchedule competitionClanSchedule = CompetitionClanSchedule.createNew(participantClan.getId(),
-                                                                                            command.description(),
-                                                                                            command.startDate(),
-                                                                                            command.endDate());
-        competitionClanScheduleService.create(competitionClanSchedule);
+        // 6. 일정 등록 및 검증
+        participantClan.addSchedule(clanSchedule);
+
+        // 7. 일정 저장
+        competitionClanScheduleService.create(clanSchedule);
+    }
+
+    @Transactional
+    public void removeCompetitionClanSchedule(CompetitionClanScheduleDeleteCommand command) {
+        // 1. 대회 조회
+        Competition competition = competitionService.findById(command.competitionId());
+
+        // 2. 대회 참여 클랜 목록 조회
+        competition.loadParticipantClans(competitionParticipateService);
+
+        // 3. 대회 참여 클랜 조회
+        CompetitionClan participantClan = competition.findParticipantClan(command.clanTag());
+
+        // 4. 대회 참여 클랜 일정 삭제
+        competitionClanScheduleService.remove(command.clanScheduleId(), participantClan.getId());
     }
 }

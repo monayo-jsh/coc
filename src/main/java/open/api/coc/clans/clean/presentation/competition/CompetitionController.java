@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.CompetitionUseCase;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -145,7 +146,7 @@ public class CompetitionController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PostMapping("/{competitionId}/participate/{clanTag}/{playerTag}")
-    public ResponseEntity<Long> postCompetitionParticipateClanPlayer(@PathVariable Long competitionId,
+    public ResponseEntity<Void> postCompetitionParticipateClanPlayer(@PathVariable Long competitionId,
                                                                      @PathVariable String clanTag,
                                                                      @PathVariable String playerTag) {
 
@@ -187,12 +188,33 @@ public class CompetitionController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PostMapping("/{competitionId}/{clanTag}/schedule")
-    public ResponseEntity<Long> postCompetitionClanSchedule(@PathVariable Long competitionId,
+    public ResponseEntity<Void> postCompetitionClanSchedule(@PathVariable Long competitionId,
                                                             @PathVariable String clanTag,
                                                             @RequestBody CompetitionClanScheduleCreateRequest request) {
 
         CompetitionClanScheduleCreateCommand command = competitionUseCaseMapper.toCompetitionClanScheduleCreateCommand(competitionId, clanTag, request);
         competitionUseCase.createCompetitionClanSchedule(command);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(
+        summary = "대회 참여 클랜의 일정을 삭제합니다. version: 1.00, Last Update: 24.09.20",
+        description = "이 API는 대회 참여 클랜의 일정을 삭제합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "404", description = "대회 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @DeleteMapping("/{competitionId}/{clanTag}/schedule/{clanScheduleId}")
+    public ResponseEntity<Void> deleteCompetitionClanSchedule(@PathVariable Long competitionId,
+                                                              @PathVariable String clanTag,
+                                                              @PathVariable Long clanScheduleId) {
+
+        CompetitionClanScheduleDeleteCommand command = competitionUseCaseMapper.toCompetitionClanScheduleDeleteCommand(competitionId, clanTag, clanScheduleId);
+        competitionUseCase.removeCompetitionClanSchedule(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

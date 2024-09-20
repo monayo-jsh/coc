@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionAlreadyExistsException;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionParticipantNotExistsException;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
@@ -98,7 +97,7 @@ public class Competition {
         }
     }
 
-    public void validateAlreadyParticipated(Clan clan) {
+    public void validateAlreadyParticipated(CompetitionClan clan) {
         if (this.isParticipated(clan.getTag())) {
             throw new CompetitionAlreadyExistsException("이미 대회 참가 클랜(%s)".formatted(clan.getName()));
         }
@@ -119,5 +118,13 @@ public class Competition {
                                     .filter(participantClan -> participantClan.isEqualsClanTag(clanTag))
                                     .findFirst()
                                     .orElseThrow(() -> new CompetitionParticipantNotExistsException(clanTag));
+    }
+
+    public void participateClan(CompetitionClan competitionClan) {
+        // 이미 참여한 클랜인지 검증
+        validateAlreadyParticipated(competitionClan);
+
+        // 클랜 참여 등록
+        this.participantClans.add(competitionClan);
     }
 }

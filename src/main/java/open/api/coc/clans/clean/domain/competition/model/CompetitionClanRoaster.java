@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.domain.competition.model;
 
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,7 @@ public class CompetitionClanRoaster {
                                      .build();
     }
 
+    public boolean isEquals(CompetitionClanRoaster roaster) {
+        return Objects.equals(this.playerTag, roaster.getPlayerTag());
+    }
 }

@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.domain.competition.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,4 +34,11 @@ public class CompetitionClanSchedule {
 
     }
 
+    public boolean isEqualsCompClanId(Long compClanId) {
+        return Objects.equals(this.compClanId, compClanId);
+    }
+
+    public boolean isNotEqualsCompClanId(Long compClanId) {
+        return !isEqualsCompClanId(compClanId);
+    }
 }

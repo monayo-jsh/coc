@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.application.competition;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -13,10 +14,11 @@ import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanRoaster;
+import open.api.coc.clans.clean.domain.competition.model.CompetitionClanSchedule;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateClanService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionService;
-import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionClanRoasterPK;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class CompetitionUseCase {
     private final CompetitionService competitionService;
     private final CompetitionParticipateService competitionParticipateService;
     private final CompetitionParticipateClanService competitionParticipateClanService;
+    private final CompetitionClanScheduleService competitionClanScheduleService;
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
 
     @Transactional(readOnly = true)
@@ -140,7 +143,7 @@ public class CompetitionUseCase {
 
         // 6. 멤버 등록
         CompetitionClanRoaster competitionClanRoaster = CompetitionClanRoaster.createNew(participantClan.getId(), command.playerTag());
-        competitionParticipateClanService.save(competitionClanRoaster);
+        competitionParticipateClanService.create(competitionClanRoaster);
     }
 
     @Transactional
@@ -155,8 +158,31 @@ public class CompetitionUseCase {
         CompetitionClan participantClan = competition.findParticipantClan(command.clanTag());
 
         // 4. 멤버 삭제
-        CompetitionClanRoasterPK competitionClanRoasterPK = CompetitionClanRoasterPK.create(participantClan.getId(), command.playerTag());
-        competitionParticipateClanService.removeById(competitionClanRoasterPK);
+        competitionParticipateClanService.remove(participantClan.getId(), command.playerTag());
     }
 
+    @Transactional
+    public void createCompetitionClanSchedule(CompetitionClanScheduleCreateCommand command) {
+        // 1. 대회 조회
+        Competition competition = competitionService.findById(command.competitionId());
+
+        // 2. 대회 참여 클랜 목록 조회
+        competition.loadParticipantClans(competitionParticipateService);
+
+        // 3. 대회 참여 클랜 조회
+        CompetitionClan participantClan = competition.findParticipantClan(command.clanTag());
+
+        // 4. 대회 참여 클랜 라운드 일정 조회
+        participantClan.loadSchedules(competitionClanScheduleService);
+
+        // 5. 동일한 라운드 시작 일정이 존재하는지 검증
+        participantClan.validateDuplicatedSchedule(command.startDate());
+
+        // 6. 일정 등록
+        CompetitionClanSchedule competitionClanSchedule = CompetitionClanSchedule.createNew(participantClan.getId(),
+                                                                                            command.description(),
+                                                                                            command.startDate(),
+                                                                                            command.endDate());
+        competitionClanScheduleService.create(competitionClanSchedule);
+    }
 }

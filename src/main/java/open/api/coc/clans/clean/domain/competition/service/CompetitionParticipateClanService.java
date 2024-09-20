@@ -16,19 +16,20 @@ public class CompetitionParticipateClanService {
     private final CompetitionParticipateClanRoasterRepository competitionParticipateClanRoasterRepository;
     private final CompetitionClanRoasterMapper competitionClanRoasterMapper;
 
-    public void save(CompetitionClanRoaster competitionClanRoaster) {
+    public void create(CompetitionClanRoaster competitionClanRoaster) {
         CompetitionClanRoasterEntity entity = competitionClanRoasterMapper.toEntity(competitionClanRoaster);
         competitionParticipateClanRoasterRepository.save(entity);
     }
 
-    public List<CompetitionClanRoaster> findAll(Long compClanId) {
-        List<CompetitionClanRoasterEntity> competitionClanEntities = competitionParticipateClanRoasterRepository.findAll(compClanId);
+    public List<CompetitionClanRoaster> findAllByCompClanId(Long compClanId) {
+        List<CompetitionClanRoasterEntity> competitionClanEntities = competitionParticipateClanRoasterRepository.findAllByCompClanId(compClanId);
         return competitionClanEntities.stream()
                                       .map(competitionClanRoasterMapper::toDomain)
                                       .toList();
     }
 
-    public void removeById(CompetitionClanRoasterPK id) {
-        competitionParticipateClanRoasterRepository.deleteById(id);
+    public void remove(Long compClanId, String playerTag) {
+        CompetitionClanRoasterPK competitionClanRoasterPK = CompetitionClanRoasterPK.create(compClanId, playerTag);
+        competitionParticipateClanRoasterRepository.deleteById(competitionClanRoasterPK);
     }
 }

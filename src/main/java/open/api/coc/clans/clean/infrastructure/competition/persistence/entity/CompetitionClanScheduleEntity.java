@@ -52,7 +52,7 @@ public class CompetitionClanScheduleEntity {
 
     @Comment("대회 종료일")
     @Column(name = "end_date", nullable = false)
-    private LocalDate end_date;
+    private LocalDate endDate;
 
     @Comment("대회 확정일시 (시작~종료일 중 네고된 일시)")
     @Column(name = "fixed_at", nullable = true)
@@ -66,13 +66,13 @@ public class CompetitionClanScheduleEntity {
     @Builder
     private CompetitionClanScheduleEntity(Long id, CompetitionClanEntity competitionClan,
                                          String description, LocalDate startDate,
-                                         LocalDate end_date, LocalDateTime fixedAt,
+                                         LocalDate endDate, LocalDateTime fixedAt,
                                          List<CompetitionClanRoundParticipantEntity> participants) {
         this.id = id;
         this.competitionClan = competitionClan;
         this.description = description;
         this.startDate = startDate;
-        this.end_date = end_date;
+        this.endDate = endDate;
         this.fixedAt = fixedAt;
         this.participants = participants;
     }

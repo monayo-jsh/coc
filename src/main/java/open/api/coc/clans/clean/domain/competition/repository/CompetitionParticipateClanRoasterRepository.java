@@ -9,6 +9,6 @@ public interface CompetitionParticipateClanRoasterRepository {
     void save(CompetitionClanRoasterEntity entity);
     void deleteById(CompetitionClanRoasterPK id);
 
-    List<CompetitionClanRoasterEntity> findAll(Long compClanId);
+    List<CompetitionClanRoasterEntity> findAllByCompClanId(Long compClanId);
 
 }

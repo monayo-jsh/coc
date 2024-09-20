@@ -1,16 +1,19 @@
 package open.api.coc.clans.clean.application.competition.mapper;
 
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
+import open.api.coc.clans.clean.presentation.competition.dto.CompetitionClanScheduleCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionUpdateRequest;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -42,4 +45,9 @@ public interface CompetitionUseCaseMapper {
     // 대회 참가 클랜 멤버 삭제 커맨드
     CompetitionParticipateClanPlayerDeleteCommand toParticipateClanPlayerDeleteCommand(Long competitionId, String clanTag, String playerTag);
 
+    // 대회 참가 클랜 라운드 일정 생성 커맨드
+    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "startDate", source = "request.startDate")
+    @Mapping(target = "endDate", source = "request.endDate")
+    CompetitionClanScheduleCreateCommand toCompetitionClanScheduleCreateCommand(Long competitionId, String clanTag, CompetitionClanScheduleCreateRequest request);
 }

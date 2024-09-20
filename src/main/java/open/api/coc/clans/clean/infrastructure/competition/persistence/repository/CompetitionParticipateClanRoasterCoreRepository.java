@@ -24,7 +24,7 @@ public class CompetitionParticipateClanRoasterCoreRepository implements Competit
     }
 
     @Override
-    public List<CompetitionClanRoasterEntity> findAll(Long compClanId) {
+    public List<CompetitionClanRoasterEntity> findAllByCompClanId(Long compClanId) {
         if (compClanId == null) {
             throw new IllegalArgumentException("compClanId can not be null");
         }

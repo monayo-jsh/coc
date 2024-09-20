@@ -132,13 +132,13 @@ body::before {
 }
 
 .m-1 {
-  margin: 1px;
+  margin: 1px !important;
 }
 .mt-5 {
-  margin-top: 5px;
+  margin-top: 5px !important;
 }
 .ml-5 {
-  margin-left: 5px;
+  margin-left: 5px !important;
 }
 
 .font-nowrap {

@@ -2,8 +2,9 @@ package open.api.coc.clans.clean.domain.competition.exception;
 
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
+import open.api.coc.clans.common.exception.NotFoundException;
 
-public class CompetitionClanScheduleNotExistsException extends BadRequestException {
+public class CompetitionClanScheduleNotExistsException extends NotFoundException {
 
     public CompetitionClanScheduleNotExistsException(Long clanScheduleId) {
         super(ExceptionCode.ERROR_NOT_FOUND);

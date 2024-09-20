@@ -81,9 +81,15 @@ public class ViewAdminController {
     }
 
 
-    /** 대회 관련 */
+    /** 대회 관리 */
     @GetMapping("/competition")
     public String competition() {
         return "cms/competition/Competition";
+    }
+
+    /** 대회 엔트리 관리 */
+    @GetMapping("/competition/round/entry")
+    public String competitionSchedule() {
+        return "cms/competition/CompetitionRoundEntry";
     }
 }

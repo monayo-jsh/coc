@@ -47,7 +47,7 @@ public interface CompetitionUseCaseMapper {
     CompetitionParticipateClanPlayerDeleteCommand toParticipateClanPlayerDeleteCommand(Long competitionId, String clanTag, String playerTag);
 
     // 대회 참가 클랜 라운드 일정 생성 커맨드
-    @Mapping(target = "description", source = "request.description")
+    @Mapping(target = "description", source = "request.name")
     @Mapping(target = "startDate", source = "request.startDate")
     @Mapping(target = "endDate", source = "request.endDate")
     CompetitionClanScheduleCreateCommand toCompetitionClanScheduleCreateCommand(Long competitionId, String clanTag, CompetitionClanScheduleCreateRequest request);

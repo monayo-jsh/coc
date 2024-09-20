@@ -174,3 +174,23 @@
   border-bottom: 1px darkgray solid;
   width: 100%;
 }
+
+.btn-add-round-schedule {
+  margin-bottom: 3px;
+}
+
+.schedule-manager {
+
+  .table-tbody {
+
+    .table-tr:nth-child(odd) {
+      background-color: unset;
+    }
+
+    .table-td {
+      text-align: unset;
+    }
+
+  }
+
+}

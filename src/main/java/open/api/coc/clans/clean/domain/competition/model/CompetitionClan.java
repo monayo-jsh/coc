@@ -11,8 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionClanRoasterAlreadyExistsException;
 import open.api.coc.clans.clean.domain.competition.exception.CompetitionClanScheduleDuplicateException;
-import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
+import open.api.coc.clans.clean.domain.competition.exception.CompetitionClanScheduleInvalidException;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionClanRoasterService;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -62,10 +63,19 @@ public class CompetitionClan {
     }
 
     public void addSchedule(CompetitionClanSchedule clanSchedule) {
+        // 일정 범위 검증
+        validateDateRange(clanSchedule.getStartDate(), clanSchedule.getEndDate());
+
         // 기존 일정과 중복 검증
         validateDuplicatedSchedule(clanSchedule.getStartDate());
 
         this.schedules.add(clanSchedule);
+    }
+
+    private void validateDateRange(LocalDate startDate, LocalDate endDate) {
+        if (startDate.isAfter(endDate)) {
+            throw new CompetitionClanScheduleInvalidException("시작/종료일 비정상: %s ~ %s".formatted(startDate, endDate));
+        }
     }
 
     private void validateDuplicatedSchedule(LocalDate startDate) {

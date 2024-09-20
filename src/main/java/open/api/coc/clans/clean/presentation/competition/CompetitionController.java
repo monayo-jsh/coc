@@ -105,7 +105,7 @@ public class CompetitionController {
     })
     @PutMapping("/{competitionId}")
     public ResponseEntity<Void> putCompetition(@PathVariable Long competitionId,
-                                                              @Valid @RequestBody CompetitionUpdateRequest request) {
+                                               @Valid @RequestBody CompetitionUpdateRequest request) {
 
         CompetitionUpdateCommand command = competitionUseCaseMapper.toUpdateCommand(competitionId, request);
         competitionUseCase.update(command);
@@ -190,7 +190,7 @@ public class CompetitionController {
     @PostMapping("/{competitionId}/{clanTag}/schedule")
     public ResponseEntity<Void> postCompetitionClanSchedule(@PathVariable Long competitionId,
                                                             @PathVariable String clanTag,
-                                                            @RequestBody CompetitionClanScheduleCreateRequest request) {
+                                                            @Valid @RequestBody CompetitionClanScheduleCreateRequest request) {
 
         CompetitionClanScheduleCreateCommand command = competitionUseCaseMapper.toCompetitionClanScheduleCreateCommand(competitionId, clanTag, request);
         competitionUseCase.createCompetitionClanSchedule(command);

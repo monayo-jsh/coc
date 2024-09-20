@@ -450,11 +450,25 @@ function convWarPreferenceName(warPreference) {
   return isWarPreferenceIn(warPreference) ? '참가' : '불참';
 }
 
-function toggleDisplay(classList) {
+function toggleDisplay(element) {
+  const { classList } = element
   if (classList.contains('display-none')) {
     classList.remove('display-none');
   }
   else {
     classList.add('display-none');
   }
+}
+
+function loadRequestBodyFromForm(formElement) {
+  const formData = new FormData(formElement);
+
+  const requestBody = {}
+  for (let pair of formData.entries()) {
+    const key = pair[0];
+    const value = pair[1];
+    requestBody[key] = value;
+  }
+
+  return requestBody;
 }

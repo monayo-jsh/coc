@@ -8,7 +8,7 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/cms/competition/competition.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/competition/competitionRoundEntry.css" />
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
@@ -27,12 +27,77 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <!-- 캘린더 -->
+  <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
+  <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
+
   <title>대회 라운드 엔트리 관리</title>
 
   <script>
+    const Calendar = tui.Calendar;
+    let calendar;
+
+    function moveMonth(number) {
+      // 캘린더 월 변경
+      calendar.move(number);
+      drawCalendar();
+    }
+
+    function getCalendarDate() {
+      return document.querySelector('.calendar-date');
+    }
+
+    async function drawCalendar() {
+      showWifiLoading('.section-wrapper');
+
+      const date = calendar.getDate();
+
+      const calendarDate = getCalendarDate();
+      calendarDate.innerHTML = dayjs(date).format('YYYY년 MM월');
+
+      const calendarStartDate = calendar.getDateRangeStart();
+      const calendarEndDate = calendar.getDateRangeEnd();
+
+      //await drawCalendarEvents(calendarStartDate, calendarEndDate);
+
+      hideWifiLoading('.section-wrapper');
+    }
+
+    function initCalendar() {
+      const container = document.getElementById('calendar');
+      const options = {
+        defaultView: 'month',
+        isReadOnly: true,
+        month: {
+          dayNames: ['일', '월', '화', '수', '목', '금', '토']
+        },
+        timezone: {
+          zones: [
+            {
+              timezoneName: 'Asia/Seoul',
+              displayLabel: 'Seoul',
+            }
+          ],
+        }
+      };
+
+      calendar = new Calendar(container, options);
+    }
+
+    const competitionPlayers = [];
+
+    async function loadCompetitionPlayers() {
+      const players = await fetchCompetitionPlayers();
+      competitionPlayers.push(...players);
+
+      console.log(competitionPlayers);
+    }
 
     window.onload = async () => {
+      initCalendar();
 
+      await loadCompetitionPlayers();
+      await drawCalendar();
     }
   </script>
 </head>
@@ -46,13 +111,35 @@
     </div>
   </div>
 
-  <div class="support-area">
+  <div class="section-wrapper">
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
 
-  </div>
-  <div class="container">
+    <div class="header">
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(-1);">
+        <i class="icon-arrow-line-left"></i>
+      </div>
+      <div class="calendar-date"></div>
+      <div class="calendar-icon cursor-pointer" onclick="moveMonth(1);">
+        <i class="icon-arrow-line-right"></i>
+      </div>
+    </div>
 
-    <div class="competition-list"></div>
-
+    <div id="calendar" class="competition-round-calendar"></div>
   </div>
 
 </div>

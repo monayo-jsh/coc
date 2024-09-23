@@ -1,0 +1,113 @@
+.header-card {
+  width: 100%;
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  background: black;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.content-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 660px) {
+    align-items: unset;
+  }
+}
+
+.section-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 660px) {
+    align-items: unset;
+  }
+}
+
+/** calendar custom */
+.toastui-calendar-weekday-event {
+  background-color: transparent !important;
+  border-radius: unset !important;
+  border: none !important;
+  height: 150px !important;
+  cursor: unset !important;
+}
+
+.toastui-calendar-weekday-event-title {
+  font-weight: bold;
+}
+
+.toastui-calendar-template-allday {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+
+  .cell-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    max-height: 145px;
+    overflow-y: auto;
+  }
+  .cell-wrap::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  .cell-wrap::-webkit-scrollbar-thumb {
+    background: rgb(168, 168, 168); /* 스크롤바 색상 */
+    border-radius: 5px; /* 스크롤바 둥근 테두리 */
+  }
+  .cell-wrap::-webkit-scrollbar-track {
+    background: rgba(182, 182, 182, 0.1);  /*스크롤바 뒷 배경 색상*/
+  }
+}
+
+.toastui-calendar-weekday-event-dot {
+
+  display: none !important;
+}
+
+.competition-round-calendar {
+  width: 700px;
+  height: 900px;
+}
+
+.header {
+  padding: 5px;
+  display: flex;
+}
+
+.calendar-date {
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.calendar-icon {
+  margin: 5px;
+  border: 1px solid #bbb;
+  border-radius: 25px;
+  padding: 3px 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

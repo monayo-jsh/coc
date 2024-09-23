@@ -86,15 +86,10 @@ public class Competition {
         if (Objects.nonNull(roasterSize)) {
             this.roasterSize =roasterSize;
         }
-        if (StringUtils.hasText(restrictions)) {
-            this.restrictions = restrictions;
-        }
-        if (StringUtils.hasText(bgColor)) {
-            this.bgColor = bgColor;
-        }
-        if (StringUtils.hasText(remarks)) {
-            this.remarks = remarks;
-        }
+
+        this.restrictions = restrictions;
+        this.bgColor = bgColor;
+        this.remarks = remarks;
     }
 
     public void validateAlreadyParticipated(CompetitionClan clan) {

@@ -1,10 +1,26 @@
 const PREFIX_COMPETITION_API = '/api/competitions' // 대회 API
 
 const URI_COMPETITIONS = `${PREFIX_COMPETITION_API}` // 등록된 대회 목록 조회
+const URI_COMPETITION_UPDATE = `${PREFIX_COMPETITION_API}/{COMPETITION_ID}` // 대회 정보 수정
+
+const URI_COMPETITION_PLAYERS = `${PREFIX_COMPETITION_API}/players` // 대회팀 멤버 목록
 
 const URI_COMPETITION_PARTICIPANT = `${PREFIX_COMPETITION_API}/{COMPETITION_ID}/participate/{CLAN_TAG}` // 대회 참가 신청
 
 const URI_COMPETITION_CLAN_SCHEDULE = `${PREFIX_COMPETITION_API}/{COMPETITION_ID}/{CLAN_TAG}/schedule` // 대회 참가 클랜 라운드 일정 생성
+
+
+async function fetchCompetitionPlayers() {
+  return await axios.get(URI_COMPETITION_PLAYERS)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
 
 async function fetchCompetitions() {
   return await axios.get(URI_COMPETITIONS)
@@ -23,6 +39,27 @@ async function createCompetition(requestBody) {
               .then(response => {
                 const { data } = response
                 let message = `대회 정보를 등록했습니다.`
+                alert(message);
+                return true;
+              })
+              .catch((error) => {
+                console.error(error);
+
+                const { status, response } = error
+                if (status === 400) {
+                  alert(response.data);
+                }
+                return false;
+              });
+}
+
+async function updateCompetition(competitionId, requestBody) {
+  const uri = URI_COMPETITION_UPDATE.replace(/{COMPETITION_ID}/, competitionId)
+
+  return axios.put(uri, requestBody)
+              .then(response => {
+                const { data } = response
+                let message = `대회 정보를 수정했습니다.`
                 alert(message);
                 return true;
               })

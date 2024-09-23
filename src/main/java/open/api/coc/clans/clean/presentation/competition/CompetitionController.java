@@ -19,6 +19,8 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionPartici
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
+import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionPlayerEntity;
+import open.api.coc.clans.clean.infrastructure.competition.persistence.repository.JpaCompetitionPlayerRepository;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionClanScheduleCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
@@ -41,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "대회", description = "대회 관리")
 public class CompetitionController {
 
+    private final JpaCompetitionPlayerRepository jpaCompetitionPlayerRepository;
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
     private final CompetitionUseCase competitionUseCase;
 
@@ -217,5 +220,19 @@ public class CompetitionController {
         competitionUseCase.removeCompetitionClanSchedule(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(
+        summary = "대회팀 전체 멤버 목록을 조회합니다. version: 1.00, Last Update: 24.09.20",
+        description = "이 API는 대회팀 전체 멤버 목록을 조회합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CompetitionResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/players")
+    public ResponseEntity<List<CompetitionPlayerEntity>> getCompetitionPlayers() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(jpaCompetitionPlayerRepository.findAll());
     }
 }

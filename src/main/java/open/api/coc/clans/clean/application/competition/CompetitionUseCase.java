@@ -16,8 +16,8 @@ import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanRoaster;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanSchedule;
-import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionClanRoasterService;
+import open.api.coc.clans.clean.domain.competition.service.CompetitionClanScheduleService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionParticipateService;
 import open.api.coc.clans.clean.domain.competition.service.CompetitionService;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
@@ -209,4 +209,5 @@ public class CompetitionUseCase {
         // 4. 대회 참여 클랜 일정 삭제
         competitionClanScheduleService.remove(command.clanScheduleId(), participantClan.getId());
     }
+
 }

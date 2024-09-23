@@ -5,6 +5,7 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionClanSch
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerQuery;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
@@ -54,4 +55,7 @@ public interface CompetitionUseCaseMapper {
 
     // 대회 참가 클랜 라운드 일정 삭제 커맨드
     CompetitionClanScheduleDeleteCommand toCompetitionClanScheduleDeleteCommand(Long competitionId, String clanTag, Long clanScheduleId);
+
+    // 대회 참가 클랜 로스터 조회용 쿼리
+    CompetitionParticipateClanPlayerQuery toCompetitionParticipateClanPlayerQuery(Long competitionId, String clanTag);
 }

@@ -8,6 +8,7 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionClanSch
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerQuery;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
@@ -210,4 +211,21 @@ public class CompetitionUseCase {
         competitionClanScheduleService.remove(command.clanScheduleId(), participantClan.getId());
     }
 
+    @Transactional(readOnly = true)
+    public List<CompetitionClanRoaster> getCompetitionParticipantClanRoasters(CompetitionParticipateClanPlayerQuery query) {
+        // 1. 대회 조회
+        Competition competition = competitionService.findById(query.competitionId());
+
+        // 2. 대회 참여 클랜 목록 조회
+        competition.loadParticipantClans(competitionParticipateService);
+
+        // 3. 대회 참여 클랜 조회
+        CompetitionClan participantClan = competition.findParticipantClan(query.clanTag());
+
+        // 4. 대회 참여 클랜 로스터 조회
+        participantClan.loadRoaster(competitionParticipateClanService);
+
+        // 5. 응답
+        return participantClan.getRoasters();
+    }
 }

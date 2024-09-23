@@ -31,7 +31,37 @@
 
 
   <script>
-    function modifyCompetition(btnElement) {
+    async function changeRoaster(btnElement) {
+      let { compId, clanTag, player } = btnElement.dataset;
+      player = JSON.parse(player);
+
+      const isRoaster = btnElement.classList.contains('is-roaster');
+      let guideMessage = isRoaster ? '제거' : '등록';
+
+      const { playerTag, name } = player;
+      if (!confirm(`"${name}(${playerTag}})" 계정을 로스터 ${guideMessage} 하시겠습니까?`)) {
+        return;
+      }
+
+      if (isRoaster) {
+        // 로스터 제거
+        const isResult = await removeCompetitionClanRoaster(compId, clanTag, playerTag);
+        if (isResult) {
+          // 성공
+          btnElement.classList.remove('is-roaster');
+        }
+        return;
+      }
+
+      // 로스터 등록
+      const isResult = await addCompetitionClanRoaster(compId, clanTag, playerTag);
+      if (isResult) {
+        // 성공
+        btnElement.classList.add('is-roaster');
+      }
+    }
+
+  function modifyCompetition(btnElement) {
       const competitionElement = btnElement.closest('.competition');
       let { competition } = competitionElement.dataset;
       if (!competition) return;
@@ -46,10 +76,35 @@
       updateCompetition(id, requestBody);
     }
 
-  function displayDetailView(btnElement) {
-      const competition = btnElement.closest('.competition');
-      const detailRow = competition.querySelector('.row.detail');
-      toggleDisplay(detailRow);
+    function displayDetailView(btnElement) {
+      const competitionElement = btnElement.closest('.competition');
+      const row = competitionElement.querySelector(`.row.detail`);
+      toggleDisplay(row);
+    }
+
+    async function displayRoasterView(btnElement) {
+      const competitionElement = btnElement.closest('.competition');
+      const row = competitionElement.querySelector(`.row.roaster`);
+      const isVisible = toggleDisplay(row);
+
+      if (isVisible) {
+        // 참가 클랜 로스터 설정
+        let { competition } = competitionElement.dataset;
+        if (!competition) return;
+        competition = JSON.parse(competition);
+        let { participantClans } = competition;
+        if (!participantClans) return;
+
+        await drawParticipantClanRoaster(row, competition.id, participantClans);
+        return;
+      }
+
+      // 구성 제거
+      const roasterTable = row.querySelector('.table.roaster');
+      const tBodies = Array.from(roasterTable.tBodies);
+      for(const tbody of tBodies) {
+        roasterTable.removeChild(tbody);
+      }
     }
 
   function registerSchedule(element) {
@@ -94,7 +149,7 @@
 
     async function participant(ele, compId, clanTag) {
       const clan = competitionClanMap.get(clanTag);
-      if (!confirm(`"${clan.name}" 클랜을 대회 참가 등록하시겠습니까?\n\n- 대회 참가 멤버 등록, 대회 일정 설정은 일정 관리 메뉴에서 설정 가능합니다.`)) return;
+      if (!confirm(`"${clan.name}" 클랜을 대회 참가 등록하시겠습니까?`)) return;
 
       participantCompetition(compId, clanTag)
       .then(() => {
@@ -191,6 +246,49 @@
       targetInput.value = value;
     }
 
+    function drawRoasterPlayers(roaster, compId, clanTag, clanRoasterSet) {
+      const playerList = roaster.querySelector('.player-list');
+      for (const player of COMPETITION_PLAYERS) {
+        const { playerTag, name } = player
+
+        const roasterAccountTemplate = copyTemplateById('competition-roaster-account-template');
+        const addButtonRoaster = roasterAccountTemplate.querySelector('.btn-roaster .button-chip');
+
+        // dataset
+        addButtonRoaster.dataset.compId = compId;
+        addButtonRoaster.dataset.clanTag = clanTag;
+        addButtonRoaster.dataset.player = JSON.stringify(player);
+
+        addButtonRoaster.innerHTML = addButtonRoaster.innerHTML
+                                                     .replace(/{PLAYER_NAME}/, name);
+
+        if (clanRoasterSet.has(playerTag)) {
+          addButtonRoaster.classList.add('is-roaster');
+        }
+
+        playerList.appendChild(addButtonRoaster);
+      }
+    }
+
+    async function drawParticipantClanRoaster(roasterRow, id, participantClans) {
+      const roasterTable = roasterRow.querySelector('.table.roaster');
+      for(const clan of participantClans) {
+        const { tag, name } = clan;
+
+        const clanRoasters = await fetchCompetitionClanRoasters(id, tag);
+        const clanRoasterSet = new Set(clanRoasters.map(roaster => roaster.playerTag));
+
+        const roasterTemplate = copyTemplateById('competition-roaster-template');
+        const roaster = roasterTemplate.querySelector('.table-tbody');
+        roaster.innerHTML = roaster.innerHTML
+                                   .replace(/{CLAN_NAME}/, name);
+
+        drawRoasterPlayers(roaster, id, tag, clanRoasterSet);
+
+        roasterTable.appendChild(roaster);
+      }
+    }
+
     function makeCompetitionRow(competition) {
 
       const { id, name, startDate, endDate, roasterSize, restrictions, remarks, discordUrl, ruleBookUrl, bgColor, participantClans } = competition;
@@ -214,12 +312,18 @@
       linkedUrl(row, 'url-rulebook', ruleBookUrl, "룰북");
 
       // 대회 정보 - 수정
+      changeValueByName(row, 'name', name);
+      changeValueByName(row, 'startDate', startDate);
+      changeValueByName(row, 'endDate', endDate);
       changeValueByName(row, 'bgColor', bgColor);
       changeValueByName(row, 'roasterSize', roasterSize);
       changeValueByName(row, 'discordUrl', discordUrl);
       changeValueByName(row, 'ruleBookUrl', ruleBookUrl);
       changeValueByName(row, 'restrictions', restrictions);
       changeValueByName(row, 'remarks', remarks);
+
+      // 미참여 클랜 참가 등록 목록 구성
+      drawUnParticipantClans(row, id, participantClans);
 
       return row;
     }
@@ -262,7 +366,14 @@
       })
     }
 
+    const COMPETITION_PLAYERS = [];
+    async function loadCompetitionPlayers() {
+      const players = await fetchCompetitionPlayers();
+      COMPETITION_PLAYERS.push(...players);
+    }
+
     window.onload = async () => {
+      await loadCompetitionPlayers(); // 대회팀 전체 멤버
       await loadCompetitionClans();
       await renderCompetition();
 
@@ -371,8 +482,8 @@
         <th class="table-th">대회기간</th>
         <th class="table-th">엔트리 인원</th>
         <th class="table-th">참여 클랜</th>
-        <th class="table-th">대회 링크</th>
-        <th class="table-th"></th>
+        <th class="table-th">관련 링크</th>
+        <th class="table-th">관리</th>
       </tr>
       </thead>
     </table>
@@ -411,11 +522,13 @@
       </div>
     </td>
     <td class="table-td">
-      <div class="td-wrap display-flex justify-content-center">
-        <div class="button-chip" onclick="displayDetailView(this);">관리</div>
+      <div class="td-wrap display-flex flex-gap justify-content-center">
+        <div class="button-chip font-small" onclick="displayDetailView(this);">대회</div>
+        <div class="button-chip font-small" onclick="displayRoasterView(this);">멤버</div>
       </div>
     </td>
   </tr>
+
   <tr class="table-tr row detail display-none">
     <td class="table-td" colspan="6">
       <div class="td-wrap">
@@ -429,7 +542,7 @@
               <tr class="table-tr">
                 <th class="table-th">대회명</th>
                 <td class="table-td">
-                  <input class="input" name="name" type="text" value="{NAME}">
+                  <input class="input" name="name" type="text">
                 </td>
               </tr>
               <tr class="table-tr">
@@ -437,11 +550,11 @@
                 <td class="table-td">
                   <div class="td-wrap display-flex justify-content-left align-items-center flex-gap">
                     <div class="picker">
-                      <input type="text" name="startDate" class="input-date start" value="{START_DATE}">
+                      <input type="text" name="startDate" class="input-date start">
                     </div>
                     ~
                     <div class="picker">
-                      <input type="text" name="endDate" class="input-date end" value="{END_DATE}">
+                      <input type="text" name="endDate" class="input-date end">
                     </div>
                   </div>
                 </td>
@@ -484,6 +597,12 @@
                   <input class="input" type="text" name="remarks">
                 </td>
               </tr>
+              <tr class="table-tr">
+                <th class="table-th">미참여 클랜<br/><div class="font-small">(클릭 시 대회 참가)</div></th>
+                <td class="table-td un-participant-clan">
+                  <div class="display-flex flex-gap clans"></div>
+                </td>
+              </tr>
               </tbody>
               <tfoot>
               <tr class="table-tr">
@@ -501,6 +620,19 @@
       </div>
     </td>
   </tr>
+
+  <tr class="table-tr row roaster display-none">
+    <td class="table-td" colspan="6">
+      <div class="td-wrap">
+        <div class="info-wrapper">
+          <table class="table roaster">
+            <caption class="table-caption bg-yellowgreen">참가 클랜 계정 목록</caption>
+          </table>
+        </div>
+      </div>
+    </td>
+  </tr>
+
   </tbody>
 </template>
 <template id="competition-clan-template">
@@ -509,6 +641,28 @@
 <template id="competition-participant-template">
   <div class="btn-participant">
     <div class="chip cursor-pointer" onclick="participant(this, '{COMP_ID}', '{CLAN_TAG}')">{CLAN_NAME}</div>
+  </div>
+</template>
+<template id="competition-roaster-template">
+  <tbody class="table-tbody">
+  <tr class="table-tr">
+    <td class="table-td">
+      <div class="td-wrap display-flex">
+        <div class="label">{CLAN_NAME}</div>
+      </div>
+    </td>
+  </tr>
+  <tr class="table-tr">
+    <td class="table-td">
+      <div class="td-wrap player-list display-flex flex-gap">
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</template>
+<template id="competition-roaster-account-template">
+  <div class="btn-roaster">
+    <div class="button-chip cursor-pointer" onclick="changeRoaster(this)">{PLAYER_NAME}</div>
   </div>
 </template>
 </html>

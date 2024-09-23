@@ -452,12 +452,17 @@ function convWarPreferenceName(warPreference) {
 
 function toggleDisplay(element) {
   const { classList } = element
+
+  // visible
   if (classList.contains('display-none')) {
     classList.remove('display-none');
+
+    return true
   }
-  else {
-    classList.add('display-none');
-  }
+
+  // invisible
+  classList.add('display-none');
+  return false
 }
 
 function loadRequestBodyFromForm(formElement) {

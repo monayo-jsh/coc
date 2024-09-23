@@ -294,6 +294,11 @@ body::before {
   color: white;
 }
 
+.bg-yellowgreen {
+  background-color: yellowgreen !important;
+  color: white !important;
+}
+
 .bg-lightgray {
   background-color: lightgray;
   color: white;
@@ -618,8 +623,8 @@ body::before {
   font-size: 14px;
 
   .table-caption {
-    border: 1px solid green;
-    border-left: 3px solid green;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
     background-color: green;
     border-radius: 5px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -713,4 +718,8 @@ body::before {
 
 .h-25 {
   height: 25px !important;
+}
+
+.font-small {
+  font-size: 12px;
 }

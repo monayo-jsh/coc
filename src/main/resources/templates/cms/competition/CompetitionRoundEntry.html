@@ -89,8 +89,6 @@
     async function loadCompetitionPlayers() {
       const players = await fetchCompetitionPlayers();
       competitionPlayers.push(...players);
-
-      console.log(competitionPlayers);
     }
 
     window.onload = async () => {

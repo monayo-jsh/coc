@@ -103,8 +103,17 @@
     border-bottom: 1px solid darkgray;
   }
 
-}
+  .button-chip {
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: .7;
+  }
 
-.is-roaster {
-  background-color: crimson;
+  .button-chip.is-roaster {
+    background-color: black;
+    opacity: 1;
+  }
+
 }

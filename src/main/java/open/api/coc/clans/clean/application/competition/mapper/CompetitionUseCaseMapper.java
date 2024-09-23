@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.application.competition.mapper;
 
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleDeleteCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleQuery;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -41,11 +42,17 @@ public interface CompetitionUseCaseMapper {
     // 대회 참가 신청 커맨드
     CompetitionParticipateCreateCommand toParticipateCreateCommand(Long competitionId, String clanTag);
 
+    // 대회 참가 클랜 로스터 조회용 쿼리
+    CompetitionParticipateClanPlayerQuery toCompetitionParticipateClanPlayerQuery(Long competitionId, String clanTag);
+
     // 대회 참가 클랜 멤버 등록 커맨드
     CompetitionParticipateClanPlayerCreateCommand toParticipateClanPlayerCreateCommand(Long competitionId, String clanTag, String playerTag);
 
     // 대회 참가 클랜 멤버 삭제 커맨드
     CompetitionParticipateClanPlayerDeleteCommand toParticipateClanPlayerDeleteCommand(Long competitionId, String clanTag, String playerTag);
+
+    // 대회 참가 클랜 일정 목록 조회
+    CompetitionClanScheduleQuery toCompetitionClanScheduleQuery(Long competitionId, String clanTag);
 
     // 대회 참가 클랜 라운드 일정 생성 커맨드
     @Mapping(target = "description", source = "request.name")
@@ -56,6 +63,4 @@ public interface CompetitionUseCaseMapper {
     // 대회 참가 클랜 라운드 일정 삭제 커맨드
     CompetitionClanScheduleDeleteCommand toCompetitionClanScheduleDeleteCommand(Long competitionId, String clanTag, Long clanScheduleId);
 
-    // 대회 참가 클랜 로스터 조회용 쿼리
-    CompetitionParticipateClanPlayerQuery toCompetitionParticipateClanPlayerQuery(Long competitionId, String clanTag);
 }

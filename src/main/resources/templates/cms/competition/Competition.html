@@ -31,7 +31,13 @@
 
 
   <script>
-    async function changeRoaster(btnElement) {
+    function displayRegisterScheduleForm(btnElement) {
+      const registerScheduleElement = btnElement.closest('.register-schedule');
+      const registerForm = registerScheduleElement.querySelector('.schedule-register-form-wrapper');
+      toggleDisplay(registerForm);
+    }
+
+  async function changeRoaster(btnElement) {
       let { compId, clanTag, player } = btnElement.dataset;
       player = JSON.parse(player);
 
@@ -104,6 +110,30 @@
       const tBodies = Array.from(roasterTable.tBodies);
       for(const tbody of tBodies) {
         roasterTable.removeChild(tbody);
+      }
+    }
+
+    async function displayScheduleView(btnElement) {
+      const competitionElement = btnElement.closest('.competition');
+      const row = competitionElement.querySelector(`.row.schedule`);
+      const isVisible = toggleDisplay(row);
+
+      if (isVisible) {
+        // 참가 클랜 로스터 설정
+        let { competition } = competitionElement.dataset;
+        if (!competition) return;
+        competition = JSON.parse(competition);
+        let { participantClans } = competition;
+        if (!participantClans) return;
+
+        await drawParticipantClanSchedule(row, competition.id, participantClans);
+        return;
+      }
+
+      // 구성 제거
+      const tables = row.querySelectorAll('.table.schedule');
+      for(const table of tables) {
+        table.remove();
       }
     }
 
@@ -263,6 +293,17 @@
         drawRoasterPlayers(roaster, id, tag, clanRoasterSet);
 
         roasterTable.appendChild(roaster);
+      }
+    }
+
+    async function drawParticipantClanSchedule(scheduleRow, id, participantClans) {
+      const schedules = scheduleRow.querySelector('.schedules');
+
+      for(const clan of participantClans) {
+        const {tag, name} = clan;
+
+        const clanRoasters = await fetchCompetitionClanRoasters(id, tag);
+
       }
     }
 
@@ -501,7 +542,8 @@
     <td class="table-td">
       <div class="td-wrap display-flex flex-gap justify-content-center">
         <div class="button-chip font-small" onclick="displayDetailView(this);">대회</div>
-        <div class="button-chip font-small" onclick="displayRoasterView(this);">멤버</div>
+        <div class="button-chip font-small" onclick="displayRoasterView(this);">로스터</div>
+        <div class="button-chip font-small" onclick="displayScheduleView(this);">일정</div>
       </div>
     </td>
   </tr>
@@ -513,7 +555,7 @@
 
           <form class="update-form">
             <table class="table">
-              <caption class="table-caption">대회 정보</caption>
+              <caption class="table-caption"><span class="font-weight-bold">대회 정보 관리</span> <span class="font-small">(대회 정보 수정한 경우 하단의 수정하기 버튼 클릭해서 적용)</span></caption>
               <colgroup><col width="20%"></colgroup>
               <tbody class="table-tbody">
               <tr class="table-tr">
@@ -603,8 +645,18 @@
       <div class="td-wrap">
         <div class="info-wrapper">
           <table class="table roaster">
-            <caption class="table-caption bg-yellowgreen">참가 클랜 계정 목록</caption>
+            <caption class="table-caption"><span class="font-weight-bold">로스터 관리</span> <span class="font-small">(계정 이름을 클릭해서 설정/해제)</span></caption>
           </table>
+        </div>
+      </div>
+    </td>
+  </tr>
+
+  <tr class="table-tr row schedule display-none">
+    <td class="table-td" colspan="6">
+      <div class="td-wrap">
+        <div class="info-wrapper schedules">
+          <div class="info-label"><span class="font-weight-bold">일정 관리</span> <span class="font-small">(대회 세부 일정 등록 및 출전 로스터 관리)</span></div>
         </div>
       </div>
     </td>
@@ -641,5 +693,58 @@
   <div class="btn-roaster">
     <div class="button-chip cursor-pointer" onclick="changeRoaster(this)">{PLAYER_NAME}</div>
   </div>
+</template>
+<template id="competition-schedule-template">
+  <table class="table schedule">
+    <thead class="table-thead">
+    <tr class="table-tr">
+      <td class="table-td">
+        <div class="td-wrap display-flex">
+          <div class="label">{CLAN_NAME}</div>
+        </div>
+      </td>
+    </tr>
+    </thead>
+    <tbody class="table-tbody"></tbody>
+    <tfoot>
+
+    <tr class="table-tr">
+      <td class="table-td">
+        <div class="td-wrap display-flex flex-colum align-items-center register-schedule">
+          <div class="button-chip bg-green" onclick="displayRegisterScheduleForm(this)">라운드 일정 추가</div>
+          <div class="schedule-register-form-wrapper mt-5 display-none">
+            <form class="schedule-register-form">
+              <table class="table">
+                <tbody>
+                <tr class="table-tr">
+                  <th class="table-th">라운드 설명</th>
+                  <td class="table-td">
+                    <input class="input" name="description" type="text">
+                  </td>
+                </tr>
+                <tr class="table-tr">
+                  <th class="table-th">라운드 일정</th>
+                  <td class="table-td">
+                    <div class="td-wrap display-flex justify-content-left">
+                      <div class="picker">
+                        <input type="text" name="startDate" class="input-date start">
+                      </div>
+                      ~
+                      <div class="picker">
+                        <input type="text" name="endDate" class="input-date end">
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+      </td>
+    </tr>
+
+    </tfoot>
+  </table>
 </template>
 </html>

@@ -14,6 +14,7 @@ import open.api.coc.clans.clean.application.competition.CompetitionUseCase;
 import open.api.coc.clans.clean.application.competition.mapper.CompetitionUseCaseMapper;
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleDeleteCommand;
+import open.api.coc.clans.clean.application.competition.model.CompetitionClanScheduleQuery;
 import open.api.coc.clans.clean.application.competition.model.CompetitionCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateClanPlayerDeleteCommand;
@@ -22,9 +23,9 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionPartici
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanRoaster;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.entity.CompetitionPlayerEntity;
-import open.api.coc.clans.clean.infrastructure.competition.persistence.repository.JpaCompetitionClanRoasterRepository;
 import open.api.coc.clans.clean.infrastructure.competition.persistence.repository.JpaCompetitionPlayerRepository;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionClanScheduleCreateRequest;
+import open.api.coc.clans.clean.presentation.competition.dto.CompetitionClanScheduleResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionCreateRequest;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionDetailResponse;
 import open.api.coc.clans.clean.presentation.competition.dto.CompetitionResponse;
@@ -47,7 +48,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CompetitionController {
 
     private final JpaCompetitionPlayerRepository jpaCompetitionPlayerRepository;
-    private final JpaCompetitionClanRoasterRepository jpaCompetitionClanRoasterRepository;
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
     private final CompetitionUseCase competitionUseCase;
 
@@ -201,6 +201,25 @@ public class CompetitionController {
         competitionUseCase.participateClanRemovePlayer(command);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @Operation(
+        summary = "대회 참여 클랜의 일정 목록을 조회합니다. version: 1.00, Last Update: 24.09.20",
+        description = "이 API는 대회 참여 클랜의 일정 목록을 조회합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{competitionId}/{clanTag}/schedules")
+    public ResponseEntity<List<CompetitionClanScheduleResponse>> getCompetitionClanSchedules(@PathVariable Long competitionId,
+                                                                                             @PathVariable String clanTag) {
+
+        CompetitionClanScheduleQuery query = competitionUseCaseMapper.toCompetitionClanScheduleQuery(competitionId, clanTag);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(competitionUseCase.getCompetitionParticipantClanSchedules(query));
     }
 
     @Operation(

@@ -27,7 +27,7 @@ public class ExceptionHandler {
     }
 
     public static NotFoundException createNotFoundException(String notFoundName) {
-        return NotFoundException.create(notFoundName);
+        return new NotFoundException(notFoundName);
     }
 
 }

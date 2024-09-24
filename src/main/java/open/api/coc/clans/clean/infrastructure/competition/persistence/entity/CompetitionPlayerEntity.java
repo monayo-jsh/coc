@@ -19,7 +19,7 @@ import org.springframework.data.domain.Persistable;
 @Table(
     name = "tb_comp_player",
     indexes = {
-        @Index(name = "idx_comp_clan_clan_tag", columnList = "clan_tag")
+        @Index(name = "idx_comp_player_clan_tag", columnList = "clan_tag")
     }
 )
 @Comment("대회팀 멤버 테이블")

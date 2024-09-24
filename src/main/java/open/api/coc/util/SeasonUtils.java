@@ -28,7 +28,11 @@ public class SeasonUtils {
         LocalDate fourthMonday = firstMonday.plusWeeks(3);
 
         // 해당 일의 오후 2시로 설정합니다.
-        return LocalDateTime.of(fourthMonday, LocalTime.of(14, 0, 0, 0));
+        return withSeasonEndTime(fourthMonday);
+    }
+
+    public static LocalDateTime withSeasonEndTime(LocalDate endDate) {
+        return LocalDateTime.of(endDate, LocalTime.of(14, 0, 0, 0));
     }
 
     /**

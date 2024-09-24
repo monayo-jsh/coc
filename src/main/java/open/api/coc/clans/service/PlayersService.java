@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
@@ -89,6 +90,8 @@ public class PlayersService {
     private final PlayerQueryRepository playerQueryRepository;
 
     private final PlayerDonationStatQueryRepository playerDonationStatQueryRepository;
+
+    private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
 
     private final PlayerResponseConverter playerResponseConverter;
 
@@ -350,6 +353,12 @@ public class PlayersService {
     private String getLeagueSeason() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime seasonEndTime = SeasonUtils.getSeasonEndTime(now.getYear(), now.getMonthValue());
+
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now.toLocalDate()).orElse(null);
+        if (seasonEndDate != null) {
+            // 시즌 종료일이 설정된 경우 설정값으로 적용
+            seasonEndTime = SeasonUtils.withSeasonEndTime(seasonEndDate);
+        }
 
         if (!now.isBefore(seasonEndTime)) {
             // 현재 시간 기준으로 이번달 시즌 종료 이후에는 다음달 시즌 종료일로 조정

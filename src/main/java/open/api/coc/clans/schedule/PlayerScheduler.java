@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.service.PlayersService;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class PlayerScheduler {
+
+    private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
 
     private final PlayerQueryRepository playerQueryRepository;
     private final PlayersService playersService;
@@ -32,6 +35,14 @@ public class PlayerScheduler {
     public void resetSeasonData() {
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
+
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+                                                                        .orElse(null);
+
+        if (seasonEndDate != null) {
+            // 당월 시즌 종료일이 설정된 경우 설정된 시즌 종료일로 동작하도록 수정
+            fourthMonday = seasonEndDate;
+        }
 
         // 현재 날짜가 4번째 주 월요일인지 확인
         if (now.isEqual(fourthMonday)) {
@@ -85,6 +96,14 @@ public class PlayerScheduler {
         // 시즌 초기화는 매달 4번째주 월요일 초기화를 기준으로 함.
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
+
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+                                                                        .orElse(null);
+
+        if (seasonEndDate != null) {
+            // 당월 시즌 종료일이 설정된 경우 설정된 시즌 종료일로 동작하도록 수정
+            fourthMonday = seasonEndDate;
+        }
 
         if (!now.isEqual(fourthMonday)) {
             // 4번째주 월요일이 아니면 수집 진행

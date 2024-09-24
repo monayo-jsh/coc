@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.league.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.entity.LeagueEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;

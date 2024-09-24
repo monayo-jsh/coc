@@ -1,19 +1,21 @@
-package open.api.coc.external.coc.clan.domain.common;
+package open.api.coc.clans.clean.domain.league.model;
+
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.external.coc.clan.domain.common.IconUrl;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Label {
+public class League {
 
     private Integer id;
     private String name;
-    private IconUrl iconUrls;
+    private IconUrl iconUrl;
 
 }

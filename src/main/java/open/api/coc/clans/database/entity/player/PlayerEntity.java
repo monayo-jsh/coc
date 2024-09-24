@@ -29,7 +29,7 @@ import lombok.Setter;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.BaseEntity;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.league.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.entity.LeagueEntity;
 import open.api.coc.clans.database.entity.player.common.WarPreferenceType;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

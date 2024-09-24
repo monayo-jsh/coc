@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.league;
+package open.api.coc.clans.clean.infrastructure.league.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -16,8 +16,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import open.api.coc.clans.database.entity.common.IconUrlEntity;
+import open.api.coc.clans.clean.infrastructure.common.entity.IconUrlEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
+import org.hibernate.annotations.Comment;
 import org.springframework.data.domain.Persistable;
 
 @Builder
@@ -27,6 +28,7 @@ import org.springframework.data.domain.Persistable;
 @AllArgsConstructor
 @Entity
 @Table(name = "tb_league")
+@Comment("리그 테이블")
 public class LeagueEntity implements Persistable<Integer> {
 
     @Id

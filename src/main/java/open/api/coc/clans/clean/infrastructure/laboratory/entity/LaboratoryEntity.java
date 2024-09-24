@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.lab;
+package open.api.coc.clans.clean.infrastructure.laboratory.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 @Entity
 @Table(name = "tb_lab")
-public class LabEntity {
+public class LaboratoryEntity {
 
     @Schema(description = "연구소 고유아이디")
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

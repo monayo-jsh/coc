@@ -1,4 +1,4 @@
-package open.api.coc.external.coc.clan.domain.common;
+package open.api.coc.clans.clean.domain.common.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;

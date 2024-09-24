@@ -13,7 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import open.api.coc.clans.database.entity.common.IconUrlEntity;
+import open.api.coc.clans.clean.infrastructure.common.entity.IconUrlEntity;
 import org.springframework.data.domain.Persistable;
 
 @Builder

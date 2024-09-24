@@ -1,4 +1,4 @@
-package open.api.coc.clans.controller;
+package open.api.coc.clans.clean.presentation.view;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/clan/cms")
-public class ViewAdminController {
+public class AdminViewController {
 
     /** 운영 기능 로그인 페이지 */
     @GetMapping("/login")

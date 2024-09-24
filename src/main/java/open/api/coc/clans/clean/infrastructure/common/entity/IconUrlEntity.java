@@ -2,18 +2,14 @@ package open.api.coc.clans.clean.infrastructure.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Comment;
 
-@Builder
-@Getter @Setter
-@Embeddable
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@Embeddable
 public class IconUrlEntity {
 
     @Column(name = "tiny", nullable = true, length = 500)
@@ -31,5 +27,13 @@ public class IconUrlEntity {
     @Column(name = "large", nullable = true, length = 500)
     @Comment("큰 아이콘 경로")
     private String large;
+
+    @Builder
+    private IconUrlEntity(String tiny, String small, String medium, String large) {
+        this.tiny = tiny;
+        this.small = small;
+        this.medium = medium;
+        this.large = large;
+    }
 
 }

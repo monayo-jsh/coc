@@ -35,7 +35,7 @@ public class MetaRunner implements CommandLineRunner {
                                                    .stream()
                                                    .map(league -> {
                                                        LeagueEntity leagueEntity = leagueEntityConverter.convert(league);
-                                                       leagueEntity.setNew(false);
+                                                       leagueEntity.markedNotNew();
                                                        return leagueEntity;
                                                    })
                                                    .toList();

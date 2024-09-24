@@ -17,7 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = IconUrlEntityMapper.class)
 @Import(IconUrlEntityMapperImpl.class)
-class IconUrlMapperTest {
+class IconUrlEntityMapperTest {
 
     @Autowired
     private IconUrlEntityMapper iconUrlEntityMapper;

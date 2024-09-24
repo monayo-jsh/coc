@@ -23,7 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
     LeagueEntityMapperImpl.class,
     IconUrlEntityMapperImpl.class
 })
-class LeagueMapperTest {
+class LeagueEntityMapperTest {
 
     @Autowired
     private LeagueEntityMapper leagueEntityMapper;
@@ -40,6 +40,8 @@ class LeagueMapperTest {
 
         // then
         assertThat(leagueEntity).isNotNull();
+
+        assertThat(leagueEntity.isNew()).isTrue();
         assertThat(leagueEntity.getId()).isEqualTo(label.getId());
         assertThat(leagueEntity.getName()).isEqualTo(label.getName());
         assertThat(leagueEntity.getIconUrl()).isNotNull();

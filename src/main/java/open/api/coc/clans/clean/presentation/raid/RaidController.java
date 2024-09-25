@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,6 +39,21 @@ public class RaidController {
     public ResponseEntity<ClanCapitalRaidResponse> getClanCapitalRaidCurrentSeason(@PathVariable String clanTag) {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(raidUseCase.getClanCapitalCurrentSeason(clanTag));
+    }
+
+    @Operation(
+        summary = "캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터 수집을 수행합니다., version: 1.00, Last Update: 24.09.26",
+        description = "이 API는 캐피탈 활성화 클랜들의 현재 시즌 캐피탈 데이터를 연동 후 서버에 수집합니다,"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/seasons/current/collect")
+    public ResponseEntity<Void> collectClanCapitalRaidSeason() {
+        raidUseCase.collectClanCapitalCurrentSeason();
+        return ResponseEntity.ok()
+                             .build();
     }
 
     @Operation(

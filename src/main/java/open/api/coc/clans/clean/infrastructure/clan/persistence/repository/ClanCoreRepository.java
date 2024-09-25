@@ -35,4 +35,9 @@ public class ClanCoreRepository implements ClanRepository {
     public boolean exists(String tag) {
         return jpaClanRepository.existsById(tag);
     }
+
+    @Override
+    public List<ClanEntity> findAllActiveCapitalClans() {
+        return jpaClanCustomRepository.findAllActiveCapitalClans();
+    }
 }

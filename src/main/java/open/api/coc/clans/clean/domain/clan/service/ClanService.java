@@ -32,20 +32,35 @@ public class ClanService {
         ClanEntity clanEntity = clanRepository.findById(clanTag)
                                               .orElseThrow(() -> new ClanNotExistsException(clanTag));
 
-        return clanMapper.toDomain(clanEntity);
+        return toDomain(clanEntity);
     }
 
     @Transactional(readOnly = true)
     public List<Clan> findAllByIds(List<String> clanTags) {
         List<ClanEntity> clanEntities = clanRepository.findByIds(clanTags);
-        return clanEntities.stream()
-                           .map(clanMapper::toDomain)
-                           .toList();
+        return toDomains(clanEntities);
     }
 
     @Transactional(readOnly = true)
     public Map<String, Clan> findAllMapByIds(List<String> clanTags) {
         return findAllByIds(clanTags).stream()
                                      .collect(Collectors.toMap(Clan::getTag, clan -> clan));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Clan> findAllActiveCapitalClans() {
+        List<ClanEntity> clanEntities = clanRepository.findAllActiveCapitalClans();
+
+        return toDomains(clanEntities);
+    }
+
+    private List<Clan> toDomains(List<ClanEntity> clanEntities) {
+        return clanEntities.stream()
+                           .map(this::toDomain)
+                           .toList();
+    }
+
+    private Clan toDomain(ClanEntity clanEntity) {
+        return clanMapper.toDomain(clanEntity);
     }
 }

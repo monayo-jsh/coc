@@ -37,6 +37,15 @@ public class JpaClanCustomRepository {
                                           .fetch();
     }
 
+    public List<ClanEntity> findAllActiveCapitalClans() {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        condition.and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
+
     private JPAQuery<ClanEntity> createSelectClanBaseQuery() {
         return queryFactory.select(clanEntity)
                            .from(clanEntity)
@@ -49,4 +58,5 @@ public class JpaClanCustomRepository {
         builder.and(clanEntity.visibleYn.eq(YnType.Y));
         return builder;
     }
+
 }

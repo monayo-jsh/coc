@@ -10,4 +10,6 @@ public interface ClanRepository {
     Optional<ClanEntity> findById(String tag);
     List<ClanEntity> findByIds(List<String> clanTags);
 
+    List<ClanEntity> findAllActiveCapitalClans();
+
 }

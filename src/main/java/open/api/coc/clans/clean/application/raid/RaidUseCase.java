@@ -1,12 +1,19 @@
 package open.api.coc.clans.clean.application.raid;
 
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalService;
+import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
+import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +23,8 @@ public class RaidUseCase {
 
     private final ClanCapitalClient clanCapitalClient;
     private final ClanCapitalService clanCapitalService;
+
+    private final ClanService clanService;
 
     private final RaidUseCaseMapper raidUseCaseMapper;
 
@@ -61,4 +70,26 @@ public class RaidUseCase {
 
         return existingRaid;
     }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidScoreResponse> getCurrentSeasonCapitalAttacks() {
+        // 현재 서버에 수집된 최근 시즌 날짜를 조회한다.
+        LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
+
+        // 클랜 캐피탈 목록(참여자 목록 포함)을 조회한다.
+        List<ClanCapitalRaid> clanCapitalRaids = clanCapitalService.findByStartDate(latestStartDate);
+
+        // 클랜 정보를 조회한다.
+        Map<String, Clan> clanMap = clanService.findAllMapByIds(clanCapitalRaids.stream().map(ClanCapitalRaid::getClanTag).toList());
+
+        // 응답
+        return clanCapitalRaids.stream()
+                               .flatMap(raid -> raid.getMembers()
+                                                    .stream()
+                                                    .map(member -> raidUseCaseMapper.toResponse(member, raid, clanMap.get(raid.getClanTag()))))
+                               .sorted(Comparator.comparing(ClanCapitalRaidScoreResponse::getClanOrder)
+                                                 .thenComparing(ClanCapitalRaidScoreResponse::id))
+                               .toList();
+    }
+
 }

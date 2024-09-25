@@ -8,12 +8,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanContentResponse;
-import open.api.coc.clans.domain.clans.IconUrlResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
+import open.api.coc.external.coc.clan.domain.common.IconUrl;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Clan {
 
@@ -30,7 +30,7 @@ public class Clan {
     private Integer clanPoints;
 
     @Schema(description = "클랜 아이콘 객체")
-    private IconUrlResponse badgeUrls;
+    private IconUrl badgeUrls;
 
     @Schema(description = "클랜 설명")
     private String description;

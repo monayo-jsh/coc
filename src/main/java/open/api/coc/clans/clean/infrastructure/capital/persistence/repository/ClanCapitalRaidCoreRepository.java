@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.infrastructure.capital.persistence.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
@@ -34,6 +35,20 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     @Override
     public void update(RaidEntity raidEntity) {
         jpaRaidCustomRepository.update(raidEntity);
+    }
+
+    @Override
+    public LocalDate findLatestStartDate() {
+        return jpaRaidCustomRepository.findLatestStartDate();
+    }
+
+    @Override
+    public List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate) {
+        if (startDate == null) {
+            throw new IllegalArgumentException("startDate can not be null");
+        }
+
+        return jpaRaidCustomRepository.findAllWithRaiderByStartDate(startDate);
     }
 
 }

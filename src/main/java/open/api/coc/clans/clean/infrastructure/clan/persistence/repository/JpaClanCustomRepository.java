@@ -7,6 +7,7 @@ import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -26,6 +27,14 @@ public class JpaClanCustomRepository {
         ClanEntity clanEntity = createSelectClanBaseQuery().where(condition)
                                                             .fetchOne();
         return Optional.ofNullable(clanEntity);
+    }
+
+    public List<ClanEntity> findByIds(List<String> clanTags) {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        condition.and(clanEntity.tag.in(clanTags));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .fetch();
     }
 
     private JPAQuery<ClanEntity> createSelectClanBaseQuery() {

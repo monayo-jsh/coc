@@ -1,6 +1,9 @@
 package open.api.coc.clans.clean.domain.capital.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
@@ -17,6 +20,7 @@ public class ClanCapitalService {
     private final ClanCapitalRaidRepository clanCapitalRaidRepository;
     private final ClanCapitalRaidMapper clanCapitalRaidMapper;
 
+    @Transactional(readOnly = true)
     public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDateTime startDateTime) {
         Optional<RaidEntity> findRaidEntity = clanCapitalRaidRepository.findByClanTagAndStartDate(clanTag, startDateTime.toLocalDate());
 
@@ -45,5 +49,23 @@ public class ClanCapitalService {
     public void updateRaid(ClanCapitalRaid clanCapitalRaid) {
         RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
         clanCapitalRaidRepository.update(raidEntity);
+    }
+
+    @Transactional(readOnly = true)
+    public LocalDate findLatestStartDate() {
+        LocalDate latestStartDate = clanCapitalRaidRepository.findLatestStartDate();
+        if (Objects.isNull(latestStartDate)) {
+            latestStartDate = LocalDate.now();
+        }
+
+        return latestStartDate;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaid> findByStartDate(LocalDate latestStartDate) {
+        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllWithRaiderByStartDate(latestStartDate);
+        return raidEntities.stream()
+                           .map(clanCapitalRaidMapper::toDomain)
+                           .toList();
     }
 }

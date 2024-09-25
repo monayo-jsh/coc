@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.infrastructure.clan.persistence.repository;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
@@ -19,6 +20,15 @@ public class ClanCoreRepository implements ClanRepository {
             throw new IllegalArgumentException("tag can not be null");
         }
         return jpaClanCustomRepository.findById(tag);
+    }
+
+    @Override
+    public List<ClanEntity> findByIds(List<String> clanTags) {
+        if (clanTags == null || clanTags.isEmpty()) {
+            throw new IllegalArgumentException("clanTags can not be null or empty");
+        }
+
+        return jpaClanCustomRepository.findByIds(clanTags);
     }
 
     @Override

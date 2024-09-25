@@ -13,4 +13,6 @@ public interface IconUrlEntityMapper {
 
     IconUrlEntity toEntity(IconUrl iconUrl);
 
+    IconUrl toDomain(IconUrlEntity entity);
+
 }

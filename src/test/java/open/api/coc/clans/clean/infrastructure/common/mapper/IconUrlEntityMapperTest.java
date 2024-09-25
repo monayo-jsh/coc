@@ -3,7 +3,9 @@ package open.api.coc.clans.clean.infrastructure.common.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Random;
-import open.api.coc.clans.clean.infrastructure.common.entity.IconUrlEntity;
+import open.api.coc.clans.clean.infrastructure.common.persistence.entity.IconUrlEntity;
+import open.api.coc.clans.clean.infrastructure.common.persistence.mapper.IconUrlEntityMapper;
+import open.api.coc.clans.clean.infrastructure.common.persistence.mapper.IconUrlEntityMapperImpl;
 import open.api.coc.external.coc.clan.domain.common.IconUrl;
 import open.api.coc.util.TestIconUrlFactory;
 import org.junit.jupiter.api.DisplayName;

@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 public interface TimeConverter {
     long toEpochMilliSecond(String time);
     long toEpochMilliSecond(LocalDate localDate);
-    long toEpochMilliSecond(LocalDateTime localDate);
+    long toEpochMilliSecond(LocalDateTime localDateTime);
     LocalDate toLocalDate(long epochMilli);
     LocalDateTime toLocalDateTime(long epochMilli);
 }

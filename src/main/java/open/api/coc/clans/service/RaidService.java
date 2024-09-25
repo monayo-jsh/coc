@@ -17,7 +17,7 @@ import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
-import open.api.coc.clans.database.entity.raid.RaidEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.database.entity.raid.converter.RaidEntityConverter;
 import open.api.coc.clans.database.repository.raid.RaidQueryRepository;
@@ -85,9 +85,9 @@ public class RaidService {
         RaidEntity raidEntity = findRaidEntity.get();
 
         // DB 데이터
-        Map<String, RaiderEntity> dbRaiderMap = makeRadierListToMap(raidEntity.getRaiderEntityList());
+        Map<String, RaiderEntity> dbRaiderMap = makeRadierListToMap(raidEntity.getRaiders());
         // API 응답 데이터
-        Map<String, RaiderEntity> realRaiderMap = makeRadierListToMap(realRaidEntity.getRaiderEntityList());
+        Map<String, RaiderEntity> realRaiderMap = makeRadierListToMap(realRaidEntity.getRaiders());
 
         for (String playerTag : realRaiderMap.keySet()) {
             RaiderEntity dbRaiderEntity = dbRaiderMap.get(playerTag);
@@ -98,8 +98,8 @@ public class RaidService {
                 continue;
             }
 
-            dbRaiderEntity.setAttacks(realRaiderEntity.getAttacks());
-            dbRaiderEntity.setResourceLooted(realRaiderEntity.getResourceLooted());
+            dbRaiderEntity.changeAttacks(realRaiderEntity.getAttacks());
+            dbRaiderEntity.changeResourceLooted(realRaiderEntity.getResourceLooted());
         }
     }
 
@@ -114,7 +114,7 @@ public class RaidService {
                         PageRequest.of(0,capitalClanCount));
         List<RaiderEntity> result = new ArrayList<>();
         for (RaidEntity raid : raidEntityList) {
-            for (RaiderEntity raider : raid.getRaiderEntityList()) {
+            for (RaiderEntity raider : raid.getRaiders()) {
                 if(raider.getResourceLooted() < point) {
                     result.add(raider);
                 }
@@ -197,7 +197,7 @@ public class RaidService {
         List<RaidEntity> raidEntities = raidQueryRepository.findAllByStartDate(currentSeason);
 
         return raidEntities.stream()
-                           .map(raid -> convertRaidScoreResponse(raid.getRaiderEntityList()))
+                           .map(raid -> convertRaidScoreResponse(raid.getRaiders()))
                            .flatMap(Collection::stream)
                            .toList();
     }

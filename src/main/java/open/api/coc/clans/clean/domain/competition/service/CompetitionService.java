@@ -27,7 +27,7 @@ public class CompetitionService {
                                   .toList();
     }
 
-    public void validateExists(String name, LocalDate startDate, LocalDate endDate) {
+    public void ensureCompetitionDoesNotExist(String name, LocalDate startDate, LocalDate endDate) {
         if (competitionRepository.exists(name, startDate, endDate)) {
             throw new CompetitionAlreadyExistsException("%s - %s ~ %s".formatted(name,
                                                                                  TimeUtils.formattedISODate(startDate),
@@ -37,11 +37,14 @@ public class CompetitionService {
 
     @Transactional
     public Competition create(Competition competition) {
+        ensureCompetitionDoesNotExist(competition.getName(), competition.getStartDate(), competition.getEndDate());
+
         CompetitionEntity competitionEntity = competitionMapper.toEntity(competition);
         CompetitionEntity saveCompetitionEntity = competitionRepository.save(competitionEntity);
         return competitionMapper.toDomain(saveCompetitionEntity);
     }
 
+    @Transactional(readOnly = true)
     public Competition findById(Long id) {
         CompetitionEntity competitionEntity = competitionRepository.findById(id)
                                                                    .orElseThrow(() -> new CompetitionNotExistsException(id));

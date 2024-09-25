@@ -25,7 +25,7 @@ import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.converter.ClanEntityConverter;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
-import open.api.coc.clans.clean.infrastructure.league.entity.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerDonationStatEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
@@ -43,7 +43,7 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryReposi
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
-import open.api.coc.clans.clean.infrastructure.league.repository.JpaLeagueRepository;
+import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerDonationStatQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;

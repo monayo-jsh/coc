@@ -16,7 +16,7 @@ import org.thymeleaf.util.StringUtils;
 public class TimeUtils implements TimeConverter {
 
     private static final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
     @Override
     public long toEpochMilliSecond(String time) {

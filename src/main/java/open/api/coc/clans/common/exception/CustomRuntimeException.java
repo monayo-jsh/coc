@@ -15,6 +15,11 @@ public class CustomRuntimeException extends RuntimeException {
         this.message = exceptionCode.getMessage();
     }
 
+    public CustomRuntimeException(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public void addExtraMessage(String message) {
         if (StringUtils.hasText(message)) {
             this.message += " - ";

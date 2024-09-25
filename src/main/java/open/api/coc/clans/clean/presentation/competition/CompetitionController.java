@@ -48,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CompetitionController {
 
     private final JpaCompetitionPlayerRepository jpaCompetitionPlayerRepository;
+
     private final CompetitionUseCaseMapper competitionUseCaseMapper;
     private final CompetitionUseCase competitionUseCase;
 

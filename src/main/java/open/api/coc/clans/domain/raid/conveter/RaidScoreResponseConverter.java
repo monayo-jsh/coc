@@ -1,7 +1,7 @@
 package open.api.coc.clans.domain.raid.conveter;
 
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.raid.RaidEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.players.PlayerClanResponse;

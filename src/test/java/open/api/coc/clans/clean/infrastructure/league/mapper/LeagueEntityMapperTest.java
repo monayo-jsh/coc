@@ -3,8 +3,10 @@ package open.api.coc.clans.clean.infrastructure.league.mapper;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Random;
-import open.api.coc.clans.clean.infrastructure.common.mapper.IconUrlEntityMapperImpl;
-import open.api.coc.clans.clean.infrastructure.league.entity.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.common.persistence.mapper.IconUrlEntityMapperImpl;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.persistence.mapper.LeagueEntityMapper;
+import open.api.coc.clans.clean.infrastructure.league.persistence.mapper.LeagueEntityMapperImpl;
 import open.api.coc.external.coc.clan.domain.common.IconUrl;
 import open.api.coc.external.coc.clan.domain.common.Label;
 import open.api.coc.util.TestIconUrlFactory;

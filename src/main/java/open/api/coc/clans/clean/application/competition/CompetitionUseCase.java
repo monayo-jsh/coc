@@ -71,10 +71,7 @@ public class CompetitionUseCase {
 
     @Transactional
     public CompetitionResponse create(CompetitionCreateCommand command) {
-        // 1. 등록된 대회 검증
-        competitionService.validateExists(command.name(), command.startDate(), command.endDate());
-
-        // 2. 대회 모델 생성
+        // 1. 대회 모델 생성
         Competition competition = Competition.createNew(command.name(),
                                                         command.startDate(),
                                                         command.endDate(),
@@ -85,10 +82,10 @@ public class CompetitionUseCase {
                                                         command.bgColor(),
                                                         command.remarks());
 
-        // 3. 대회 저장
+        // 2. 대회 저장
         Competition createdCompetition = competitionService.create(competition);
 
-        // 4. 응답
+        // 3. 응답
         return competitionUseCaseMapper.toResponse(createdCompetition);
     }
 
@@ -114,10 +111,11 @@ public class CompetitionUseCase {
 
     @Transactional
     public Long participate(CompetitionParticipateCreateCommand command) {
-        // 1. 대회 조회
-        Competition competition = competitionService.findById(command.competitionId());
-        // 2. 클랜 조회
+        // 1. 클랜 조회
         Clan clan = clanService.findById(command.clanTag());
+
+        // 2. 대회 조회
+        Competition competition = competitionService.findById(command.competitionId());
 
         // 3. 대회 참여 클랜 목록 조회
         competition.loadParticipantClans(competitionParticipateService);

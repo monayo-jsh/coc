@@ -1,6 +1,6 @@
 package open.api.coc.clans.database.repository.player;
 
-import static open.api.coc.clans.clean.infrastructure.league.entity.QLeagueEntity.leagueEntity;
+import static open.api.coc.clans.clean.infrastructure.league.persistence.entity.QLeagueEntity.leagueEntity;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;

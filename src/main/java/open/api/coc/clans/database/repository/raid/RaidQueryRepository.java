@@ -1,8 +1,8 @@
 package open.api.coc.clans.database.repository.raid;
 
+import static open.api.coc.clans.clean.infrastructure.capital.persistence.entity.QRaidEntity.raidEntity;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
-import static open.api.coc.clans.database.entity.raid.QRaidEntity.raidEntity;
 
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,8 +10,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
-import open.api.coc.clans.database.entity.raid.RaidEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 

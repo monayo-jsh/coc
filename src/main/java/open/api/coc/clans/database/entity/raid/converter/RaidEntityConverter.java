@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.raid.RaidEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonMemberResponse;
 import open.api.coc.clans.domain.raid.ClanCapitalRaidSeasonResponse;
@@ -23,7 +23,7 @@ public class RaidEntityConverter {
                          .clanTag(clanTag)
                          .startDate(timeConverter.toLocalDate(source.getStartTime()))
                          .endDate(timeConverter.toLocalDate(source.getEndTime()))
-                         .radierEntityList(makeMembers(source.getMembers())).build();
+                         .raiders(makeMembers(source.getMembers())).build();
     }
 
     private List<RaiderEntity> makeMembers(List<ClanCapitalRaidSeasonMemberResponse> members) {

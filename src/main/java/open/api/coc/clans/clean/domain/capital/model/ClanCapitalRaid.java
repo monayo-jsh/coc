@@ -47,7 +47,7 @@ public class ClanCapitalRaid {
     }
 
     public void updateParticipants(List<ClanCapitalRaidSeasonMember> members) {
-        Map<String, ClanCapitalRaidMember> clanCapitalRaidMemberMap = makeMemberMapByPlayerTag(this.members);
+        Map<String, ClanCapitalRaidMember> clanCapitalRaidMemberMap = makeMemberMapByTag(this.members);
 
         for (ClanCapitalRaidSeasonMember member : members) {
             ClanCapitalRaidMember clanCapitalRaidMember = clanCapitalRaidMemberMap.get(member.getTag());
@@ -76,16 +76,16 @@ public class ClanCapitalRaid {
     }
 
     public void mappingParticipantIds(List<ClanCapitalRaidMember> members) {
-        Map<String, ClanCapitalRaidMember> clanCapitalRaidMemberMap = makeMemberMapByPlayerTag(members);
+        Map<String, ClanCapitalRaidMember> memberMap = makeMemberMapByTag(members);
 
         // 신규 생성된 참여자의 고유키 매핑
         for( ClanCapitalRaidMember member : this.members) {
-            ClanCapitalRaidMember clanCapitalRaidMember = clanCapitalRaidMemberMap.get(member.getTag());
-            member.changeId(clanCapitalRaidMember.getId());
+            ClanCapitalRaidMember clanCapitalRaidMember = memberMap.get(member.getTag());
+            member.assignIdIfAbsent(clanCapitalRaidMember.getId());
         }
     }
 
-    private Map<String, ClanCapitalRaidMember> makeMemberMapByPlayerTag(List<ClanCapitalRaidMember> members) {
+    private Map<String, ClanCapitalRaidMember> makeMemberMapByTag(List<ClanCapitalRaidMember> members) {
         return members.stream()
                       .collect(Collectors.toMap(ClanCapitalRaidMember::getTag, member -> member));
     }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
@@ -46,7 +47,6 @@ public class ClanCapitalService {
     public ClanCapitalRaid update(ClanCapitalRaid clanCapitalRaid) {
         RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
         RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-
         return clanCapitalRaidMapper.toDomain(saveRaidEntity);
     }
 
@@ -86,4 +86,28 @@ public class ClanCapitalService {
 
         return startDates.subList(1, startDates.size());
     }
+
+    @Transactional
+    public ClanCapitalRaid createClanCapitalRaid(String clanTag, ClanCapitalRaidSeason currentSeason) {
+
+        // 새로운 클랜 캐피탈 생성
+        ClanCapitalRaid newClanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
+                                                                       currentSeason.getState(),
+                                                                       currentSeason.getStartTime(),
+                                                                       currentSeason.getEndTime());
+
+        return create(newClanCapitalRaid);
+    }
+
+    @Transactional
+    public ClanCapitalRaid updateClanCapitalRaid(ClanCapitalRaid existingRaid, ClanCapitalRaidSeason currentSeason) {
+        // 저장된 클랜 캐피탈 데이터 상태 비교 후 업데이트
+        if (existingRaid.isDifferentState(currentSeason.getState())) {
+            existingRaid.changeState(currentSeason.getState());
+            updateRaid(existingRaid);
+        }
+
+        return existingRaid;
+    }
+
 }

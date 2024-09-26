@@ -35,10 +35,10 @@ public class RaidUseCase {
 
     @Transactional
     public ClanCapitalRaidResponse getClanCapitalCurrentSeason(String clanTag) {
-        // 1. 클랜 캐피탈 현재 시즌을 조회한다.
+        // 1. 클랜 캐피탈 현재 시즌을 COC API 조회한다.
         ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clanTag);
 
-        // 2. 클랜 캐피탈 조회
+        // 2. 클랜 캐피탈 도메인 조회
         ClanCapitalRaid clanCapitalRaid = processClanCapitalCurrentSeason(clanTag, currentSeason);
 
         // 3. 신규 참가자 아이디 매핑
@@ -87,34 +87,14 @@ public class RaidUseCase {
     public ClanCapitalRaid processClanCapitalCurrentSeason(String tag, ClanCapitalRaidSeason currentSeason) {
         // 클랜 캐피탈 조회 및 생성, 업데이트
         ClanCapitalRaid clanCapitalRaid = clanCapitalService.findByClanTagAndStartDate(tag, currentSeason.getStartTime())
-                                                            .map(existingRaid -> updateClanCapitalRaid(existingRaid, currentSeason))
-                                                            .orElseGet(() -> createClanCapitalRaid(tag, currentSeason));
+                                                            .map(existingRaid -> clanCapitalService.updateClanCapitalRaid(existingRaid, currentSeason))
+                                                            .orElseGet(() -> clanCapitalService.createClanCapitalRaid(tag, currentSeason));
 
         // 클랜 캐피탈 참가자 정보 갱신
         clanCapitalRaid.updateParticipants(currentSeason.getMembers());
 
         // 클랜 캐피탈 참가자 데이터 업데이트 및 갱신된 객체 반환
         return clanCapitalService.update(clanCapitalRaid);
-    }
-
-    public ClanCapitalRaid createClanCapitalRaid(String clanTag, ClanCapitalRaidSeason currentSeason) {
-        // 새로운 클랜 캐피탈 생성
-        ClanCapitalRaid newClanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
-                                                                       currentSeason.getState(),
-                                                                       currentSeason.getStartTime(),
-                                                                       currentSeason.getEndTime());
-
-        return clanCapitalService.create(newClanCapitalRaid);
-    }
-
-    public ClanCapitalRaid updateClanCapitalRaid(ClanCapitalRaid existingRaid, ClanCapitalRaidSeason currentSeason) {
-        // 저장된 클랜 캐피탈 데이터 상태 비교 후 업데이트
-        if (existingRaid.isDifferentState(currentSeason.getState())) {
-            existingRaid.changeState(currentSeason.getState());
-            clanCapitalService.updateRaid(existingRaid);
-        }
-
-        return existingRaid;
     }
 
     @Transactional(readOnly = true)

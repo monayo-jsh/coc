@@ -12,7 +12,6 @@ import open.api.coc.clans.clean.application.raid.RaidUseCase;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreResponse;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

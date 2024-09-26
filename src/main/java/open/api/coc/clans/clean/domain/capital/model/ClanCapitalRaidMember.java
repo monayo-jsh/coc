@@ -35,8 +35,8 @@ public class ClanCapitalRaidMember {
 
     }
 
-    public void changeId(Long id) {
-        // 도메인 모델에 아이디 매핑은 빈 상태에서만 1회 매핑
+    public void assignIdIfAbsent(Long id) {
+        // 도메인 모델에 아이디 매핑은 빈 상태에서만 1회 할당
         if (this.id == null){
             this.id = id;
         }

@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankingDTO;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidMemberRepository;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.dto.RaiderRankingDTO;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMemberMapper;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.database.entity.raid.RaiderEntity;
@@ -24,20 +26,27 @@ public class ClanCapitalMemberService {
 
     public List<ClanCapitalRaidMember> findByRaidId(Long raidId) {
         List<RaiderEntity> raiderEntities = clanCapitalRaidMemberRepository.findAllByRaidId(raidId);
-        return toDomains(raiderEntities);
+        return raiderEntities.stream()
+                             .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMember)
+                             .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<ClanCapitalRaidMember> rankingResourceLootedByStartDate(LocalDate startDate) {
+    public List<ClanCapitalRaidMemberRankingDTO> rankingResourceLootedByStartDate(LocalDate startDate) {
         Pageable pageable = Pageable.ofSize(hallOfFameConfig.getRanking());
-        List<RaiderEntity> raiderEntities = clanCapitalRaidMemberRepository.findAllResourceLootedRankingByStartDateAndPage(startDate, pageable);
-        return toDomains(raiderEntities);
-
+        List<RaiderRankingDTO> rankingDTOs = clanCapitalRaidMemberRepository.findAllResourceLootedRankingByStartDateAndPage(startDate, pageable);
+        return rankingDTOs.stream()
+                          .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMemberRankingDTO)
+                          .toList();
     }
 
-    private List<ClanCapitalRaidMember> toDomains(List<RaiderEntity> raiderEntities) {
-        return raiderEntities.stream()
-                             .map(clanCapitalRaidMemberMapper::toDomain)
-                             .toList();
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidMemberRankingDTO> rankingResourceLootedAverageByStartDates(List<LocalDate> startDates) {
+        Pageable pageable = Pageable.ofSize(hallOfFameConfig.getRanking());
+        List<RaiderRankingDTO> rankingDTOs = clanCapitalRaidMemberRepository.findAllResourceLootedAverageRankingByStartDateAndPage(startDates, pageable);
+        return rankingDTOs.stream()
+                          .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMemberRankingDTO)
+                          .toList();
     }
+
 }

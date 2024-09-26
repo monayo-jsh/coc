@@ -9,7 +9,7 @@ import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
-import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankingDTO;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalMemberService;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalService;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
@@ -123,7 +123,21 @@ public class RaidUseCase {
         LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
 
         // 캐피탈 참여자 획득 점수 랭킹을 조회한다.
-        List<ClanCapitalRaidMember> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedByStartDate(latestStartDate);
+        List<ClanCapitalRaidMemberRankingDTO> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedByStartDate(latestStartDate);
+
+        // 응답
+        return clanCapitalRaidMembers.stream()
+                                     .map(raidUseCaseMapper::toRankingResponse)
+                                     .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RankingHallOfFameResponse> getRankingAverageSeason() {
+        // 현재 서버에 수집된 최근 시즌 날짜 목록을 조회한다.
+        List<LocalDate> startDates = clanCapitalService.findAverageStartDates();
+
+        // 캐피탈 참여자 획득 점수 평균 랭킹을 조회한다.
+        List<ClanCapitalRaidMemberRankingDTO> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(startDates);
 
         // 응답
         return clanCapitalRaidMembers.stream()

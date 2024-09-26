@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -45,6 +46,16 @@ public class JpaRaidCustomRepository {
                            .fetchOne();
     }
 
+    public List<LocalDate> findLatestStartDatesByPage(Pageable pageable) {
+        return queryFactory.select(raidEntity.startDate)
+                           .from(raidEntity)
+                           .groupBy(raidEntity.startDate)
+                           .orderBy(raidEntity.startDate.desc())
+                           .offset(pageable.getOffset())
+                           .limit(pageable.getPageSize())
+                           .fetch();
+    }
+
     public List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(raidEntity.startDate.eq(startDate));
@@ -55,4 +66,5 @@ public class JpaRaidCustomRepository {
                            .where(condition)
                            .fetch();
     }
+
 }

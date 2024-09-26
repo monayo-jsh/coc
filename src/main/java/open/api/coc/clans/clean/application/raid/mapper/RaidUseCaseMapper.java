@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.application.raid.mapper;
 import java.time.LocalDate;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankingDTO;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
@@ -40,7 +41,7 @@ public abstract class RaidUseCaseMapper {
         return timeConverter.toEpochMilliSecond(localDate);
     }
 
-    @Mapping(target = "score", source = "capitalResourcesLooted")
-    public abstract RankingHallOfFameResponse toRankingResponse(ClanCapitalRaidMember clanCapitalRaidMember);
+    @Mapping(target = "score", source = "resourceLooted")
+    public abstract RankingHallOfFameResponse toRankingResponse(ClanCapitalRaidMemberRankingDTO clanCapitalRaidMemberRankingDTO);
 
 }

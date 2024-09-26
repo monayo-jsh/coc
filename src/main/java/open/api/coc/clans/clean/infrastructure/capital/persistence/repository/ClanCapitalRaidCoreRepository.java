@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -40,6 +41,15 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     @Override
     public LocalDate findLatestStartDate() {
         return jpaRaidCustomRepository.findLatestStartDate();
+    }
+
+    @Override
+    public List<LocalDate> findLatestStartDates(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("pageable can not be null");
+        }
+
+        return jpaRaidCustomRepository.findLatestStartDatesByPage(pageable);
     }
 
     @Override

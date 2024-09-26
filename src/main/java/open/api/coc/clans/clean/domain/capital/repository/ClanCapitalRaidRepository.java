@@ -8,16 +8,18 @@ import org.springframework.data.domain.Pageable;
 
 public interface ClanCapitalRaidRepository {
 
-    Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
-
     RaidEntity save(RaidEntity entity);
 
     void update(RaidEntity raidEntity);
 
+    Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
+
+    List<RaidEntity> findAllByIds(List<Long> raidIds);
+
+    List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate);
+
     LocalDate findLatestStartDate();
 
     List<LocalDate> findLatestStartDates(Pageable pageable);
-
-    List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate);
 
 }

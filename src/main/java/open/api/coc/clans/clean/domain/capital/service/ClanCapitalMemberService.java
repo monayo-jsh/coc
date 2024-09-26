@@ -26,9 +26,7 @@ public class ClanCapitalMemberService {
 
     public List<ClanCapitalRaidMember> findByRaidId(Long raidId) {
         List<RaiderEntity> raiderEntities = clanCapitalRaidMemberRepository.findAllByRaidId(raidId);
-        return raiderEntities.stream()
-                             .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMember)
-                             .toList();
+        return mapToClanCapitalRaidMember(raiderEntities);
     }
 
     @Transactional(readOnly = true)
@@ -47,6 +45,24 @@ public class ClanCapitalMemberService {
         return rankingDTOs.stream()
                           .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMemberRankingDTO)
                           .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidMember> findByTag(String playerTag, Integer limit) {
+        List<RaiderEntity> raiderEntities = clanCapitalRaidMemberRepository.findAllByPlayerTag(playerTag, limit);
+        return mapToClanCapitalRaidMember(raiderEntities);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidMember> findByName(String playerName, Integer limit) {
+        List<RaiderEntity> raiderEntities = clanCapitalRaidMemberRepository.findAllByPlayerName(playerName, limit);
+        return mapToClanCapitalRaidMember(raiderEntities);
+    }
+
+    private List<ClanCapitalRaidMember> mapToClanCapitalRaidMember(List<RaiderEntity> raiderEntities) {
+        return raiderEntities.stream()
+                             .map(clanCapitalRaidMemberMapper::toClanCapitalRaidMember)
+                             .toList();
     }
 
 }

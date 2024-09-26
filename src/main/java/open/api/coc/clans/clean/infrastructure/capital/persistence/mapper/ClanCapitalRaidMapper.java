@@ -16,7 +16,10 @@ public interface ClanCapitalRaidMapper {
     @Mapping(target = "raiders", source = "members")
     RaidEntity toEntity(ClanCapitalRaid clanCapitalRaid);
 
+    @Mapping(target = "members", ignore = true)
+    ClanCapitalRaid toClanCapitalRaid(RaidEntity entity);
+
     @Mapping(target = "members", source = "raiders")
-    ClanCapitalRaid toDomain(RaidEntity entity);
+    ClanCapitalRaid toClanCapitalRaidWithMembers(RaidEntity entity);
 
 }

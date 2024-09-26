@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
@@ -32,7 +34,7 @@ public class ClanCapitalService {
 
         if (findRaidEntity.isEmpty()) return Optional.empty();
 
-        ClanCapitalRaid clanCapitalRaid = clanCapitalRaidMapper.toDomain(findRaidEntity.get());
+        ClanCapitalRaid clanCapitalRaid = clanCapitalRaidMapper.toClanCapitalRaidWithMembers(findRaidEntity.get());
         return Optional.of(clanCapitalRaid);
     }
 
@@ -40,14 +42,14 @@ public class ClanCapitalService {
     public ClanCapitalRaid create(ClanCapitalRaid clanCapitalRaid) {
         RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
         RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-        return clanCapitalRaidMapper.toDomain(saveRaidEntity);
+        return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
     }
 
     @Transactional
     public ClanCapitalRaid update(ClanCapitalRaid clanCapitalRaid) {
         RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
         RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-        return clanCapitalRaidMapper.toDomain(saveRaidEntity);
+        return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
     }
 
     @Transactional
@@ -60,7 +62,7 @@ public class ClanCapitalService {
     public List<ClanCapitalRaid> findByStartDate(LocalDate latestStartDate) {
         List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllWithRaiderByStartDate(latestStartDate);
         return raidEntities.stream()
-                           .map(clanCapitalRaidMapper::toDomain)
+                           .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
                            .toList();
     }
 
@@ -110,4 +112,11 @@ public class ClanCapitalService {
         return existingRaid;
     }
 
+    @Transactional(readOnly = true)
+    public Map<Long, ClanCapitalRaid> findAllMapByIds(List<Long> raidIds) {
+        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllByIds(raidIds);
+        return raidEntities.stream()
+                           .map(clanCapitalRaidMapper::toClanCapitalRaid)
+                           .collect(Collectors.toMap(ClanCapitalRaid::getId, raid -> raid));
+    }
 }

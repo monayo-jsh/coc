@@ -35,7 +35,7 @@ public abstract class RaidUseCaseMapper {
     @Mapping(target = "seasonStartDate", source = "raid.startDate")
     @Mapping(target = "seasonEndDate", source = "raid.endDate")
     @Mapping(target = "clan", source = "clan")
-    public abstract ClanCapitalRaidScoreResponse toResponse(ClanCapitalRaidMember member, ClanCapitalRaid raid, Clan clan);
+    public abstract ClanCapitalRaidScoreResponse toClanCapitalRaidScoreResponse(ClanCapitalRaidMember member, ClanCapitalRaid raid, Clan clan);
 
     protected Long map(LocalDate localDate) {
         return timeConverter.toEpochMilliSecond(localDate);

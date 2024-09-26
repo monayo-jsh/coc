@@ -25,6 +25,24 @@ public class ClanCapitalRaidMemberCoreRepository implements ClanCapitalRaidMembe
     }
 
     @Override
+    public List<RaiderEntity> findAllByPlayerTag(String playerTag, Integer limit) {
+        if (playerTag == null) {
+            throw new IllegalArgumentException("playerTag can not be null");
+        }
+
+        return jpaRaiderRepository.findAllByPlayerTag(playerTag, limit);
+    }
+
+    @Override
+    public List<RaiderEntity> findAllByPlayerName(String playerName, Integer limit) {
+        if (playerName == null) {
+            throw new IllegalArgumentException("playerName can not be null");
+        }
+
+        return jpaRaiderRepository.findAllByPlayerName(playerName, limit);
+    }
+
+    @Override
     public List<RaiderRankingDTO> findAllResourceLootedRankingByStartDateAndPage(LocalDate startDate, Pageable pageable) {
         if (startDate == null) {
             throw new IllegalArgumentException("startDate can not be null");

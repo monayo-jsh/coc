@@ -1,15 +1,18 @@
 package open.api.coc.clans.clean.application.raid;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.application.raid.mapper.RaidScoreQuery;
 import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankingDTO;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalMemberService;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalService;
@@ -58,6 +61,8 @@ public class RaidUseCase {
         // 클랜 캐피탈 목록(참여자 목록 포함)을 조회한다.
         List<ClanCapitalRaid> clanCapitalRaids = clanCapitalService.findByStartDate(latestStartDate);
 
+        if (clanCapitalRaids.isEmpty()) return Collections.emptyList();
+
         // 클랜 정보를 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(clanCapitalRaids.stream().map(ClanCapitalRaid::getClanTag).toList());
 
@@ -65,7 +70,7 @@ public class RaidUseCase {
         return clanCapitalRaids.stream()
                                .flatMap(raid -> raid.getMembers()
                                                     .stream()
-                                                    .map(member -> raidUseCaseMapper.toResponse(member, raid, clanMap.get(raid.getClanTag()))))
+                                                    .map(member -> toClanCapitalRaidScoreResponse(member, raid, clanMap)))
                                .sorted(Comparator.comparing(ClanCapitalRaidScoreResponse::getClanOrder)
                                                  .thenComparing(ClanCapitalRaidScoreResponse::id))
                                .toList();
@@ -109,10 +114,10 @@ public class RaidUseCase {
         LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
 
         // 캐피탈 참여자 획득 점수 랭킹을 조회한다.
-        List<ClanCapitalRaidMemberRankingDTO> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedByStartDate(latestStartDate);
+        List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedByStartDate(latestStartDate);
 
         // 응답
-        return clanCapitalRaidMembers.stream()
+        return raidMemberRankingDTOs.stream()
                                      .map(raidUseCaseMapper::toRankingResponse)
                                      .toList();
     }
@@ -122,12 +127,45 @@ public class RaidUseCase {
         // 현재 서버에 수집된 최근 시즌 날짜 목록을 조회한다.
         List<LocalDate> startDates = clanCapitalService.findAverageStartDates();
 
+        if (startDates.isEmpty()) return Collections.emptyList();
+
         // 캐피탈 참여자 획득 점수 평균 랭킹을 조회한다.
-        List<ClanCapitalRaidMemberRankingDTO> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(startDates);
+        List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(startDates);
 
         // 응답
-        return clanCapitalRaidMembers.stream()
+        return raidMemberRankingDTOs.stream()
                                      .map(raidUseCaseMapper::toRankingResponse)
                                      .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidScoreResponse> getClanCapitalRaiderScore(RaidScoreQuery query) {
+        // 현재 서버에 수집된 캐피탈 참여자의 공격 목록을 조회한다.
+        List<ClanCapitalRaidMember> clanCapitalRaidMembers = query.getStrategy().execute(clanCapitalMemberService, query.getCriteria(), query.getLimit());
+
+        if (clanCapitalRaidMembers.isEmpty()) return Collections.emptyList();
+
+        // 캐피탈 목록을 조회한다.
+        Map<Long, ClanCapitalRaid> raidMap = clanCapitalService.findAllMapByIds(clanCapitalRaidMembers.stream().map(ClanCapitalRaidMember::getRaidId).toList());
+
+        // 클랜 목록을 조회한다.
+        Map<String, Clan> clanMap = clanService.findAllMapByIds(raidMap.values().stream().map(ClanCapitalRaid::getClanTag).toList());
+
+        // 응답
+        return clanCapitalRaidMembers.stream()
+                                     .map(member -> toClanCapitalRaidScoreResponse(member, raidMap, clanMap))
+                                     .sorted(Comparator.comparing(ClanCapitalRaidScoreResponse::id).reversed())
+                                     .toList();
+    }
+
+    private ClanCapitalRaidScoreResponse toClanCapitalRaidScoreResponse(ClanCapitalRaidMember member, Map<Long, ClanCapitalRaid> raidMap, Map<String, Clan> clanMap) {
+        ClanCapitalRaid raid = raidMap.getOrDefault(member.getRaidId(), null);
+        return toClanCapitalRaidScoreResponse(member, raid, clanMap);
+    }
+
+    private ClanCapitalRaidScoreResponse toClanCapitalRaidScoreResponse(ClanCapitalRaidMember member, ClanCapitalRaid raid, Map<String, Clan> clanMap) {
+        Clan clan = clanMap.getOrDefault(raid.getClanTag(), null);
+        return raidUseCaseMapper.toClanCapitalRaidScoreResponse(member, raid, clan);
+    }
+
 }

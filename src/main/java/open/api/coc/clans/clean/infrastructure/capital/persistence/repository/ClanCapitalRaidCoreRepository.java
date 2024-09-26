@@ -29,6 +29,15 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     }
 
     @Override
+    public List<RaidEntity> findAllByIds(List<Long> raidIds) {
+        if (raidIds == null || raidIds.isEmpty()) {
+            throw new IllegalArgumentException("raidIds can not be null or empty");
+        }
+
+        return jpaRaidRepository.findAllById(raidIds);
+    }
+
+    @Override
     public RaidEntity save(RaidEntity entity) {
         return jpaRaidRepository.save(entity);
     }

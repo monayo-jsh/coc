@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
@@ -20,6 +21,7 @@ import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreRespon
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RaidUseCase {
@@ -75,10 +77,14 @@ public class RaidUseCase {
         List<Clan> clans = clanService.findAllActiveCapitalClans();
 
         for(Clan clan : clans) {
-            // 클랜 캐피탈 현재 시즌을 조회한다.
-            ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clan.getTag());
-            // 클랜 캐피탈 수집
-            processClanCapitalCurrentSeason(clan.getTag(), currentSeason);
+            try {
+                // 클랜 캐피탈 현재 시즌을 조회한다.
+                ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clan.getTag());
+                // 클랜 캐피탈 수집
+                processClanCapitalCurrentSeason(clan.getTag(), currentSeason);
+            } catch (Exception e) {
+                log.error("[%s] 클랜 캐피탈 현재 시즌 수집 실패".formatted(clan.getName()), e);
+            }
         }
 
     }

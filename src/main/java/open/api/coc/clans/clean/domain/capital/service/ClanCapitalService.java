@@ -68,4 +68,5 @@ public class ClanCapitalService {
                            .map(clanCapitalRaidMapper::toDomain)
                            .toList();
     }
+
 }

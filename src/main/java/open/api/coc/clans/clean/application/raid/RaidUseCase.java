@@ -9,9 +9,12 @@ import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
+import open.api.coc.clans.clean.domain.capital.service.ClanCapitalMemberService;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalService;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
+import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreResponse;
 import org.springframework.stereotype.Service;
@@ -22,7 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RaidUseCase {
 
     private final ClanCapitalClient clanCapitalClient;
+
     private final ClanCapitalService clanCapitalService;
+    private final ClanCapitalMemberService clanCapitalMemberService;
 
     private final ClanService clanService;
 
@@ -44,7 +49,7 @@ public class RaidUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<ClanCapitalRaidScoreResponse> getCurrentSeasonCapitalAttacks() {
+    public List<ClanCapitalRaidScoreResponse> getClanCapitalCurrentSeasonAttacks() {
         // 현재 서버에 수집된 최근 시즌 날짜를 조회한다.
         LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
 
@@ -110,5 +115,19 @@ public class RaidUseCase {
         }
 
         return existingRaid;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RankingHallOfFameResponse> getRankingCurrentSeason() {
+        // 현재 서버에 수집된 최근 시즌 날짜를 조회한다.
+        LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
+
+        // 캐피탈 참여자 획득 점수 랭킹을 조회한다.
+        List<ClanCapitalRaidMember> clanCapitalRaidMembers = clanCapitalMemberService.rankingResourceLootedByStartDate(latestStartDate);
+
+        // 응답
+        return clanCapitalRaidMembers.stream()
+                                     .map(raidUseCaseMapper::toRankingResponse)
+                                     .toList();
     }
 }

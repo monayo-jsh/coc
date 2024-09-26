@@ -19,7 +19,7 @@ public class ClanService {
     private final ClanRepository clanRepository;
     private final ClanMapper clanMapper;
 
-    public void validateExists(String clanTag) {
+    public void validateClanExists(String clanTag) {
         if (clanRepository.exists(clanTag)) {
             return;
         }
@@ -29,10 +29,9 @@ public class ClanService {
 
     @Transactional(readOnly = true)
     public Clan findById(String clanTag) {
-        ClanEntity clanEntity = clanRepository.findById(clanTag)
-                                              .orElseThrow(() -> new ClanNotExistsException(clanTag));
-
-        return toDomain(clanEntity);
+        return clanRepository.findById(clanTag)
+                             .map(clanMapper::toDomain)
+                             .orElseThrow(() -> new ClanNotExistsException(clanTag));
     }
 
     @Transactional(readOnly = true)
@@ -50,17 +49,13 @@ public class ClanService {
     @Transactional(readOnly = true)
     public List<Clan> findAllActiveCapitalClans() {
         List<ClanEntity> clanEntities = clanRepository.findAllActiveCapitalClans();
-
         return toDomains(clanEntities);
     }
 
     private List<Clan> toDomains(List<ClanEntity> clanEntities) {
         return clanEntities.stream()
-                           .map(this::toDomain)
+                           .map(clanMapper::toDomain)
                            .toList();
     }
 
-    private Clan toDomain(ClanEntity clanEntity) {
-        return clanMapper.toDomain(clanEntity);
-    }
 }

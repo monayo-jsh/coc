@@ -7,6 +7,7 @@ const URI_RAID_SEASON_COLLECT = `${PREFIX_RAID_API}/seasons/current/collect`; //
 
 // 플레이어 기록 관련 엔드포인트
 const URI_RAID_SCORE_PLAYER = `${PREFIX_RAID_API}/score`; // 클랜 캐피탈 플레이어 기록 조회
+const URI_RAIDER_VIOLATION_PLAYERS = `${PREFIX_RAID_API}/violation/raiders`// 플레이어 위반 참여자 목록
 
 // 랭킹 관련 엔드포인트
 const URI_RAID_SEASON_CURRENT_RANKING = `${PREFIX_RAID_API}/seasons/current/ranking`; // 클랜 캐피탈 현재 시즌 랭킹
@@ -102,6 +103,18 @@ async function fetchRankingRaidCurrentSeason() {
 
 async function fetchRankingRaidAverageSeason() {
   return await axios.get(URI_RAID_SEASON_AVERAGE_RANKING)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchCapitalViolationRaiders() {
+  return await axios.get(URI_RAIDER_VIOLATION_PLAYERS)
                     .then((response) => {
                       const { data } = response
                       return data;

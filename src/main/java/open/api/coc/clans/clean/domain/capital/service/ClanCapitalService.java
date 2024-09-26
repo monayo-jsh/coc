@@ -14,7 +14,6 @@ import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMapper;
-import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ClanCapitalService {
-
-    private final HallOfFameConfig hallOfFameConfig;
 
     private final ClanCapitalRaidRepository clanCapitalRaidRepository;
     private final ClanCapitalRaidMapper clanCapitalRaidMapper;
@@ -77,16 +74,9 @@ public class ClanCapitalService {
     }
 
     @Transactional(readOnly = true)
-    public List<LocalDate> findAverageStartDates() {
-        Pageable pageable = Pageable.ofSize(hallOfFameConfig.getAverage() + 1);
-        List<LocalDate> startDates = clanCapitalRaidRepository.findLatestStartDates(pageable);
-
-        // 수집된 캐피탈 시즌이 비어있거나 하나인경우 평균 랭킹 제공 불가
-        if (startDates.isEmpty() || startDates.size() == 1) {
-            return Collections.emptyList();
-        }
-
-        return startDates.subList(1, startDates.size());
+    public List<LocalDate> findStartDates(int countOfRecent) {
+        Pageable pageable = Pageable.ofSize(countOfRecent);
+        return clanCapitalRaidRepository.findLatestStartDates(pageable);
     }
 
     @Transactional
@@ -118,5 +108,29 @@ public class ClanCapitalService {
         return raidEntities.stream()
                            .map(clanCapitalRaidMapper::toClanCapitalRaid)
                            .collect(Collectors.toMap(ClanCapitalRaid::getId, raid -> raid));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaid> findAllAtLastWeek() {
+        // 현재 서버에 수집된 최근 시작 날짜 2주치를 조회한다.
+        int searchCountOfRecent = 2;
+        Pageable pageable = Pageable.ofSize(searchCountOfRecent);
+        List<LocalDate> latestStartDates = clanCapitalRaidRepository.findLatestStartDates(pageable);
+
+        if (latestStartDates.isEmpty() || latestStartDates.size() < 2) {
+            // 최근 날짜가 비어있거나 하나인 경우 지난주 위반 항목 제공 불가
+            return Collections.emptyList();
+        }
+
+        // 수집 시작일을 기준으로 지난주 시작일자 획득
+        LocalDate lastWeekStartDate = latestStartDates.get(1);
+
+        // 지난주 진행된 캐피탈 목록 조회
+        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllWithRaiderByStartDate(lastWeekStartDate);
+
+        // 결과 반환
+        return raidEntities.stream()
+                           .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
+                           .toList();
     }
 }

@@ -9,15 +9,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import open.api.coc.clans.database.entity.clan.ClanEntity;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
 import org.hibernate.annotations.Comment;
 
 @Getter
@@ -55,9 +52,6 @@ public class RaidEntity {
     @OneToMany(mappedBy = "raid", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RaiderEntity> raiders;
 
-    @Transient
-    private ClanEntity clan;
-
     @Builder
     private RaidEntity(Long id, String state, LocalDate startDate, LocalDate endDate, String clanTag, List<RaiderEntity> raiders) {
         this.id = id;
@@ -71,10 +65,6 @@ public class RaidEntity {
     // 기본값 설정을 위한 빌더 객체
     public static class RaidEntityBuilder {
         private List<RaiderEntity> raiders = new ArrayList<>();
-    }
-
-    public void changeClan(ClanEntity clan) {
-        this.clan = clan;
     }
 
     public void addRaiders(List<RaiderEntity> raiders) {

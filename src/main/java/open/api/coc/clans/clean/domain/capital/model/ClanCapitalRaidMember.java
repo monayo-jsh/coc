@@ -49,4 +49,7 @@ public class ClanCapitalRaidMember {
         this.capitalResourcesLooted = capitalResourcesLooted;
     }
 
+    public boolean isLessThenOrEqualsResourceLooted(int highTierMinimumScore) {
+        return this.capitalResourcesLooted <= highTierMinimumScore;
+    }
 }

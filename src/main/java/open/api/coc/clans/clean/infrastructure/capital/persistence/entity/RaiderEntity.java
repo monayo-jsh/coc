@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.raid;
+package open.api.coc.clans.clean.infrastructure.capital.persistence.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -15,8 +15,6 @@ import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
 import org.hibernate.annotations.Comment;
 
 @Getter
@@ -67,11 +65,4 @@ public class RaiderEntity {
         this.raid = raid;
     }
 
-    public void changeAttacks(Integer attacks) {
-        this.attacks = attacks;
-    }
-
-    public void changeResourceLooted(Integer resourceLooted) {
-        this.resourceLooted = resourceLooted;
-    }
 }

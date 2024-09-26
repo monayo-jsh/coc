@@ -21,6 +21,7 @@ import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreResponse;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RaidUseCase {
 
+    private final HallOfFameConfig hallOfFameConfig;
     private final ClanCapitalClient clanCapitalClient;
 
     private final ClanCapitalService clanCapitalService;
@@ -124,13 +126,12 @@ public class RaidUseCase {
 
     @Transactional(readOnly = true)
     public List<RankingHallOfFameResponse> getRankingAverageSeason() {
-        // 현재 서버에 수집된 최근 시즌 날짜 목록을 조회한다.
-        List<LocalDate> startDates = clanCapitalService.findAverageStartDates();
-
-        if (startDates.isEmpty()) return Collections.emptyList();
+        // 현재 서버에 수집된 최근 시작 날짜 목록을 조회한다.
+        int searchCountOfRecent = hallOfFameConfig.getAverage() + 1;
+        List<LocalDate> latestStartDates = clanCapitalService.findStartDates(searchCountOfRecent);
 
         // 캐피탈 참여자 획득 점수 평균 랭킹을 조회한다.
-        List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(startDates);
+        List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(latestStartDates);
 
         // 응답
         return raidMemberRankingDTOs.stream()
@@ -141,21 +142,37 @@ public class RaidUseCase {
     @Transactional(readOnly = true)
     public List<ClanCapitalRaidScoreResponse> getClanCapitalRaiderScore(RaidScoreQuery query) {
         // 현재 서버에 수집된 캐피탈 참여자의 공격 목록을 조회한다.
-        List<ClanCapitalRaidMember> clanCapitalRaidMembers = query.getStrategy().execute(clanCapitalMemberService, query.getCriteria(), query.getLimit());
+        List<ClanCapitalRaidMember> raidMembers = query.getStrategy().execute(clanCapitalMemberService, query.getCriteria(), query.getLimit());
 
-        if (clanCapitalRaidMembers.isEmpty()) return Collections.emptyList();
+        if (raidMembers.isEmpty()) return Collections.emptyList();
 
         // 캐피탈 목록을 조회한다.
-        Map<Long, ClanCapitalRaid> raidMap = clanCapitalService.findAllMapByIds(clanCapitalRaidMembers.stream().map(ClanCapitalRaidMember::getRaidId).toList());
+        Map<Long, ClanCapitalRaid> raidMap = clanCapitalService.findAllMapByIds(raidMembers.stream().map(ClanCapitalRaidMember::getRaidId).toList());
 
         // 클랜 목록을 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(raidMap.values().stream().map(ClanCapitalRaid::getClanTag).toList());
 
         // 응답
-        return clanCapitalRaidMembers.stream()
+        return raidMembers.stream()
                                      .map(member -> toClanCapitalRaidScoreResponse(member, raidMap, clanMap))
-                                     .sorted(Comparator.comparing(ClanCapitalRaidScoreResponse::id).reversed())
+                                     .sorted(Comparator.comparing(ClanCapitalRaidScoreResponse::tag)
+                                                       .thenComparing(ClanCapitalRaidScoreResponse::id).reversed())
                                      .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaidScoreResponse> getViolationRaiders() {
+        // 수집 시작일 기준 지난주차의 캐피탈 참여 목록 조회한다.
+        List<ClanCapitalRaid> raids = clanCapitalService.findAllAtLastWeek();
+
+        // 클랜 목록을 조회한다.
+        Map<String, Clan> clanMap = clanService.findAllMapByIds(raids.stream().map(ClanCapitalRaid::getClanTag).toList());
+
+        // 캐피탈 참여 위반 목록을 수집해서 응답
+        return raids.stream()
+                    .flatMap(raid -> raid.getViolationMembers()
+                                         .stream().map(member -> toClanCapitalRaidScoreResponse(member, raid, clanMap)))
+                    .toList();
     }
 
     private ClanCapitalRaidScoreResponse toClanCapitalRaidScoreResponse(ClanCapitalRaidMember member, Map<Long, ClanCapitalRaid> raidMap, Map<String, Clan> clanMap) {
@@ -164,7 +181,10 @@ public class RaidUseCase {
     }
 
     private ClanCapitalRaidScoreResponse toClanCapitalRaidScoreResponse(ClanCapitalRaidMember member, ClanCapitalRaid raid, Map<String, Clan> clanMap) {
-        Clan clan = clanMap.getOrDefault(raid.getClanTag(), null);
+        Clan clan = null;
+        if (raid != null) {
+            clan = clanMap.getOrDefault(raid.getClanTag(), null);
+        }
         return raidUseCaseMapper.toClanCapitalRaidScoreResponse(member, raid, clan);
     }
 

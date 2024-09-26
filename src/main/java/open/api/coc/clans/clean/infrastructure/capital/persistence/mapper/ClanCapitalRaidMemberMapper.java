@@ -3,7 +3,7 @@ package open.api.coc.clans.clean.infrastructure.capital.persistence.mapper;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankingDTO;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.dto.RaiderRankingDTO;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidMemberRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.dto.RaiderRankingDTO;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 

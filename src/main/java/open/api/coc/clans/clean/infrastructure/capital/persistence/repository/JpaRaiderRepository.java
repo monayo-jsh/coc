@@ -1,7 +1,7 @@
 package open.api.coc.clans.clean.infrastructure.capital.persistence.repository;
 
 import java.util.List;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

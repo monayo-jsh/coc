@@ -3,7 +3,7 @@ package open.api.coc.clans.clean.domain.capital.repository;
 import java.time.LocalDate;
 import java.util.List;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.dto.RaiderRankingDTO;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import org.springframework.data.domain.Pageable;
 
 public interface ClanCapitalRaidMemberRepository {

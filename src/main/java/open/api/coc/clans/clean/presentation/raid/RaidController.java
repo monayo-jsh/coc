@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "클랜 캐피탈", description = "클랜 캐피탈 관련 기능")
 @RestController(value = "raidV2Controller")
 @RequiredArgsConstructor
-@RequestMapping("/api/raid/v2")
+@RequestMapping("/api/raid")
 public class RaidController {
 
     private final RaidUseCase raidUseCase;
@@ -124,7 +124,21 @@ public class RaidController {
         RaidScoreQuery query = RaidScoreQueryFactory.create(playerTag, playerName);
         List<ClanCapitalRaidScoreResponse> raidScoreResponses = raidUseCase.getClanCapitalRaiderScore(query);
 
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.OK)
                              .body(raidScoreResponses);
+    }
+
+    @Operation(
+        summary = "클랜 캐피탈 참여 위반 플레이어 목록을 조회합니다. version: 1.00, Last Update: 24.09.26",
+        description = "이 API는 서버에 수집된 데이터를 기반으로 캐피탈 참여 위반 플레이어 목록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanCapitalRaidScoreResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/violation/raiders")
+    public ResponseEntity<List<ClanCapitalRaidScoreResponse>> getViolationRaiders() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(raidUseCase.getViolationRaiders());
     }
 }

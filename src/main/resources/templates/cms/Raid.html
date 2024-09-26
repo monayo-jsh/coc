@@ -70,18 +70,6 @@
     launchAppWithOpenClanProfile(clanTag);
   }
 
-    async function fetchCapitalClans() {
-      return await axios.get("/clan/cms/capital")
-          .then((response) => {
-            const { data } = response
-            return data;
-          })
-          .catch((error) => {
-            console.error(error)
-            return [];
-          });
-    }
-
     function renderFailed(capitalCardElement) {
       const errorContentTemplate = document.querySelector("#error-content");
       const errorContent = document.importNode(errorContentTemplate.content, true);
@@ -267,9 +255,8 @@
     }
 
     async function writeCapitalClans() {
-      const data = await fetchCapitalClans();
-      const capitalClans = data.clanResponses;
-      lastWeekWarningMembers = data.raiderResponse;
+      const capitalClans = await fetchCapitalClans();
+      lastWeekWarningMembers = await fetchCapitalViolationRaiders();
 
       const capitalRaidElement = document.querySelector('.capital-raid');
       for (const capitalClan of capitalClans) {

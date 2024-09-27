@@ -62,7 +62,7 @@ public class JpaRaidCustomRepository {
 
         return queryFactory.select(raidEntity)
                            .from(raidEntity)
-                           .join(raidEntity.raiders, raiderEntity).fetchJoin()
+                           .leftJoin(raidEntity.raiders, raiderEntity).fetchJoin()
                            .where(condition)
                            .fetch();
     }

@@ -25,7 +25,7 @@ public abstract class RaidUseCaseMapper {
 
     @Mapping(target = "startTime", source = "startDate")
     @Mapping(target = "endTime", source = "endDate")
-    public abstract ClanCapitalRaidResponse toResponse(ClanCapitalRaid source);
+    public abstract ClanCapitalRaidResponse toClanCapitalRaidResponse(ClanCapitalRaid clanCapitalRaid);
 
     @Mapping(target = "id", source = "member.id")
     @Mapping(target = "tag", source = "member.tag")

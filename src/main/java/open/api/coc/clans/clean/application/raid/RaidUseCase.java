@@ -49,7 +49,7 @@ public class RaidUseCase {
         ClanCapitalRaid clanCapitalRaid = clanCapitalService.collectCurrentSeason(clanTag, currentSeason);
 
         // 3.응답
-        return raidUseCaseMapper.toResponse(clanCapitalRaid);
+        return raidUseCaseMapper.toClanCapitalRaidResponse(clanCapitalRaid);
     }
 
     @Transactional(readOnly = true)

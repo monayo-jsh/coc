@@ -163,7 +163,7 @@ public class RaidUseCase {
     @Transactional(readOnly = true)
     public List<ClanCapitalRaidScoreResponse> getViolationRaiders() {
         // 수집 시작일 기준 지난주차의 캐피탈 참여 목록 조회한다.
-        List<ClanCapitalRaid> raids = clanCapitalService.findAllAtLastWeek();
+        List<ClanCapitalRaid> raids = clanCapitalService.findAllWithMembersFromLastWeek();
 
         // 클랜 목록을 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(raids.stream().map(ClanCapitalRaid::getClanTag).toList());

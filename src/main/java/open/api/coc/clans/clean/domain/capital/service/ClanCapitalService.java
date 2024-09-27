@@ -111,7 +111,7 @@ public class ClanCapitalService {
     }
 
     @Transactional(readOnly = true)
-    public List<ClanCapitalRaid> findAllAtLastWeek() {
+    public List<ClanCapitalRaid> findAllWithMembersFromLastWeek() {
         // 현재 서버에 수집된 최근 시작 날짜 2주치를 조회한다.
         int searchCountOfRecent = 2;
         Pageable pageable = Pageable.ofSize(searchCountOfRecent);

@@ -101,4 +101,8 @@ public class ClanCapitalRaid {
                            .filter(member -> member.isLessThenOrEqualsResourceLooted(highTierMinimumScore))
                            .toList();
     }
+
+    public boolean isNotEnded() {
+        return Objects.equals(this.state, "ended");
+    }
 }

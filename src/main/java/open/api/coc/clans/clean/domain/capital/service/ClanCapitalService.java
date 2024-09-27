@@ -37,21 +37,21 @@ public class ClanCapitalService {
 
     @Transactional
     public ClanCapitalRaid create(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
+        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityOnly(clanCapitalRaid);
+        RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
+        return clanCapitalRaidMapper.toClanCapitalRaid(saveRaidEntity);
+    }
+
+    @Transactional
+    public ClanCapitalRaid updateWithMember(ClanCapitalRaid clanCapitalRaid) {
+        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityWithRaiderEntity(clanCapitalRaid);
         RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
         return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
     }
 
     @Transactional
-    public ClanCapitalRaid update(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
-        RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-        return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
-    }
-
-    @Transactional
-    public void updateRaid(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toEntity(clanCapitalRaid);
+    public void updateOnlyRaid(ClanCapitalRaid clanCapitalRaid) {
+        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityOnly(clanCapitalRaid);
         clanCapitalRaidRepository.update(raidEntity);
     }
 
@@ -96,7 +96,7 @@ public class ClanCapitalService {
         // 저장된 클랜 캐피탈 데이터 상태 비교 후 업데이트
         if (existingRaid.isDifferentState(currentSeason.getState())) {
             existingRaid.changeState(currentSeason.getState());
-            updateRaid(existingRaid);
+            updateOnlyRaid(existingRaid);
         }
 
         return existingRaid;
@@ -133,4 +133,19 @@ public class ClanCapitalService {
                            .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
                            .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ClanCapitalRaid> findAllThatNeedSync() {
+        // 수집된 캐피탈 최근 시작일자를 조회한다.
+        LocalDate latestStartDate = findLatestStartDate();
+
+        // 캐피탈 목록을 조회한다.
+        List<ClanCapitalRaid> raids = findByStartDate(latestStartDate);
+
+        // 종료되지 않은 상태의 캐피탈 목록을 반환한다.
+        return raids.stream()
+                    .filter(ClanCapitalRaid::isNotEnded)
+                    .toList();
+    }
+
 }

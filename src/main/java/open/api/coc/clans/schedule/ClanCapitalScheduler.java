@@ -12,11 +12,10 @@ import org.springframework.stereotype.Component;
 public class ClanCapitalScheduler {
     private final RaidUseCase raidUseCase;
 
-    @Scheduled(cron = "0 0,5,10 16 ? * MON")
+    // 매주 월요일 오후 4시 0분부터 5분 간격으로 클랜 캐피탈 종료 데이터 수집
+    @Scheduled(cron = "0 0/5 16 ? * MON")
     public void raidScheduling() {
-        log.info("clan capital auto collection start");
-        raidUseCase.collectClanCapitalCurrentSeason();
-        log.info("clan capital auto collection ended");
+        raidUseCase.collectCapitalCurrentSeason();
     }
 
 }

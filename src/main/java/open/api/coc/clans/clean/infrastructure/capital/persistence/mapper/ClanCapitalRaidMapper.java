@@ -13,8 +13,11 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface ClanCapitalRaidMapper {
 
+    @Mapping(target = "raiders", ignore = true)
+    RaidEntity toRaidEntityOnly(ClanCapitalRaid clanCapitalRaid);
+
     @Mapping(target = "raiders", source = "members")
-    RaidEntity toEntity(ClanCapitalRaid clanCapitalRaid);
+    RaidEntity toRaidEntityWithRaiderEntity(ClanCapitalRaid clanCapitalRaid);
 
     @Mapping(target = "members", ignore = true)
     ClanCapitalRaid toClanCapitalRaid(RaidEntity entity);

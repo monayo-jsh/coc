@@ -99,7 +99,7 @@ public class Competition {
     }
 
     private boolean isParticipated(String clanTag) {
-        return this.participantClans.stream().anyMatch(participantClan -> Objects.equals(participantClan.getTag(), clanTag));
+        return this.participantClans.stream().anyMatch(participantClan -> participantClan.isEqualsClanTag(clanTag));
     }
 
     public void loadParticipantClans(CompetitionParticipateService competitionParticipateService) {

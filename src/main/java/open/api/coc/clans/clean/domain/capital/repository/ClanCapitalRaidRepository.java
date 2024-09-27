@@ -3,20 +3,19 @@ package open.api.coc.clans.clean.domain.capital.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import org.springframework.data.domain.Pageable;
 
 public interface ClanCapitalRaidRepository {
 
-    RaidEntity save(RaidEntity entity);
+    ClanCapitalRaid save(ClanCapitalRaid clanCapitalRaid);
 
-    void update(RaidEntity raidEntity);
 
-    Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
+    Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDate startDate);
 
-    List<RaidEntity> findAllByIds(List<Long> raidIds);
+    List<ClanCapitalRaid> findAllByIds(List<Long> raidIds);
 
-    List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate);
+    List<ClanCapitalRaid> findAllWithRaiderByStartDate(LocalDate startDate);
 
     LocalDate findLatestStartDate();
 

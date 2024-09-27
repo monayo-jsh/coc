@@ -1,7 +1,6 @@
 package open.api.coc.clans.clean.domain.capital.model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeasonMember;
 
 @Getter
@@ -30,23 +30,26 @@ public class ClanCapitalRaid {
     @Builder.Default
     private List<ClanCapitalRaidMember> members = new ArrayList<>(); // 캐피탈 참여자 목록
 
-    public static ClanCapitalRaid createNew(String clanTag, String state, LocalDateTime startTime, LocalDateTime endTime) {
-        return ClanCapitalRaid.builder()
-                              .clanTag(clanTag)
-                              .state(state)
-                              .startDate(startTime.toLocalDate())
-                              .endDate(endTime.toLocalDate())
-                              .build();
+    public static ClanCapitalRaid createNew(String clanTag, String state, LocalDate startDate, LocalDate endDate, List<ClanCapitalRaidSeasonMember> members) {
+        ClanCapitalRaid clanCapitalRaid = ClanCapitalRaid.builder()
+                                                         .clanTag(clanTag)
+                                                         .state(state)
+                                                         .startDate(startDate)
+                                                         .endDate(endDate)
+                                                         .build();
+        clanCapitalRaid.mergeParticipants(members);
+        return clanCapitalRaid;
     }
 
-    public boolean isDifferentState(String state) {
-        return !Objects.equals(this.state, state);
+    public void changeRaidInfo(ClanCapitalRaidSeason currentSeason) {
+        changeState(currentSeason.getState());
     }
+
     public void changeState(String state) {
         this.state = state;
     }
 
-    public void updateParticipants(List<ClanCapitalRaidSeasonMember> members) {
+    public void mergeParticipants(List<ClanCapitalRaidSeasonMember> members) {
         Map<String, ClanCapitalRaidMember> clanCapitalRaidMemberMap = makeMemberMapByTag(this.members);
 
         for (ClanCapitalRaidSeasonMember member : members) {
@@ -82,6 +85,7 @@ public class ClanCapitalRaid {
         for( ClanCapitalRaidMember member : this.members) {
             ClanCapitalRaidMember clanCapitalRaidMember = memberMap.get(member.getTag());
             member.assignIdIfAbsent(clanCapitalRaidMember.getId());
+            member.assignRaidIdIfAbsent(clanCapitalRaidMember.getRaidId());
         }
     }
 
@@ -104,5 +108,11 @@ public class ClanCapitalRaid {
 
     public boolean isNotEnded() {
         return Objects.equals(this.state, "ended");
+    }
+
+    public void assignIdIfAbsent(Long id) {
+        if (this.id == null) {
+            this.id = id;
+        }
     }
 }

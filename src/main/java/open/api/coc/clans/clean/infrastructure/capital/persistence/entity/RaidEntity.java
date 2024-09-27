@@ -67,13 +67,4 @@ public class RaidEntity {
         private List<RaiderEntity> raiders = new ArrayList<>();
     }
 
-    public void addRaiders(List<RaiderEntity> raiders) {
-        raiders.forEach(this::addRaider);
-    }
-
-    public void addRaider(RaiderEntity raider) {
-        raider.changeRaid(this);
-        this.raiders.add(raider);
-    }
-
 }

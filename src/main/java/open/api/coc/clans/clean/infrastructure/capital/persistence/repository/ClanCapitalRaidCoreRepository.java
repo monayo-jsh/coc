@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -16,35 +18,28 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     private final JpaRaidRepository jpaRaidRepository;
     private final JpaRaidCustomRepository jpaRaidCustomRepository;
 
-    @Override
-    public Optional<RaidEntity> findByClanTagAndStartDate(String clanTag, LocalDate startDate) {
-        if (clanTag == null || clanTag.trim().isEmpty()) {
-            throw new IllegalArgumentException("clanTag can not be null");
-        }
-        if (startDate == null) {
-            throw new IllegalArgumentException("startDate can not be null");
-        }
+    private final ClanCapitalRaidMapper clanCapitalRaidMapper;
 
-        return jpaRaidCustomRepository.findByClanTagAndStartDate(clanTag, startDate);
+    @Override
+    public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDate startDate) {
+        Optional<RaidEntity> findRaidEntity = jpaRaidCustomRepository.findByClanTagAndStartDate(clanTag, startDate);
+        return findRaidEntity.map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers);
+
     }
 
     @Override
-    public List<RaidEntity> findAllByIds(List<Long> raidIds) {
-        if (raidIds == null || raidIds.isEmpty()) {
-            throw new IllegalArgumentException("raidIds can not be null or empty");
-        }
-
-        return jpaRaidRepository.findAllById(raidIds);
+    public List<ClanCapitalRaid> findAllByIds(List<Long> raidIds) {
+        return jpaRaidRepository.findAllById(raidIds)
+                                .stream()
+                                .map(clanCapitalRaidMapper::toClanCapitalRaid)
+                                .toList();
     }
 
     @Override
-    public RaidEntity save(RaidEntity entity) {
-        return jpaRaidRepository.save(entity);
-    }
-
-    @Override
-    public void update(RaidEntity raidEntity) {
-        jpaRaidCustomRepository.update(raidEntity);
+    public ClanCapitalRaid save(ClanCapitalRaid clanCapitalRaid) {
+        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityWithRaiderEntity(clanCapitalRaid);
+        RaidEntity saveRaidEntity = jpaRaidRepository.save(raidEntity);
+        return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
     }
 
     @Override
@@ -54,20 +49,15 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
 
     @Override
     public List<LocalDate> findLatestStartDates(Pageable pageable) {
-        if (pageable == null) {
-            throw new IllegalArgumentException("pageable can not be null");
-        }
-
         return jpaRaidCustomRepository.findLatestStartDatesByPage(pageable);
     }
 
     @Override
-    public List<RaidEntity> findAllWithRaiderByStartDate(LocalDate startDate) {
-        if (startDate == null) {
-            throw new IllegalArgumentException("startDate can not be null");
-        }
-
-        return jpaRaidCustomRepository.findAllWithRaiderByStartDate(startDate);
+    public List<ClanCapitalRaid> findAllWithRaiderByStartDate(LocalDate startDate) {
+        return jpaRaidCustomRepository.findAllWithRaiderByStartDate(startDate)
+                                      .stream()
+                                      .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
+                                      .toList();
     }
 
 }

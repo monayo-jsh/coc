@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
-import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
-import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,34 +20,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClanCapitalService {
 
     private final ClanCapitalRaidRepository clanCapitalRaidRepository;
-    private final ClanCapitalRaidMapper clanCapitalRaidMapper;
-
     
     @Transactional(readOnly = true)
     public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDate startDate) {
-        Optional<RaidEntity> findRaidEntity = clanCapitalRaidRepository.findByClanTagAndStartDate(clanTag, startDate);
+        if (clanTag == null || clanTag.trim().isEmpty()) {
+            throw new IllegalArgumentException("clanTag can not be null");
+        }
+        if (startDate == null) {
+            throw new IllegalArgumentException("startDate can not be null");
+        }
 
-        if (findRaidEntity.isEmpty()) return Optional.empty();
-
-        ClanCapitalRaid clanCapitalRaid = clanCapitalRaidMapper.toClanCapitalRaidWithMembers(findRaidEntity.get());
-        return Optional.of(clanCapitalRaid);
+        return clanCapitalRaidRepository.findByClanTagAndStartDate(clanTag, startDate);
     }
 
-    
-    @Transactional
-    public ClanCapitalRaid mergeRaidWithMember(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityWithRaiderEntity(clanCapitalRaid);
-        RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-        return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
-    }
-
-    
     @Transactional(readOnly = true)
-    public List<ClanCapitalRaid> findAllByStartDate(LocalDate latestStartDate) {
-        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllWithRaiderByStartDate(latestStartDate);
-        return raidEntities.stream()
-                           .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
-                           .toList();
+    public List<ClanCapitalRaid> findAllByStartDate(LocalDate startDate) {
+        if (startDate == null) {
+            throw new IllegalArgumentException("startDate can not be null");
+        }
+
+        return clanCapitalRaidRepository.findAllWithRaiderByStartDate(startDate);
     }
 
     
@@ -74,44 +64,51 @@ public class ClanCapitalService {
     @Transactional
     public ClanCapitalRaid createClanCapitalRaid(String clanTag, ClanCapitalRaidSeason currentSeason) {
         // 새로운 클랜 캐피탈 생성
-        ClanCapitalRaid newClanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
+        ClanCapitalRaid clanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
                                                                        currentSeason.getState(),
-                                                                       currentSeason.getStartTime(),
-                                                                       currentSeason.getEndTime());
+                                                                       currentSeason.getStartTime().toLocalDate(),
+                                                                       currentSeason.getEndTime().toLocalDate(),
+                                                                       currentSeason.getMembers());
 
-        return create(newClanCapitalRaid);
+        // 저장
+        ClanCapitalRaid newClanCapitalRaid = clanCapitalRaidRepository.save(clanCapitalRaid);
+
+        // 신규 캐피탈 고유키 매핑
+        clanCapitalRaid.assignIdIfAbsent(newClanCapitalRaid.getId());
+
+        // 신규 참가자 아이디 매핑
+        clanCapitalRaid.mappingParticipantIds(newClanCapitalRaid.getMembers());
+
+        return clanCapitalRaid;
     }
 
-    private ClanCapitalRaid create(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityOnly(clanCapitalRaid);
-        RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
-        return clanCapitalRaidMapper.toClanCapitalRaid(saveRaidEntity);
-    }
-
-    
     @Transactional
     public ClanCapitalRaid updateClanCapitalRaid(ClanCapitalRaid existingRaid, ClanCapitalRaidSeason currentSeason) {
-        // 저장된 클랜 캐피탈 데이터 상태 비교 후 업데이트
-        if (existingRaid.isDifferentState(currentSeason.getState())) {
-            existingRaid.changeState(currentSeason.getState());
-            updateOnlyRaid(existingRaid);
-        }
+        // 클랜 캐피탈 정보 갱신
+        existingRaid.changeRaidInfo(currentSeason);
+
+        // 클랜 캐피탈 참가자 정보 갱신
+        existingRaid.mergeParticipants(currentSeason.getMembers());
+
+        // 클랜 캐피탈 참가자 데이터 업데이트
+        ClanCapitalRaid updateRaid = clanCapitalRaidRepository.save(existingRaid);
+
+        // 신규 참가자 아이디 매핑
+        existingRaid.mappingParticipantIds(updateRaid.getMembers());
 
         return existingRaid;
-    }
-
-    private void updateOnlyRaid(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityOnly(clanCapitalRaid);
-        clanCapitalRaidRepository.update(raidEntity);
     }
 
     
     @Transactional(readOnly = true)
     public Map<Long, ClanCapitalRaid> findAllMapByIds(List<Long> raidIds) {
-        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllByIds(raidIds);
-        return raidEntities.stream()
-                           .map(clanCapitalRaidMapper::toClanCapitalRaid)
-                           .collect(Collectors.toMap(ClanCapitalRaid::getId, raid -> raid));
+        if (raidIds == null || raidIds.isEmpty()) {
+            throw new IllegalArgumentException("raidIds can not be null or empty");
+        }
+
+        List<ClanCapitalRaid> clanCapitalRaids = clanCapitalRaidRepository.findAllByIds(raidIds);
+        return clanCapitalRaids.stream()
+                               .collect(Collectors.toMap(ClanCapitalRaid::getId, raid -> raid));
     }
 
     
@@ -131,12 +128,7 @@ public class ClanCapitalService {
         LocalDate lastWeekStartDate = latestStartDates.get(1);
 
         // 지난주 진행된 캐피탈 목록 조회
-        List<RaidEntity> raidEntities = clanCapitalRaidRepository.findAllWithRaiderByStartDate(lastWeekStartDate);
-
-        // 결과 반환
-        return raidEntities.stream()
-                           .map(clanCapitalRaidMapper::toClanCapitalRaidWithMembers)
-                           .toList();
+        return clanCapitalRaidRepository.findAllWithRaiderByStartDate(lastWeekStartDate);
     }
 
     
@@ -157,21 +149,9 @@ public class ClanCapitalService {
     
     @Transactional
     public ClanCapitalRaid collectCurrentSeason(String clanTag, ClanCapitalRaidSeason currentSeason) {
-        // 1. 클랜 캐피탈 조회 및 생성 또는 업데이트
-        ClanCapitalRaid clanCapitalRaid = this.findByClanTagAndStartDate(clanTag, currentSeason.getStartTime().toLocalDate())
-                                              .map(existingRaid -> updateClanCapitalRaid(existingRaid, currentSeason))
-                                              .orElseGet(() -> createClanCapitalRaid(clanTag, currentSeason));
-
-        // 클랜 캐피탈 참가자 정보 갱신
-        clanCapitalRaid.updateParticipants(currentSeason.getMembers());
-
-        // 클랜 캐피탈 참가자 데이터 업데이트
-        ClanCapitalRaid updateClanCapitalRaid = mergeRaidWithMember(clanCapitalRaid);
-
-        // 신규 참가자 아이디 매핑
-        clanCapitalRaid.mappingParticipantIds(updateClanCapitalRaid.getMembers());
-
-        // 반환
-        return clanCapitalRaid;
+        // 클랜 캐피탈 조회 결과에 따라서 생성 또는 업데이트
+        return this.findByClanTagAndStartDate(clanTag, currentSeason.getStartTime().toLocalDate())
+                   .map(existingRaid -> updateClanCapitalRaid(existingRaid, currentSeason))
+                   .orElseGet(() -> createClanCapitalRaid(clanTag, currentSeason));
     }
 }

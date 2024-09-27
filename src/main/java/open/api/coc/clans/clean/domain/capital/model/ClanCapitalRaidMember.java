@@ -42,6 +42,12 @@ public class ClanCapitalRaidMember {
         }
     }
 
+    public void assignRaidIdIfAbsent(Long raidId) {
+        if (this.raidId == null){
+            this.raidId = raidId;
+        }
+    }
+
     public void changeMemberInfo(Integer attacks, Integer attackLimit, Integer bonusAttackLimit, Integer capitalResourcesLooted) {
         this.attacks = attacks;
         this.attackLimit = attackLimit;
@@ -52,4 +58,5 @@ public class ClanCapitalRaidMember {
     public boolean isLessThenOrEqualsResourceLooted(int highTierMinimumScore) {
         return this.capitalResourcesLooted <= highTierMinimumScore;
     }
+
 }

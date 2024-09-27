@@ -17,9 +17,8 @@ public class ClanCapitalRaidSeasonsResponse {
         return CollectionUtils.isEmpty(items);
     }
 
-    public ClanCapitalRaidSeasonResponse getItemWithMembers() {
+    public ClanCapitalRaidSeasonResponse getFirstItem() {
         return items.stream()
-                    .filter(item -> !item.getMembers().isEmpty())
                     .findFirst()
                     .orElse(null);
     }

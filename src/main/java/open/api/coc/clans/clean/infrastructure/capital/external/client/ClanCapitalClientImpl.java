@@ -34,7 +34,11 @@ public class ClanCapitalClientImpl implements ClanCapitalClient {
             throw new ClanCapitalRaidSeasonException(clanTag);
         }
 
-        ClanCapitalRaidSeasonResponse clanCapitalRaidSeasonResponse = clanCapitalRaidSeasons.getItemWithMembers();
+        ClanCapitalRaidSeasonResponse clanCapitalRaidSeasonResponse = clanCapitalRaidSeasons.getFirstItem();
+        if (clanCapitalRaidSeasonResponse == null) {
+            throw new ClanCapitalRaidSeasonException(clanTag);
+        }
+
         return clanCapitalRaidSeasonMapper.toDomain(clanCapitalRaidSeasonResponse);
     }
 

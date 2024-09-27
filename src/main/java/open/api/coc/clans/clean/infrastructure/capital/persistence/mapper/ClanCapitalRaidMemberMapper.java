@@ -15,7 +15,6 @@ import org.mapstruct.ReportingPolicy;
 public interface ClanCapitalRaidMemberMapper {
 
     @Mapping(target = "resourceLooted", source = "capitalResourcesLooted")
-    @Mapping(target = "raid.id", source = "raidId")
     RaiderEntity toEntity(ClanCapitalRaidMember clanCapitalRaidMember);
 
     @Mapping(target = "capitalResourcesLooted", source = "resourceLooted")

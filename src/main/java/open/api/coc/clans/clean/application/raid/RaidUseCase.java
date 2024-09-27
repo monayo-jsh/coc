@@ -58,7 +58,7 @@ public class RaidUseCase {
         LocalDate latestStartDate = clanCapitalService.findLatestStartDate();
 
         // 클랜 캐피탈 목록(참여자 목록 포함)을 조회한다.
-        List<ClanCapitalRaid> clanCapitalRaids = clanCapitalService.findByStartDate(latestStartDate);
+        List<ClanCapitalRaid> clanCapitalRaids = clanCapitalService.findAllByStartDate(latestStartDate);
 
         if (clanCapitalRaids.isEmpty()) return Collections.emptyList();
 
@@ -112,7 +112,7 @@ public class RaidUseCase {
     public List<RankingHallOfFameResponse> getRankingAverageSeason() {
         // 현재 서버에 수집된 최근 시작 날짜 목록을 조회한다.
         int searchCountOfRecent = hallOfFameConfig.getAverage() + 1;
-        List<LocalDate> latestStartDates = clanCapitalService.findStartDates(searchCountOfRecent);
+        List<LocalDate> latestStartDates = clanCapitalService.findAllStartDates(searchCountOfRecent);
 
         // 캐피탈 참여자 획득 점수 평균 랭킹을 조회한다.
         List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(latestStartDates);

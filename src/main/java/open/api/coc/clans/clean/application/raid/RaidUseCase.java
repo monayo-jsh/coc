@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.clean.application.raid.mapper.RaidScoreQuery;
+import open.api.coc.clans.clean.application.raid.query.RaidScoreQuery;
 import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;

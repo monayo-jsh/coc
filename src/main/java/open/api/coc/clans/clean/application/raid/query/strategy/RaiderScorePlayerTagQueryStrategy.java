@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.domain.capital.service.strategy;
+package open.api.coc.clans.clean.application.raid.query.strategy;
 
 import java.util.List;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMember;

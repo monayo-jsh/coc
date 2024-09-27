@@ -1,7 +1,7 @@
-package open.api.coc.clans.clean.application.raid.mapper;
+package open.api.coc.clans.clean.application.raid.query;
 
 
-import open.api.coc.clans.clean.domain.capital.service.strategy.RaiderScoreQueryStrategy;
+import open.api.coc.clans.clean.application.raid.query.strategy.RaiderScoreQueryStrategy;
 
 public interface RaidScoreQuery {
 

@@ -1,10 +1,8 @@
-package open.api.coc.clans.clean.application.raid.mapper;
+package open.api.coc.clans.clean.application.raid.query;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import open.api.coc.clans.clean.application.raid.dto.RaidScorePlayerNameQuery;
-import open.api.coc.clans.clean.application.raid.dto.RaidScorePlayerTagQuery;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import org.springframework.util.StringUtils;

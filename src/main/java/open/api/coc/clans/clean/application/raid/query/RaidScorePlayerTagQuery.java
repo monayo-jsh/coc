@@ -1,8 +1,7 @@
-package open.api.coc.clans.clean.application.raid.dto;
+package open.api.coc.clans.clean.application.raid.query;
 
-import open.api.coc.clans.clean.application.raid.mapper.RaidScoreQuery;
-import open.api.coc.clans.clean.domain.capital.service.strategy.RaiderScorePlayerTagQueryStrategy;
-import open.api.coc.clans.clean.domain.capital.service.strategy.RaiderScoreQueryStrategy;
+import open.api.coc.clans.clean.application.raid.query.strategy.RaiderScorePlayerTagQueryStrategy;
+import open.api.coc.clans.clean.application.raid.query.strategy.RaiderScoreQueryStrategy;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import org.springframework.util.StringUtils;

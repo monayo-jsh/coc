@@ -45,8 +45,8 @@ public class RaidUseCase {
         // 1. 클랜 캐피탈 현재 시즌을 COC API 조회한다.
         ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clanTag);
 
-        // 2. 클랜 캐피탈 도메인 동기화
-        ClanCapitalRaid clanCapitalRaid = processClanCapitalCurrentSeason(clanTag, currentSeason);
+        // 2. 클랜 캐피탈 수집
+        ClanCapitalRaid clanCapitalRaid = clanCapitalService.collectCurrentSeason(clanTag, currentSeason);
 
         // 3.응답
         return raidUseCaseMapper.toResponse(clanCapitalRaid);
@@ -84,33 +84,14 @@ public class RaidUseCase {
             try {
                 // 클랜 캐피탈 현재 시즌을 조회한다.
                 ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clan.getTag());
+
                 // 클랜 캐피탈 수집
-                processClanCapitalCurrentSeason(clan.getTag(), currentSeason);
+                clanCapitalService.collectCurrentSeason(clan.getTag(), currentSeason);
             } catch (Exception e) {
                 log.error("[%s] 클랜 캐피탈 현재 시즌 수집 실패".formatted(clan.getName()), e);
             }
         }
 
-    }
-
-    @Transactional
-    public ClanCapitalRaid processClanCapitalCurrentSeason(String tag, ClanCapitalRaidSeason currentSeason) {
-        // 클랜 캐피탈 조회 및 생성, 업데이트
-        ClanCapitalRaid clanCapitalRaid = clanCapitalService.findByClanTagAndStartDate(tag, currentSeason.getStartTime())
-                                                            .map(existingRaid -> clanCapitalService.updateClanCapitalRaid(existingRaid, currentSeason))
-                                                            .orElseGet(() -> clanCapitalService.createClanCapitalRaid(tag, currentSeason));
-
-        // 클랜 캐피탈 참가자 정보 갱신
-        clanCapitalRaid.updateParticipants(currentSeason.getMembers());
-
-        // 클랜 캐피탈 참가자 데이터 업데이트 및 갱신된 객체 반환
-        ClanCapitalRaid mergeClanCapitalRaid = clanCapitalService.updateWithMember(clanCapitalRaid);
-
-        // 신규 참가자 아이디 매핑
-        clanCapitalRaid.mappingParticipantIds(mergeClanCapitalRaid.getMembers());
-
-        // 반환
-        return clanCapitalRaid;
     }
 
     @Transactional(readOnly = true)
@@ -197,13 +178,15 @@ public class RaidUseCase {
         List<ClanCapitalRaid> needSyncRaids = clanCapitalService.findAllThatNeedSync();
 
         for(ClanCapitalRaid needSyncRaid : needSyncRaids) {
+            // 클랜 정보를 조회한다.
             Clan clan = clanService.findById(needSyncRaid.getClanTag());
 
             try {
                 // 클랜 캐피탈 현재 시즌을 조회한다.
                 ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clan.getTag());
+
                 // 클랜 캐피탈 수집
-                processClanCapitalCurrentSeason(clan.getTag(), currentSeason);
+                clanCapitalService.collectCurrentSeason(clan.getTag(), currentSeason);
 
                 log.info("[%s] 클랜 캐피탈 현재 시즌 자동 수집 완료".formatted(clan.getName()));
             } catch (Exception e) {

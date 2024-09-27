@@ -1,7 +1,6 @@
 package open.api.coc.clans.clean.domain.capital.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +25,8 @@ public class ClanCapitalService {
     private final ClanCapitalRaidMapper clanCapitalRaidMapper;
 
     @Transactional(readOnly = true)
-    public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDateTime startDateTime) {
-        Optional<RaidEntity> findRaidEntity = clanCapitalRaidRepository.findByClanTagAndStartDate(clanTag, startDateTime.toLocalDate());
+    public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDate startDate) {
+        Optional<RaidEntity> findRaidEntity = clanCapitalRaidRepository.findByClanTagAndStartDate(clanTag, startDate);
 
         if (findRaidEntity.isEmpty()) return Optional.empty();
 
@@ -43,7 +42,7 @@ public class ClanCapitalService {
     }
 
     @Transactional
-    public ClanCapitalRaid updateWithMember(ClanCapitalRaid clanCapitalRaid) {
+    public ClanCapitalRaid mergeRaidWithMember(ClanCapitalRaid clanCapitalRaid) {
         RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityWithRaiderEntity(clanCapitalRaid);
         RaidEntity saveRaidEntity = clanCapitalRaidRepository.save(raidEntity);
         return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
@@ -81,7 +80,6 @@ public class ClanCapitalService {
 
     @Transactional
     public ClanCapitalRaid createClanCapitalRaid(String clanTag, ClanCapitalRaidSeason currentSeason) {
-
         // 새로운 클랜 캐피탈 생성
         ClanCapitalRaid newClanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
                                                                        currentSeason.getState(),
@@ -148,4 +146,23 @@ public class ClanCapitalService {
                     .toList();
     }
 
+    @Transactional
+    public ClanCapitalRaid collectCurrentSeason(String clanTag, ClanCapitalRaidSeason currentSeason) {
+        // 1. 클랜 캐피탈 조회 및 생성 또는 업데이트
+        ClanCapitalRaid clanCapitalRaid = this.findByClanTagAndStartDate(clanTag, currentSeason.getStartTime().toLocalDate())
+                                              .map(existingRaid -> updateClanCapitalRaid(existingRaid, currentSeason))
+                                              .orElseGet(() -> createClanCapitalRaid(clanTag, currentSeason));
+
+        // 클랜 캐피탈 참가자 정보 갱신
+        clanCapitalRaid.updateParticipants(currentSeason.getMembers());
+
+        // 클랜 캐피탈 참가자 데이터 업데이트
+        ClanCapitalRaid updateClanCapitalRaid = mergeRaidWithMember(clanCapitalRaid);
+
+        // 신규 참가자 아이디 매핑
+        clanCapitalRaid.mappingParticipantIds(updateClanCapitalRaid.getMembers());
+
+        // 반환
+        return clanCapitalRaid;
+    }
 }

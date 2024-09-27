@@ -45,13 +45,10 @@ public class RaidUseCase {
         // 1. 클랜 캐피탈 현재 시즌을 COC API 조회한다.
         ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clanTag);
 
-        // 2. 클랜 캐피탈 도메인 조회
+        // 2. 클랜 캐피탈 도메인 동기화
         ClanCapitalRaid clanCapitalRaid = processClanCapitalCurrentSeason(clanTag, currentSeason);
 
-        // 3. 신규 참가자 아이디 매핑
-        clanCapitalRaid.mappingParticipantIds(clanCapitalRaid.getMembers());
-
-        // 4.응답
+        // 3.응답
         return raidUseCaseMapper.toResponse(clanCapitalRaid);
     }
 
@@ -107,7 +104,13 @@ public class RaidUseCase {
         clanCapitalRaid.updateParticipants(currentSeason.getMembers());
 
         // 클랜 캐피탈 참가자 데이터 업데이트 및 갱신된 객체 반환
-        return clanCapitalService.updateWithMember(clanCapitalRaid);
+        ClanCapitalRaid mergeClanCapitalRaid = clanCapitalService.updateWithMember(clanCapitalRaid);
+
+        // 신규 참가자 아이디 매핑
+        clanCapitalRaid.mappingParticipantIds(mergeClanCapitalRaid.getMembers());
+
+        // 반환
+        return clanCapitalRaid;
     }
 
     @Transactional(readOnly = true)

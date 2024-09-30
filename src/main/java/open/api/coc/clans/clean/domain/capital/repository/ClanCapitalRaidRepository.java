@@ -19,6 +19,6 @@ public interface ClanCapitalRaidRepository {
 
     LocalDate findLatestStartDate();
 
-    List<LocalDate> findLatestStartDates(Pageable pageable);
+    List<LocalDate> findAllLatestStartDate(Pageable pageable);
 
 }

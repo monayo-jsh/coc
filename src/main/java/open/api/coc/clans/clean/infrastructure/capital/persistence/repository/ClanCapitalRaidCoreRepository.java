@@ -48,8 +48,8 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     }
 
     @Override
-    public List<LocalDate> findLatestStartDates(Pageable pageable) {
-        return jpaRaidCustomRepository.findLatestStartDatesByPage(pageable);
+    public List<LocalDate> findAllLatestStartDate(Pageable pageable) {
+        return jpaRaidCustomRepository.findAllLatestStartDateByPage(pageable);
     }
 
     @Override

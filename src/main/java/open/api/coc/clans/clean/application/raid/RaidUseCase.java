@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.raid.query.RaidScoreQuery;
 import open.api.coc.clans.clean.application.raid.mapper.RaidUseCaseMapper;
+import open.api.coc.clans.clean.application.raid.query.RaidScoreQueryFactory;
 import open.api.coc.clans.clean.domain.capital.external.client.ClanCapitalClient;
 import open.api.coc.clans.clean.domain.capital.external.model.ClanCapitalRaidSeason;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
@@ -112,7 +113,7 @@ public class RaidUseCase {
     public List<RankingHallOfFameResponse> getRankingAverageSeason() {
         // 현재 서버에 수집된 최근 시작 날짜 목록을 조회한다.
         int searchCountOfRecent = hallOfFameConfig.getAverage() + 1;
-        List<LocalDate> latestStartDates = clanCapitalService.findAllStartDates(searchCountOfRecent);
+        List<LocalDate> latestStartDates = clanCapitalService.findAllLatestStartDateByCount(searchCountOfRecent);
 
         // 캐피탈 참여자 획득 점수 평균 랭킹을 조회한다.
         List<ClanCapitalRaidMemberRankingDTO> raidMemberRankingDTOs = clanCapitalMemberService.rankingResourceLootedAverageByStartDates(latestStartDates);
@@ -124,7 +125,10 @@ public class RaidUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<ClanCapitalRaidScoreResponse> getClanCapitalRaiderScore(RaidScoreQuery query) {
+    public List<ClanCapitalRaidScoreResponse> getClanCapitalRaiderScore(String playerTag, String playerName) {
+        // 조회하기 위한 쿼리 생성
+        RaidScoreQuery query = RaidScoreQueryFactory.create(playerTag, playerName);
+
         // 현재 서버에 수집된 캐피탈 참여자의 공격 목록을 조회한다.
         List<ClanCapitalRaidMember> raidMembers = query.getStrategy().execute(clanCapitalMemberService, query.getCriteria(), query.getLimit());
 

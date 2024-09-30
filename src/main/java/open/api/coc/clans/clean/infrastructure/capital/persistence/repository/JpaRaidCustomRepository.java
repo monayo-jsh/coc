@@ -46,7 +46,7 @@ public class JpaRaidCustomRepository {
                            .fetchOne();
     }
 
-    public List<LocalDate> findLatestStartDatesByPage(Pageable pageable) {
+    public List<LocalDate> findAllLatestStartDateByPage(Pageable pageable) {
         return queryFactory.select(raidEntity.startDate)
                            .from(raidEntity)
                            .groupBy(raidEntity.startDate)

@@ -42,14 +42,18 @@ public class ClanCapitalRaid {
     }
 
     public void changeRaidInfo(ClanCapitalRaidSeason currentSeason) {
+        // 캐피탈 정보
         changeState(currentSeason.getState());
+
+        // 캐피탈 참여 정보
+        mergeParticipants(currentSeason.getMembers());
     }
 
     public void changeState(String state) {
         this.state = state;
     }
 
-    public void mergeParticipants(List<ClanCapitalRaidSeasonMember> members) {
+    private void mergeParticipants(List<ClanCapitalRaidSeasonMember> members) {
         Map<String, ClanCapitalRaidMember> clanCapitalRaidMemberMap = makeMemberMapByTag(this.members);
 
         for (ClanCapitalRaidSeasonMember member : members) {
@@ -85,7 +89,7 @@ public class ClanCapitalRaid {
         for( ClanCapitalRaidMember member : this.members) {
             ClanCapitalRaidMember clanCapitalRaidMember = memberMap.get(member.getTag());
             member.assignIdIfAbsent(clanCapitalRaidMember.getId());
-            member.assignRaidIdIfAbsent(clanCapitalRaidMember.getRaidId());
+            member.assignRaidIdIfAbsent(this.id);
         }
     }
 

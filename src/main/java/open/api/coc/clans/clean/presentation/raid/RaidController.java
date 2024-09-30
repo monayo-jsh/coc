@@ -12,8 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.raid.RaidUseCase;
-import open.api.coc.clans.clean.application.raid.query.RaidScoreQuery;
-import open.api.coc.clans.clean.application.raid.query.RaidScoreQueryFactory;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidScoreResponse;
@@ -121,8 +119,7 @@ public class RaidController {
     public ResponseEntity<List<ClanCapitalRaidScoreResponse>> getPlayerRaidScoreWithTag(@RequestParam(required = false) String playerTag,
                                                                                         @RequestParam(required = false) String playerName) {
 
-        RaidScoreQuery query = RaidScoreQueryFactory.create(playerTag, playerName);
-        List<ClanCapitalRaidScoreResponse> raidScoreResponses = raidUseCase.getClanCapitalRaiderScore(query);
+        List<ClanCapitalRaidScoreResponse> raidScoreResponses = raidUseCase.getClanCapitalRaiderScore(playerTag, playerName);
 
         return ResponseEntity.status(HttpStatus.OK)
                              .body(raidScoreResponses);

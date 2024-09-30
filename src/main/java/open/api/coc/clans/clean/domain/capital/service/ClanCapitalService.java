@@ -55,20 +55,24 @@ public class ClanCapitalService {
 
     
     @Transactional(readOnly = true)
-    public List<LocalDate> findAllStartDates(int countOfRecent) {
+    public List<LocalDate> findAllLatestStartDateByCount(int countOfRecent) {
         Pageable pageable = Pageable.ofSize(countOfRecent);
-        return clanCapitalRaidRepository.findLatestStartDates(pageable);
+        return clanCapitalRaidRepository.findAllLatestStartDate(pageable);
     }
 
     
     @Transactional
     public ClanCapitalRaid createClanCapitalRaid(String clanTag, ClanCapitalRaidSeason currentSeason) {
+        if (clanTag == null || clanTag.trim().isEmpty()) {
+            throw new IllegalArgumentException("clanTag can not be null");
+        }
+
         // 새로운 클랜 캐피탈 생성
         ClanCapitalRaid clanCapitalRaid = ClanCapitalRaid.createNew(clanTag,
-                                                                       currentSeason.getState(),
-                                                                       currentSeason.getStartTime().toLocalDate(),
-                                                                       currentSeason.getEndTime().toLocalDate(),
-                                                                       currentSeason.getMembers());
+                                                                    currentSeason.getState(),
+                                                                    currentSeason.getStartTime().toLocalDate(),
+                                                                    currentSeason.getEndTime().toLocalDate(),
+                                                                    currentSeason.getMembers());
 
         // 저장
         ClanCapitalRaid newClanCapitalRaid = clanCapitalRaidRepository.save(clanCapitalRaid);
@@ -86,9 +90,6 @@ public class ClanCapitalService {
     public ClanCapitalRaid updateClanCapitalRaid(ClanCapitalRaid existingRaid, ClanCapitalRaidSeason currentSeason) {
         // 클랜 캐피탈 정보 갱신
         existingRaid.changeRaidInfo(currentSeason);
-
-        // 클랜 캐피탈 참가자 정보 갱신
-        existingRaid.mergeParticipants(currentSeason.getMembers());
 
         // 클랜 캐피탈 참가자 데이터 업데이트
         ClanCapitalRaid updateRaid = clanCapitalRaidRepository.save(existingRaid);
@@ -117,7 +118,7 @@ public class ClanCapitalService {
         // 현재 서버에 수집된 최근 시작 날짜 2주치를 조회한다.
         int searchCountOfRecent = 2;
         Pageable pageable = Pageable.ofSize(searchCountOfRecent);
-        List<LocalDate> latestStartDates = clanCapitalRaidRepository.findLatestStartDates(pageable);
+        List<LocalDate> latestStartDates = clanCapitalRaidRepository.findAllLatestStartDate(pageable);
 
         if (latestStartDates.isEmpty() || latestStartDates.size() < 2) {
             // 최근 날짜가 비어있거나 하나인 경우 지난주 위반 항목 제공 불가

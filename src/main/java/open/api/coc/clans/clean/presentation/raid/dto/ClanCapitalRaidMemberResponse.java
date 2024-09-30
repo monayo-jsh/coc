@@ -10,13 +10,13 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ClanCapitalRaidMemberResponse {
 
-    @Schema(description = "사용자 참여 고유키")
+    @Schema(description = "플레이어 참여 고유키")
     private String id;
 
-    @Schema(description = "사용자 태그")
+    @Schema(description = "플레이어 태그")
     private String tag;
 
-    @Schema(description = "사용자 이름")
+    @Schema(description = "플레이어 이름")
     private String name;
 
     @Schema(description = "현재 진행 공격수")

@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "클랜 캐피탈", description = "클랜 캐피탈 관련 기능")
-@RestController(value = "raidV2Controller")
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/raid")
 public class RaidController {

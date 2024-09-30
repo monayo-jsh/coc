@@ -5,13 +5,13 @@ import open.api.coc.clans.clean.presentation.common.dto.ClanSimpleResponse;
 
 public record ClanCapitalRaidScoreResponse(
 
-    @Schema(description = "사용자 참여 고유키")
+    @Schema(description = "플레이어 참여 고유키")
     Long id,
 
-    @Schema(description = "사용자 태그")
+    @Schema(description = "플레이어 태그")
     String tag,
 
-    @Schema(description = "사용자 이름")
+    @Schema(description = "플레이어 이름")
     String name,
 
     @Schema(description = "진행 클랜")

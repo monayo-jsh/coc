@@ -29,7 +29,7 @@ public class PlayerUseCase {
     @Transactional(readOnly = true)
     public List<PlayerResponse> getAllPlayers() {
         // 플레이어 목록을 조회한다.
-        List<Player> players = playerService.getAllPlayers();
+        List<Player> players = playerService.findAllPlayers();
 
         // 클랜 정보를 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(players.stream().map(Player::getClanTag).distinct().toList());
@@ -52,6 +52,20 @@ public class PlayerUseCase {
         if (player.isInLeague()) {
             league = leagueMap.get(player.getLeagueId());
         }
+
+        return playerUseCaseMapper.toPlayerResponse(player, clan, league);
+    }
+
+    @Transactional
+    public PlayerResponse getPlayer(String playerTag) {
+        // 플레이어를 조회한다.
+        Player player = playerService.findById(playerTag);
+
+        // 플레이어 클랜 정보를 조회한다.
+        Clan clan = clanService.findById(player.getClanTag());
+
+        // 플레이어 리그 정보를 조회한다.
+        League league = leagueService.findById(player.getLeagueId());
 
         return playerUseCaseMapper.toPlayerResponse(player, clan, league);
     }

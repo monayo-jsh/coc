@@ -38,7 +38,7 @@ class LeagueEntityMapperTest {
         Label label = TestLabelFactory.create(new Random().nextInt(), iconUrl);
 
         // when
-        LeagueEntity leagueEntity = leagueEntityMapper.toEntity(label);
+        LeagueEntity leagueEntity = leagueEntityMapper.toLeagueEntity(label);
 
         // then
         assertThat(leagueEntity).isNotNull();

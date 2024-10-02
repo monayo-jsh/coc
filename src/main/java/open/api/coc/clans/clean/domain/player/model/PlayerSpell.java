@@ -41,7 +41,9 @@ public class PlayerSpell {
     private SpellConfig loadConfig() {
         return SpellConfig.findByName(this.name);
     }
-
+    public String getType() {
+        return this.config.getType().name();
+    }
     public String getKoreanName() {
         return this.config.getKoreanName();
     }

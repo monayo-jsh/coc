@@ -34,7 +34,4 @@ public class PlayerHeroEquipmentResponse {
     @Schema(description = "착용중인 영웅 이름")
     private String heroName;
 
-    @Schema(description = "착용중인 영웅 한글 이름 약자")
-    private String heroKoreanName;
-
 }

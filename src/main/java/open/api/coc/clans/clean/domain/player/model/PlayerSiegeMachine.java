@@ -32,11 +32,14 @@ public class PlayerSiegeMachine {
         this.config = loadConfig();
     }
 
+    public boolean isVillageHome() {
+        return Objects.equals("home", village);
+    }
     private SiegeMachineConfig loadConfig() {
         return SiegeMachineConfig.findByName(this.name);
     }
-    public boolean isVillageHome() {
-        return Objects.equals("home", village);
+    public String getType() {
+        return this.config.getType().name();
     }
     public String getKoreanName() {
         return this.config.getKoreanName();

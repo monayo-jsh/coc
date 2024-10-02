@@ -14,6 +14,7 @@ import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,7 @@ public class PlayerController {
 
     @Operation(
         summary = "플레이어 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
-        description = "이 API는 서버에 플레이어 목록을 제공합니다."
+        description = "이 API는 서버에 등록된 플레이어 목록으로 제공됩니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerResponse.class)))),
@@ -39,4 +40,18 @@ public class PlayerController {
                              .body(playerUseCase.getAllPlayers());
     }
 
+    @Operation(
+        summary = "플레이어 정보를 조회합니다. version: 1.00, Last Update: 24.10.02",
+        description = "이 API는 서버에 등록된 플레이어 정보로 제공됩니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = PlayerResponse.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/{playerTag}")
+    public ResponseEntity<PlayerResponse> getPlayer(@PathVariable String playerTag) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getPlayer(playerTag));
+    }
 }

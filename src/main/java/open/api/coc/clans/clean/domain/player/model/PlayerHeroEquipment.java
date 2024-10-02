@@ -60,13 +60,6 @@ public class PlayerHeroEquipment {
         return this.getHeroConfig().getName();
 
     }
-    public String getHeroKoreanName() {
-        return this.getHeroConfig().getKoreanName();
-
-    }
-    public String getHeroShortName() {
-        return this.getHeroConfig().getKoreanShortName();
-    }
 
     public boolean isWear() {
         return YnType.Y.equals(this.wearYn);

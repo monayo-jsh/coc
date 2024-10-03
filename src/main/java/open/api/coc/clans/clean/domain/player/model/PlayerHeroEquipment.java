@@ -16,13 +16,15 @@ public class PlayerHeroEquipment {
 
     private final HeroEquipmentConfig config; // 영웅 장비 메타 정보
 
+    private String playerTag; // 플레이어 태그
     private String name; // 장비 이름
+
+    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
+
     private Integer level; // 현재 레벨
     private Integer maxLevel; // 최대 레벨
 
     private YnType wearYn; // 영웅 장비 착용 여부 - Y: 착용, N: 안함
-
-    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
 
     private PlayerHeroEquipment(String name, Integer level, Integer maxLevel, String village, YnType wearYn) {
         this.name = name;
@@ -65,12 +67,28 @@ public class PlayerHeroEquipment {
         return YnType.Y.equals(this.wearYn);
     }
 
+    public void wear() {
+        // 장비를 착용
+        this.wearYn = YnType.Y;
+    }
+
+    public void assignPlayerTagIfAbsent(String playerTag) {
+        if (this.playerTag == null) {
+            this.playerTag = playerTag;
+        }
+    }
+
     public static class PlayerHeroEquipmentBuilder {
+
+        private String playerTag;
         private String name;
-        private Integer level; // 현재 레벨
-        private Integer maxLevel; // 최대 레벨
-        private YnType wearYn;
+
         private String village = "home"; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
+
+        private Integer level;
+        private Integer maxLevel;
+
+        private YnType wearYn = YnType.N;
 
         public PlayerHeroEquipment build() {
             return new PlayerHeroEquipment(name, level, maxLevel, village, wearYn);

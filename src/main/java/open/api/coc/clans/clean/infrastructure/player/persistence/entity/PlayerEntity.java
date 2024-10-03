@@ -168,11 +168,8 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     }
 
     public void changeHeroes(List<PlayerHeroEntity> heroes) {
-        this.heroes = heroes;
-
-        for (PlayerHeroEntity hero : this.heroes) {
-            hero.changePlayer(this);
-        }
+        this.heroes.clear();
+        heroes.forEach(this::addHero);
     }
 
     public void addHeroEquipment(PlayerHeroEquipmentEntity heroEquipment) {
@@ -181,11 +178,8 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     }
 
     public void changeHeroEquipments(List<PlayerHeroEquipmentEntity> heroEquipments) {
-        this.heroEquipments = heroEquipments;
-
-        for (PlayerHeroEquipmentEntity heroEquipment : this.heroEquipments) {
-            heroEquipment.changePlayer(this);
-        }
+        this.heroEquipments.clear();
+        heroEquipments.forEach(this::addHeroEquipment);
     }
 
     public void addTroop(PlayerTroopsEntity troop) {
@@ -194,11 +188,8 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     }
 
     public void changeTroops(List<PlayerTroopsEntity> troops) {
-        this.troops = troops;
-
-        for (PlayerTroopsEntity troop : this.troops) {
-            troop.changePlayer(this);
-        }
+        this.troops.clear();
+        troops.forEach(this::addTroop);
     }
 
     public void addSpell(PlayerSpellEntity spell) {
@@ -206,11 +197,8 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
         this.spells.add(spell);
     }
     public void changeSpells(List<PlayerSpellEntity> spells) {
-        this.spells = spells;
-
-        for (PlayerSpellEntity spell : this.spells) {
-            spell.changePlayer(this);
-        }
+        this.spells.clear();
+        spells.forEach(this::addSpell);
     }
 
     public void changeSupportYn(YnType supportYn) {

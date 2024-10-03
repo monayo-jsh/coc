@@ -2,7 +2,6 @@ package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
@@ -37,7 +36,7 @@ public class PlayerHeroEntity implements Persistable<PlayerItemInfoPK> {
     private PlayerItemInfo levelInfo;
 
     @MapsId(value = "playerTag")
-    @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "player_tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private PlayerEntity player;
 

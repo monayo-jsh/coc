@@ -10,4 +10,8 @@ public interface PlayerRepository {
 
     Optional<Player> findById(String playerTag);
 
+    boolean exists(String playerTag);
+
+    Player save(Player newPlayer);
+
 }

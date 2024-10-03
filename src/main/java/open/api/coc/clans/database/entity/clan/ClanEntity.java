@@ -4,9 +4,11 @@ import static jakarta.persistence.FetchType.LAZY;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -81,12 +83,12 @@ public class ClanEntity implements Persistable<String> {
     private LocalDateTime regDate;
 
     // clanContent 1:1 관계 NULL 불가에 따라 Lazy 로드 가능하도록 외래키 조건 제거
-    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "tag")
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private ClanContentEntity clanContent;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "tag")
+    @OneToOne(fetch = LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private ClanBadgeEntity badgeUrl;
 
     @Builder.Default

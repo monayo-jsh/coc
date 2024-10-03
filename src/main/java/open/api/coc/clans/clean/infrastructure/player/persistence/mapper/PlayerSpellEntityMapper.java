@@ -12,6 +12,13 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface PlayerSpellEntityMapper {
 
+    @Mapping(target = "id.playerTag", source = "playerTag")
+    @Mapping(target = "id.name", source = "name")
+    @Mapping(target = "levelInfo.level", source = "level")
+    @Mapping(target = "levelInfo.maxLevel", source = "maxLevel")
+    PlayerSpellEntity toPlayerSpellEntity(PlayerSpell playerSpell);
+
+    @Mapping(target = "playerTag", source = "id.playerTag")
     @Mapping(target = "name", source = "id.name")
     @Mapping(target = "level", source = "levelInfo.level")
     @Mapping(target = "maxLevel", source = "levelInfo.maxLevel")

@@ -3,7 +3,6 @@ package open.api.coc.clans.clean.domain.player.config;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
-import open.api.coc.clans.clean.infrastructure.player.persistence.entity.SpellType;
 
 @Getter
 public enum SpellConfig {
@@ -45,4 +44,13 @@ public enum SpellConfig {
                      .orElse(UNKNOWN);
     }
 
+    public enum SpellType {
+
+        ELIXIR, // 엘릭서
+
+        DARK_ELIXIR, // 다크 엘릭서
+
+        UNKNOWN // 매핑 필요
+
+    }
 }

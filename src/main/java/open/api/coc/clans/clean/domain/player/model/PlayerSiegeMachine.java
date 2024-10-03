@@ -16,12 +16,14 @@ public class PlayerSiegeMachine {
 
     private SiegeMachineConfig config; // 시즈머신 메타 정보
 
+    private String playerTag; // 플레이어 태그
     private String name; // 이름
+
+    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
 
     private Integer level; // 현재 레벨
     private Integer maxLevel; // 최대 레벨
 
-    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
 
     private PlayerSiegeMachine(String name, Integer level, Integer maxLevel, String village) {
         this.name = name;
@@ -48,12 +50,21 @@ public class PlayerSiegeMachine {
         return this.config.getOrder();
     }
 
+    public void assignPlayerTagIfAbsent(String playerTag) {
+        if (this.playerTag == null) {
+            this.playerTag = playerTag;
+        }
+    }
+
 
     public static class PlayerSiegeMachineBuilder {
+        private String playerTag;
         private String name;
+
+        private String village = "home";
+
         private Integer level;
         private Integer maxLevel;
-        private String village = "home";
 
         public PlayerSiegeMachine build() {
             return new PlayerSiegeMachine(name, level, maxLevel, village);

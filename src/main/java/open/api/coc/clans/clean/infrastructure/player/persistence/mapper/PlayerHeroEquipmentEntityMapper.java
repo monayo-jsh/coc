@@ -12,6 +12,15 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface PlayerHeroEquipmentEntityMapper {
 
+    @Mapping(target = "id.playerTag", source = "playerTag")
+    @Mapping(target = "id.name", source = "name")
+    @Mapping(target = "levelInfo.level", source = "level")
+    @Mapping(target = "levelInfo.maxLevel", source = "maxLevel")
+    @Mapping(target = "targetHeroName", source = "config.hero.name")
+    @Mapping(target = "player.playerTag", source = "playerTag")
+    PlayerHeroEquipmentEntity toPlayerHeroEquipmentEntity(PlayerHeroEquipment playerHeroEquipment);
+
+    @Mapping(target = "playerTag", source = "id.playerTag")
     @Mapping(target = "name", source = "id.name")
     @Mapping(target = "level", source = "levelInfo.level")
     @Mapping(target = "maxLevel", source = "levelInfo.maxLevel")

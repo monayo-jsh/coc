@@ -9,6 +9,7 @@ import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
+import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class PlayerUseCase {
+
+    private final PlayerClient playerClient;
 
     private final PlayerService playerService;
 
@@ -56,18 +59,46 @@ public class PlayerUseCase {
         return playerUseCaseMapper.toPlayerResponse(player, clan, league);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PlayerResponse getPlayer(String playerTag) {
         // 플레이어를 조회한다.
         Player player = playerService.findById(playerTag);
 
+        // 응답한다.
+        return mapToPlayerResponse(player);
+    }
+
+    private PlayerResponse mapToPlayerResponse(Player player) {
         // 플레이어 클랜 정보를 조회한다.
-        Clan clan = clanService.findById(player.getClanTag());
+        Clan clan = null;
+        if (player.isJoinedClan()) {
+            try {
+                // 서버에서 등록된 클랜이 아닐 수 있음
+                clan = clanService.findById(player.getClanTag());
+            } catch (Exception ignore) {}
+        }
 
         // 플레이어 리그 정보를 조회한다.
-        League league = leagueService.findById(player.getLeagueId());
+        League league = null;
+        if (player.isInLeague()) {
+            league = leagueService.findById(player.getLeagueId());
+        }
 
         return playerUseCaseMapper.toPlayerResponse(player, clan, league);
     }
 
+    @Transactional
+    public PlayerResponse registerPlayer(String playerTag) {
+        // 등록된 플레이어를 검증한다.
+        playerService.ensurePlayerDoesNotExist(playerTag);
+
+        // 플레이어를 조회한다.
+        Player player = playerClient.findByTag(playerTag);
+
+        // 플레리어를 저장한다.
+        Player savePlayer = playerService.create(player);
+
+        // 응답한다.
+        return mapToPlayerResponse(savePlayer);
+    }
 }

@@ -16,6 +16,7 @@ public class PlayerPet {
 
     private PetConfig config; // 펫 메타 정보
 
+    private String playerTag; // 플레이어 태그
     private String name; // 이름
 
     private Integer level; // 현재 레벨
@@ -48,12 +49,21 @@ public class PlayerPet {
         return this.config.getOrder();
     }
 
+    public void assignPlayerTagIfAbsent(String playerTag) {
+        if (this.playerTag == null) {
+            this.playerTag = playerTag;
+        }
+    }
+
 
     public static class PlayerPetBuilder {
+        private String playerTag;
         private String name;
+
+        private String village = "home";
+
         private Integer level;
         private Integer maxLevel;
-        private String village = "home";
 
         public PlayerPet build() {
             return new PlayerPet(name, level, maxLevel, village);

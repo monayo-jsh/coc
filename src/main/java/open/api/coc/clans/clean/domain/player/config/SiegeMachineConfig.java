@@ -37,4 +37,7 @@ public enum SiegeMachineConfig {
                      .orElse(UNKNOWN);
     }
 
+    public boolean isSiegeMachine() {
+        return this.type.equals(TroopType.SIEGE_MACHINE);
+    }
 }

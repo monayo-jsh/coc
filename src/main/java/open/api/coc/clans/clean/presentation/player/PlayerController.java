@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,4 +55,20 @@ public class PlayerController {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.getPlayer(playerTag));
     }
+
+    @Operation(
+        summary = "플레이어를 저장합니다. version: 1.00, Last Update: 24.10.02",
+        description = "이 API는 서버에 플레이어를 저장합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = PlayerResponse.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{playerTag}")
+    public ResponseEntity<PlayerResponse> postPlayer(@PathVariable String playerTag) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.registerPlayer(playerTag));
+    }
+
 }

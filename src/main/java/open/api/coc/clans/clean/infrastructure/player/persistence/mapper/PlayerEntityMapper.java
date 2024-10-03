@@ -19,14 +19,24 @@ import org.springframework.beans.factory.annotation.Autowired;
     unmappedTargetPolicy = ReportingPolicy.IGNORE,
     uses = {
         PlayerHeroEntityMapper.class,
-        PlayerSpellEntityMapper.class,
-        PlayerHeroEquipmentEntityMapper.class
+        PlayerHeroEquipmentEntityMapper.class,
+        PlayerSpellEntityMapper.class
     }
 )
 public abstract class PlayerEntityMapper {
 
     @Autowired
     private PlayerTroopsEntityMapper playerTroopsEntityMapper;
+
+    @Mapping(target = "playerTag", source = "tag")
+    @Mapping(target = "clan.tag", source = "clanTag")
+    @Mapping(target = "league.id", source = "leagueId")
+    // 연관관계 매핑은 리포지토리 구현체에서 처리
+    @Mapping(target = "heroes", ignore = true)
+    @Mapping(target = "heroEquipments", ignore = true)
+    @Mapping(target = "troops", ignore = true)
+    @Mapping(target = "spells", ignore = true)
+    public abstract PlayerEntity toEntity(Player newPlayer);
 
     @Mapping(target = "tag", source = "playerTag")
     @Mapping(target = "clanTag", source = "clan.tag")
@@ -36,7 +46,7 @@ public abstract class PlayerEntityMapper {
     public abstract Player toPlayer(PlayerEntity playerEntity);
 
     @AfterMapping
-    protected void fillHeroWearEquipments(PlayerEntity playerEntity, @MappingTarget Player.PlayerBuilder playerBuilder) {
+    protected void afterMappingToPlayer(PlayerEntity playerEntity, @MappingTarget Player.PlayerBuilder playerBuilder) {
         if (playerBuilder == null) return;
         playerBuilder.mappingHeroWearEquipments();
     }

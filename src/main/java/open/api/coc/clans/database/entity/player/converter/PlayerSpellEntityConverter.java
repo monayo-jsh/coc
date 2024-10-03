@@ -17,7 +17,6 @@ public class PlayerSpellEntityConverter {
                                                     .playerTag(playerTag)
                                                     .name(source.getName())
                                                     .build())
-                                .type(spell.getType())
                                 .levelInfo(PlayerItemInfo.builder()
                                                          .level(source.getLevel())
                                                          .maxLevel(source.getMaxLevel())

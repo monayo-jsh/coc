@@ -186,13 +186,15 @@ public class RaidUseCase {
             Clan clan = clanService.findById(needSyncRaid.getClanTag());
 
             try {
+                log.info("[%s] 클랜 캐피탈 현재 시즌 자동 수집 시작".formatted(clan.getName()));
+
                 // 클랜 캐피탈 현재 시즌을 조회한다.
                 ClanCapitalRaidSeason currentSeason = clanCapitalClient.findCurrentSeasonByClanTag(clan.getTag());
 
                 // 클랜 캐피탈 수집
-                clanCapitalService.collectCurrentSeason(clan.getTag(), currentSeason);
+                ClanCapitalRaid result = clanCapitalService.collectCurrentSeason(clan.getTag(), currentSeason);
 
-                log.info("[%s] 클랜 캐피탈 현재 시즌 자동 수집 완료".formatted(clan.getName()));
+                log.info("[%s] 클랜 캐피탈 현재 시즌 자동 수집 결과: %s".formatted(clan.getName(), result.getState()));
             } catch (Exception e) {
                 log.error("[%s] 클랜 캐피탈 현재 시즌 자동 수집 실패".formatted(clan.getName()), e);
             }

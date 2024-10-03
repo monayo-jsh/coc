@@ -17,14 +17,19 @@ public class PlayerHero {
 
     private final HeroConfig config; // 영웅 메타 정보
 
+    private String playerTag; // 플레이어  태그
     private String name; // 이름
+
+    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
+
     private Integer level; // 현재 레벨
     private Integer maxLevel; // 최대 레벨
-    private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
 
     private List<PlayerHeroEquipment> equipments; // 현재 착용중인 장비 목록
 
-    private PlayerHero(String name, Integer level, Integer maxLevel, String village) {
+    private PlayerHero(String playerTag, String name, Integer level, Integer maxLevel, String village) {
+        this.playerTag = playerTag;
+
         this.name = name;
         this.level = level;
         this.maxLevel = maxLevel;
@@ -63,14 +68,23 @@ public class PlayerHero {
         this.equipments.addAll(new ArrayList<>(playerHeroEquipments));
     }
 
+    public void assignPlayerTagIfAbsent(String playerTag) {
+        if (this.playerTag == null) {
+            this.playerTag = playerTag;
+        }
+    }
+
     public static class PlayerHeroBuilder {
+        private String playerTag;
         private String name;
-        private Integer level; // 현재 레벨
-        private Integer maxLevel; // 최대 레벨
-        private String village = "home"; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
+
+        private String village = "home";
+
+        private Integer level;
+        private Integer maxLevel;
 
         public PlayerHero build() {
-            return new PlayerHero(name, level, maxLevel, village);
+            return new PlayerHero(playerTag, name, level, maxLevel, village);
         }
 
     }

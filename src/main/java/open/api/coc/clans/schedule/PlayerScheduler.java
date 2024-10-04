@@ -80,7 +80,8 @@ public class PlayerScheduler {
                        .parallel()
                        .map(player -> {
                            try {
-                               return playersService.updatePlayer(player.getPlayerTag());
+                               playersService.updatePlayer(player.getPlayerTag());
+                               return true;
                            } catch (Exception e) {
                                log.error("player {} is update failed...", player.getName());
                                log.error("player {} is fail message", e.getMessage());

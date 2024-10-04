@@ -291,8 +291,8 @@ public class PlayersService {
                      .collect(Collectors.toList());
     }
 
-    @Transactional
-    public boolean updatePlayer(String playerTag) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public PlayerEntity updatePlayer(String playerTag) {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
                                                     .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
@@ -316,9 +316,7 @@ public class PlayersService {
         modifyLeague(playerEntity, player.getLeague());
         modifyClan(playerEntity, player.getClan());
 
-        playerRepository.save(playerEntity);
-
-        return true;
+        return playerRepository.save(playerEntity);
     }
 
     private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {

@@ -118,9 +118,6 @@
   .card {
     width: 140px !important;
   }
-  .card.w90 {
-    width: 90px !important;
-  }
 }
 
 .card.with-icon {
@@ -143,6 +140,10 @@
   color: white;
   cursor: pointer;
   transition: 400ms;
+}
+
+.card.w100p {
+  width: 100% !important;
 }
 
 .card p.tip {

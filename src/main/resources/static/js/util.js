@@ -207,6 +207,10 @@ function sortedByOrder(arrays) {
   return arrays.sort((a, b) => a.order - b.order);
 }
 
+function formatPeriod(start, end) {
+  return `${start} ~ ${end}`;
+}
+
 function formatYYMMDate(date) {
   const formattedDate = dayjs(date).format('YY년 MM월');
   return `[${formattedDate}] `;

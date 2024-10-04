@@ -24,4 +24,8 @@ public class EventTeamLegendService {
         return teamLegendRepository.findByStartDate(startDate);
     }
 
+    @Transactional
+    public void update(EventTeamLegend teamLegend) {
+        teamLegendRepository.save(teamLegend);
+    }
 }

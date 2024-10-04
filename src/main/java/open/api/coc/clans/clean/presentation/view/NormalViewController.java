@@ -19,6 +19,11 @@ public class NormalViewController {
         return "HallOfFame";
     }
 
+    @GetMapping("/event")
+    public String event() {
+        return "Event";
+    }
+
     /** 클랜원 목록 */
     @GetMapping("/clan/member")
     public String clanMember() {

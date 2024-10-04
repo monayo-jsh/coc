@@ -25,6 +25,18 @@ public class EventTeamLegend {
 
     private List<EventTeam> teams; // 팀 목록
 
+    public boolean isFinish() {
+        return EventStatus.FINISH.equals(this.status);
+    }
+
+    public boolean isPassedEndDate() {
+        return LocalDateTime.now().isAfter(this.endDate);
+    }
+
+    public void finishEvent() {
+        this.status = EventStatus.FINISH;
+    }
+
     public static class EventTeamLegendBuilder {
         private List<EventTeam> teams = new ArrayList<>();
     }

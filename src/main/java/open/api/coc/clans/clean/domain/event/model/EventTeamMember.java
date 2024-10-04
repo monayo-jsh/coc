@@ -22,4 +22,8 @@ public class EventTeamMember {
 
     private LocalDateTime updatedAt; // 최종 수정일시
 
+    public void refreshInfo(String name, Integer trophies) {
+        this.name = name;
+        this.trophies = trophies;
+    }
 }

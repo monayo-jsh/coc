@@ -17,6 +17,7 @@ import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -77,6 +78,30 @@ public class EventEntity {
     @Comment("팀 목록")
     @OneToMany(fetch = LAZY, mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventTeamLegendEntity> teams;
+
+    @Builder
+    private EventEntity(Long id, String name, EventType type, LocalDateTime startDate,
+                       LocalDateTime endDate, EventStatus status, LocalDateTime createdAt,
+                       LocalDateTime updatedAt, List<EventTeamLegendEntity> teams) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.teams = teams;
+    }
+
+    public void addTeam(EventTeamLegendEntity team) {
+        team.changeEvent(this);
+        this.teams.add(team);
+    }
+    public void changeTeams(List<EventTeamLegendEntity> teamEntities) {
+        this.teams.clear();
+        teamEntities.forEach(this::addTeam);
+    }
 
     // 기본값 설정을 위한 빌더 객체
     public static class EventEntityBuilder {

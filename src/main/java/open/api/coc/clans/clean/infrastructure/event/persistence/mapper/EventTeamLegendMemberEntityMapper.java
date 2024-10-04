@@ -12,7 +12,9 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface EventTeamLegendMemberEntityMapper {
 
-    @Mapping(target = "teamId", source = "teamLegend.id")
+    @Mapping(target = "teamId", source = "team.id")
     EventTeamMember toEventTeamMember(EventTeamLegendMemberEntity teamLegendMemberEntity);
+
+    EventTeamLegendMemberEntity toEventTeamLegendMemberEntity(EventTeamMember teamMember);
 
 }

@@ -16,6 +16,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
@@ -45,8 +46,31 @@ public class EventTeamLegendEntity {
     private EventEntity event;
 
     @Comment("팀원 목록")
-    @OneToMany(fetch = LAZY, mappedBy = "teamLegend", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = LAZY, mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EventTeamLegendMemberEntity> members;
+
+    @Builder
+    private EventTeamLegendEntity(Long id, String name, EventEntity event,
+                                 List<EventTeamLegendMemberEntity> members) {
+        this.id = id;
+        this.name = name;
+        this.event = event;
+        this.members = members;
+    }
+
+    public void changeEvent(EventEntity event) {
+        this.event = event;
+    }
+
+    public void addMember(EventTeamLegendMemberEntity member) {
+        member.changeTeam(this);
+        this.members.add(member);
+    }
+
+    public void changeMembers(List<EventTeamLegendMemberEntity> memberEntities) {
+        this.members.clear();
+        memberEntities.forEach(this::addMember);
+    }
 
     // 기본값 설정을 위한 빌더 객체
     public static class EventTeamLegendEntityBuilder {

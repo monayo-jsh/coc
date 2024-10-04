@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.infrastructure.event.persistence.mapper;
 import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
 import open.api.coc.clans.clean.infrastructure.event.persistence.entity.EventEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
@@ -15,5 +16,8 @@ import org.mapstruct.ReportingPolicy;
 public interface EventEntityMapper {
 
     EventTeamLegend toEventTeamLegend(EventEntity eventEntity);
+
+    @Mapping(target = "teams", ignore = true)
+    EventEntity toEventEntity(EventTeamLegend teamLegend);
 
 }

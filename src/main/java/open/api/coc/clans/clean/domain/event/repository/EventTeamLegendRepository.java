@@ -9,4 +9,6 @@ public interface EventTeamLegendRepository {
 
     EventTeamLegend findByStartDate(LocalDateTime startDate);
 
+    void save(EventTeamLegend teamLegend);
+
 }

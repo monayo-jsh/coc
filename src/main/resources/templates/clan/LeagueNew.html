@@ -999,7 +999,11 @@
           }
 
           // 강등 기준
-          const demotedCriteria = 2;
+          let demotedCriteria = 2;
+          if (leagueClanCount === 6) {
+            // 리그 클랜이 6팀인 경우 하위 1개팀 강등
+            demotedCriteria = 1;
+          }
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기
@@ -1023,7 +1027,11 @@
             return 'promoted';
           }
           // 강등 기준
-          const demotedCriteria = 2;
+          let demotedCriteria = 2;
+          if (leagueClanCount === 6) {
+            // 리그 클랜이 6팀인 경우 하위 1개팀 강등
+            demotedCriteria = 1;
+          }
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기

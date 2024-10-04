@@ -76,8 +76,6 @@ body {
   }
 
   .section-contents {
-    min-width: 320px;
-    min-height: 320px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
@@ -138,6 +136,32 @@ body {
 
           .td-wrap:not(:first-child) {
             margin-top: 3px;
+          }
+        }
+      }
+
+      .teams {
+        margin-top: 10px;
+        width: 660px;
+        display: flex;
+        flex-wrap: wrap;
+
+        @media (max-width: 620px) {
+          width: 320px;
+        }
+
+        .team-detail {
+          width: 320px;
+          margin: 3px;
+
+          .table-caption {
+            background-color: #6c8e45;
+          }
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
           }
         }
       }

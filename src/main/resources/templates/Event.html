@@ -37,59 +37,8 @@
       return document.importNode(medalTemplate.content, true);
     }
 
-    function makeRankRow(rowData) {
-      const rankingRowTemplate = document.querySelector('#ranking-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      const row = rankingRow.querySelector('.table-tr');
-
-      const { rank, name, score, icon_class_name } = rowData;
-
-      row.innerHTML = row.innerHTML
-                         .replace(/{RANK}/, rank)
-                         .replace(/{NAME}/, name)
-                         .replace(/{ICON_CLASS_NAME}/, icon_class_name)
-                         .replace(/{SCORE}/, score);
-
-      row.classList.add(`rank-${rank}`);
-
-      if (rank < 4) {
-        //순위권 메달 표기
-        const medalIcon = getMedalIcon(rank);
-        const rankTd = row.querySelector('.table-td.rank');
-        rankTd.innerHTML = "";
-        rankTd.appendChild(medalIcon);
-      }
-
-      return row;
-    }
-
-    function convHallOfFameRankingItem(rank, name, score, iconClassName) {
-      return {
-        rank: rank,
-        name: name,
-        score: score,
-        icon_class_name: iconClassName
-      };
-    }
-
-    function renderRankings(sectionClassName, players, iconClassName) {
-      if (!players || !players.length) return;
-
-      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
-      // clear
-      rankingTbody.innerHTML = '';
-
-      let rank = 1;
-      for(const player of players) {
-        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
-        const row = makeRankRow(rowData);
-        rankingTbody.appendChild(row);
-        rank++;
-      }
-    }
-
     function makeTeamElement(rank, team) {
-      const { name, trophies, members } = team;
+      const { name, trophies } = team;
 
       const teamTbodyTemplate = copyTemplateById('legend-team-tbody-template');
       const teamTbody = teamTbodyTemplate.querySelector('.team');
@@ -98,8 +47,7 @@
       teamRow.innerHTML = teamRow.innerHTML
                                      .replace(/{RANK}/, rank)
                                      .replace(/{TEAM_NAME}/, name)
-                                     .replace(/{ICON_CLASS_NAME}/, 'icon trophies')
-                                     .replace(/{TOTAL_SCORE}/, Number(trophies).toLocaleString())
+                                     .replace(/{TOTAL_TROPHIES}/, Number(trophies).toLocaleString())
 
       teamRow.classList.add(`rank-${rank}`);
 
@@ -114,15 +62,50 @@
       return teamTbody;
     }
 
+    function makeMemberRow(member) {
+      const { tag, name, trophies } = member;
+
+      const memberRowTemplate = copyTemplateById('team-member-row-template');
+      const memberRow = memberRowTemplate.querySelector('.table-tr');
+
+      memberRow.innerHTML = memberRow.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{TROPHIES}/, trophies);
+
+      return memberRow;
+    }
+
+    function drawTeamDetail(teamsElement, team) {
+      const teamDetailTemplate = copyTemplateById('legend-team-detail-template');
+      const teamDetail = teamDetailTemplate.querySelector('.table');
+
+      const { name, trophies, members } = team
+      teamDetail.innerHTML = teamDetail.innerHTML
+                                       .replace(/{TEAM_NAME}/, name)
+                                       .replace(/{TOTAL_TROPHIES}/, trophies);
+
+      const tableTbody = teamDetail.querySelector('.table-tbody');
+      for(const member of members) {
+        const memberRow = makeMemberRow(member);
+        tableTbody.appendChild(memberRow);
+      }
+
+      teamsElement.appendChild(teamDetail);
+    }
+
     function drawTeamLegendTeams(eventTeamLegendSection, teams) {
       if (!teams || !teams.length) return;
 
-      const table = eventTeamLegendSection.querySelector('.team-legend .table');
+      const teamLegend = eventTeamLegendSection.querySelector('.team-legend');
+      const rankingTable = teamLegend.querySelector('.rankings .table');
+      const teamsElement = teamLegend.querySelector('.teams');
       let rank = 1;
       for (const team of sortByTrophies(teams)) {
         const teamElement = makeTeamElement(rank, team);
-        table.appendChild(teamElement);
+        rankingTable.appendChild(teamElement);
         rank++;
+
+        drawTeamDetail(teamsElement, team);
       }
     }
 
@@ -154,7 +137,6 @@
       const targetClassName = 'event-team-legend';
       const latestTeamLegend = await fetchLatestTeamLegendEvent();
       renderTeamLegend(targetClassName, latestTeamLegend);
-      //renderRankings(targetClassName, rankings, 'icon trophies');
     }
 
     function getTargetElement(targetClassName) {
@@ -181,8 +163,8 @@
 
       <div class="section-wrapper sections">
 
-        <div class="section-wrapper event-team-legend">
-        </div>
+        <div class="section-wrapper event-team-legend"></div>
+
       </div>
 
     </div>
@@ -205,6 +187,7 @@
           </thead>
         </table>
       </div>
+      <div class="teams"></div>
     </div>
   </div>
 </template>
@@ -213,15 +196,29 @@
   <tr class="table-tr">
     <td class="table-td rank">{RANK}</td>
     <td class="table-td name">{TEAM_NAME}</td>
-    <td class="table-td"><div class="td-wrap"><div class="{ICON_CLASS_NAME}"></div>{TOTAL_SCORE}</div></td>
+    <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TOTAL_TROPHIES}</div></td>
   </tr>
   </tbody>
 </template>
-<template id="ranking-row-template">
+<template id="legend-team-detail-template">
+  <table class="table team-detail">
+    <caption class="table-caption text-align-center">{TEAM_NAME}</caption>
+    <tbody class="table-tbody"></tbody>
+    <tfoot class="table-tfoot text-align-center">
+      <tr class="table-tr">
+        <td class="table-td font-weight-bold" colspan="2">
+          <div class="td-wrap">
+            <div class="icon trophies"></div>{TOTAL_TROPHIES}
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</template>
+<template id="team-member-row-template">
   <tr class="table-tr">
-    <td class="table-td rank">{RANK}</td>
     <td class="table-td name">{NAME}</td>
-    <td class="table-td"><div class="td-wrap"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div></td>
+    <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TROPHIES}</div></td>
   </tr>
 </template>
 <template id="ranking-first-place-template">

@@ -335,6 +335,10 @@
 
     function initLeagueClan(leagueClanMap, warLeague, clans, roundSize) {
       for(const clan of clans) {
+        if (leagueClanMap.get(clan.tag)) {
+          // 이미 초기화된 클랜은 중복 처리 방지
+          continue;
+        }
         // 라운드 별 dataset
         clan.rounds = [];
         clan.roundSize = roundSize;

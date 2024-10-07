@@ -352,6 +352,7 @@
     }
 
     async function fetchLeagueClanRoundInfo(leagueClanMap, clanTag, season, rounds) {
+      let roundNo = 1;
       for (const round of rounds) {
         const { warTags } = round;
 
@@ -364,15 +365,24 @@
           const { clan, opponent } = currentWarLeagueRound;
           const targetClan = leagueClanMap.get(clan.tag);
           const clanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
-          targetClan.rounds.push(clanRoundWarInfo);
+
+          if (targetClan.rounds.length < roundNo) {
+            // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
+            targetClan.rounds.push(clanRoundWarInfo);
+          }
 
           const opponentClanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
           swipeClanAndOpponent(opponentClanRoundWarInfo);
           const opponentClan = leagueClanMap.get(opponent.tag);
-          opponentClan.rounds.push(opponentClanRoundWarInfo);
-        }
-      }
 
+          if (targetClan.rounds.length < roundNo) {
+            // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
+            opponentClan.rounds.push(opponentClanRoundWarInfo);
+          }
+        }
+
+        roundNo++;
+      }
     }
 
     function drawLeagueWarRound(clanWarContentsElement, drawClan) {
@@ -899,7 +909,6 @@
     }
 
     function drawMedalBonusQuantity(leagueWarClanContents, clanWarLeagueInfo) {
-      console.log(clanWarLeagueInfo);
       const medalBonusQuantity = leagueWarClanContents.querySelector('.additional-info .bonus-medal .count');
       medalBonusQuantity.innerHTML = clanWarLeagueInfo.medalBonusQuantity;
     }

@@ -13,11 +13,8 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface ClanCapitalRaidMapper {
 
-    @Mapping(target = "raiders", ignore = true)
+    @Mapping(target = "raiders", ignore = true) // 연관관계 매핑은 로직에서 처리
     RaidEntity toRaidEntity(ClanCapitalRaid clanCapitalRaid);
-
-    @Mapping(target = "raiders", source = "members")
-    RaidEntity toRaidEntityWithRaiderEntity(ClanCapitalRaid clanCapitalRaid);
 
     @Mapping(target = "members", ignore = true)
     ClanCapitalRaid toClanCapitalRaid(RaidEntity entity);

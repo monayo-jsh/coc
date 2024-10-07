@@ -19,9 +19,9 @@ public class NormalViewController {
         return "HallOfFame";
     }
 
-    @GetMapping("/event")
+    @GetMapping("/event/team/legend")
     public String event() {
-        return "Event";
+        return "event/TeamLegend";
     }
 
     /** 클랜원 목록 */

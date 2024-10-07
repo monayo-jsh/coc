@@ -299,6 +299,10 @@ body::before {
   color: white !important;
 }
 
+.bg-lightgoldenrodyellow {
+  background-color: lightgoldenrodyellow !important;
+}
+
 .bg-lightgray {
   background-color: lightgray;
   color: white;

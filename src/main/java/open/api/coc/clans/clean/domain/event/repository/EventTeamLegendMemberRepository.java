@@ -7,4 +7,6 @@ public interface EventTeamLegendMemberRepository {
 
     void saveRecordHistory(List<EventTeamMember> members);
 
+//    List<EventTeamMemberHistory> findByMemberHistory(List<Long> teamIds);
+
 }

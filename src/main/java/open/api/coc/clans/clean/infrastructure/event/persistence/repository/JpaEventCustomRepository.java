@@ -5,6 +5,7 @@ import static open.api.coc.clans.clean.infrastructure.event.persistence.entity.Q
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.event.persistence.entity.EventEntity;
 import open.api.coc.clans.clean.infrastructure.event.persistence.entity.EventType;
@@ -32,13 +33,15 @@ public class JpaEventCustomRepository {
                            .fetchOne();
     }
 
-    public EventEntity findByStartDate(LocalDateTime startDate) {
+    public Optional<EventEntity> findByStartDate(LocalDateTime startDate) {
         BooleanBuilder condition = createBaseCondition();
         condition.and(eventEntity.startDate.eq(startDate));
 
-        return queryFactory.select(eventEntity)
-                           .from(eventEntity)
-                           .where(condition)
-                           .fetchOne();
+        EventEntity findEvent = queryFactory.select(eventEntity)
+                                            .from(eventEntity)
+                                            .where(condition)
+                                            .fetchOne();
+
+        return Optional.ofNullable(findEvent);
     }
 }

@@ -25,4 +25,9 @@ public class EventTeamLegendMemberDatabaseService implements EventTeamLegendMemb
 
         memberHistoryRepository.saveAll(memberHistoryEntities);
     }
+
+//    @Override
+//    public List<EventTeamMemberHistory> findByMemberHistory(List<Long> teamIds) {
+//        memberHistoryRepository.findAllByt
+//    }
 }

@@ -4,4 +4,7 @@ import open.api.coc.clans.clean.infrastructure.event.persistence.entity.EventTea
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface JpaEventTeamLegendMemberHistoryRepository extends JpaRepository<EventTeamLegendMemberHistoryEntity, Long> {
+
+//    List<EventTeamLegendMemberHistoryEntity> findAllByTeamLegendIds(List<Long> teamLegendIds);
+
 }

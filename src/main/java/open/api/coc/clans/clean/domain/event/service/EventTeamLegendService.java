@@ -25,7 +25,8 @@ public class EventTeamLegendService {
             throw new EventTeamLegendNotExistsException();
         }
 
-        return teamLegendRepository.findByStartDate(startDate);
+        return teamLegendRepository.findByStartDate(startDate)
+                                   .orElseThrow(() -> new EventTeamLegendNotExistsException(startDate));
     }
 
     @Transactional
@@ -48,4 +49,15 @@ public class EventTeamLegendService {
 
         teamLegendMemberRepository.saveRecordHistory(allMembers);
     }
+
+    @Transactional(readOnly = true)
+    public EventTeamLegend findById(Long eventId) {
+        return teamLegendRepository.findById(eventId)
+                                   .orElseThrow(() -> new EventTeamLegendNotExistsException(eventId));
+    }
+
+//    @Transactional(readOnly = true)
+//    public List<EventTeamMemberHistory> findLastTeamMemberHistory(List<Long> teamIds) {
+//        return teamLegendMemberRepository.findByMemberHistory(teamIds);
+//    }
 }

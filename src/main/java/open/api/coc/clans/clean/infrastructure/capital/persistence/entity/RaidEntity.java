@@ -62,6 +62,16 @@ public class RaidEntity {
         this.raiders = raiders;
     }
 
+    public void addRadier(RaiderEntity raider) {
+        raider.changeRaid(this);
+        this.raiders.add(raider);
+    }
+
+    public void changeRaiders(List<RaiderEntity> raiders) {
+        this.raiders.clear();
+        raiders.forEach(this::addRadier);
+    }
+
     // 기본값 설정을 위한 빌더 객체
     public static class RaidEntityBuilder {
         private List<RaiderEntity> raiders = new ArrayList<>();

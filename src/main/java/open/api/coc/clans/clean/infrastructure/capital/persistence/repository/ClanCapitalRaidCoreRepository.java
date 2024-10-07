@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaid;
 import open.api.coc.clans.clean.domain.capital.repository.ClanCapitalRaidRepository;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaidEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMapper;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.mapper.ClanCapitalRaidMemberMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,7 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
     private final JpaRaidCustomRepository jpaRaidCustomRepository;
 
     private final ClanCapitalRaidMapper clanCapitalRaidMapper;
+    private final ClanCapitalRaidMemberMapper clanCapitalRaidMemberMapper;
 
     @Override
     public Optional<ClanCapitalRaid> findByClanTagAndStartDate(String clanTag, LocalDate startDate) {
@@ -37,7 +40,10 @@ public class ClanCapitalRaidCoreRepository implements ClanCapitalRaidRepository 
 
     @Override
     public ClanCapitalRaid save(ClanCapitalRaid clanCapitalRaid) {
-        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntityWithRaiderEntity(clanCapitalRaid);
+        RaidEntity raidEntity = clanCapitalRaidMapper.toRaidEntity(clanCapitalRaid);
+        List<RaiderEntity> raiderEntities = clanCapitalRaid.getMembers().stream().map(clanCapitalRaidMemberMapper::toRaiderEntity).toList();
+        raidEntity.changeRaiders(raiderEntities);
+
         RaidEntity saveRaidEntity = jpaRaidRepository.save(raidEntity);
         return clanCapitalRaidMapper.toClanCapitalRaidWithMembers(saveRaidEntity);
     }

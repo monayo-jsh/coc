@@ -61,4 +61,7 @@ public class RaiderEntity {
         this.raid = raid;
     }
 
+    public void changeRaid(RaidEntity raid) {
+        this.raid = raid;
+    }
 }

@@ -89,7 +89,7 @@ body {
     justify-content: space-around;
 
     .section {
-      margin: 10px;
+      margin: 1px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -108,7 +108,7 @@ body {
 
       .rankings {
         margin-top: 10px;
-        width: 320px;
+        width: 385px;
 
         .table {
           .table-caption {
@@ -153,16 +153,16 @@ body {
 
       .teams {
         margin-top: 10px;
-        width: 660px;
+        width: 800px;
         display: flex;
         flex-wrap: wrap;
 
         @media (max-width: 620px) {
-          width: 320px;
+          width: 385px;
         }
 
         .team-detail {
-          width: 320px;
+          width: 385px;
           margin: 3px;
 
           .table-caption {

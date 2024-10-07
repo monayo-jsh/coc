@@ -80,14 +80,15 @@
     }
 
     function makeMemberRow(member) {
-      const { tag, name, trophies } = member;
+      const { tag, name, trophies, updatedAt } = member;
 
       const memberRowTemplate = copyTemplateById('team-member-row-template');
       const memberRow = memberRowTemplate.querySelector('.table-tr');
 
       memberRow.innerHTML = memberRow.innerHTML
                                      .replace(/{NAME}/, name)
-                                     .replace(/{TROPHIES}/, trophies);
+                                     .replace(/{TROPHIES}/, trophies)
+                                     .replace(/{RECORD_TIME}/, formatTime(updatedAt, 'MM/DD HH:mm'));
 
       return memberRow;
     }
@@ -246,7 +247,7 @@
     <tbody class="table-tbody"></tbody>
     <tfoot class="table-tfoot text-align-center">
       <tr class="table-tr bg-lightgoldenrodyellow">
-        <td class="table-td font-weight-bold" colspan="2">
+        <td class="table-td font-weight-bold" colspan="3">
           <div class="td-wrap">
             <div class="icon trophies"></div>{TOTAL_TROPHIES}
           </div>
@@ -259,6 +260,7 @@
   <tr class="table-tr">
     <td class="table-td name">{NAME}</td>
     <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TROPHIES}</div></td>
+    <td class="table-td"><div class="td-wrap">{RECORD_TIME}</div></td>
   </tr>
 </template>
 <template id="ranking-first-place-template">

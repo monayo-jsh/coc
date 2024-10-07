@@ -157,7 +157,7 @@ body {
         display: flex;
         flex-wrap: wrap;
 
-        @media (max-width: 620px) {
+        @media (max-width: 800px) {
           width: 385px;
         }
 

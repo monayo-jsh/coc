@@ -356,7 +356,6 @@
     }
 
     async function fetchLeagueClanRoundInfo(leagueClanMap, clanTag, season, rounds) {
-      let roundNo = 1;
       for (const round of rounds) {
         const { warTags } = round;
 
@@ -370,7 +369,7 @@
           const targetClan = leagueClanMap.get(clan.tag);
           const clanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
 
-          if (targetClan.rounds.length < roundNo) {
+          if (isRoundNotExists(targetClan.rounds, clanRoundWarInfo)) {
             // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
             targetClan.rounds.push(clanRoundWarInfo);
           }
@@ -379,13 +378,17 @@
           swipeClanAndOpponent(opponentClanRoundWarInfo);
           const opponentClan = leagueClanMap.get(opponent.tag);
 
-          if (targetClan.rounds.length < roundNo) {
+          if (isRoundNotExists(opponentClan.rounds, opponentClanRoundWarInfo)) {
             // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
             opponentClan.rounds.push(opponentClanRoundWarInfo);
           }
         }
+      }
 
-        roundNo++;
+      function isRoundNotExists(rounds, roundWarInfo) {
+        // 라운드 전쟁 정보에 전쟁 시작/종료일시가 동일한 데이터로 중복 판단
+        const { startTime, endTime } = roundWarInfo
+        return !rounds.some(round => round.startTime === startTime && round.endTime === endTime)
       }
     }
 

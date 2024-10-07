@@ -82,7 +82,7 @@
       const { name, trophies, members } = team
       teamDetail.innerHTML = teamDetail.innerHTML
                                        .replace(/{TEAM_NAME}/, name)
-                                       .replace(/{TOTAL_TROPHIES}/, trophies);
+                                       .replace(/{TOTAL_TROPHIES}/, Number(trophies).toLocaleString());
 
       const tableTbody = teamDetail.querySelector('.table-tbody');
       for(const member of members) {

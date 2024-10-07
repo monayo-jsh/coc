@@ -30,7 +30,9 @@ public class EventTeamLegend {
     }
 
     public boolean isPassedEndDate() {
-        return LocalDateTime.now().isAfter(this.endDate);
+        // 종료 시간을 기준으로 1분 전까지만 갱신
+        LocalDateTime conditionEndDate = this.endDate.minusMinutes(1);
+        return LocalDateTime.now().isAfter(conditionEndDate);
     }
 
     public void finishEvent() {

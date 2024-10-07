@@ -34,7 +34,7 @@ public class EventUseCase {
     }
 
     @Transactional
-    public void processTeamLegendRecord() {
+    public void processForTeamLegendRecord() {
         // 최신 팀 전설내기 이벤트 정보를 조회한다.
         EventTeamLegend teamLegend = eventTeamLegendService.findLatestTeamLegend();
 
@@ -68,5 +68,10 @@ public class EventUseCase {
                 log.error("%s (%s) 정보 동기화 실패".formatted(member.getName(), member.getTag()), e);
             }
         }
+    }
+
+    @Transactional
+    public void processForTeamLegendRecordKeeping() {
+        eventTeamLegendService.saveCurrentTeamLegendRecord();
     }
 }

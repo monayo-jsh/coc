@@ -12,8 +12,14 @@ public class EventScheduler {
     private final EventUseCase eventUseCase;
 
     @Scheduled(fixedDelay = 1000 * 60)
-    public void processTeamLegendRecord() {
-        eventUseCase.processTeamLegendRecord();
+    public void processForTeamLegendRecord() {
+        // 팀 전설내기 분 단위 기록 갱신용
+        eventUseCase.processForTeamLegendRecord();
     }
 
+    @Scheduled(cron = "0 59 13 ? * *")
+    public void processForTeamLegendRecordKeeping() {
+        // 팀 전설내기 일별 기록 보관용 스케쥴러
+        eventUseCase.processForTeamLegendRecordKeeping();
+    }
 }

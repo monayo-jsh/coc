@@ -37,7 +37,20 @@
       return document.importNode(medalTemplate.content, true);
     }
 
-    function makeTeamElement(rank, team) {
+    function drawDifferenceChip(teamRow, rank) {
+      const diffElement = teamRow.querySelector('.chip.difference');
+
+      let icon = copyTemplateById('icon-arrow-down');
+      if (rank === 1) {
+        icon = copyTemplateById('icon-arrow-up');
+      } else {
+        diffElement.classList.add('bg-lightcoral');
+      }
+
+      diffElement.prepend(icon);
+    }
+
+    function makeTeamElement(rank, team, differenceTrophies) {
       const { name, trophies } = team;
 
       const teamTbodyTemplate = copyTemplateById('legend-team-tbody-template');
@@ -48,6 +61,7 @@
                                      .replace(/{RANK}/, rank)
                                      .replace(/{TEAM_NAME}/, name)
                                      .replace(/{TOTAL_TROPHIES}/, Number(trophies).toLocaleString())
+                                     .replace(/{DIFFERENCE_TROPHIES}/, Number(differenceTrophies).toLocaleString())
 
       teamRow.classList.add(`rank-${rank}`);
 
@@ -58,6 +72,9 @@
         rankTd.innerHTML = "";
         rankTd.appendChild(medalIcon);
       }
+
+      // 격차 아이콘 및 색상 설정
+      drawDifferenceChip(teamRow, rank);
 
       return teamTbody;
     }
@@ -93,15 +110,32 @@
       teamsElement.appendChild(teamDetail);
     }
 
+    function getDifferenceTrophies(rank, teams) {
+      if (rank === 1) {
+        // 1등은 2등과의 차이로 표현
+        if (teams.length > 2) {
+          // 2등이 존재할 경우
+          return teams[0].trophies - teams[1].trophies;
+        }
+
+        return 0; // 2등이 없는 경우
+      }
+
+      // 2등부터는 앞 팀과의 격차 표현
+      return teams[rank-2].trophies - teams[rank-1].trophies;
+    }
+
     function drawTeamLegendTeams(eventTeamLegendSection, teams) {
       if (!teams || !teams.length) return;
 
       const teamLegend = eventTeamLegendSection.querySelector('.team-legend');
       const rankingTable = teamLegend.querySelector('.rankings .table');
       const teamsElement = teamLegend.querySelector('.teams');
+      const sortedTeams = sortByTrophies(teams);
       let rank = 1;
-      for (const team of sortByTrophies(teams)) {
-        const teamElement = makeTeamElement(rank, team);
+      for (const team of sortedTeams) {
+        const differenceTrophies = getDifferenceTrophies(rank, sortedTeams);
+        const teamElement = makeTeamElement(rank, team, differenceTrophies);
         rankingTable.appendChild(teamElement);
         rank++;
 
@@ -183,6 +217,7 @@
             <th class="table-th">순위</th>
             <th class="table-th">팀 이름</th>
             <th class="table-th">팀 트로피</th>
+            <th class="table-th">격차</th>
           </tr>
           </thead>
         </table>
@@ -197,6 +232,11 @@
     <td class="table-td rank">{RANK}</td>
     <td class="table-td name">{TEAM_NAME}</td>
     <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TOTAL_TROPHIES}</div></td>
+    <td class="table-td">
+      <div class="td-wrap">
+        <div class="chip difference">{DIFFERENCE_TROPHIES}</div>
+      </div>
+    </td>
   </tr>
   </tbody>
 </template>
@@ -229,5 +269,11 @@
 </template>
 <template id="ranking-third-place-template">
   <i class="fa-solid fa-medal third-place"></i>
+</template>
+<template id="icon-arrow-up">
+  <i class="fa-solid fa-sort-up"></i>
+</template>
+<template id="icon-arrow-down">
+  <i class="fa-solid fa-sort-down"></i>
 </template>
 </html>

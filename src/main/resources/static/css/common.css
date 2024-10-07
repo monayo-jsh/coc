@@ -289,9 +289,14 @@ body::before {
   padding: 0 2px;
 }
 
+.bg-lightcoral {
+  background-color: lightcoral !important;
+  color: white !important;
+}
+
 .bg-gray {
-  background-color: gray;
-  color: white;
+  background-color: gray !important;
+  color: white !important;
 }
 
 .bg-yellowgreen {
@@ -304,13 +309,13 @@ body::before {
 }
 
 .bg-lightgray {
-  background-color: lightgray;
-  color: white;
+  background-color: lightgray !important;
+  color: white !important;
 }
 
 .bg-black {
-  background-color: black;
-  color: white;
+  background-color: black !important;
+  color: white !important;
 }
 
 .bg-black-2 {

@@ -131,6 +131,9 @@ body {
 
         .table-th {
           font-size: 16px;
+          font-weight: 800;
+          background-color: #0c770c;
+          color: white;
         }
 
         .table-td {
@@ -209,4 +212,23 @@ i.second-place {
 }
 i.third-place {
   color: #CD7F32;
+}
+
+i.fa-sort-up {
+  margin-right: 4px;
+  margin-top: 3px;
+}
+
+i.fa-sort-down {
+  margin-right: 4px;
+  margin-bottom: 3px;
+}
+
+.chip.difference {
+  display: flex;
+  align-items: center;
+  background-color: #48b448;
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
 }

@@ -52,6 +52,19 @@ public class PlayerScheduler {
         }
     }
 
+    @Scheduled(fixedDelay = 1000 * 10)
+    public void processForPlayerRecordKeeping() {
+        List<String> playerTags = playersService.findAllPlayersToRecord();
+        if (playerTags.isEmpty()) return;
+        for(String playerTag : playerTags) {
+            try {
+                playersService.updatePlayer(playerTag);
+            } catch (Exception e) {
+                log.error("플레이어 기록 보관 실패: %s".formatted(playerTag), e);
+            }
+        }
+    }
+
     @Scheduled(fixedDelay = 1000 * 60 * 5)
     public void syncPlayers() {
 

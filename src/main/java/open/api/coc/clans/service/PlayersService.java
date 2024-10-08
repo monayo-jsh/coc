@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.config.HallOfFameConfig;
@@ -25,12 +27,13 @@ import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.converter.ClanEntityConverter;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
-import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
 import open.api.coc.clans.database.entity.player.PlayerDonationStatEntity;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
 import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.database.entity.player.PlayerRecordEntity;
+import open.api.coc.clans.database.entity.player.PlayerRecordHistoryEntity;
 import open.api.coc.clans.database.entity.player.PlayerSpellEntity;
 import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
 import open.api.coc.clans.database.entity.player.common.WarPreferenceType;
@@ -43,9 +46,10 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryReposi
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
-import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.database.repository.player.PlayerDonationStatQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
+import open.api.coc.clans.database.repository.player.PlayerRecordHistoryRepository;
+import open.api.coc.clans.database.repository.player.PlayerRecordRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
@@ -88,6 +92,9 @@ public class PlayersService {
 
     private final PlayerRepository playerRepository;
     private final PlayerQueryRepository playerQueryRepository;
+
+    private final PlayerRecordRepository playerRecordRepository;
+    private final PlayerRecordHistoryRepository playerRecordHistoryRepository;
 
     private final PlayerDonationStatQueryRepository playerDonationStatQueryRepository;
 
@@ -299,6 +306,8 @@ public class PlayersService {
         Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
+        processRecordPlayer(player, playerEntity);
+
         try {
             // 마지막 지원/지원 받은 유닛 수 통계 누적을 위해 사용자 정보 갱신보다 선행 처리
             collectPlayerDonationStat(playerEntity, player);
@@ -317,6 +326,23 @@ public class PlayersService {
         modifyClan(playerEntity, player.getClan());
 
         return playerRepository.save(playerEntity);
+    }
+
+    private void processRecordPlayer(Player player, PlayerEntity playerEntity) {
+        // 기록 대상이 아닌 경우 기록하지 않음
+        if (player.isNotRecoding(playerEntity)) return;
+
+        Optional<PlayerRecordEntity> recordingPlayer = playerRecordRepository.findById(playerEntity.getPlayerTag());
+        if (recordingPlayer.isEmpty()) return;
+
+        // 플레이어 기록
+        PlayerRecordHistoryEntity recordHistoryEntity = PlayerRecordHistoryEntity.builder()
+                                                                                 .tag(playerEntity.getPlayerTag())
+                                                                                 .oldTrophies(playerEntity.getTrophies())
+                                                                                 .newTrophies(player.getTrophies())
+                                                                                 .build();
+
+        playerRecordHistoryRepository.save(recordHistoryEntity);
     }
 
     private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {
@@ -650,4 +676,13 @@ public class PlayersService {
         String season = getLeagueSeason();
         return playerDonationStatQueryRepository.findRankingDonationsReceivedBySeasonAndPage(season, PageRequest.of(0, hallOfFameConfig.getRanking()));
     }
+
+    @Transactional(readOnly = true)
+    public List<String> findAllPlayersToRecord() {
+        return playerRecordRepository.findAll()
+                                     .stream()
+                                     .map(PlayerRecordEntity::getTag)
+                                     .toList();
+    }
+
 }

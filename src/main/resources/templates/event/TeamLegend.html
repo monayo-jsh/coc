@@ -22,8 +22,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <!-- chartjs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chartjs -->
 
   <script type="text/javascript">
     dayjs.locale('ko')
@@ -205,10 +204,31 @@
         data: data,
         options: {
           plugins: {
+            title: {
+                display: true,
+                text: '일별 순위'
+            },
             legend: {
               display: true,
               position: 'top'
-            }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  const { dataset, dataIndex } = tooltipItem;
+                  const { label, data } = dataset;
+                  const { record } = data[dataIndex];
+                  const { dailyRank, trophies } = record;
+                  return `${dailyRank}. ${label} (${trophies.toLocaleString()})`;
+                }
+              },
+              itemSort: function(a, b) {
+                return a.raw.y - b.raw.y;
+              }
+            },
+          },
+          interaction: {
+            mode: 'index' // 동일 인덱스의 여러 데이터셋을 보여줌
           },
           scales: {
             y: {
@@ -251,7 +271,8 @@
         const { rankingDate, dailyRank } = record;
         return {
           x: rankingDate,
-          y: dailyRank
+          y: dailyRank,
+          record: record
         }
       }
 

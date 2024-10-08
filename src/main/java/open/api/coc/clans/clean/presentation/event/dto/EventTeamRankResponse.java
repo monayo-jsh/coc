@@ -15,7 +15,7 @@ public record EventTeamRankResponse(
     String teamName,
 
     @Schema(description = "팀 총 트로피")
-    Integer Trophies,
+    Integer trophies,
 
     @Schema(description = "기준일 순위")
     Integer dailyRank

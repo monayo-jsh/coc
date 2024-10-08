@@ -461,12 +461,12 @@ function toggleDisplay(element) {
   if (classList.contains('display-none')) {
     classList.remove('display-none');
 
-    return true
+    return true;
   }
 
   // invisible
   classList.add('display-none');
-  return false
+  return false;
 }
 
 function loadRequestBodyFromForm(formElement) {

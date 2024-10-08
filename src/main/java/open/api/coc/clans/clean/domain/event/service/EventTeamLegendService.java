@@ -8,6 +8,7 @@ import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
 import open.api.coc.clans.clean.domain.event.model.EventTeamMember;
 import open.api.coc.clans.clean.domain.event.repository.EventTeamLegendMemberRepository;
 import open.api.coc.clans.clean.domain.event.repository.EventTeamLegendRepository;
+import open.api.coc.clans.clean.presentation.event.dto.EventTeamRankResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,8 @@ public class EventTeamLegendService {
             throw new EventTeamLegendNotExistsException();
         }
 
-        return teamLegendRepository.findByStartDate(startDate);
+        return teamLegendRepository.findByStartDate(startDate)
+                                   .orElseThrow(() -> new EventTeamLegendNotExistsException(startDate));
     }
 
     @Transactional
@@ -47,5 +49,16 @@ public class EventTeamLegendService {
         if (allMembers.isEmpty()) return; // 참여자가 없으면 이력 생성 안해도 됨.
 
         teamLegendMemberRepository.saveRecordHistory(allMembers);
+    }
+
+    @Transactional(readOnly = true)
+    public EventTeamLegend findById(Long eventId) {
+        return teamLegendRepository.findById(eventId)
+                                   .orElseThrow(() -> new EventTeamLegendNotExistsException(eventId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<EventTeamRankResponse> findAllTeamLegendDailyRankingsByIds(List<Long> teamIds) {
+        return teamLegendMemberRepository.findAllTeamLegendDailyRankingsByIds(teamIds);
     }
 }

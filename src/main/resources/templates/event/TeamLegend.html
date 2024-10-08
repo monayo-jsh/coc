@@ -22,6 +22,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+  <!-- chartjs -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <script type="text/javascript">
     dayjs.locale('ko')
     //dayjs duration 확장
@@ -126,6 +129,7 @@
       return teams[rank-2].trophies - teams[rank-1].trophies;
     }
 
+    let SORTED_TEAMS;
     function drawTeamLegendTeams(eventTeamLegendSection, teams) {
       if (!teams || !teams.length) return;
 
@@ -133,6 +137,9 @@
       const rankingTable = teamLegend.querySelector('.rankings .table');
       const teamsElement = teamLegend.querySelector('.teams');
       const sortedTeams = sortByTrophies(teams);
+
+      SORTED_TEAMS = sortedTeams; // 참조용 데이터셋
+
       let rank = 1;
       for (const team of sortedTeams) {
         const differenceTrophies = getDifferenceTrophies(rank, sortedTeams);
@@ -166,11 +173,14 @@
       const drawTargetElement = document.querySelector(`.${targetClassName}`);
       const teamLegendEventElement = makeTeamLegendEventElement(teamLegend);
       drawTargetElement.appendChild(teamLegendEventElement);
+
+      drawEventTeamLegendDailyRanking(teamLegend.id);
     }
 
     async function drawEventTeamLegend() {
       const targetClassName = 'event-team-legend';
       const latestTeamLegend = await fetchLatestTeamLegendEvent();
+
       renderTeamLegend(targetClassName, latestTeamLegend);
     }
 
@@ -178,9 +188,87 @@
       return document.querySelector(`.${targetClassName}`);
     }
 
+    async function drawEventTeamLegendDailyRanking(eventId) {
+      const dailyRankings = await fetchTeamLegendDailyRanking(eventId);
+
+      if (!dailyRankings || !dailyRankings.length) return;
+
+      renderRankingChart('daily-ranking', dailyRankings);
+    }
+
+    function renderRankingChart(canvasId, rankings) {
+      const context = document.getElementById(canvasId);
+
+      const data = makeChartDataset(rankings);
+      new Chart(context, {
+        type: 'line',
+        data: data,
+        options: {
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              reverse: true,
+              ticks: {
+                stepSize: 1
+              }
+            },
+          }
+        }
+      });
+
+      toggleDisplay(context);
+    }
+    function makeChartDataset(rows) {
+      const teamMap = convertArrayToMapByKey(rows, 'teamName', true);
+
+      const dataset = [];
+
+      for(const team of SORTED_TEAMS) {
+        const dailyRecords = teamMap.get(team.name);
+        const sortedRecords = dailyRecords.sort((a, b) => a.rankingDate - b.rankingDate);
+        const teamDataset = {
+          label: team.name,
+          data: sortedRecords.map(convertRecord),
+          fill: false,
+          borderColor: getColor(team.id),
+          backgroundColor: getColor(team.id),
+          tension: 0.1
+        }
+
+        dataset.push(teamDataset);
+      }
+
+      return {
+        datasets: dataset
+      }
+
+      function convertRecord(record) {
+        const { rankingDate, dailyRank } = record;
+        return {
+          x: rankingDate,
+          y: dailyRank
+        }
+      }
+
+      function getColor(teamId) {
+        switch (teamId) {
+          case 1: return 'rgb(255,0,0)';
+          case 2: return 'rgb(255,107,0)';
+          case 3: return 'rgb(255,181,0)';
+          case 4: return 'rgb(72,157,0)';
+        }
+        return "";
+      }
+    }
+
     window.onload = async () => {
       // 이벤트 : 팀 전설내기
-      drawEventTeamLegend();
+      await drawEventTeamLegend();
     }
   </script>
 
@@ -224,6 +312,9 @@
         </table>
       </div>
       <div class="teams"></div>
+      <div class="ranking-chart">
+        <canvas id="daily-ranking" class="display-none"></canvas>
+      </div>
     </div>
   </div>
 </template>

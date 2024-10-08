@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.infrastructure.event.persistence.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.event.model.EventTeam;
 import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
@@ -33,9 +34,15 @@ public class EventTeamLegendDatabaseService implements EventTeamLegendRepository
     }
 
     @Override
-    public EventTeamLegend findByStartDate(LocalDateTime startDate) {
-        EventEntity teamLegendEntity = eventCustomRepository.findByStartDate(startDate);
-        return eventEntityMapper.toEventTeamLegend(teamLegendEntity);
+    public Optional<EventTeamLegend> findById(Long eventId) {
+        return jpaEventRepository.findById(eventId)
+                                 .map(eventEntityMapper::toEventTeamLegend);
+    }
+
+    @Override
+    public Optional<EventTeamLegend> findByStartDate(LocalDateTime startDate) {
+        return eventCustomRepository.findByStartDate(startDate)
+                                    .map(eventEntityMapper::toEventTeamLegend);
     }
 
     @Override

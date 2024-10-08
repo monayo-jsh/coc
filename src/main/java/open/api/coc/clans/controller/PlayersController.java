@@ -3,8 +3,10 @@ package open.api.coc.clans.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.repository.player.PlayerRecordHistoryRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
+import open.api.coc.clans.domain.players.PlayerRecordResponse;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.domain.players.SupportPlayerBulkRequest;
@@ -12,6 +14,9 @@ import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import open.api.coc.clans.service.PlayersService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayersController {
 
     private final PlayersService playersService;
+    private final PlayerRecordHistoryRepository playerRecordHistoryRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<PlayerResponse>> getAllPlayer() {
@@ -142,5 +148,12 @@ public class PlayersController {
     public ResponseEntity<List<RankingHallOfFameDTO>> getRankingDonationsReceived() {
         return ResponseEntity.ok()
                              .body(playersService.getRankingDonationsReceived());
+    }
+
+    @GetMapping("/{playerTag}/record/history")
+    public ResponseEntity<List<PlayerRecordResponse>> getPlayerRecordHistory(@PathVariable String playerTag) {
+        Pageable pageable = PageRequest.of(0, 20).withSort(Sort.by("recordedAt").descending());
+        return ResponseEntity.ok()
+                             .body(playerRecordHistoryRepository.findAllById(playerTag, pageable));
     }
 }

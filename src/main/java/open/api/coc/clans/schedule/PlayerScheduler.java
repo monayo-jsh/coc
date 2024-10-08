@@ -52,7 +52,7 @@ public class PlayerScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    @Scheduled(cron = "0/10 * * * * *")  // 매 10초마다
     public void processForPlayerRecordKeeping() {
         List<String> playerTags = playersService.findAllPlayersToRecord();
         if (playerTags.isEmpty()) return;

@@ -8,6 +8,7 @@ import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
 import open.api.coc.clans.clean.domain.event.model.EventTeamMember;
 import open.api.coc.clans.clean.domain.event.repository.EventTeamLegendMemberRepository;
 import open.api.coc.clans.clean.domain.event.repository.EventTeamLegendRepository;
+import open.api.coc.clans.clean.presentation.event.dto.EventTeamRankResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,8 +57,8 @@ public class EventTeamLegendService {
                                    .orElseThrow(() -> new EventTeamLegendNotExistsException(eventId));
     }
 
-//    @Transactional(readOnly = true)
-//    public List<EventTeamMemberHistory> findLastTeamMemberHistory(List<Long> teamIds) {
-//        return teamLegendMemberRepository.findByMemberHistory(teamIds);
-//    }
+    @Transactional(readOnly = true)
+    public List<EventTeamRankResponse> findAllTeamLegendDailyRankingsByIds(List<Long> teamIds) {
+        return teamLegendMemberRepository.findAllTeamLegendDailyRankingsByIds(teamIds);
+    }
 }

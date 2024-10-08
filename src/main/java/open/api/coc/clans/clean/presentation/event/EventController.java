@@ -11,7 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.event.EventUseCase;
 import open.api.coc.clans.clean.presentation.event.dto.EventTeamLegendResponse;
-import open.api.coc.clans.clean.presentation.event.dto.EventTeamMemberResponse;
+import open.api.coc.clans.clean.presentation.event.dto.EventTeamRankResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,16 +42,16 @@ public class EventController {
     }
 
     @Operation(
-        summary = "팀 전설내기 참여자 마지막 기록 정보를 조회합니다. version: 1.00, Last Update: 24.10.7",
-        description = "이 API는 팀 전설내기 참여자 마지막 기록 정보를 조회합니다."
+        summary = "팀 전설내기 일별 순위 기록 정보를 조회합니다. version: 1.00, Last Update: 24.10.7",
+        description = "이 API는 팀 전설내기 일별 순위 기록 정보를 조회합니다."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventTeamMemberResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EventTeamRankResponse.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @GetMapping("/team/legend/{eventId}/record/history")
-    public ResponseEntity<List<EventTeamMemberResponse>> getTeamLegendHistoryRecordHistory(@PathVariable Long eventId) {
+    @GetMapping("/team/legend/{eventId}/daily/ranking")
+    public ResponseEntity<List<EventTeamRankResponse>> getTeamLegendDailyRankings(@PathVariable Long eventId) {
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(eventUseCase.getTeamLegendMemberRecordHistoryLatest(eventId));
+                             .body(eventUseCase.getTeamLegendDailyRankings(eventId));
     }
 }

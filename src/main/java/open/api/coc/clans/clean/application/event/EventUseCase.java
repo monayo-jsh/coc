@@ -1,6 +1,5 @@
 package open.api.coc.clans.clean.application.event;
 
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +9,7 @@ import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
 import open.api.coc.clans.clean.domain.event.model.EventTeamMember;
 import open.api.coc.clans.clean.domain.event.service.EventTeamLegendService;
 import open.api.coc.clans.clean.presentation.event.dto.EventTeamLegendResponse;
-import open.api.coc.clans.clean.presentation.event.dto.EventTeamMemberResponse;
+import open.api.coc.clans.clean.presentation.event.dto.EventTeamRankResponse;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.stereotype.Service;
@@ -79,15 +78,14 @@ public class EventUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<EventTeamMemberResponse> getTeamLegendMemberRecordHistoryLatest(Long eventId) {
+    public List<EventTeamRankResponse> getTeamLegendDailyRankings(Long eventId) {
         // 이벤트 전설내기를 조회한다.
         EventTeamLegend eventTeamLegend = eventTeamLegendService.findById(eventId);
 
         // 참여 팀 아이디 목록을 구한다.
         List<Long> teamIds = eventTeamLegend.getTeams().stream().map(EventTeam::getId).toList();
 
-        // 참여팀의 참여자들의 기록된 마지막 점수를 조회한다.
-//        List<EventTeamMemberHistory> memberHistories = eventTeamLegendService.findLastTeamMemberHistory(teamIds);
-        return Collections.emptyList();
+        // 참여팀의 일별 결과를 조회한다.
+        return eventTeamLegendService.findAllTeamLegendDailyRankingsByIds(teamIds);
     }
 }

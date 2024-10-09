@@ -333,6 +333,7 @@ public class PlayersService {
         // 기록 대상이 아닌 경우 기록하지 않음
         if (player.isNotRecoding(playerEntity)) return;
 
+        // 기록 대상 플레이어 검증
         Optional<PlayerRecordEntity> recordingPlayer = playerRecordRepository.findById(playerEntity.getPlayerTag());
         if (recordingPlayer.isEmpty()) return;
 

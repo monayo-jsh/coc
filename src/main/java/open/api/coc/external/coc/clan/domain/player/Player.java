@@ -50,17 +50,17 @@ public class Player {
     private List<Troops> spells;
 
     public boolean isRecoding(PlayerEntity playerEntity) {
-        // 공격 성공 수치 다른 경우
+        // 공격 성공 수치 다른 경우 기록
         if (!Objects.equals(this.attackWins, playerEntity.getAttackWins())) return true;
 
-        // 방어 성공 수치 다른 경우
+        // 방어 성공 수치 다른 경우 기록
         if (!Objects.equals(this.defenseWins, playerEntity.getDefenseWins())) return true;
 
-        // 트로피 점수 다른 경우
+        // 트로피 점수 다른 경우 기록
         if (!Objects.equals(this.trophies, playerEntity.getTrophies())) return true;
 
 
-        // 시즌 트로피 백업 시간 범위
+        // 시즌 트로피 백업 시간 범위에 포함되면 기록
         LocalTime now = LocalTime.now();
         LocalTime start = LocalTime.of(13, 59, 50); // 13:59:50
         LocalTime end = LocalTime.of(14, 0, 0);     // 14:00:00

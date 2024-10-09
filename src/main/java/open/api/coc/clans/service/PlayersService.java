@@ -131,8 +131,9 @@ public class PlayersService {
                          .toList();
     }
 
-    public List<PlayerEntity> findAllPlayerEntities() {
-        return playerQueryRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<PlayerEntity> findAllWithoutRecordTarget() {
+        return playerQueryRepository.findAllWithoutRecordTarget();
     }
 
     public List<PlayerResponse> findAllPlayers() {

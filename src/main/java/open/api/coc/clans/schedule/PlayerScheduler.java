@@ -52,8 +52,12 @@ public class PlayerScheduler {
         }
     }
 
-    @Scheduled(cron = "0/10 * * * * *")  // 매 10초마다
+    @Scheduled(fixedDelay = 1000 * 10)  // 매 10초마다
     public void processForPlayerRecordKeeping() {
+        if (isNotCollectionTime()) {
+            return;
+        }
+
         List<String> playerTags = playersService.findAllPlayersToRecord();
         if (playerTags.isEmpty()) return;
         for(String playerTag : playerTags) {
@@ -84,7 +88,8 @@ public class PlayerScheduler {
 
     private void processSyncPlayers() {
 
-        List<PlayerEntity> players = playersService.findAllPlayerEntities();
+        // 플레이어 기록 설정되지 않은 플레이어를 대상으로 갱신
+        List<PlayerEntity> players = playersService.findAllWithoutRecordTarget();
 
         final int offset = 50;
         for (int fromIndex = 0; fromIndex < players.size(); fromIndex += offset) {

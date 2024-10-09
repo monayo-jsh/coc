@@ -4,6 +4,7 @@ import static open.api.coc.clans.clean.infrastructure.league.persistence.entity.
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
+import static open.api.coc.clans.database.entity.player.QPlayerRecordEntity.playerRecordEntity;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -80,5 +81,13 @@ public class PlayerQueryRepository {
                            .set(playerEntity.donations, 0)
                            .set(playerEntity.donationsReceived, 0)
                            .execute();
+    }
+
+    public List<PlayerEntity> findAllWithoutRecordTarget() {
+        return queryFactory.select(playerEntity)
+                           .from(playerEntity)
+                           .leftJoin(playerRecordEntity).on(playerRecordEntity.tag.eq(playerEntity.playerTag))
+                           .where(playerRecordEntity.tag.isNull())
+                           .fetch();
     }
 }

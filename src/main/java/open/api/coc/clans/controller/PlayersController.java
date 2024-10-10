@@ -154,6 +154,12 @@ public class PlayersController {
                              .body(playersService.getRankingDonationsReceived());
     }
 
+    @GetMapping("/legend/record")
+    public ResponseEntity<List<String>> getLegendRecordPlayers() {
+        return ResponseEntity.ok()
+                             .body(playersService.findAllPlayersToRecord());
+    }
+
     @GetMapping("/{playerTag}/legend/record")
     public ResponseEntity<List<PlayerRecordResponse>> getPlayerLegendRecord(@PathVariable String playerTag) {
         List<LocalDate> seasonEndDates = jpaSeasonEndManagementCustomRepository.findLatestSeasonEndDate(2);

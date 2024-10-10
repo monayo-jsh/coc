@@ -224,7 +224,7 @@
     }
 
     window.onload = async () => {
-      const playerTags = ["#JU0PUPPG", "#QJJRPPGCR"];
+      const playerTags = await fetchAllLegendRecordPlayers();
 
       for (const playerTag of playerTags) {
         await drawLegendRecord(playerTag);

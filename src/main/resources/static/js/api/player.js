@@ -8,6 +8,7 @@ const URI_PLAYERS_ALL_TAGS = '/players/all/tags'; //전체 클랜원 태그 조�
 const URI_PLAYERS_REALTIME = '/players/{playerTag}'; //멤버 상세 조회 (항시 실연동)
 const URI_PLAYERS_DETAIL = '/players/{playerTag}'; //멤버 등록,삭제
 
+const URI_PLAYERS_TAGS_LEGEND_RECORD = '/players/legend/record'; // 플레이어 전설 기록 플레이어 태그 목록 조회
 const URI_PLAYERS_LEGEND_RECORD = '/players/{playerTag}/legend/record'; // 플레이어 전설 기록 조회
 
 const URI_PLAYERS_SUPPORT_ALL = '/players/support/all'; //지원 계정 목록 조회
@@ -38,6 +39,18 @@ async function fetchPlayerLegendRecord(playerTag) {
   const uri = `${URI_PLAYERS_LEGEND_RECORD.replace(/{playerTag}/, encodeURIComponent(playerTag))}`;
 
   return await axios.get(uri)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchAllLegendRecordPlayers() {
+  return await axios.get(URI_PLAYERS_TAGS_LEGEND_RECORD)
                     .then(response => {
                       const { data } = response
                       return data;

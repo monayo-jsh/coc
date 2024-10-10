@@ -1,6 +1,5 @@
 package open.api.coc.external.coc.clan.domain.player;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
@@ -58,15 +57,6 @@ public class Player {
 
         // 트로피 점수 다른 경우 기록
         if (!Objects.equals(this.trophies, playerEntity.getTrophies())) return true;
-
-
-        // 시즌 트로피 백업 시간 범위에 포함되면 기록
-        LocalTime now = LocalTime.now();
-        LocalTime start = LocalTime.of(13, 59, 50); // 13:59:50
-        LocalTime end = LocalTime.of(14, 0, 0);     // 14:00:00
-        if (!now.isBefore(start) && !now.isAfter(end)) {
-            return true;
-        }
 
         // 그 외는 기록하지 않음
         return false;

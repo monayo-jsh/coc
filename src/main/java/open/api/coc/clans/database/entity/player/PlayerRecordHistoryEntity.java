@@ -6,6 +6,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -21,7 +22,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
-    name = "tb_player_record_history"
+    name = "tb_player_record_history",
+    indexes = {
+        @Index(name = "idx_record_history_tag_recorded_at", columnList = "tag, recorded_at")
+    }
 )
 @Comment("플레이어 기록 이력 테이블")
 public class PlayerRecordHistoryEntity {

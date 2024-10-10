@@ -232,6 +232,30 @@ function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
 }
 
+// 주어진 시간으로부터 현재 시간까지의 차이를 분 단위로 계산
+function getMinutesDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+   // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'minute'));
+}
+
+// 주어진 시간으로부터 현재 시간까지의 차이를 시간 단위로 계산
+function getHoursDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+  // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'hour'));
+}
+
+// 주어진 시간으로부터 현재 시간까지의 차이를 일 단위로 계산
+function getDaysDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+  // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'day'));
+}
+
 function toastMessage(message){
   if (!Toastify) return;
 

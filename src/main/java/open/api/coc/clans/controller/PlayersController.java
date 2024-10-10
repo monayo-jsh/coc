@@ -1,8 +1,12 @@
 package open.api.coc.clans.controller;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
 import open.api.coc.clans.database.repository.player.PlayerRecordHistoryRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
@@ -14,9 +18,6 @@ import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import open.api.coc.clans.service.PlayersService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayersController {
 
     private final PlayersService playersService;
+
+    // 추 후 리팩토링하면서 제거 예정
+    private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
     private final PlayerRecordHistoryRepository playerRecordHistoryRepository;
 
     @GetMapping("/all")
@@ -150,10 +154,13 @@ public class PlayersController {
                              .body(playersService.getRankingDonationsReceived());
     }
 
-    @GetMapping("/{playerTag}/record/history")
-    public ResponseEntity<List<PlayerRecordResponse>> getPlayerRecordHistory(@PathVariable String playerTag) {
-        Pageable pageable = PageRequest.of(0, 20).withSort(Sort.by("recordedAt").descending());
+    @GetMapping("/{playerTag}/legend/record")
+    public ResponseEntity<List<PlayerRecordResponse>> getPlayerLegendRecord(@PathVariable String playerTag) {
+        List<LocalDate> seasonEndDates = jpaSeasonEndManagementCustomRepository.findLatestSeasonEndDate(2);
+        LocalTime seasonTime = LocalTime.of(14, 0, 0);
+        LocalDateTime endDateTime = LocalDateTime.of(seasonEndDates.get(0), seasonTime);
+        LocalDateTime startDateTime = LocalDateTime.of(seasonEndDates.get(1), seasonTime);
         return ResponseEntity.ok()
-                             .body(playerRecordHistoryRepository.findAllById(playerTag, pageable));
+                             .body(playerRecordHistoryRepository.findAllById(playerTag, startDateTime, endDateTime));
     }
 }

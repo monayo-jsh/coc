@@ -4,6 +4,7 @@ import static open.api.coc.clans.clean.infrastructure.season.entity.QSeasonEndMa
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -26,4 +27,11 @@ public class JpaSeasonEndManagementCustomRepository {
         return Optional.ofNullable(seasonEndDate);
     }
 
+    public List<LocalDate> findLatestSeasonEndDate(int count) {
+        return queryFactory.select(seasonEndManagementEntity.endDate)
+                           .from(seasonEndManagementEntity)
+                           .orderBy(seasonEndManagementEntity.endDate.desc())
+                           .limit(count)
+                           .fetch();
+    }
 }

@@ -14,14 +14,22 @@ public class NormalViewController {
         return "Home";
     }
 
+    /** 명예의 전당 */
     @GetMapping("/hall-of-fame")
     public String hallOfFame() {
         return "HallOfFame";
     }
 
+    /** 팀 전설내기 이벤트 */
     @GetMapping("/event/team/legend")
     public String event() {
         return "event/TeamLegend";
+    }
+
+    /** 전설 기록 확인용 */
+    @GetMapping("/test/legend/record")
+    public String playerLegendRecord() {
+        return "player/legendRecord";
     }
 
     /** 클랜원 목록 */

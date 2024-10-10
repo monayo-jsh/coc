@@ -25,7 +25,13 @@ body {
   }
 }
 
+.information {
+  display: flex;
+  justify-content: center;
+}
+
 .description {
+  width: fit-content;
   margin-top: 5px;
   padding: 5px 15px;
   font-size: 12px;
@@ -40,6 +46,13 @@ body {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
+  gap: 10px;
+}
+
+.player-legend-wrapper {
+  padding: 10px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
 }
 
 .player-name {
@@ -51,11 +64,14 @@ body {
 .player-records {
   width: 870px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  overflow-y: auto;
 
   @media (max-width: 870px) {
     width: 380px;
+  }
+
+  @media (max-width: 380px) {
+    width: 320px;
   }
 }
 

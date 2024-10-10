@@ -29,11 +29,22 @@
     //dayjs duration 확장
     dayjs.extend(dayjs_plugin_duration)
 
-    function renderRankingChart(canvasId, rankings) {
-      const context = document.getElementById(canvasId);
+    function makeChartDataset(rows) {
+      const sortedRows = rows.sort((a, b) => new Date(a.x) - new Date(b.x));
+      return {
+        datasets: [{
+          data: sortedRows,
+          fill: false,
+          backgroundColor: 'rgb(255,107,0)',
+          borderColor: 'rgb(255,107,0)',
+          tension: 0.1
+        }]
+      }
+    }
+    function renderRecordChart(canvas, rows) {
+      const data = makeChartDataset(rows);
 
-      const data = makeChartDataset(rankings);
-      new Chart(context, {
+      new Chart(canvas, {
         type: 'line',
         data: data,
         options: {
@@ -42,90 +53,13 @@
                 display: true,
                 text: "일자별 순위 그래프"
             },
-            subtitle: {
-              display: true,
-              text: "아래의 팀명을 선택해서 팀별 그래프를 확인할 수 있습니다"
-            },
             legend: {
-              display: true,
+              display: false,
               position: 'top'
-            },
-            tooltip: {
-              callbacks: {
-                // 툴팁 라벨 사용자화
-                label: function(tooltipItem) {
-                  const { dataset, dataIndex } = tooltipItem;
-                  const { label, data } = dataset;
-                  const { record } = data[dataIndex];
-                  const { dailyRank, trophies } = record;
-                  return `${dailyRank}. ${label} (${trophies.toLocaleString()})`;
-                }
-              },
-              // 툴팁 정렬
-              itemSort: function(a, b) {
-                return a.raw.y - b.raw.y;
-              }
-            },
-          },
-          interaction: {
-            mode: 'index' // 동일 인덱스의 여러 데이터셋을 보여줌
-          },
-          scales: {
-            y: {
-              reverse: true,
-              ticks: {
-                stepSize: 1
-              }
-            },
+            }
           }
         }
       });
-
-      toggleDisplay(context);
-    }
-    function makeChartDataset(rows) {
-      const teamMap = convertArrayToMapByKey(rows, 'teamName', true);
-
-      const dataset = [];
-
-      for(const team of SORTED_TEAMS) {
-        const dailyRecords = teamMap.get(team.name);
-        const sortedRecords = dailyRecords.sort((a, b) => a.rankingDate - b.rankingDate);
-        const teamDataset = {
-          label: team.name,
-          data: sortedRecords.map(convertRecord),
-          fill: false,
-          borderColor: getColor(team.id),
-          backgroundColor: getColor(team.id),
-          tension: 0.1
-        }
-
-        dataset.push(teamDataset);
-      }
-
-      return {
-        datasets: dataset
-      }
-
-      function convertRecord(record) {
-        const { rankingDate, dailyRank } = record;
-        const displayDate = dayjs(rankingDate).add(-1, 'day');
-        return {
-          x: formatYYMMDD(displayDate),
-          y: dailyRank,
-          record: record
-        }
-      }
-
-      function getColor(teamId) {
-        switch (teamId) {
-          case 1: return 'rgb(255,0,0)';
-          case 2: return 'rgb(255,107,0)';
-          case 3: return 'rgb(255,181,0)';
-          case 4: return 'rgb(72,157,0)';
-        }
-        return "";
-      }
     }
 
     function makeRecord(record) {
@@ -205,10 +139,27 @@
       targetElement.appendChild(playerLegendRecordElement);
     }
 
+    function renderLegendRecordChart(playerLegend, playerTag, chartDataset) {
+
+      const recordChartTemplate = copyTemplateById('record-chart-template');
+      const recordChart = recordChartTemplate.querySelector('.record-history-chart');
+      const canvas = recordChart.querySelector('canvas');
+
+      canvas.id = removeHashTag(playerTag);
+
+      renderRecordChart(canvas, chartDataset);
+
+      const targetElement = playerLegend.querySelector('.record-chart');
+      targetElement.appendChild(canvas);
+    }
+
     async function drawLegendRecord(playerTag) {
       const legendRecords = await fetchPlayerLegendRecord(playerTag);
 
       if (!legendRecords.length) return;
+
+      // chart dataset initial
+      const chartDataset = [];
 
       const playerLegendTemplate = copyTemplateById('player-legend-template');
       const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
@@ -217,10 +168,22 @@
       const recordMap = convertArrayToMapByKey(legendRecords, 'baseDate', true);
       for(const [baseDate, records] of recordMap) {
         renderLegendRecord(playerLegend, baseDate, records);
+        addChartDataset(chartDataset, baseDate, records);
       }
+
+      renderLegendRecordChart(playerLegend, playerTag, chartDataset);
 
       const targetElement = document.querySelector('.legend-record-wrapper');
       targetElement.appendChild(playerLegend);
+
+      function addChartDataset(chartDataset, baseDate, records) {
+        const [latest] = records;
+        const { newTrophies } = latest;
+        chartDataset.push({
+          x: baseDate,
+          y: newTrophies
+        })
+      }
     }
 
     window.onload = async () => {
@@ -302,6 +265,15 @@
   <div class="player-legend-wrapper">
     <div class="player-name">{PLAYER_NAME}</div>
     <div class="player-records"></div>
+    <div class="information">
+      <div class="description"><span class="color-red">* 가로스크롤을 통해 이전 기록을 확인할 수 있습니다</span></div>
+    </div>
+    <div class="record-chart"></div>
+  </div>
+</template>
+<template id="record-chart-template">
+  <div class="record-history-chart">
+    <canvas></canvas>
   </div>
 </template>
 </html>

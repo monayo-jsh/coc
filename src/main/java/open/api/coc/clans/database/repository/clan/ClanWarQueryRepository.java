@@ -249,8 +249,9 @@ public class ClanWarQueryRepository {
         return clanWarRepository.save(clanWarEntity);
     }
 
-    public Optional<ClanWarEntity> findByClanWarTag(String warTag) {
+    public Optional<ClanWarEntity> findByClanTagAndWarTag(String clanTag, String warTag) {
         BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.clanTag.eq(clanTag));
         condition.and(clanWarEntity.warTag.eq(warTag));
 
         ClanWarEntity clanWar = queryFactory.selectFrom(clanWarEntity)

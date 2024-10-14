@@ -111,7 +111,7 @@ public class ClanCapitalRaid {
     }
 
     public boolean isNotEnded() {
-        return Objects.equals(this.state, "ended");
+        return !Objects.equals(this.state, "ended");
     }
 
     public void assignIdIfAbsent(Long id) {

@@ -142,15 +142,25 @@
       let endTrophies = records[0].newTrophies;
 
       let resultTrophies = endTrophies - startTrophies;
+
+      let displayResultTrophies = resultTrophies;
       if (resultTrophies >= 0) {
-        resultTrophies = `+${resultTrophies}`
+        displayResultTrophies = `+${resultTrophies}`
       }
 
       playerLegendRecordElement.innerHTML = playerLegendRecordElement.innerHTML
                                                                      .replace(/{RECORD_DATE}/, baseDate)
                                                                      .replace(/{START_TROPHIES}/, Number(startTrophies).toLocaleString())
                                                                      .replace(/{END_TROPHIES}/, Number(endTrophies).toLocaleString())
-                                                                     .replace(/{RECORD_RESULT_TROPHIES}/, String(resultTrophies));
+                                                                     .replace(/{RECORD_RESULT_TROPHIES}/, String(displayResultTrophies));
+
+      const summaryElement = playerLegendRecordElement.querySelector('.result.summary');
+      if (resultTrophies > 0) {
+        summaryElement.classList.add('bg-green');
+      } else if (resultTrophies < 0) {
+        summaryElement.classList.add('bg-crimson');
+      }
+
 
       targetElement.appendChild(playerLegendRecordElement);
     }
@@ -247,7 +257,7 @@
 
     <div class="players">
       <div class="radio-inputs filter">
-
+        
       </div>
     </div>
 
@@ -275,17 +285,17 @@
 <template id="player-legend-record-template">
   <div class="player-record">
 
-    <div class="summary">
+    <div class="result summary">
       <span class="label">{RECORD_DATE}</span>
       <div class="count">{RECORD_RESULT_TROPHIES}<div class="icon trophies"></div></div>
     </div>
 
     <div class="wrap display-flex justify-content-space-between">
-      <div class="summary">
+      <div class="summary bg-black">
           <div class="label">시작</div>
           <div class="count">{START_TROPHIES}<div class="icon trophies"></div></div>
       </div>
-      <div class="summary">
+      <div class="summary bg-black">
         <div class="label">종료</div>
         <div class="count">{END_TROPHIES}<div class="icon trophies"></div></div>
       </div>
@@ -294,17 +304,17 @@
     <div class="detail">
 
       <table class="table attack">
-        <caption class="table-caption summary">
+        <caption class="table-caption summary bg-black">
           <span class="label">공격</span>
-          <div class="count">{ATTACK_TOTAL_TROPHIES} <div class="icon trophies"></div></div>
+          <div class="attack-total count">{ATTACK_TOTAL_TROPHIES} <div class="icon trophies"></div></div>
         </caption>
         <tbody class="table-tbody"></tbody>
       </table>
 
       <table class="table defence">
-        <caption class="table-caption summary">
+        <caption class="table-caption summary bg-black">
           <span class="label">방어</span>
-          <div class="count">{DEFENCE_TOTAL_TROPHIES}<div class="icon trophies"></div></div>
+          <div class="defence-total count">{DEFENCE_TOTAL_TROPHIES}<div class="icon trophies"></div></div>
         </caption>
         <tbody class="table-tbody"></tbody>
       </table>
@@ -317,7 +327,7 @@
   <div class="player-legend-wrapper display-none">
     <div class="player-name">{PLAYER_NAME}</div>
     <div class="information">
-      <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기됩니다.</span></div>
+      <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기되므로 차이가 있을 수 있습니다.</span></div>
     </div>
     <div class="player-records"></div>
     <div class="information">

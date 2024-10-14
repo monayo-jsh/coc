@@ -327,43 +327,43 @@ body::before {
 }
 
 .bg-pink {
-  background-color: #e87186;
-  color: white;
+  background-color: #e87186 !important;
+  color: white !important;
 }
 
 .bg-gold {
-  background-color: #a18700;
-  color: #ffef9c;
+  background-color: #a18700 !important;
+  color: #ffef9c !important;
 }
 
 .bg-forestgreen {
-  background-color: forestgreen;
-  color: white;
+  background-color: forestgreen !important;
+  color: white !important;
 }
 
 .bg-red {
-  background-color: red;
-  color: white;
+  background-color: red !important;
+  color: white !important;
 }
 
 .bg-crimson {
-  background-color: crimson;
-  color: white;
+  background-color: crimson !important;
+  color: white !important;
 }
 
 .bg-orange {
-  background-color: #ff9800;
-  color: white;
+  background-color: #ff9800 !important;
+  color: white !important;
 }
 
 .bg-blue {
-  background-color: #4687f0;
-  color: white;
+  background-color: #4687f0 !important;
+  color: white !important;
 }
 
 .bg-green {
-  background-color: green;
-  color: white;
+  background-color: green !important;
+  color: white !important;
 }
 
 .search {

@@ -90,15 +90,9 @@
                                                        .replace(/{CAPITAL_HALL_LEVEL}/, capitalHallLevel);
     }
 
-    async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClan(capitalClan.tag);
+    function renderCapital(capitalCardElement, capitalClan) {
 
-      if (!Object.keys(clan).length) {
-        renderFailed(capitalCardElement);
-        return;
-      }
-
-      const { capitalLeague, clanCapital, clanCapitalPoints } = clan;
+      const { capitalLeague, clanCapital, clanCapitalPoints } = capitalClan;
 
       renderCapitalLeagueIcon(capitalLeague, capitalCardElement);
       renderCapitalHallLevel(clanCapital, capitalCardElement);
@@ -248,7 +242,7 @@
 
       capitalRaidElement.appendChild(capitalCardElement);
 
-      await renderCapital(capitalCardElement, capitalClan);
+      renderCapital(capitalCardElement, capitalClan);
       await renderCapitalSeason(capitalCardElement, capitalClan);
 
       capitalCardElement.querySelector('.row.loader').classList.add('display-none');

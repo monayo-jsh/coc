@@ -190,7 +190,7 @@ public class ClansService {
 
         // 클랜 리그전 정보 현행화
         List<ClanEntity> toUpdateEntities = clans.stream()
-                                                 .map(clan -> changeClanWarLeagueName(clan, clanEntityMap))
+                                                 .map(clan -> changeClanInfo(clan, clanEntityMap))
                                                  .filter(Objects::nonNull)
                                                  .toList();
 
@@ -201,10 +201,14 @@ public class ClansService {
                     .collect(Collectors.toList());
     }
 
-    private ClanEntity changeClanWarLeagueName(Clan clan, Map<String, ClanEntity> clanEntityMap) {
+    private ClanEntity changeClanInfo(Clan clan, Map<String, ClanEntity> clanEntityMap) {
         ClanEntity clanEntity = clanEntityMap.get(clan.getTag());
         if (Objects.nonNull(clanEntity)) {
             clanEntity.setWarLeague(clan.getWarLeagueName());
+
+            clanEntity.setCapitalHallLevel(clan.getClanCapitalHallLevel());
+            clanEntity.setCapitalPoints(clan.getClanCapitalPoints());
+            clanEntity.setCapitalLeague(clan.getClanCapitalLeagueName());
         }
 
         return clanEntity;
@@ -271,6 +275,11 @@ public class ClansService {
 
     private ClanResponse updateExistingClan(ClanEntity clan, Clan clanResponse) {
         clan.setWarLeague(clanResponse.getWarLeagueName());
+
+        clan.setCapitalHallLevel(clanResponse.getClanCapitalHallLevel());
+        clan.setCapitalPoints(clanResponse.getClanCapitalPoints());
+        clan.setCapitalLeague(clanResponse.getClanCapitalLeagueName());
+
         clan.setVisibleYn(YnType.Y);
 
         clanRepository.save(clan);
@@ -298,6 +307,9 @@ public class ClansService {
                          .tag(clan.getTag())
                          .name(clan.getName())
                          .warLeague(clan.getWarLeagueName())
+                         .capitalHallLevel(clan.getClanCapitalHallLevel())
+                         .capitalPoints(clan.getClanCapitalPoints())
+                         .capitalLeague(clan.getClanCapitalLeagueName())
                          .order(clanMaxOrders + 1)
                          .visibleYn(YnType.Y)
                          .regDate(LocalDateTime.now())

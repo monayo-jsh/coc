@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.domain.clans.ClanCapitalResponse;
 import open.api.coc.clans.domain.clans.ClanMemberResponse;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
@@ -62,6 +63,9 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
                            .tag(clanEntity.getTag())
                            .name(clanEntity.getName())
                            .warLeague(makeWarLeagueResponse(clanEntity.getWarLeague()))
+                           .capitalLeague(makeClanCapitalLeagueResponse(clanEntity.getCapitalLeague()))
+                           .clanCapitalPoints(clanEntity.getCapitalPoints())
+                           .clanCapital(makeClanCapitalResponse(clanEntity.getCapitalHallLevel()))
                            .order(clanEntity.getOrder())
                            .clanContent(clanContentResponseConverter.convert(clanEntity.getClanContent()))
                            .build();
@@ -72,6 +76,20 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
         return LabelResponse.builder()
                             .name(warLeague)
                             .build();
+    }
+
+    private LabelResponse makeClanCapitalLeagueResponse(String capitalLeague) {
+        if (Objects.isNull(capitalLeague)) return null;
+        return LabelResponse.builder()
+                            .name(capitalLeague)
+                            .build();
+    }
+
+    private ClanCapitalResponse makeClanCapitalResponse(Integer capitalHallLevel) {
+        if (Objects.isNull(capitalHallLevel)) return null;
+        return ClanCapitalResponse.builder()
+                                  .capitalHallLevel(capitalHallLevel)
+                                  .build();
     }
 
     private List<ClanMemberResponse> makeMemberList(List<ClanMember> clanMembers) {

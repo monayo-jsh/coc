@@ -45,6 +45,15 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "war_league", nullable = true, length = 100)
     private String warLeague;
 
+    @Column(name = "capital_hall_level", nullable = true)
+    private Integer capitalHallLevel;
+
+    @Column(name = "capital_points", nullable = true)
+    private Integer capitalPoints;
+
+    @Column(name = "capital_league", nullable = true, length = 100)
+    private String capitalLeague;
+
     @Column(name = "orders", nullable = false)
     private Integer order;
 

@@ -46,4 +46,14 @@ public class Clan {
         if (Objects.isNull(warLeague)) return null;
         return warLeague.getName();
     }
+
+    public String getClanCapitalLeagueName() {
+        if (Objects.isNull(capitalLeague)) return null;
+        return capitalLeague.getName();
+    }
+
+    public Integer getClanCapitalHallLevel() {
+        if (Objects.isNull(clanCapital)) return null;
+        return clanCapital.getCapitalHallLevel();
+    }
 }

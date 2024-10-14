@@ -300,14 +300,14 @@ public class PlayersService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public PlayerEntity updatePlayer(String playerTag) {
+    public PlayerEntity updatePlayer(String traceName, String playerTag) {
         PlayerEntity playerEntity = playerRepository.findById(playerTag)
                                                     .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
-        processRecordPlayer(player, playerEntity);
+        processRecordPlayer(traceName, player, playerEntity);
 
         try {
             // 마지막 지원/지원 받은 유닛 수 통계 누적을 위해 사용자 정보 갱신보다 선행 처리
@@ -329,7 +329,7 @@ public class PlayersService {
         return playerRepository.save(playerEntity);
     }
 
-    private void processRecordPlayer(Player player, PlayerEntity playerEntity) {
+    private void processRecordPlayer(String traceName, Player player, PlayerEntity playerEntity) {
         // 기록 대상이 아닌 경우 기록하지 않음
         if (player.isNotRecoding(playerEntity)) return;
 
@@ -345,6 +345,8 @@ public class PlayersService {
                                                                                  .build();
 
         playerRecordHistoryRepository.save(recordHistoryEntity);
+
+        log.info("sync [%s] - %s [%s] - trophies: %s -> %s - attacks: %s -> %s - defence: %s -> %s".formatted(traceName, player.getName(), player.getTag(), playerEntity.getTrophies(), player.getTrophies(), playerEntity.getAttackWins(), player.getAttackWins(), playerEntity.getDefenseWins(), player.getDefenseWins()));
     }
 
     private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {
@@ -687,4 +689,24 @@ public class PlayersService {
                                      .toList();
     }
 
+    @Transactional
+    public void syncPlayerFromCOC(String traceName, String playerTag) {
+//        StringBuilder logStr = new StringBuilder();
+        try {
+            PlayerResponse player = findPlayerBy(playerTag);
+//            logStr.append("[%s]".formatted(traceName));
+//            logStr.append(" - player: %s [%s]".formatted(player.getName(), playerTag));
+
+            updatePlayer(traceName, playerTag);
+
+//            logStr.append(" - result: success");
+        } catch (Exception e) {
+            log.error("플레이어 동기화 실패: %s".formatted(playerTag), e);
+//            logStr.append(" - result: fail");
+        } finally {
+//            logStr.append(" - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))));
+//            log.info(logStr.toString());
+        }
+
+    }
 }

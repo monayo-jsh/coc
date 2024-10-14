@@ -87,7 +87,7 @@ public class PlayersController {
     @PutMapping("/{playerTag}")
     public ResponseEntity<?> modifyPlayer(@PathVariable String playerTag) {
 
-        playersService.updatePlayer(playerTag);
+        playersService.updatePlayer("api", playerTag);
 
         return ResponseEntity.ok().build();
     }

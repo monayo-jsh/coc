@@ -10,7 +10,7 @@ import open.api.coc.clans.clean.domain.event.model.EventTeamMember;
 import open.api.coc.clans.clean.domain.event.service.EventTeamLegendService;
 import open.api.coc.clans.clean.presentation.event.dto.EventTeamLegendResponse;
 import open.api.coc.clans.clean.presentation.event.dto.EventTeamRankResponse;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,8 +64,8 @@ public class EventUseCase {
 
         for (EventTeamMember member : allTeamMembers) {
             try {
-                PlayerEntity playerEntity = playersService.updatePlayer(member.getTag());
-                member.refreshInfo(playerEntity.getName(), playerEntity.getTrophies());
+                PlayerResponse playerResponse = playersService.findPlayerBy(member.getTag());
+                member.refreshInfo(playerResponse.getName(), playerResponse.getTrophies());
             } catch (Exception e) {
                 log.error("%s (%s) 정보 동기화 실패".formatted(member.getName(), member.getTag()), e);
             }

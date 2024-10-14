@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
@@ -61,11 +60,7 @@ public class PlayerScheduler {
         List<String> playerTags = playersService.findAllPlayersToRecord();
         if (playerTags.isEmpty()) return;
         for(String playerTag : playerTags) {
-            try {
-                playersService.updatePlayer(playerTag);
-            } catch (Exception e) {
-                log.error("플레이어 기록 보관 실패: %s".formatted(playerTag), e);
-            }
+            playersService.syncPlayerFromCOC("processForPlayerRecordKeeping", playerTag);
         }
     }
 
@@ -96,17 +91,7 @@ public class PlayerScheduler {
             List<PlayerEntity> syncPlayers = players.subList(fromIndex, Math.min(fromIndex + offset, players.size()));
             syncPlayers.stream()
                        .parallel()
-                       .map(player -> {
-                           try {
-                               playersService.updatePlayer(player.getPlayerTag());
-                               return true;
-                           } catch (Exception e) {
-                               log.error("player {} is update failed...", player.getName());
-                               log.error("player {} is fail message", e.getMessage());
-                               return false;
-                           }
-                       })
-                       .collect(Collectors.toList());
+                       .forEach(player -> playersService.syncPlayerFromCOC("processSyncPlayers", player.getPlayerTag()));
         }
 
     }

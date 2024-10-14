@@ -25,6 +25,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chartjs -->
 
   <script type="text/javascript">
+
     dayjs.locale('ko')
     //dayjs duration 확장
     dayjs.extend(dayjs_plugin_duration)
@@ -97,22 +98,37 @@
 
       let attackTotalTrophies = 0;
       let defenceTotalTrophies = 0;
+
       for (const record of records) {
-        const { diffTrophies } = record;
-        const recordRow = makeRecord(record);
-
-        if (diffTrophies <= 0) {
-          defenceRecordTable.appendChild(recordRow);
-          defenceTotalTrophies += diffTrophies;
-          continue;
+        if (record.diffTrophies > 0) {
+          // 공격 처리
+          attackTotalTrophies = addRecordToTable(record, attackRecordTable, attackTotalTrophies, 1);
+        } else if (record.diffTrophies < 0) {
+          // 방어 처리
+          defenceTotalTrophies = addRecordToTable(record, defenceRecordTable, defenceTotalTrophies, -1);
         }
-
-        attackRecordTable.appendChild(recordRow);
-        attackTotalTrophies += diffTrophies;
       }
 
       attackRecordTable.innerHTML = attackRecordTable.innerHTML.replace(/{ATTACK_TOTAL_TROPHIES}/, `+${attackTotalTrophies}`);
       defenceRecordTable.innerHTML = defenceRecordTable.innerHTML.replace(/{DEFENCE_TOTAL_TROPHIES}/, defenceTotalTrophies);
+
+      function addRecordToTable(record, targetTable, totalTrophies, diffValue) {
+        while (record.diffTrophies * diffValue >= 40) {
+          const newRecord = { ...record, diffTrophies: diffValue * 40 }; // 40 또는 -40으로 분할
+          const newRecordRow = makeRecord(newRecord);
+          targetTable.appendChild(newRecordRow);
+          totalTrophies += newRecord.diffTrophies;
+          record.diffTrophies -= diffValue * 40;
+        }
+
+        if (record.diffTrophies !== 0) {
+          const remainingRecordRow = makeRecord(record); // 남은 트로피 처리
+          targetTable.appendChild(remainingRecordRow);
+          totalTrophies += record.diffTrophies;
+        }
+
+        return totalTrophies;
+      }
     }
 
     function renderLegendRecord(playerLegendElement, baseDate, records) {
@@ -122,19 +138,19 @@
 
       renderRecords(playerLegendRecordElement, records);
 
-      let resultTrophies = records.reduce((sum, record) => { sum += record.diffTrophies; return sum; }, 0);
+      let startTrophies = records[records.length-1].oldTrophies;
+      let endTrophies = records[0].newTrophies;
+
+      let resultTrophies = endTrophies - startTrophies;
       if (resultTrophies >= 0) {
         resultTrophies = `+${resultTrophies}`
       }
-
-      let startTrophies = records[records.length-1].oldTrophies;
-      let endTrophies = records[0].newTrophies;
 
       playerLegendRecordElement.innerHTML = playerLegendRecordElement.innerHTML
                                                                      .replace(/{RECORD_DATE}/, baseDate)
                                                                      .replace(/{START_TROPHIES}/, Number(startTrophies).toLocaleString())
                                                                      .replace(/{END_TROPHIES}/, Number(endTrophies).toLocaleString())
-                                                                     .replace(/{RECORD_RESULT_TROPHIES}/, resultTrophies);
+                                                                     .replace(/{RECORD_RESULT_TROPHIES}/, String(resultTrophies));
 
       targetElement.appendChild(playerLegendRecordElement);
     }
@@ -153,17 +169,41 @@
       targetElement.appendChild(canvas);
     }
 
+    function displayPlayerRecord(tag) {
+      const playerRecordElement = document.querySelector(`.player-${tag}`);
+      toggleDisplay(playerRecordElement);
+    }
+
+    function renderDisplayButton(record) {
+      const { tag, name } = record;
+
+      const radioItemTemplate = copyTemplateById('radio-item-template');
+      const radioItem = radioItemTemplate.querySelector('.radio.item');
+
+      radioItem.innerHTML = radioItem.innerHTML
+                                     .replace(/{TAG}/g, removeHashTag(tag))
+                                     .replace(/{NAME}/, name);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      radioInputs.appendChild(radioItem);
+    }
+
     async function drawLegendRecord(playerTag) {
       const legendRecords = await fetchPlayerLegendRecord(playerTag);
 
       if (!legendRecords.length) return;
+
+      const metaData = legendRecords[0];
+      renderDisplayButton(metaData);
 
       // chart dataset initial
       const chartDataset = [];
 
       const playerLegendTemplate = copyTemplateById('player-legend-template');
       const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
-      playerLegend.innerHTML = playerLegend.innerHTML.replace(/{PLAYER_NAME}/, legendRecords[0].name);
+      playerLegend.innerHTML = playerLegend.innerHTML.replace(/{PLAYER_NAME}/, metaData.name);
+
+      playerLegend.classList.add(`player-${removeHashTag(metaData.tag)}`)
 
       const recordMap = convertArrayToMapByKey(legendRecords, 'baseDate', true);
       for(const [baseDate, records] of recordMap) {
@@ -205,9 +245,21 @@
     </div>
     <div class="description">데이터 수집 결과에 따라 차이가 있을 수 있습니다</div>
 
+    <div class="players">
+      <div class="radio-inputs filter">
+
+      </div>
+    </div>
+
     <div class="legend-record-wrapper"></div>
 
 </body>
+<template id="radio-item-template">
+  <label class="radio item">
+    <input type="checkbox" name="checkbox-{TAG}" onchange="displayPlayerRecord('{TAG}'); return false;">
+    <span class="name">{NAME}</span>
+  </label>
+</template>
 <template id="record-row-template">
   <tr class="table-tr record-row">
     <td class="table-td">
@@ -262,8 +314,11 @@
   </div>
 </template>
 <template id="player-legend-template">
-  <div class="player-legend-wrapper">
+  <div class="player-legend-wrapper display-none">
     <div class="player-name">{PLAYER_NAME}</div>
+    <div class="information">
+      <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기됩니다.</span></div>
+    </div>
     <div class="player-records"></div>
     <div class="information">
       <div class="description"><span class="color-red">* 가로스크롤을 통해 이전 기록을 확인할 수 있습니다</span></div>

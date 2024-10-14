@@ -61,17 +61,40 @@ body {
   justify-content: center;
 }
 
+.players {
+  width: 870px;
+
+  .radio-inputs {
+    padding: 10px;
+    box-shadow: none;
+    display: flex;
+    gap: 1px;
+
+    .radio.item {
+      display: flex;
+    }
+  }
+
+  @media (max-width: 870px) {
+    width: 380px !important;
+  }
+
+  @media (max-width: 380px) {
+    width: 320px !important;
+  }
+}
+
 .player-records {
   width: 870px;
   display: flex;
   overflow-y: auto;
 
   @media (max-width: 870px) {
-    width: 380px;
+    width: 380px !important;
   }
 
   @media (max-width: 380px) {
-    width: 320px;
+    width: 320px !important;
   }
 }
 

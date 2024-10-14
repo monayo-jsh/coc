@@ -42,9 +42,9 @@ public class EventTeamLegendService {
         if (eventTeamLegend.isFinish()) return; // 종료된 경우
 
         List<EventTeamMember> allMembers = eventTeamLegend.getTeams()
-                                                    .stream()
-                                                    .flatMap(team -> team.getMembers().stream())
-                                                    .toList();
+                                                          .stream()
+                                                          .flatMap(team -> team.getMembers().stream())
+                                                          .toList();
 
         if (allMembers.isEmpty()) return; // 참여자가 없으면 이력 생성 안해도 됨.
 

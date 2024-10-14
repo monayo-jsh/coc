@@ -347,7 +347,7 @@ public class PlayersService {
         playerRecordHistoryRepository.save(recordHistoryEntity);
 
         String currentTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-        log.info("sync [%s] - %s [%s] - trophies: %s -> %s - attacks: %s -> %s - defence: %s -> %s, at: ".formatted(traceName, player.getName(), player.getTag(), playerEntity.getTrophies(), player.getTrophies(), playerEntity.getAttackWins(), player.getAttackWins(), playerEntity.getDefenseWins(), player.getDefenseWins()), currentTime);
+        log.info("sync [%s] - %s [%s] - trophies: %s -> %s - attacks: %s -> %s - defence: %s -> %s, at: %s".formatted(traceName, player.getName(), player.getTag(), playerEntity.getTrophies(), player.getTrophies(), playerEntity.getAttackWins(), player.getAttackWins(), playerEntity.getDefenseWins(), player.getDefenseWins(), currentTime));
     }
 
     private void collectPlayerDonationStat(PlayerEntity playerEntity, Player player) {

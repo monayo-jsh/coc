@@ -36,6 +36,8 @@ public enum HeroEquipmentConfig {
     ETERNAL_TOME(GRAND_WARDEN, 302, "normal", "Eternal Tome", "영원의 책"),
     HEALING_TOME(GRAND_WARDEN, 303, "normal", "Healing Tome", "치유의 책"),
 
+    LAVALOON_PUPPET(GRAND_WARDEN, 320, "epic", "Lavaloon Puppet", "라벌 인형"),
+
     FIREBALL(GRAND_WARDEN, 320, "epic", "Fireball", "파이어 볼"),
 
     // 로얄 챔피언

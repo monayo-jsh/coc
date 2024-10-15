@@ -67,6 +67,10 @@
   background-image: url("/static/images/hero/equipment/Invisibility_Vial.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.lavaloon_puppet {
+  background-image: url("/static/images/hero/equipment/Lavaloon_Puppet.png");
+  color: rgba(0, 0, 0, 0);
+}
 .img-icon.healer_puppet {
   background-image: url("/static/images/hero/equipment/Healer_Puppet.png");
   color: rgba(0, 0, 0, 0);

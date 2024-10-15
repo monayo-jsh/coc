@@ -49,6 +49,26 @@ public class PlayerRecordHistoryEntity {
     @ColumnDefault("0")
     private Integer newTrophies;
 
+    @Comment("이전 공격 성공수")
+    @Column(name = "old_attack_wins", nullable = false)
+    @ColumnDefault("0")
+    private Integer oldAttackWins;
+
+    @Comment("변경 공격 성공수")
+    @Column(name = "new_attack_wins", nullable = false)
+    @ColumnDefault("0")
+    private Integer newAttackWins;
+
+    @Comment("이전 방어 성공수")
+    @Column(name = "old_defence_wins", nullable = false)
+    @ColumnDefault("0")
+    private Integer oldDefenceWins;
+
+    @Comment("변경 방어 성공수")
+    @Column(name = "new_defence_wins", nullable = false)
+    @ColumnDefault("0")
+    private Integer newDefenceWins;
+
     @Comment("기록일시")
     @Column(name = "recorded_at", nullable = false, updatable = false)
     @CreatedDate
@@ -56,11 +76,18 @@ public class PlayerRecordHistoryEntity {
 
     @Builder
     private PlayerRecordHistoryEntity(Long id, String tag, Integer oldTrophies, Integer newTrophies,
+                                     Integer oldAttackWins, Integer newAttackWins,
+                                     Integer oldDefenceWins, Integer newDefenceWins,
                                      LocalDateTime recordedAt) {
         this.id = id;
         this.tag = tag;
         this.oldTrophies = oldTrophies;
         this.newTrophies = newTrophies;
+        this.oldAttackWins = oldAttackWins;
+        this.newAttackWins = newAttackWins;
+        this.oldDefenceWins = oldDefenceWins;
+        this.newDefenceWins = newDefenceWins;
         this.recordedAt = recordedAt;
     }
+
 }

@@ -341,7 +341,11 @@ public class PlayersService {
         PlayerRecordHistoryEntity recordHistoryEntity = PlayerRecordHistoryEntity.builder()
                                                                                  .tag(playerEntity.getPlayerTag())
                                                                                  .oldTrophies(playerEntity.getTrophies())
+                                                                                 .oldAttackWins(playerEntity.getAttackWins())
+                                                                                 .oldDefenceWins(playerEntity.getDefenseWins())
                                                                                  .newTrophies(player.getTrophies())
+                                                                                 .newAttackWins(player.getAttackWins())
+                                                                                 .newDefenceWins(player.getDefenseWins())
                                                                                  .build();
 
         playerRecordHistoryRepository.save(recordHistoryEntity);

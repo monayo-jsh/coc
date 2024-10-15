@@ -13,7 +13,9 @@ public interface PlayerRecordHistoryRepository extends JpaRepository<PlayerRecor
 
 
     @Query(
-        value = "select new open.api.coc.clans.domain.players.PlayerRecordResponse(pr.tag, p.name, pr.oldTrophies, pr.newTrophies, pr.recordedAt) "
+        value = "select new open.api.coc.clans.domain.players.PlayerRecordResponse("
+              + "  pr.tag, p.name, pr.oldTrophies, pr.newTrophies, pr.oldAttackWins, pr.newAttackWins, pr.oldDefenceWins, pr.newDefenceWins, pr.recordedAt"
+              + " ) "
               + "from PlayerRecordHistoryEntity pr "
               + "join PlayerEntity p on p.playerTag = pr.tag "
               + "where pr.tag = :playerTag "

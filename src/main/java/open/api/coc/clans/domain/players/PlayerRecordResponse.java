@@ -7,9 +7,16 @@ public record PlayerRecordResponse(
 
     String tag,
     String name,
+
     Integer oldTrophies,
     Integer newTrophies,
     Integer diffTrophies,
+
+    Integer oldAttackWins,
+    Integer newAttackWins,
+
+    Integer oldDefenceWins,
+    Integer newDefenceWins,
 
     LocalDateTime recordedAt,
 
@@ -17,8 +24,17 @@ public record PlayerRecordResponse(
 
 ) {
 
-    public PlayerRecordResponse(String tag, String name, Integer oldTrophies, Integer newTrophies, LocalDateTime recordedAt) {
-        this(tag, name, oldTrophies, newTrophies, newTrophies - oldTrophies, recordedAt, getBaseDate(recordedAt));
+    public PlayerRecordResponse(String tag, String name,
+                                Integer oldTrophies, Integer newTrophies,
+                                Integer oldAttackWins, Integer newAttackWins,
+                                Integer oldDefenceWins, Integer newDefenceWins,
+                                LocalDateTime recordedAt) {
+        this(tag, name,
+             oldTrophies, newTrophies, newTrophies - oldTrophies,
+             oldAttackWins, newAttackWins,
+             oldDefenceWins, newDefenceWins,
+             recordedAt,
+             getBaseDate(recordedAt));
     }
 
     private static LocalDate getBaseDate(LocalDateTime recordedAt) {

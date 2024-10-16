@@ -29,9 +29,9 @@ public abstract class PlayerEntityMapper {
     private PlayerTroopsEntityMapper playerTroopsEntityMapper;
 
     @Mapping(target = "playerTag", source = "tag")
-    @Mapping(target = "clan.tag", source = "clanTag")
-    @Mapping(target = "league.id", source = "leagueId")
     // 연관관계 매핑은 리포지토리 구현체에서 처리
+    @Mapping(target = "clan", ignore = true)
+    @Mapping(target = "league", ignore = true)
     @Mapping(target = "heroes", ignore = true)
     @Mapping(target = "heroEquipments", ignore = true)
     @Mapping(target = "troops", ignore = true)

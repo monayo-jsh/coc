@@ -187,6 +187,9 @@ public class Player {
         this.expLevel = latestPlayer.getExpLevel();
         this.townHallLevel = latestPlayer.getTownHallLevel();
 
+        // 리그
+        this.leagueId = latestPlayer.getLeagueId();
+
         // 트로피
         this.trophies = latestPlayer.getTrophies();
         this.bestTrophies = latestPlayer.getBestTrophies();
@@ -199,6 +202,8 @@ public class Player {
         this.attackWins = latestPlayer.getAttackWins();
         this.defenseWins = latestPlayer.getDefenseWins();
 
+        // 클랜
+        this.clanTag = latestPlayer.getClanTag();
         this.warStars = latestPlayer.getWarStars(); // 전쟁 획득 별
         this.role = latestPlayer.getRole(); // 클랜 직급
         this.warPreference = latestPlayer.getWarPreference(); // 전쟁 선호도

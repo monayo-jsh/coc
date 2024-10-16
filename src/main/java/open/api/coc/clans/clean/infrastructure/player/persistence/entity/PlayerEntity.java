@@ -153,7 +153,6 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     }
 
     public void changeLeague(LeagueEntity league) {
-        league.add(this);
         this.league = league;
     }
 

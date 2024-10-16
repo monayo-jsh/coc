@@ -4,6 +4,7 @@ package open.api.coc.clans.clean.application.player;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
@@ -16,8 +17,10 @@ import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlayerUseCase {
@@ -127,4 +130,12 @@ public class PlayerUseCase {
         playerService.save(player);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void synchronizePlayerFromSchedule(String taskName, String playerTag) {
+        try {
+            synchronizePlayer(playerTag);
+        } catch (Exception e) {
+            log.error("[%s] 플레이어 동기화 실패: %s".formatted(taskName, playerTag), e);
+        }
+    }
 }

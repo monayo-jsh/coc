@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanRepository;
+import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEquipmentEntity;
@@ -24,6 +26,9 @@ import org.springframework.stereotype.Repository;
 public class PlayerDatabaseService implements PlayerRepository {
 
     private final JpaPlayerRepository jpaPlayerRepository;
+
+    private final JpaClanRepository jpaClanRepository;
+    private final JpaLeagueRepository jpaLeagueRepository;
 
     private final PlayerEntityMapper playerEntityMapper;
     private final PlayerHeroEntityMapper heroEntityMapper;
@@ -54,6 +59,18 @@ public class PlayerDatabaseService implements PlayerRepository {
     public Player save(Player newPlayer) {
         // 플레이어 엔티티 생성
         PlayerEntity playerEntity = playerEntityMapper.toEntity(newPlayer);
+
+        // 리그 매핑
+        if (newPlayer.getLeagueId() != null) {
+            jpaLeagueRepository.findById(newPlayer.getLeagueId())
+                               .ifPresent(playerEntity::changeLeague);
+        }
+
+        // 클랜 매핑
+        if (newPlayer.getClanTag() != null) {
+            jpaClanRepository.findById(newPlayer.getClanTag())
+                             .ifPresent(playerEntity::changeClan);
+        }
 
         // 플레이어 영웅 매핑
         List<PlayerHeroEntity> heroEntities = newPlayer.getHeroes().stream().map(heroEntityMapper::toPlayerHeroEntity).toList();

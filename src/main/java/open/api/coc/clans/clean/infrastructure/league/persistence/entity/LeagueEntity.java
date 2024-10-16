@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -39,19 +38,14 @@ public class LeagueEntity implements Persistable<Integer> {
     @Embedded
     private IconUrlEntity iconUrl;
 
-    // TODO 얘는 지워야됨 !
-    @OneToMany(mappedBy = "league")
-    private List<PlayerEntity> players;
-
     @Transient
     private boolean isNew;
 
     @Builder
-    private LeagueEntity(Integer id, String name, IconUrlEntity iconUrl, List<PlayerEntity> players, boolean isNew) {
+    private LeagueEntity(Integer id, String name, IconUrlEntity iconUrl, boolean isNew) {
         this.id = id;
         this.name = name;
         this.iconUrl = iconUrl;
-        this.players = players;
         this.isNew = isNew;
     }
 
@@ -74,10 +68,6 @@ public class LeagueEntity implements Persistable<Integer> {
     @Override
     public Integer getId() {
         return this.id;
-    }
-
-    public void add(PlayerEntity player) {
-        this.players.add(player);
     }
 
 }

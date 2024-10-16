@@ -192,6 +192,23 @@
 
       if (!dailyRankings || !dailyRankings.length) return;
 
+      // 실시간 순위 추가
+      let currentRank = 0;
+      for (const team of SORTED_TEAMS) {
+        const now = dayjs()
+        const currentHour = now.hour();
+        const displayRank = currentHour < 14 ? now : now.add(+1, 'day'); // 현재 랭크 표기
+        const { id, name, trophies } = team;
+        const dailyRank = {
+          rankingDate: formatMMDD(displayRank),
+          teamId: id,
+          teamName: name,
+          trophies: trophies,
+          dailyRank: ++currentRank
+        };
+        dailyRankings.push(dailyRank);
+      }
+
       renderRankingChart('daily-ranking', dailyRankings);
     }
 
@@ -277,7 +294,7 @@
         const { rankingDate, dailyRank } = record;
         const displayDate = dayjs(rankingDate).add(-1, 'day');
         return {
-          x: formatYYMMDD(displayDate),
+          x: formatMMDD(displayDate),
           y: dailyRank,
           record: record
         }

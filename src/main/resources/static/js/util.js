@@ -224,6 +224,10 @@ function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
 }
 
+function formatMMDD(date) {
+  return dayjs(date).format('MM-DD');
+}
+
 function formatDD(date) {
   return dayjs(date).format('DD');
 }

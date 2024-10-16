@@ -200,7 +200,7 @@
         const displayRank = currentHour < 14 ? now : now.add(+1, 'day'); // 현재 랭크 표기
         const { id, name, trophies } = team;
         const dailyRank = {
-          rankingDate: formatMMDD(displayRank),
+          rankingDate: formatYYYYMMDD(displayRank),
           teamId: id,
           teamName: name,
           trophies: trophies,

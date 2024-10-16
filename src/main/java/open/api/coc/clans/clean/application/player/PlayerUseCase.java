@@ -11,6 +11,8 @@ import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
+import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,8 @@ public class PlayerUseCase {
     private final PlayerClient playerClient;
 
     private final PlayerService playerService;
+    private final PlayerRecordService playerRecordService;
+    private final PlayerDonationService playerDonationService;
 
     private final ClanService clanService;
     private final LeagueService leagueService;
@@ -109,6 +113,12 @@ public class PlayerUseCase {
 
         // COC 플레이어 최신 정보를 조회한다.
         Player latestPlayer = playerClient.findByTag(playerTag);
+
+        // 플레이어의 트로피, 공/방 변화를 기록한다.
+        playerRecordService.createHistory(player, latestPlayer);
+
+        // 플레이어의 지원 통계를 기록한다.
+        playerDonationService.collect(player, latestPlayer);
 
         // 서버의 플레이어 정보를 현행화한다.
         player.changeInfo(latestPlayer);

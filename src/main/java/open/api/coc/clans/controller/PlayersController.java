@@ -7,7 +7,7 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
-import open.api.coc.clans.database.repository.player.PlayerRecordHistoryRepository;
+import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerRecordHistoryRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerModifyRequest;
 import open.api.coc.clans.domain.players.PlayerRecordResponse;
@@ -38,7 +38,7 @@ public class PlayersController {
 
     // 추 후 리팩토링하면서 제거 예정
     private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
-    private final PlayerRecordHistoryRepository playerRecordHistoryRepository;
+    private final JpaPlayerRecordHistoryRepository playerRecordHistoryRepository;
 
     @GetMapping("/all")
     public ResponseEntity<List<PlayerResponse>> getAllPlayer() {

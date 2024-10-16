@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.player;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @Table(
@@ -73,21 +76,5 @@ public class PlayerRecordHistoryEntity {
     @Column(name = "recorded_at", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime recordedAt;
-
-    @Builder
-    private PlayerRecordHistoryEntity(Long id, String tag, Integer oldTrophies, Integer newTrophies,
-                                     Integer oldAttackWins, Integer newAttackWins,
-                                     Integer oldDefenceWins, Integer newDefenceWins,
-                                     LocalDateTime recordedAt) {
-        this.id = id;
-        this.tag = tag;
-        this.oldTrophies = oldTrophies;
-        this.newTrophies = newTrophies;
-        this.oldAttackWins = oldAttackWins;
-        this.newAttackWins = newAttackWins;
-        this.oldDefenceWins = oldDefenceWins;
-        this.newDefenceWins = newDefenceWins;
-        this.recordedAt = recordedAt;
-    }
 
 }

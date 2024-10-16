@@ -1,16 +1,15 @@
-package open.api.coc.clans.database.repository.player;
+package open.api.coc.clans.clean.infrastructure.player.persistence.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import open.api.coc.clans.database.entity.player.PlayerRecordHistoryEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordHistoryEntity;
 import open.api.coc.clans.domain.players.PlayerRecordResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PlayerRecordHistoryRepository extends JpaRepository<PlayerRecordHistoryEntity, String> {
-
+public interface JpaPlayerRecordHistoryRepository extends JpaRepository<PlayerRecordHistoryEntity, String> {
 
     @Query(
         value = "select new open.api.coc.clans.domain.players.PlayerRecordResponse("

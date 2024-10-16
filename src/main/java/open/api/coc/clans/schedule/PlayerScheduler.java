@@ -35,7 +35,7 @@ public class PlayerScheduler {
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
 
-        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(now)
                                                                         .orElse(null);
 
         if (seasonEndDate != null) {
@@ -101,7 +101,7 @@ public class PlayerScheduler {
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
 
-        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(now)
                                                                         .orElse(null);
 
         if (seasonEndDate != null) {

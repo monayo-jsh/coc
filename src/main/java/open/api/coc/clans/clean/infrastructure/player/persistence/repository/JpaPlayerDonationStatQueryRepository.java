@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.repository.player;
+package open.api.coc.clans.clean.infrastructure.player.persistence.repository;
 
 import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerDonationStatEntity.playerDonationStatEntity;
 import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
@@ -10,7 +10,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerDonationStatRepository;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
@@ -21,25 +20,20 @@ import org.thymeleaf.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
-public class PlayerDonationStatQueryRepository {
+public class JpaPlayerDonationStatQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final JpaPlayerDonationStatRepository playerDonationStatRepository;
-
     public Optional<PlayerDonationStatEntity> findByPlayerTagAndSeason(String playerTag, String season) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(playerDonationStatEntity.playerTag.eq(playerTag))
                  .and(playerDonationStatEntity.season.eq(season));
 
-        return Optional.ofNullable(queryFactory.select(playerDonationStatEntity)
-                                               .from(playerDonationStatEntity)
-                                               .where(condition)
-                                               .fetchOne());
-    }
+        PlayerDonationStatEntity findEntity = queryFactory.select(playerDonationStatEntity)
+                                                          .from(playerDonationStatEntity)
+                                                          .where(condition)
+                                                          .fetchOne();
 
-    public PlayerDonationStatEntity save(PlayerDonationStatEntity entity) {
-        // JPA 기본 메서드로 처리
-        return playerDonationStatRepository.save(entity);
+        return Optional.ofNullable(findEntity);
     }
 
     public List<RankingHallOfFameDonationDTO> findRankingDonationsBySeasonAndPage(String season, Pageable page) {
@@ -52,7 +46,6 @@ public class PlayerDonationStatQueryRepository {
             playerDonationStatEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
             playerDonationStatEntity.donationsDelta.as("score"),
-            playerEntity.townHallLevel.as("townHallLevel"),
             playerEntity.supportYn.as("supportYn")
         );
 
@@ -75,8 +68,7 @@ public class PlayerDonationStatQueryRepository {
             RankingHallOfFameDTO.class,
             playerDonationStatEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
-            playerDonationStatEntity.donationsReceivedDelta.as("score"),
-            playerEntity.townHallLevel.as("townHallLevel")
+            playerDonationStatEntity.donationsReceivedDelta.as("score")
         );
 
         return queryFactory.select(rankingHallOfFameDTO)

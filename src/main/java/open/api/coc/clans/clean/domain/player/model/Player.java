@@ -204,6 +204,24 @@ public class Player {
         this.warPreference = latestPlayer.getWarPreference(); // 전쟁 선호도
     }
 
+    private boolean isRecoding(Player originPlayer) {
+        // 공격 성공 수치 다른 경우 기록
+        if (!Objects.equals(this.attackWins, originPlayer.getAttackWins())) return true;
+
+        // 방어 성공 수치 다른 경우 기록
+        if (!Objects.equals(this.defenseWins, originPlayer.getDefenseWins())) return true;
+
+        // 트로피 점수 다른 경우 기록
+        if (!Objects.equals(this.trophies, originPlayer.getTrophies())) return true;
+
+        // 그 외는 기록하지 않음
+        return false;
+    }
+
+    public boolean isNotRecoding(Player originPlayer) {
+        return !isRecoding(originPlayer);
+    }
+
     // 기본값 설정을 위한 빌더 객체
     public static class PlayerBuilder {
         private String tag; // 플레이어 태그

@@ -35,9 +35,9 @@ import open.api.coc.clans.database.entity.clan.converter.ClanEntityConverter;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
 import open.api.coc.clans.database.entity.league.converter.LeagueEntityConverter;
-import open.api.coc.clans.database.entity.player.PlayerDonationStatEntity;
-import open.api.coc.clans.database.entity.player.PlayerRecordEntity;
-import open.api.coc.clans.database.entity.player.PlayerRecordHistoryEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordHistoryEntity;
 import open.api.coc.clans.database.entity.player.converter.PlayerEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEntityConverter;
 import open.api.coc.clans.database.entity.player.converter.PlayerHeroEquipmentEntityConverter;
@@ -49,8 +49,8 @@ import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepos
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerDonationStatQueryRepository;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
-import open.api.coc.clans.database.repository.player.PlayerRecordHistoryRepository;
-import open.api.coc.clans.database.repository.player.PlayerRecordRepository;
+import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerRecordHistoryRepository;
+import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerRecordRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.players.PlayerModify;
 import open.api.coc.clans.domain.players.PlayerResponse;
@@ -96,8 +96,8 @@ public class PlayersService {
     private final PlayerRepository playerRepository;
     private final PlayerQueryRepository playerQueryRepository;
 
-    private final PlayerRecordRepository playerRecordRepository;
-    private final PlayerRecordHistoryRepository playerRecordHistoryRepository;
+    private final JpaPlayerRecordRepository playerRecordRepository;
+    private final JpaPlayerRecordHistoryRepository playerRecordHistoryRepository;
 
     private final PlayerDonationStatQueryRepository playerDonationStatQueryRepository;
 
@@ -344,15 +344,15 @@ public class PlayersService {
         if (recordingPlayer.isEmpty()) return;
 
         // 플레이어 기록
-        PlayerRecordHistoryEntity recordHistoryEntity = PlayerRecordHistoryEntity.builder()
-                                                                                 .tag(playerEntity.getPlayerTag())
-                                                                                 .oldTrophies(playerEntity.getTrophies())
-                                                                                 .oldAttackWins(playerEntity.getAttackWins())
-                                                                                 .oldDefenceWins(playerEntity.getDefenseWins())
-                                                                                 .newTrophies(player.getTrophies())
-                                                                                 .newAttackWins(player.getAttackWins())
-                                                                                 .newDefenceWins(player.getDefenseWins())
-                                                                                 .build();
+        PlayerRecordHistoryEntity recordHistoryEntity = new PlayerRecordHistoryEntity(null,
+                                                                                      playerEntity.getPlayerTag(),
+                                                                                      playerEntity.getTrophies(),
+                                                                                      playerEntity.getAttackWins(),
+                                                                                      playerEntity.getDefenseWins(),
+                                                                                      player.getTrophies(),
+                                                                                      player.getAttackWins(),
+                                                                                      player.getDefenseWins(),
+                                                                                      LocalDateTime.now());
 
         playerRecordHistoryRepository.save(recordHistoryEntity);
 
@@ -397,7 +397,7 @@ public class PlayersService {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime seasonEndTime = SeasonUtils.getSeasonEndTime(now.getYear(), now.getMonthValue());
 
-        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now.toLocalDate()).orElse(null);
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(now.toLocalDate()).orElse(null);
         if (seasonEndDate != null) {
             // 시즌 종료일이 설정된 경우 설정값으로 적용
             seasonEndTime = SeasonUtils.withSeasonEndTime(seasonEndDate);

@@ -312,7 +312,7 @@
       const { heroes } = player
       if (!heroes) return;
 
-      for (const hero of heroes) {
+      for (const hero of sortedByCode(heroes)) {
         renderHero(memberHtml, hero);
       }
     }

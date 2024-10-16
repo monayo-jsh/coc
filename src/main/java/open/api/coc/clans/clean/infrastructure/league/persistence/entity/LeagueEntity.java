@@ -15,7 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.common.persistence.entity.IconUrlEntity;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.domain.Persistable;
 
@@ -26,17 +26,17 @@ import org.springframework.data.domain.Persistable;
 @Comment("리그 테이블")
 public class LeagueEntity implements Persistable<Integer> {
 
+    @Comment("리그 고유키")
     @Id
     @Column(name = "league_id", nullable = false, length = 255)
-    @Comment("리그 고유키")
     private Integer id;
 
-    @Column(name = "league_name", nullable = false, length = 255)
     @Comment("리그 이름")
+    @Column(name = "league_name", nullable = false, length = 255)
     private String name;
 
-    @Embedded
     @Comment("리그 아이콘")
+    @Embedded
     private IconUrlEntity iconUrl;
 
     // TODO 얘는 지워야됨 !

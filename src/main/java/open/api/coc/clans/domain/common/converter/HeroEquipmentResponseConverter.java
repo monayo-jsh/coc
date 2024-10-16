@@ -1,6 +1,6 @@
 package open.api.coc.clans.domain.common.converter;
 
-import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEquipmentEntity;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.config.HeroEquipmentConfig;

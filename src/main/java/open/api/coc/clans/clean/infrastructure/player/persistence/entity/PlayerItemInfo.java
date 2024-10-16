@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.player.common;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Embeddable
 @EqualsAndHashCode
-public class PlayerItemEntity {
+public class PlayerItemInfo {
 
     @Column(name = "level", nullable = false)
     private Integer level;

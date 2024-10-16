@@ -1,11 +1,11 @@
-package open.api.coc.clans.database.entity.player.common;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
 
 @Getter
-public enum Troop {
+public enum TroopConfig {
 
     BARBARIAN(TroopType.ELIXIR, 1, "Barbarian", "바바리안"),
     ARCHER(TroopType.ELIXIR, 2, "Archer", "아처"),
@@ -79,14 +79,14 @@ public enum Troop {
     private final String name;
     private final String koreanName;
 
-    Troop(TroopType type, Integer order, String name, String koreanName) {
+    TroopConfig(TroopType type, Integer order, String name, String koreanName) {
         this.type = type;
         this.order = order;
         this.name = name;
         this.koreanName = koreanName;
     }
 
-    public static Troop findByName(String troopName) {
+    public static TroopConfig findByName(String troopName) {
         return Arrays.stream(values())
                      .filter(troop -> Objects.equals(troop.getName(), troopName))
                      .findFirst()

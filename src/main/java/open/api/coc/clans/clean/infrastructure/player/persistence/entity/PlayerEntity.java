@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.player;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -30,7 +30,7 @@ import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.common.BaseEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
-import open.api.coc.clans.database.entity.player.common.WarPreferenceType;
+import org.hibernate.annotations.Comment;
 import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -42,78 +42,99 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "tb_player",
-    indexes = @Index(name = "P_IDX_01", columnList = "name")
+    indexes = @Index(name = "idx_player_name", columnList = "name")
 )
+@Comment("플레이어 테이블")
 public class PlayerEntity extends BaseEntity implements Persistable<String> {
 
+    @Comment("플레이어 태그")
     @Id
-    @Column(name = "player_tag", length = 100)
+    @Column(name = "player_tag", nullable = false, length = 100)
     private String playerTag;
 
+    @Comment("플레이어 이름")
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
+    @Comment("지원계정 여부")
     @Builder.Default
     @Enumerated(EnumType.STRING)
-    @Column(name = "support_yn", nullable = false)
+    @Column(name = "support_yn", nullable = false, length = 10)
     private YnType supportYn = YnType.N;
 
+    @Comment("플레이어 레벨")
     @Column(name = "exp_level", nullable = false)
     private Integer expLevel;
 
+    @Comment("플레이어 타운홀 레벨")
     @Column(name = "town_halll_level", nullable = false)
     private Integer townHallLevel;
 
+    @Comment("플레이어 현재 트로피")
     @Column(name = "trophies", nullable = false)
     private Integer trophies;
 
+    @Comment("플레이어 최대 트로피")
     @Column(name = "best_trophies", nullable = false)
     private Integer bestTrophies;
 
-    @Column(name = "warStars", nullable = false)
-    private Integer warStars;
-
-    @Column(name = "donations", nullable = false)
-    private Integer donations;
-
-    @Column(name = "donations_received", nullable = false)
-    private Integer donationsReceived;
-
+    @Comment("플레이어 공격 성공수")
     @Column(name = "attackWins", nullable = false)
     private Integer attackWins;
 
+    @Comment("플레이어 방어 성공수")
     @Column(name = "defenseWins", nullable = false)
     private Integer defenseWins;
 
+    @Comment("플레이어 전쟁 획득 별")
+    @Column(name = "warStars", nullable = false)
+    private Integer warStars;
+
+    @Comment("플레이어 지원수")
+    @Column(name = "donations", nullable = false)
+    private Integer donations;
+
+    @Comment("플레이어 지원받은수")
+    @Column(name = "donations_received", nullable = false)
+    private Integer donationsReceived;
+
+    @Comment("플레이어 가입 클랜 직위 - leader: 대표, coLeader: 공동대표, admin: 장로, member: 일반")
     @Column(name = "role")
     private String role;
 
+    @Comment("플레이어 전쟁선호도")
     @Enumerated(EnumType.STRING)
     @Column(name = "war_preference")
     private WarPreferenceType warPreference;
 
+    @Comment("플레이어 현재 가입 클랜 태그")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "clan_tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private ClanEntity clan;
 
+    @Comment("플레이어 현재 리그")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "league_id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     private LeagueEntity league;
 
+    @Comment("플레이어 영웅 목록")
     @Builder.Default
-    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
+    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerHeroEntity> heroes = new ArrayList<>();
 
+    @Comment("플레이어 영웅장비 목록")
     @Builder.Default
-    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
+    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerHeroEquipmentEntity> heroEquipments = new ArrayList<>();
 
+    @Comment("플레이어 유닛 목록")
     @Builder.Default
-    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
+    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerTroopsEntity> troops = new ArrayList<>();
 
+    @Comment("플레이어 마법 목록")
     @Builder.Default
-    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL)
+    @OneToMany(fetch = LAZY, mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerSpellEntity> spells = new ArrayList<>();
 
     @Transient

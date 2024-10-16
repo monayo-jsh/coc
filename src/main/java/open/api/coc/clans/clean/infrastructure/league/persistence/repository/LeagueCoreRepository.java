@@ -22,4 +22,12 @@ public class LeagueCoreRepository implements LeagueRepository {
                                   .map(leagueMapper::toDomain)
                                   .toList();
     }
+
+    @Override
+    public List<League> findAllByIds(List<Integer> leagueIds) {
+        return jpaLeagueRepository.findAllById(leagueIds)
+                                  .stream()
+                                  .map(leagueMapper::toDomain)
+                                  .toList();
+    }
 }

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import open.api.coc.external.coc.clan.domain.common.IconUrl;
+import open.api.coc.clans.clean.domain.common.model.IconUrl;
 
 @Getter
 @NoArgsConstructor

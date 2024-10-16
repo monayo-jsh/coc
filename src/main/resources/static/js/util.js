@@ -202,6 +202,11 @@ function sortByHeroTotalLevel(players) {
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
 }
 
+function sortedByCode(arrays) {
+  // order 필드에 따른 정렬
+  return arrays.sort((a, b) => a.code - b.code);
+}
+
 function sortedByOrder(arrays) {
   // order 필드에 따른 정렬
   return arrays.sort((a, b) => a.order - b.order);

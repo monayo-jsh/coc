@@ -24,7 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import org.springframework.data.domain.Persistable;
 
 @Builder

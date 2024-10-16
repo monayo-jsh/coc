@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.application.player.PlayerUseCase;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/players")
 public class PlayerController {
 
+    private final PlayerUseCase playerUseCase;
 
     @Operation(
         summary = "플레이어 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
@@ -35,7 +36,7 @@ public class PlayerController {
     @GetMapping("")
     public ResponseEntity<List<PlayerResponse>> getPlayers() {
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(Collections.emptyList());
+                             .body(playerUseCase.getAllPlayers());
     }
 
 }

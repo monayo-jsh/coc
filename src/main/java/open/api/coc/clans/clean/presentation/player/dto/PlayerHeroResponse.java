@@ -36,4 +36,5 @@ public class PlayerHeroResponse {
     public boolean isHomeHero() {
         return Objects.equals("home", village);
     }
+
 }

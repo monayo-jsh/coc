@@ -1,7 +1,5 @@
 package open.api.coc.external.coc.config;
 
-import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
-
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
@@ -32,6 +30,6 @@ public enum HeroConfig {
         return Arrays.stream(values())
                      .filter(hero -> Objects.equals(hero.getName(), name))
                      .findFirst()
-                     .orElseThrow(() -> createNotFoundException("영웅 코드를 찾지 못함"));
+                     .orElse(UNKNOWN);
     }
 }

@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.player.common;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
-public class PlayerItemPKEntity implements Serializable {
+public class PlayerItemInfoPK implements Serializable {
 
     @Column(name = "player_tag", length = 100)
     private String playerTag;
@@ -24,10 +24,10 @@ public class PlayerItemPKEntity implements Serializable {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
-    public static PlayerItemPKEntity create(String tag, String name) {
-        return PlayerItemPKEntity.builder()
-                                 .playerTag(tag)
-                                 .name(name)
-                                 .build();
+    public static PlayerItemInfoPK create(String tag, String name) {
+        return PlayerItemInfoPK.builder()
+                               .playerTag(tag)
+                               .name(name)
+                               .build();
     }
 }

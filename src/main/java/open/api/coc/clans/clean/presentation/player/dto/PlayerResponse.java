@@ -62,19 +62,17 @@ public class PlayerResponse {
     private List<PlayerHeroEquipmentResponse> heroEquipments;
 
     @Schema(description = "마법 목록")
-    private List<PlayerTroopsResponse> spells;
+    private List<PlayerTroopResponse> spells;
 
     @Schema(description = "펫 목록")
-    private List<PlayerTroopsResponse> pets;
+    private List<PlayerTroopResponse> pets;
 
     @Schema(description = "시즈머신 목록")
-    private List<PlayerTroopsResponse> siegeMachines;
+    private List<PlayerTroopResponse> siegeMachines;
 
-    // TODO 겟 메서드로 제공해도 될듯
     @Schema(description = "보유 영웅 레벨 합")
     private Integer heroTotalLevel;
 
-    // TODO 겟 메서드로 제공해도 될듯
     @Schema(description = "보유 영웅 최대 레벨 합")
     private Integer heroTotalMaxLevel;
 

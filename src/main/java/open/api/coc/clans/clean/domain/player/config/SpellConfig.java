@@ -1,11 +1,12 @@
-package open.api.coc.clans.database.entity.player.common;
+package open.api.coc.clans.clean.domain.player.config;
 
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.SpellType;
 
 @Getter
-public enum Spell {
+public enum SpellConfig {
 
     LIGHTNING_SPELL(SpellType.ELIXIR, 1, "Lightning Spell", "번개 마법"),
     HEALING_SPELL(SpellType.ELIXIR, 2, "Healing Spell", "치유 마법"),
@@ -30,14 +31,14 @@ public enum Spell {
     private final String name;
     private final String koreanName;
 
-    Spell(SpellType type, Integer order, String name, String koreanName) {
+    SpellConfig(SpellType type, Integer order, String name, String koreanName) {
         this.type = type;
         this.order = order;
         this.name = name;
         this.koreanName = koreanName;
     }
 
-    public static Spell findByName(String troopName) {
+    public static SpellConfig findByName(String troopName) {
         return Arrays.stream(values())
                      .filter(troop -> Objects.equals(troop.getName(), troopName))
                      .findFirst()

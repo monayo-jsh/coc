@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.player;
+package open.api.coc.clans.clean.infrastructure.player.persistence.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -24,9 +24,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import open.api.coc.clans.database.entity.player.common.PlayerItemEntity;
-import open.api.coc.clans.database.entity.player.common.PlayerItemPKEntity;
-import open.api.coc.clans.database.entity.player.common.TroopType;
 import org.springframework.data.domain.Persistable;
 
 @Builder
@@ -35,17 +32,17 @@ import org.springframework.data.domain.Persistable;
 @AllArgsConstructor
 @Entity
 @Table(name = "tb_player_troops")
-public class PlayerTroopsEntity implements Persistable<PlayerItemPKEntity> {
+public class PlayerTroopsEntity implements Persistable<PlayerItemInfoPK> {
 
     @EmbeddedId
-    private PlayerItemPKEntity id;
+    private PlayerItemInfoPK id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private TroopType type;
 
     @Embedded
-    private PlayerItemEntity levelInfo;
+    private PlayerItemInfo levelInfo;
 
     @MapsId(value = "playerTag")
     @ManyToOne(fetch = LAZY, cascade = CascadeType.ALL)
@@ -63,7 +60,7 @@ public class PlayerTroopsEntity implements Persistable<PlayerItemPKEntity> {
     }
 
     @Override
-    public PlayerItemPKEntity getId() {
+    public PlayerItemInfoPK getId() {
         return this.id;
     }
 

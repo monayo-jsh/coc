@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class PlayerTroopsResponse {
+public class PlayerTroopResponse {
 
     @Schema(description = "유형")
     private String type;

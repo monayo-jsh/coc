@@ -92,7 +92,7 @@ public class PlayerUseCase {
         // 등록된 플레이어를 검증한다.
         playerService.ensurePlayerDoesNotExist(playerTag);
 
-        // 플레이어를 조회한다.
+        // COC 플레이어 최신 정보를 조회한다.
         Player player = playerClient.findByTag(playerTag);
 
         // 플레리어를 저장한다.
@@ -101,4 +101,20 @@ public class PlayerUseCase {
         // 응답한다.
         return mapToPlayerResponse(savePlayer);
     }
+
+    @Transactional
+    public void synchronizePlayer(String playerTag) {
+        // 서버의 플레이어 정보를 조회한다.
+        Player player = playerService.findById(playerTag);
+
+        // COC 플레이어 최신 정보를 조회한다.
+        Player latestPlayer = playerClient.findByTag(playerTag);
+
+        // 서버의 플레이어 정보를 현행화한다.
+        player.changeInfo(latestPlayer);
+
+        // 플레이어를 저장한다.
+        playerService.save(player);
+    }
+
 }

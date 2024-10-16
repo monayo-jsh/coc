@@ -143,7 +143,7 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
 
     @PrePersist
     @PostLoad
-    void markNotNew() {
+    public void markNotNew() {
         this.isNew = false;
     }
 

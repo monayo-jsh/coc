@@ -24,7 +24,8 @@ public class PlayerSpell {
     private Integer level; // 현재 레벨
     private Integer maxLevel; // 최대 레벨
 
-    private PlayerSpell(String name, Integer level, Integer maxLevel, String village) {
+    private PlayerSpell(String playerTag, String name, Integer level, Integer maxLevel, String village) {
+        this.playerTag = playerTag;
         this.name = name;
         this.level = level;
         this.maxLevel = maxLevel;
@@ -57,6 +58,11 @@ public class PlayerSpell {
         }
     }
 
+    public void changeInfo(PlayerSpell newSpell) {
+        this.level = newSpell.getLevel();
+        this.maxLevel = newSpell.getMaxLevel();
+    }
+
     public static class PlayerSpellBuilder {
 
         private String playerTag;
@@ -66,7 +72,7 @@ public class PlayerSpell {
         private String village = "home";
 
         public PlayerSpell build() {
-            return new PlayerSpell(name, level, maxLevel, village);
+            return new PlayerSpell(playerTag, name, level, maxLevel, village);
         }
 
     }

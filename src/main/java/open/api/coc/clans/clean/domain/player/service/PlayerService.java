@@ -40,6 +40,11 @@ public class PlayerService {
     @Transactional
     public Player create(Player newPlayer) {
         newPlayer.changeNormalPlayer();
-        return playerRepository.save(newPlayer);
+        return save(newPlayer);
+    }
+
+    @Transactional
+    public Player save(Player player) {
+        return playerRepository.save(player);
     }
 }

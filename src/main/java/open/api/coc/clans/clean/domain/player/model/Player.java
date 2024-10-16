@@ -80,6 +80,130 @@ public class Player {
         this.supportYn = YnType.N;
     }
 
+    public void changeInfo(Player latestPlayer) {
+        changePlayer(latestPlayer);
+        changeHero(latestPlayer.getHeroes());
+        changeHeroEquipments(latestPlayer.getHeroEquipments());
+        changeSpells(latestPlayer.getSpells());
+        changePets(latestPlayer.getPets());
+        changeSiegeMachines(latestPlayer.getSiegeMachines());
+    }
+
+    private void changeSiegeMachines(List<PlayerSiegeMachine> newSiegeMachines) {
+        Map<String, PlayerSiegeMachine> origSiegeMachineMap = this.siegeMachines.stream()
+                                                                                .collect(Collectors.toMap(PlayerSiegeMachine::getName, siegeMachine -> siegeMachine));
+
+        for(PlayerSiegeMachine newSiegeMachine : newSiegeMachines) {
+            // 기존 정보 조회
+            PlayerSiegeMachine findOrigSiegeMachine = origSiegeMachineMap.get(newSiegeMachine.getName());
+            if (findOrigSiegeMachine == null) {
+                // 기존 정보 없으면 추가
+                this.siegeMachines.add(newSiegeMachine);
+                continue;
+            }
+
+            // 정보 현행화
+            findOrigSiegeMachine.changeInfo(newSiegeMachine);
+        }
+    }
+
+    private void changePets(List<PlayerPet> newPets) {
+        Map<String, PlayerPet> origPetMap = this.pets.stream()
+                                                     .collect(Collectors.toMap(PlayerPet::getName, pet -> pet));
+
+        for(PlayerPet newPet : newPets) {
+            // 기존 정보 조회
+            PlayerPet findOrigPet = origPetMap.get(newPet.getName());
+            if (findOrigPet == null) {
+                // 기존 정보 없으면 추가
+                this.pets.add(newPet);
+                continue;
+            }
+
+            // 정보 현행화
+            findOrigPet.changeInfo(newPet);
+        }
+    }
+
+    private void changeSpells(List<PlayerSpell> newSpells) {
+        Map<String, PlayerSpell> origSpellMap = this.spells.stream()
+                                                           .collect(Collectors.toMap(PlayerSpell::getName, spell -> spell));
+
+        for(PlayerSpell newSpell : newSpells) {
+            // 기존 정보 조회
+            PlayerSpell findOrigSpell = origSpellMap.get(newSpell.getName());
+            if (findOrigSpell == null) {
+                // 기존 정보 없으면 추가
+                this.spells.add(newSpell);
+                continue;
+            }
+
+            // 정보 현행화
+            findOrigSpell.changeInfo(newSpell);
+        }
+    }
+
+    private void changeHeroEquipments(List<PlayerHeroEquipment> newHeroEquipments) {
+        Map<String, PlayerHeroEquipment> origHeroEquipmentMap = this.heroEquipments.stream()
+                                                                                   .collect(Collectors.toMap(PlayerHeroEquipment::getName, heroEquipment -> heroEquipment));
+
+        for(PlayerHeroEquipment newHeroEquipment : newHeroEquipments) {
+            // 기존 정보 조회
+            PlayerHeroEquipment findOrigHeroEquipment = origHeroEquipmentMap.get(newHeroEquipment.getName());
+            if (findOrigHeroEquipment == null) {
+                // 기존 정보 없으면 추가
+                this.heroEquipments.add(newHeroEquipment);
+                continue;
+            }
+
+            // 정보 현행화
+            findOrigHeroEquipment.changeInfo(newHeroEquipment);
+        }
+    }
+
+    private void changeHero(List<PlayerHero> newHeroes) {
+        Map<String, PlayerHero> origHeroMap = this.heroes.stream()
+                                                         .collect(Collectors.toMap(PlayerHero::getName, hero -> hero));
+
+        for(PlayerHero latestHero : newHeroes) {
+            // 기존 정보 조회
+            PlayerHero findOrigHero = origHeroMap.get(latestHero.getName());
+            if (findOrigHero == null) {
+                // 기존 정보 없으면 추가
+                this.heroes.add(latestHero);
+                continue;
+            }
+
+            // 정보 현행화
+            findOrigHero.changeInfo(latestHero);
+        }
+    }
+
+    private void changePlayer(Player latestPlayer) {
+        // 이름
+        this.name = latestPlayer.getName();
+
+        // 레벨
+        this.expLevel = latestPlayer.getExpLevel();
+        this.townHallLevel = latestPlayer.getTownHallLevel();
+
+        // 트로피
+        this.trophies = latestPlayer.getTrophies();
+        this.bestTrophies = latestPlayer.getBestTrophies();
+
+        // 지원
+        this.donations = latestPlayer.getDonations();
+        this.donationsReceived = latestPlayer.getDonationsReceived();
+
+        // 공/방 성공
+        this.attackWins = latestPlayer.getAttackWins();
+        this.defenseWins = latestPlayer.getDefenseWins();
+
+        this.warStars = latestPlayer.getWarStars(); // 전쟁 획득 별
+        this.role = latestPlayer.getRole(); // 클랜 직급
+        this.warPreference = latestPlayer.getWarPreference(); // 전쟁 선호도
+    }
+
     // 기본값 설정을 위한 빌더 객체
     public static class PlayerBuilder {
         private String tag; // 플레이어 태그

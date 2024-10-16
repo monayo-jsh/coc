@@ -24,7 +24,8 @@ public class PlayerPet {
 
     private String village; // 제공 마을 유형 - home: 본 마을, builderBase: 장인기지
 
-    private PlayerPet(String name, Integer level, Integer maxLevel, String village) {
+    private PlayerPet(String playerTag, String name, Integer level, Integer maxLevel, String village) {
+        this.playerTag = playerTag;
         this.name = name;
         this.level = level;
         this.maxLevel = maxLevel;
@@ -55,6 +56,11 @@ public class PlayerPet {
         }
     }
 
+    public void changeInfo(PlayerPet newPet) {
+        this.level = newPet.getLevel();
+        this.maxLevel = newPet.getMaxLevel();
+    }
+
 
     public static class PlayerPetBuilder {
         private String playerTag;
@@ -66,7 +72,7 @@ public class PlayerPet {
         private Integer maxLevel;
 
         public PlayerPet build() {
-            return new PlayerPet(name, level, maxLevel, village);
+            return new PlayerPet(playerTag, name, level, maxLevel, village);
         }
 
     }

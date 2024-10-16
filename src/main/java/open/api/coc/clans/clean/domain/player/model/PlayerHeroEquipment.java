@@ -26,7 +26,8 @@ public class PlayerHeroEquipment {
 
     private YnType wearYn; // 영웅 장비 착용 여부 - Y: 착용, N: 안함
 
-    private PlayerHeroEquipment(String name, Integer level, Integer maxLevel, String village, YnType wearYn) {
+    private PlayerHeroEquipment(String playerTag, String name, Integer level, Integer maxLevel, String village, YnType wearYn) {
+        this.playerTag = playerTag;
         this.name = name;
         this.level = level;
         this.maxLevel = maxLevel;
@@ -78,6 +79,13 @@ public class PlayerHeroEquipment {
         }
     }
 
+    public void changeInfo(PlayerHeroEquipment newHeroEquipment) {
+        this.level = newHeroEquipment.getLevel();
+        this.maxLevel = newHeroEquipment.getMaxLevel();
+
+        this.wearYn = newHeroEquipment.getWearYn();
+    }
+
     public static class PlayerHeroEquipmentBuilder {
 
         private String playerTag;
@@ -91,7 +99,7 @@ public class PlayerHeroEquipment {
         private YnType wearYn = YnType.N;
 
         public PlayerHeroEquipment build() {
-            return new PlayerHeroEquipment(name, level, maxLevel, village, wearYn);
+            return new PlayerHeroEquipment(playerTag, name, level, maxLevel, village, wearYn);
         }
 
     }

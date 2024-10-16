@@ -74,6 +74,13 @@ public class PlayerHero {
         }
     }
 
+    public void changeInfo(PlayerHero latestHero) {
+        this.level = latestHero.getLevel();
+        this.maxLevel = latestHero.getMaxLevel();
+
+        changeEquipments(latestHero.getEquipments());
+    }
+
     public static class PlayerHeroBuilder {
         private String playerTag;
         private String name;

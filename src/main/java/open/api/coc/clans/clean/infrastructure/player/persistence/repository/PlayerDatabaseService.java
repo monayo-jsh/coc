@@ -73,6 +73,12 @@ public class PlayerDatabaseService implements PlayerRepository {
         List<PlayerTroopsEntity> troopsEntities = Stream.of(petEntities, siegeMachineEntities).flatMap(Collection::stream).toList();
         playerEntity.changeTroops(troopsEntities);
 
+        // 플레이어 유무 확인
+        boolean isExistsPlayer = jpaPlayerRepository.existsById(newPlayer.getTag());
+        if (isExistsPlayer) {
+            playerEntity.markNotNew();
+        }
+
         PlayerEntity savePlayerEntity = jpaPlayerRepository.save(playerEntity);
         return playerEntityMapper.toPlayer(savePlayerEntity);
     }

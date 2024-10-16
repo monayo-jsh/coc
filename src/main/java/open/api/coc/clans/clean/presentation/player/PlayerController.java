@@ -71,4 +71,19 @@ public class PlayerController {
                              .body(playerUseCase.registerPlayer(playerTag));
     }
 
+    @Operation(
+        summary = "플레이어를 현행화합니다. version: 1.00, Last Update: 24.10.16",
+        description = "이 API는 서버에 저장된 플레이어 정보를 현행화합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{playerTag}/synchronize")
+    public ResponseEntity<Void> syncPlayer(@PathVariable String playerTag) {
+        playerUseCase.synchronizePlayer(playerTag);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
 }

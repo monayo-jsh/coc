@@ -25,7 +25,8 @@ public class PlayerSiegeMachine {
     private Integer maxLevel; // 최대 레벨
 
 
-    private PlayerSiegeMachine(String name, Integer level, Integer maxLevel, String village) {
+    private PlayerSiegeMachine(String playerTag, String name, Integer level, Integer maxLevel, String village) {
+        this.playerTag = playerTag;
         this.name = name;
         this.level = level;
         this.maxLevel = maxLevel;
@@ -56,6 +57,11 @@ public class PlayerSiegeMachine {
         }
     }
 
+    public void changeInfo(PlayerSiegeMachine newSiegeMachine) {
+        this.level = newSiegeMachine.getLevel();
+        this.maxLevel = newSiegeMachine.getMaxLevel();
+    }
+
 
     public static class PlayerSiegeMachineBuilder {
         private String playerTag;
@@ -67,7 +73,7 @@ public class PlayerSiegeMachine {
         private Integer maxLevel;
 
         public PlayerSiegeMachine build() {
-            return new PlayerSiegeMachine(name, level, maxLevel, village);
+            return new PlayerSiegeMachine(playerTag, name, level, maxLevel, village);
         }
 
     }

@@ -302,7 +302,10 @@ public class ClanWarService {
         if (Objects.isNull(clanWar)) return;
 
         mergeClanWarMember(clanWarEntity, clanWar);
-        clanWarEntity.changeStateWarCollected();
+
+        if (clanWar.isWarCollected()) {
+            clanWarEntity.changeStateWarCollected();
+        }
     }
 
     private ClanWar getClanWar(ClanWarEntity clanWarEntity) {
@@ -322,14 +325,24 @@ public class ClanWarService {
             Optional<ClanWar> findClanWar = clanApiService.findClanCurrentWarByClanTag(clanWarEntity.getClanTag());
             if (findClanWar.isEmpty()) {
                 log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanWarEntity.getClanTag());
+
+                clanWar.changeWarCollected(); // 수집 완료 설정
             } else {
                 // 수집하기 직전 최신 데이터로 수집 진행
                 ClanWar currentClanWar = findClanWar.get();
-                if (currentClanWar.isWarEnded() || currentClanWar.isInWar()) {
-                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                if (currentClanWar.isInWar()) {
+                    // 최신 데이터가 진행중인 경우 해당 데이터로 수집 진행 및 재수집하도록 수집 완료 설정하지 않음
                     clanWar = currentClanWar;
+                }
+                else if (currentClanWar.isWarEnded()) {
+                    // 최신 데이터가 전쟁 종료된 경우 해당 데이터로 수집 진행
+                    clanWar = currentClanWar;
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 } else {
                     log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanWarEntity.getClanTag());
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 }
 
                 // 최신 데이터 기록
@@ -353,14 +366,24 @@ public class ClanWarService {
             Optional<ClanWar> findClanWarLeague = clanApiService.findWarLeagueByWarTag(warTag);
             if (findClanWarLeague.isEmpty()) {
                 log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanTag);
+
+                clanWar.changeWarCollected(); // 수집 완료 설정
             } else {
                 // 수집하기 직전 최신 데이터로 수집 진행
                 ClanWar clanWarLeague = findClanWarLeague.get();
-                if (clanWarLeague.isWarEnded() || clanWarLeague.isInWar()) {
-                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                if (clanWarLeague.isInWar()) {
+                    // 최신 데이터가 진행중이면 해당 데이터로 수집 진행 및 재수집하도록 수집 완료 설정하지 않음
                     clanWar = clanWarLeague;
+                }
+                else if (clanWarLeague.isWarEnded()) {
+                    // 최신 데이터가 전쟁 종료된 경우 해당 데이터로 수집 진행
+                    clanWar = clanWarLeague;
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 } else {
                     log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanTag);
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 }
 
                 // 최신 데이터 기록

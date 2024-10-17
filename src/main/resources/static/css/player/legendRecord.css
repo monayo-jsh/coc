@@ -71,7 +71,7 @@ body {
     gap: 1px;
 
     .radio.item {
-      display: flex;
+      display: contents;
     }
   }
 

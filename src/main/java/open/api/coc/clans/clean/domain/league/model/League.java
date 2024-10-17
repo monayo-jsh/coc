@@ -14,8 +14,8 @@ import open.api.coc.clans.clean.domain.common.model.IconUrl;
 @Builder
 public class League {
 
-    private Integer id;
-    private String name;
-    private IconUrl iconUrl;
+    private Integer id; // 고유키
+    private String name; // 이름
+    private IconUrl iconUrl; // 아이콘 정보
 
 }

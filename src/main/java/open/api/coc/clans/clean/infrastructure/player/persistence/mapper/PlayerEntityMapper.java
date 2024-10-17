@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.infrastructure.player.persistence.mapper;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerPet;
 import open.api.coc.clans.clean.domain.player.model.PlayerSiegeMachine;
@@ -56,7 +57,7 @@ public abstract class PlayerEntityMapper {
         return troopsEntities.stream()
                              .filter(PlayerTroopsEntity::isPet)
                              .map(playerTroopsEntityMapper::toPlayerPet)
-                             .toList();
+                             .collect(Collectors.toList());
     }
 
     @Named(value = "mapSiegeMachines")
@@ -64,7 +65,7 @@ public abstract class PlayerEntityMapper {
         return troopsEntities.stream()
                              .filter(PlayerTroopsEntity::isSiegeMachine)
                              .map(playerTroopsEntityMapper::toPlayerSiegeMachine)
-                             .toList();
+                             .collect(Collectors.toList());
     }
 
 }

@@ -100,10 +100,13 @@ public class PlayerUseCase {
         playerService.ensurePlayerDoesNotExist(playerTag);
 
         // COC 플레이어 최신 정보를 조회한다.
-        Player player = playerClient.findByTag(playerTag);
+        Player latestPlayer = playerClient.findByTag(playerTag);
+
+        // 플레이어가 가입한 클랜 데이터 생성
+        clanService.createIfNotExists(latestPlayer.getClanTag());
 
         // 플레리어를 저장한다.
-        Player savePlayer = playerService.create(player);
+        Player savePlayer = playerService.create(latestPlayer);
 
         // 응답한다.
         return mapToPlayerResponse(savePlayer);
@@ -116,6 +119,9 @@ public class PlayerUseCase {
 
         // COC 플레이어 최신 정보를 조회한다.
         Player latestPlayer = playerClient.findByTag(playerTag);
+
+        // 플레이어가 가입한 클랜 데이터 생성
+        clanService.createIfNotExists(latestPlayer.getClanTag());
 
         // 플레이어의 트로피, 공/방 변화를 기록한다.
         playerRecordService.createHistory(player, latestPlayer);

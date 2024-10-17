@@ -6,6 +6,7 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ForeignKey;
@@ -20,21 +21,26 @@ import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
+import open.api.coc.clans.database.entity.common.YnType;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Persistable;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Builder
-@Getter @Setter
+@Setter // 리팩토링 끝나면 제거
+@Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "tb_clan")
+@Builder
 public class ClanEntity implements Persistable<String> {
 
     @Id
@@ -80,6 +86,7 @@ public class ClanEntity implements Persistable<String> {
     private String warDescription;
 
     @Column(name = "reg_date", nullable = false)
+    @CreatedDate
     private LocalDateTime regDate;
 
     // clanContent 1:1 관계 NULL 불가에 따라 Lazy 로드 가능하도록 외래키 조건 제거
@@ -115,6 +122,7 @@ public class ClanEntity implements Persistable<String> {
     }
 
     public void changeBadgeUrl(ClanBadgeEntity iconUrl) {
+        iconUrl.changeTag(this.tag);
         this.badgeUrl = iconUrl;
     }
 

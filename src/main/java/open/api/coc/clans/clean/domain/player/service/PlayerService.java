@@ -56,4 +56,11 @@ public class PlayerService {
     public List<String> findAllPlayerTags() {
         return playerRepository.findAllPlayerTags();
     }
+
+    @Transactional
+    public void delete(String playerTag) {
+        findById(playerTag);
+
+        playerRepository.deleteById(playerTag);
+    }
 }

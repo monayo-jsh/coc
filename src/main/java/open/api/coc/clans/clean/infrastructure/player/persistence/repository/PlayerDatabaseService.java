@@ -114,4 +114,9 @@ public class PlayerDatabaseService implements PlayerRepository {
         return playerEntityMapper.toPlayer(savePlayerEntity);
     }
 
+    @Override
+    public void deleteById(String playerTag) {
+        jpaPlayerRepository.deleteById(playerTag);
+    }
+
 }

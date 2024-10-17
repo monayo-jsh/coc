@@ -20,7 +20,7 @@ import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerDTO;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPK;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -339,10 +339,10 @@ public class ClansService {
             playersService.registerPlayer(playerTag);
         }
 
-        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
-                                                                                    .seasonDate(seasonDate)
-                                                                                    .playerTag(playerTag)
-                                                                                    .build();
+        ClanAssignedPlayerPK clanAssignedPlayerPK = ClanAssignedPlayerPK.builder()
+                                                                        .seasonDate(seasonDate)
+                                                                        .playerTag(playerTag)
+                                                                        .build();
 
         Optional<ClanAssignedPlayerEntity> findClanAssignedPlayer = clanAssignedPlayerRepository.findById(clanAssignedPlayerPK);
         if (findClanAssignedPlayer.isPresent()) {
@@ -371,10 +371,10 @@ public class ClansService {
 
     @Transactional
     public void deleteClanAssignedMember(String clanTag, String seasonDate, String playerTag) {
-        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
-                                                                                    .seasonDate(seasonDate)
-                                                                                    .playerTag(playerTag)
-                                                                                    .build();
+        ClanAssignedPlayerPK clanAssignedPlayerPK = ClanAssignedPlayerPK.builder()
+                                                                        .seasonDate(seasonDate)
+                                                                        .playerTag(playerTag)
+                                                                        .build();
 
         clanAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
     }
@@ -442,10 +442,10 @@ public class ClansService {
                                         .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(player.getClanTag())));
 
         return ClanAssignedPlayerEntity.builder()
-                                       .id(ClanAssignedPlayerPKEntity.builder()
-                                                                     .seasonDate(seasonDate)
-                                                                     .playerTag(player.getPlayerTag())
-                                                                     .build())
+                                       .id(ClanAssignedPlayerPK.builder()
+                                                               .seasonDate(seasonDate)
+                                                               .playerTag(player.getPlayerTag())
+                                                               .build())
                                        .clan(clan)
                                        .build();
     }
@@ -491,10 +491,10 @@ public class ClansService {
             playersService.registerPlayer(playerTag);
         }
 
-        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
-                                                                                    .seasonDate(seasonDate)
-                                                                                    .playerTag(playerTag)
-                                                                                    .build();
+        ClanAssignedPlayerPK clanAssignedPlayerPK = ClanAssignedPlayerPK.builder()
+                                                                        .seasonDate(seasonDate)
+                                                                        .playerTag(playerTag)
+                                                                        .build();
 
         Optional<ClanLeagueAssignedPlayerEntity> findClanLeagueAssignedPlayer = clanLeagueAssignedPlayerRepository.findById(clanAssignedPlayerPK);
         if (findClanLeagueAssignedPlayer.isPresent()) {
@@ -523,10 +523,10 @@ public class ClansService {
 
     @Transactional
     public void deleteClanLeagueAssignedMember(String clanTag, String seasonDate, String playerTag) {
-        ClanAssignedPlayerPKEntity clanAssignedPlayerPK = ClanAssignedPlayerPKEntity.builder()
-                                                                                    .seasonDate(seasonDate)
-                                                                                    .playerTag(playerTag)
-                                                                                    .build();
+        ClanAssignedPlayerPK clanAssignedPlayerPK = ClanAssignedPlayerPK.builder()
+                                                                        .seasonDate(seasonDate)
+                                                                        .playerTag(playerTag)
+                                                                        .build();
 
         clanLeagueAssignedPlayerRepository.deleteById(clanAssignedPlayerPK);
     }
@@ -557,10 +557,10 @@ public class ClansService {
                                         .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 실패".formatted(player.getClanTag())));
 
         return ClanLeagueAssignedPlayerEntity.builder()
-                                             .id(ClanAssignedPlayerPKEntity.builder()
-                                                                           .seasonDate(seasonDate)
-                                                                           .playerTag(player.getPlayerTag())
-                                                                           .build())
+                                             .id(ClanAssignedPlayerPK.builder()
+                                                                     .seasonDate(seasonDate)
+                                                                     .playerTag(player.getPlayerTag())
+                                                                     .build())
                                              .clan(clan)
                                              .build();
     }

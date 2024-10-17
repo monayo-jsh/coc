@@ -15,6 +15,7 @@ import open.api.coc.clans.clean.application.player.PlayerUseCase;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -89,6 +90,22 @@ public class PlayerController {
     public ResponseEntity<PlayerResponse> postPlayer(@PathVariable String playerTag) {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.registerPlayer(playerTag));
+    }
+
+    @Operation(
+        summary = "플레이어를 삭제합니다. version: 1.00, Last Update: 24.10.17",
+        description = "이 API는 서버 등록된 플레이어를 삭제합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @DeleteMapping("/{playerTag}")
+    public ResponseEntity<Void> removePlayer(@PathVariable String playerTag) {
+        playerUseCase.removePlayer(playerTag);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
     }
 
     @Operation(

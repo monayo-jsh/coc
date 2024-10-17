@@ -1,9 +1,9 @@
 package open.api.coc.clans.database.repository.clan;
 
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
 import static open.api.coc.clans.database.entity.clan.QClanAssignedPlayerEntity.clanAssignedPlayerEntity;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
@@ -51,7 +51,7 @@ public class ClanAssignedPlayerQueryRepository {
     public long deleteBySeasonDateAndPlayerTags(String seasonDate, List<String> playerTags) {
         return queryFactory.delete(clanAssignedPlayerEntity)
                            .where(clanAssignedPlayerEntity.id.seasonDate.eq(seasonDate)
-                                                                        .and(clanAssignedPlayerEntity.id.playerTag.in(playerTags)))
+                                                                              .and(clanAssignedPlayerEntity.id.playerTag.in(playerTags)))
                            .execute();
 
     }

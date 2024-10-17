@@ -27,7 +27,7 @@ import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPK;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
@@ -571,10 +571,10 @@ public class PlayersService {
             return;
         }
 
-        clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
-                                                                          .seasonDate(latestAssignedSeasonDate)
-                                                                          .playerTag(player.getPlayerTag())
-                                                                          .build());
+        clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPK.builder()
+                                                                    .seasonDate(latestAssignedSeasonDate)
+                                                                    .playerTag(player.getPlayerTag())
+                                                                    .build());
     }
 
     private void deleteClanLeague(PlayerEntity player) {
@@ -583,10 +583,10 @@ public class PlayersService {
             return;
         }
 
-        clanLeagueAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
-                                                                                .seasonDate(latestAssignedSeasonDate)
-                                                                                .playerTag(player.getPlayerTag())
-                                                                                .build());
+        clanLeagueAssignedPlayerRepository.deleteById(ClanAssignedPlayerPK.builder()
+                                                                          .seasonDate(latestAssignedSeasonDate)
+                                                                          .playerTag(player.getPlayerTag())
+                                                                          .build());
     }
 
     public List<String> findAllPlayerTags() {
@@ -604,10 +604,10 @@ public class PlayersService {
 
         // 지원계정 전환 시 배정된 클랜 제거
         if (playerModify.isSupport()) {
-            clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPKEntity.builder()
-                                                                              .seasonDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM")))
-                                                                              .playerTag(player.getPlayerTag())
-                                                                              .build());
+            clanAssignedPlayerRepository.deleteById(ClanAssignedPlayerPK.builder()
+                                                                        .seasonDate(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM")))
+                                                                        .playerTag(player.getPlayerTag())
+                                                                        .build());
         }
     }
 

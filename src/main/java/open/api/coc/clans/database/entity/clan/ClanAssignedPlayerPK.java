@@ -17,7 +17,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
-public class ClanAssignedPlayerPKEntity implements Serializable {
+public class ClanAssignedPlayerPK implements Serializable {
 
     @Column(name = "season_date", nullable = false, length = 6)
     private String seasonDate;
@@ -25,4 +25,7 @@ public class ClanAssignedPlayerPKEntity implements Serializable {
     @Column(name = "player_tag", nullable = false, length = 100)
     private String playerTag;
 
+    public static ClanAssignedPlayerPK of(String seasonDate, String playerTag) {
+        return new ClanAssignedPlayerPK(seasonDate, playerTag);
+    }
 }

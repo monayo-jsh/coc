@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
+import open.api.coc.clans.clean.domain.clan.service.ClanLeagueAssignService;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
@@ -32,6 +34,10 @@ public class PlayerUseCase {
     private final PlayerDonationService playerDonationService;
 
     private final ClanService clanService;
+    private final ClanAssignService clanAssignService;
+    private final ClanLeagueAssignService clanLeagueAssignService;
+
+
     private final LeagueService leagueService;
 
     private final PlayerUseCaseMapper playerUseCaseMapper;
@@ -161,4 +167,15 @@ public class PlayerUseCase {
         }
     }
 
+    @Transactional
+    public void removePlayer(String playerTag) {
+        // 최근 클랜 배정 삭제
+        clanAssignService.cancelRecently(playerTag);
+
+        // 최근 리그 배정 삭제
+        clanLeagueAssignService.cancelRecently(playerTag);
+
+        // 플레이어 삭제
+        playerService.delete(playerTag);
+    }
 }

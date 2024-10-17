@@ -17,5 +17,5 @@ public interface PlayerRepository {
     boolean exists(String playerTag);
 
     Player save(Player newPlayer);
-
+    void deleteById(String playerTag);
 }

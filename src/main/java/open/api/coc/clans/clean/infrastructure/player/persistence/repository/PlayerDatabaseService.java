@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 public class PlayerDatabaseService implements PlayerRepository {
 
     private final JpaPlayerRepository jpaPlayerRepository;
+    private final JpaPlayerCustomRepository jpaPlayerCustomRepository;
 
     private final JpaClanRepository jpaClanRepository;
     private final JpaLeagueRepository jpaLeagueRepository;
@@ -50,6 +51,11 @@ public class PlayerDatabaseService implements PlayerRepository {
                                   .stream()
                                   .map(playerEntityMapper::toSummarizedPlayer)
                                   .toList();
+    }
+
+    @Override
+    public List<String> findAllPlayerTags() {
+        return jpaPlayerCustomRepository.findAllPlayerTag();
     }
 
     @Override

@@ -37,19 +37,15 @@ public class PlayerUseCase {
     private final PlayerUseCaseMapper playerUseCaseMapper;
 
     @Transactional(readOnly = true)
-    public List<PlayerResponse> getAllPlayers() {
+    public List<PlayerResponse> getAllPlayers(String viewMode) {
         // 플레이어 목록을 조회한다.
-        List<Player> players = playerService.findAllPlayers();
+        List<Player> players;
+        if ("summary".equals(viewMode)) { // 확장될 경우 Enum 등으로 객체 처리
+            players = playerService.findSummarizedPlayers();
+        } else {
+            players = playerService.findAllPlayers();
+        }
 
-        return mapToPlayerRespons(players);
-    }
-
-    @Transactional(readOnly = true)
-    public List<PlayerResponse> getAllSummarizedPlayers() {
-        // 플레이어 목록을 조회한다.
-        List<Player> players = playerService.findSummarizedPlayers();
-
-        // 클랜 정보를 조회한다.
         return mapToPlayerRespons(players);
     }
 
@@ -66,6 +62,7 @@ public class PlayerUseCase {
                       .toList();
     }
 
+
     private PlayerResponse mapToPlayerResponse(Player player, Map<String, Clan> clanMap, Map<Integer, League> leagueMap) {
         Clan clan = null;
         League league = null;
@@ -77,6 +74,12 @@ public class PlayerUseCase {
         }
 
         return playerUseCaseMapper.toPlayerResponse(player, clan, league);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> getAllPlayerTags() {
+        // 플레이어 태그 목록을 반환한다.
+        return playerService.findAllPlayerTags();
     }
 
     @Transactional(readOnly = true)

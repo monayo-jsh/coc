@@ -1,6 +1,8 @@
 package open.api.coc.clans.clean.presentation.player;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "플레이어", description = "플레이어 관련 기능")
@@ -28,31 +31,34 @@ public class PlayerController {
     private final PlayerUseCase playerUseCase;
 
     @Operation(
-        summary = "플레이어 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
-        description = "이 API는 서버에 등록된 플레이어 목록으로 제공됩니다."
+        summary = "플레이어 전체 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
+        description = "이 API는 서버에 등록된 플레이어 전체 목록으로 제공됩니다."
+    )
+    @Parameters(
+        @Parameter(name = "viewMode", description = "조회 모드 (detail: 전체 제공, summary: 플레이어 영웅, 영웅장비까지만 제공)", required = false)
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerResponse.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("")
-    public ResponseEntity<List<PlayerResponse>> getPlayers() {
+    public ResponseEntity<List<PlayerResponse>> getAllPlayers(@RequestParam(defaultValue = "detail") String viewMode) {
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(playerUseCase.getAllPlayers());
+                             .body(playerUseCase.getAllPlayers(viewMode));
     }
 
     @Operation(
-        summary = "플레이어 목록(요약)을 조회합니다. version: 1.00, Last Update: 24.10.17",
-        description = "이 API는 서버에 등록된 플레이어 목록으로 제공됩니다."
+        summary = "플레이어 전체 태그 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
+        description = "이 API는 서버에 등록된 플레이어 전체 태그 목록으로 제공됩니다."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = String.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @GetMapping("/summary")
-    public ResponseEntity<List<PlayerResponse>> getSummarizedPlayers() {
+    @GetMapping("/tags")
+    public ResponseEntity<List<String>> getAllPlayerTags() {
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(playerUseCase.getAllSummarizedPlayers());
+                             .body(playerUseCase.getAllPlayerTags());
     }
 
     @Operation(

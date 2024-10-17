@@ -45,6 +45,14 @@ public class PlayerDatabaseService implements PlayerRepository {
     }
 
     @Override
+    public List<Player> findAllSummarized() {
+        return jpaPlayerRepository.findAll()
+                                  .stream()
+                                  .map(playerEntityMapper::toSummarizedPlayer)
+                                  .toList();
+    }
+
+    @Override
     public Optional<Player> findById(String playerTag) {
         return jpaPlayerRepository.findById(playerTag)
                                   .map(playerEntityMapper::toPlayer);

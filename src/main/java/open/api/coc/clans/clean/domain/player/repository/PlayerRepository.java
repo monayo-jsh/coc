@@ -8,10 +8,13 @@ public interface PlayerRepository {
 
     List<Player> findAll();
 
+    List<Player> findAllSummarized();
+
     Optional<Player> findById(String playerTag);
 
     boolean exists(String playerTag);
 
     Player save(Player newPlayer);
+
 
 }

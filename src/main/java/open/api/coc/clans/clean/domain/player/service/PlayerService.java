@@ -21,6 +21,11 @@ public class PlayerService {
     }
 
     @Transactional(readOnly = true)
+    public List<Player> findSummarizedPlayers() {
+        return playerRepository.findAllSummarized();
+    }
+
+    @Transactional(readOnly = true)
     public Player findById(String playerTag) {
         if (playerTag == null || playerTag.isEmpty()) {
             throw new IllegalArgumentException("playerTag can not be null or empty");
@@ -47,5 +52,4 @@ public class PlayerService {
     public Player save(Player player) {
         return playerRepository.save(player);
     }
-
 }

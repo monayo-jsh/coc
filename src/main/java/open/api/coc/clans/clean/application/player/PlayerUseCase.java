@@ -41,6 +41,19 @@ public class PlayerUseCase {
         // 플레이어 목록을 조회한다.
         List<Player> players = playerService.findAllPlayers();
 
+        return mapToPlayerRespons(players);
+    }
+
+    @Transactional(readOnly = true)
+    public List<PlayerResponse> getAllSummarizedPlayers() {
+        // 플레이어 목록을 조회한다.
+        List<Player> players = playerService.findSummarizedPlayers();
+
+        // 클랜 정보를 조회한다.
+        return mapToPlayerRespons(players);
+    }
+
+    private List<PlayerResponse> mapToPlayerRespons(List<Player> players) {
         // 클랜 정보를 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(players.stream().map(Player::getClanTag).distinct().toList());
 
@@ -144,4 +157,5 @@ public class PlayerUseCase {
             log.error("[%s] 플레이어 동기화 실패: %s".formatted(taskName, playerTag), e);
         }
     }
+
 }

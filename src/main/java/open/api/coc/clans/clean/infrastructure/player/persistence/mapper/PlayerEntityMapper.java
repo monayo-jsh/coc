@@ -46,6 +46,14 @@ public abstract class PlayerEntityMapper {
     @Mapping(target = "siegeMachines", source = "troops", qualifiedByName = "mapSiegeMachines")
     public abstract Player toPlayer(PlayerEntity playerEntity);
 
+    @Mapping(target = "tag", source = "playerTag")
+    @Mapping(target = "clanTag", source = "clan.tag")
+    @Mapping(target = "leagueId", source = "league.id")
+    @Mapping(target = "spells", ignore = true)
+    @Mapping(target = "pets", ignore = true)
+    @Mapping(target = "siegeMachines", ignore = true)
+    public abstract Player toSummarizedPlayer(PlayerEntity playerEntity);
+
     @AfterMapping
     protected void afterMappingToPlayer(PlayerEntity playerEntity, @MappingTarget Player.PlayerBuilder playerBuilder) {
         if (playerBuilder == null) return;

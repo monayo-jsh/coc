@@ -42,6 +42,20 @@ public class PlayerController {
     }
 
     @Operation(
+        summary = "플레이어 목록(요약)을 조회합니다. version: 1.00, Last Update: 24.10.17",
+        description = "이 API는 서버에 등록된 플레이어 목록으로 제공됩니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/summary")
+    public ResponseEntity<List<PlayerResponse>> getSummarizedPlayers() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getAllSummarizedPlayers());
+    }
+
+    @Operation(
         summary = "플레이어 정보를 조회합니다. version: 1.00, Last Update: 24.10.02",
         description = "이 API는 서버에 등록된 플레이어 정보로 제공됩니다."
     )

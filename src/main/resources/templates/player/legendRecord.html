@@ -137,17 +137,26 @@
 
       function addZeroRecordToTable(record, attackRecordTable, defenceRecordTable) {
         // 0점으로 수집된 기록을 처리한다.
-        // 공격이 0점일 수도, 방어가 0점일 수도, 공/방 집계되어 0점일 수도 있는 상황
+        const { oldDefenceWins, newDefenceWins } = record;
         const recordRow = makeRecord(record);
 
         const attackRecordTbody = attackRecordTable.querySelector('.table-tbody');
+        const defenceRecordTbody = defenceRecordTable.querySelector('.table-tbody');
+
+        // 방어 성공 기록으로 처리
+        if (newDefenceWins > oldDefenceWins) {
+          recordRow.querySelector('.table-td').classList.add('bg-green');
+          
+          defenceRecordTbody.appendChild(recordRow);
+          return;
+        }
+
         // 전설 8공이 채워지지 않은 경우
         if (attackRecordTbody.children.length < 8) {
           attackRecordTbody.appendChild(recordRow);
           return;
         }
 
-        const defenceRecordTbody = defenceRecordTable.querySelector('.table-tbody');
         defenceRecordTbody.appendChild(recordRow);
       }
     }

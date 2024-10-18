@@ -137,17 +137,38 @@
 
       function addZeroRecordToTable(record, attackRecordTable, defenceRecordTable) {
         // 0점으로 수집된 기록을 처리한다.
-        // 공격이 0점일 수도, 방어가 0점일 수도, 공/방 집계되어 0점일 수도 있는 상황
+        const { oldAttackWins, newAttackWins, oldDefenceWins, newDefenceWins } = record;
         const recordRow = makeRecord(record);
 
         const attackRecordTbody = attackRecordTable.querySelector('.table-tbody');
+        const defenceRecordTbody = defenceRecordTable.querySelector('.table-tbody');
+
+        if (newAttackWins > oldAttackWins) {
+          // 공격 성공 횟수가 있는 경우 공격과 방어가 동시에 반영된 데이터로 양쪽에 40점씩 보정
+          const attackCalibrationRecord = { ...record, diffTrophies: 40 };
+          const attackCalibrationRecordRow = makeRecord(attackCalibrationRecord);
+          attackRecordTbody.appendChild(attackCalibrationRecordRow);
+
+          const defenceCalibrationRecord = { ...record, diffTrophies: -40 };
+          const defenceCalibrationRecordRow = makeRecord(defenceCalibrationRecord);
+          defenceRecordTbody.appendChild(defenceCalibrationRecordRow);
+          return;
+        }
+
+        if (newDefenceWins > oldDefenceWins) {
+          recordRow.querySelector('.table-td').classList.add('bg-green');
+          
+          // 방어 성공한 경우
+          defenceRecordTbody.appendChild(recordRow);
+          return;
+        }
+
         // 전설 8공이 채워지지 않은 경우
         if (attackRecordTbody.children.length < 8) {
           attackRecordTbody.appendChild(recordRow);
           return;
         }
 
-        const defenceRecordTbody = defenceRecordTable.querySelector('.table-tbody');
         defenceRecordTbody.appendChild(recordRow);
       }
     }

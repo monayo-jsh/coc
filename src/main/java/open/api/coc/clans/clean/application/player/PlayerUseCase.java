@@ -43,13 +43,13 @@ public class PlayerUseCase {
     private final PlayerUseCaseMapper playerUseCaseMapper;
 
     @Transactional(readOnly = true)
-    public List<PlayerResponse> getAllPlayers(String viewMode) {
+    public List<PlayerResponse> getAllPlayers(String accountType, String viewMode) {
         // 플레이어 목록을 조회한다.
         List<Player> players;
         if ("summary".equals(viewMode)) { // 확장될 경우 Enum 등으로 객체 처리
-            players = playerService.findSummarizedPlayers();
+            players = playerService.findSummarizedPlayers(accountType);
         } else {
-            players = playerService.findAllPlayers();
+            players = playerService.findAllPlayers(accountType);
         }
 
         return mapToPlayerRespons(players);

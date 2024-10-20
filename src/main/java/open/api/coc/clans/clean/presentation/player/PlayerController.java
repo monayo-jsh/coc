@@ -36,16 +36,20 @@ public class PlayerController {
         description = "이 API는 서버에 등록된 플레이어 전체 목록으로 제공됩니다."
     )
     @Parameters(
-        @Parameter(name = "viewMode", description = "조회 모드 (detail: 전체 제공, summary: 플레이어 영웅, 영웅장비까지만 제공)", required = false)
+        value = {
+            @Parameter(name = "viewMode", description = "조회 모드 (detail: 전체 제공, summary: 플레이어 영웅, 영웅장비까지만 제공)", required = false),
+            @Parameter(name = "accountType", description = "계정 유형 (support: 지원계정)", required = false)
+        }
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerResponse.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("")
-    public ResponseEntity<List<PlayerResponse>> getAllPlayers(@RequestParam(defaultValue = "detail") String viewMode) {
+    public ResponseEntity<List<PlayerResponse>> getAllPlayers(@RequestParam(defaultValue = "all") String accountType,
+                                                              @RequestParam(defaultValue = "detail") String viewMode) {
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(playerUseCase.getAllPlayers(viewMode));
+                             .body(playerUseCase.getAllPlayers(accountType, viewMode));
     }
 
     @Operation(

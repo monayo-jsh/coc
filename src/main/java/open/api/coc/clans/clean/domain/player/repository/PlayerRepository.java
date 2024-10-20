@@ -6,9 +6,9 @@ import open.api.coc.clans.clean.domain.player.model.Player;
 
 public interface PlayerRepository {
 
-    List<Player> findAll();
+    List<Player> findAll(String accountType);
 
-    List<Player> findAllSummarized();
+    List<Player> findAllSummarized(String accountType);
 
     List<String> findAllPlayerTags();
 

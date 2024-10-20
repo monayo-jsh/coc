@@ -38,19 +38,19 @@ public class PlayerDatabaseService implements PlayerRepository {
     private final PlayerTroopsEntityMapper troopsEntityMapper;
 
     @Override
-    public List<Player> findAll() {
-        return jpaPlayerRepository.findAll()
-                                  .stream()
-                                  .map(playerEntityMapper::toPlayer)
-                                  .toList();
+    public List<Player> findAll(String accountType) {
+        return jpaPlayerCustomRepository.findAll(accountType)
+                                        .stream()
+                                        .map(playerEntityMapper::toPlayer)
+                                        .toList();
     }
 
     @Override
-    public List<Player> findAllSummarized() {
-        return jpaPlayerRepository.findAll()
-                                  .stream()
-                                  .map(playerEntityMapper::toSummarizedPlayer)
-                                  .toList();
+    public List<Player> findAllSummarized(String accountType) {
+        return jpaPlayerCustomRepository.findAll(accountType)
+                                        .stream()
+                                        .map(playerEntityMapper::toSummarizedPlayer)
+                                        .toList();
     }
 
     @Override

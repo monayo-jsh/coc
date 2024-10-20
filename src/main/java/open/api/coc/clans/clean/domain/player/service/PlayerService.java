@@ -16,13 +16,13 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
 
     @Transactional(readOnly = true)
-    public List<Player> findAllPlayers() {
-        return playerRepository.findAll();
+    public List<Player> findAllPlayers(String accountType) {
+        return playerRepository.findAll(accountType);
     }
 
     @Transactional(readOnly = true)
-    public List<Player> findSummarizedPlayers() {
-        return playerRepository.findAllSummarized();
+    public List<Player> findSummarizedPlayers(String accountType) {
+        return playerRepository.findAllSummarized(accountType);
     }
 
     @Transactional(readOnly = true)

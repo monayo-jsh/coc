@@ -118,12 +118,19 @@
     }
 
     function renderAssignedDate(viewType, assignedDate) {
-      const target = document.querySelector('.assigned-date');
+      const assignedLabel = document.querySelector('.assigned-label:not(.loading)');
+
+      const target = assignedLabel.querySelector('.assigned-date');
       if (assignedDate) {
         target.innerHTML = formatYYYYMM(dayjs(assignedDate));
       }
-      const viewTypeTarget = document.querySelector('.view-type');
+      const viewTypeTarget = assignedLabel.querySelector('.view-type');
       viewTypeTarget.innerHTML = viewType === 'league' ? "리그전" : "클랜전"
+
+      toggleDisplay(assignedLabel);
+
+      const prefixAssignedLabel = document.querySelector('.assigned-label.loading');
+      toggleDisplay(prefixAssignedLabel);
     }
 
     let leagueMap = new Map();
@@ -153,6 +160,9 @@
 
     async function drawAssignedMember() {
       const viewType = getUriForClanWarViewType();
+
+      showWifiLoading(".section");
+
       const clans = await fetchViewClans(viewType);
       const clanAssignedMembers = await fetchAssignedMembers(viewType);
       const assignedDate = clanAssignedMembers?.seasonDate;
@@ -166,10 +176,13 @@
         const clanAssignedTable = drawClanAssignedTable(viewType, clan, clanAssignedMemberMap.get(clan.tag));
         assignedTableWrapper.appendChild(clanAssignedTable);
       }
+
+      hideWifiLoading(".section");
     }
 
     window.onload = async () => {
       await loadLeagues();
+
       await drawAssignedMember();
     }
   </script>
@@ -177,7 +190,25 @@
 </head>
 <body>
 <div class="section">
-  <div class="assigned-label"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
+  <div id="wifi-loader" class="display-none">
+    <svg class="circle-outer" viewBox="0 0 86 86">
+      <circle class="back" cx="43" cy="43" r="40"></circle>
+      <circle class="front" cx="43" cy="43" r="40"></circle>
+      <circle class="new" cx="43" cy="43" r="40"></circle>
+    </svg>
+    <svg class="circle-middle" viewBox="0 0 60 60">
+      <circle class="back" cx="30" cy="30" r="27"></circle>
+      <circle class="front" cx="30" cy="30" r="27"></circle>
+    </svg>
+    <svg class="circle-inner" viewBox="0 0 34 34">
+      <circle class="back" cx="17" cy="17" r="14"></circle>
+      <circle class="front" cx="17" cy="17" r="14"></circle>
+    </svg>
+    <div class="text" data-text="Searching"></div>
+  </div>
+
+  <div class="assigned-label loading">배정표 불러오는중 ...</div>
+  <div class="assigned-label display-none"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
   <div class="assigned-table-wrapper"></div>
 </div>
 </body>

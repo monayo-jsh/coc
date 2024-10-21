@@ -14,39 +14,40 @@
   <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
 
   <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script>
-    async function checkClashOfClanServer() {
-      axios.get("/leagues")
-           .then((response) => {})
-           .catch((error) => {
-             const { response } = error;
-             const { status, data } = response;
-
-             let msg = 'Clash of Clan API Server\n'
-             const { reason, message } = data;
-             if (reason) {
-               msg += `\nreason: ${reason}`;
-             }
-             if (message) {
-               msg += `\nmessage: ${message}`;
-             }
-
-             msg += `\n\n위와 같은 사유로 편의기능을 제공 불가`;
-
-             const codeContainerElement = document.querySelector('#code');
-             codeContainerElement.value = msg;
-
-             const homeWrapperElement = document.querySelector('.home-wrapper');
-             homeWrapperElement.classList.add('display-none');
-
-             const errorElement = document.querySelector('.error');
-             errorElement.classList.remove('display-none');
-           })
-    }
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>아카데미 클랜 편의기능</title>
+
+  <script>
+    function formatDate(date) {
+      if (date) {
+        const parseDate = dayjs(String(date));
+        const formatDate = formatYYYYMM(parseDate)
+        return `(${formatDate})`;
+      }
+      return date;
+    }
+
+    async function initAssignedDate() {
+      const latestClanAssignedSeasonDate = await latestClanAssignedDate();
+      const clanAssignedDate = formatDate(latestClanAssignedSeasonDate);
+      const clanAssignedDateDisplay = document.querySelector('.clan-assigned-date');
+      clanAssignedDateDisplay.innerHTML = clanAssignedDate;
+
+      const latestLeagueAssignedSeasonDate = await latestLeagueAssignedDate();
+      const leagueAssignedDate = formatDate(latestLeagueAssignedSeasonDate);
+      const leagueAssignedDateDisplay = document.querySelector('.league-assigned-date');
+      leagueAssignedDateDisplay.innerHTML = leagueAssignedDate;
+    }
+
+    window.onload = () => {
+      initAssignedDate();
+    }
+  </script>
 </head>
 <body>
   <div class="error display-none">
@@ -110,6 +111,16 @@
           <div class="card bg-black-2" onclick="renderPage('/clan'); return false;">
             <p class="tip">클랜 목록</p>
             <p class="second-text"></p>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('/assigned-member?view=none'); return false;">
+            <p class="tip">클랜 배정표</p>
+            <p class="second-text"><span class="clan-assigned-date">(조회중)</span></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('/assigned-member?view=league'); return false;">
+            <p class="tip">리그 배정표</p>
+            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
           </div>
         </div>
       </div>

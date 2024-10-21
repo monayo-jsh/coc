@@ -66,6 +66,9 @@ public class ClanResponseConverter implements Converter<Clan, ClanResponse> {
                            .capitalLeague(makeClanCapitalLeagueResponse(clanEntity.getCapitalLeague()))
                            .clanCapitalPoints(clanEntity.getCapitalPoints())
                            .clanCapital(makeClanCapitalResponse(clanEntity.getCapitalHallLevel()))
+                           .isMaxWar(clanEntity.getIsMaxWar())
+                           .isOccupy(clanEntity.getIsOccupy())
+                           .warDescription(clanEntity.getWarDescription())
                            .order(clanEntity.getOrder())
                            .clanContent(clanContentResponseConverter.convert(clanEntity.getClanContent()))
                            .build();

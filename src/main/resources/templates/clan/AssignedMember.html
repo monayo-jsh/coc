@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/warLeague.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/clan/assignedMember.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/league.js"></script>
+  <script src="/static/js/api/clan.js"></script>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <title>배정표 확인</title>
+
+  <script>
+    function convertArrayToMapByKey(array = []) {
+      return array.reduce((map, row) => {
+        const key = row.clan.tag;
+        if (!map.get(key)) {
+          map.set(key, []);
+        }
+
+        map.get(key).push(row);
+        return map;
+      }, new Map());
+    }
+
+    function drawMember(member) {
+      const { name, tag } = member;
+      const rowTemplate = copyTemplateById('assigned-table-row-template');
+      const row = rowTemplate.querySelector('.row');
+
+      row.innerHTML = row.innerHTML
+                         .replace(/{PLAYER_NAME}/, name);
+
+      return row;
+    }
+
+    function appendMember(table, clanAssignedMembers) {
+      const tableTbody = table.querySelector('.table-tbody');
+      const sortedMembers = clanAssignedMembers.sort((a, b) => a.name.localeCompare(b.name));
+      for (const member of sortedMembers) {
+        const memberRow = drawMember(member);
+        tableTbody.appendChild(memberRow);
+      }
+    }
+
+    function loadTemplate(viewType) {
+      if (viewType === 'league') {
+        return copyTemplateById('league-assigned-table-template')
+      }
+      return copyTemplateById('assigned-table-template');
+    }
+
+    function drawClanAssignedTable(viewType, clan, clanAssignedMembers = []) {
+      const tableTemplate = loadTemplate(viewType);
+      const table = tableTemplate.querySelector('.table');
+
+      const { name, isMaxWar, warDescription, isOccupy, warLeague } = clan;
+      table.innerHTML = table.innerHTML
+                             .replace(/{CLAN_NAME}/, name)
+                             .replace(/{WAR_LEAGUE}/, warLeague.name)
+                             .replace(/{WAR_TYPE}/, isMaxWar ? "맥스쟁" : "믹스쟁")
+                             .replace(/{WAR_DESCRIPTION}/, warDescription ? warDescription : "&nbsp")
+                             .replace(/{IS_OCCUPY}/, isOccupy ? "선점제" : "동번제")
+                             .replace(/{ASSIGNED_SIZE}/, clanAssignedMembers.length);
+
+      if (viewType === 'league') {
+        const warLeagueIconClassName = warLeague.name.replace(/\s/g, "");
+        const warLeagueImgIcon = table.querySelector('.img-icon');
+        warLeagueImgIcon.classList.add(warLeagueIconClassName);
+      }
+
+      appendMember(table, clanAssignedMembers);
+
+      return table;
+    }
+
+    function getUriForClanWarViewType() {
+      const urlSearchParams = new URLSearchParams(location.search);
+      return urlSearchParams.get('view');
+    }
+
+    async function fetchAssignedMembers(viewType) {
+      if (viewType === "league") {
+          return await latestLeagueAssignedMembers();
+      }
+
+      return await latestClanAssignedMembers();
+    }
+
+    function renderAssignedDate(viewType, assignedDate) {
+      const target = document.querySelector('.assigned-date');
+      if (assignedDate) {
+        target.innerHTML = formatYYYYMM(dayjs(assignedDate));
+      }
+      const viewTypeTarget = document.querySelector('.view-type');
+      viewTypeTarget.innerHTML = viewType === 'league' ? "리그전" : "클랜전"
+    }
+
+    let leagueMap = {}
+    async function loadLeagues() {
+      // 리그 목록 조회
+      const leagues = await fetchLeagues();
+      leagues.map(league => {
+        leagueMap[league.name] = league;
+      });
+    }
+    async function drawAssignedMember() {
+      const viewType = getUriForClanWarViewType();
+      const clans = await fetchWarClans(viewType);
+      const clanAssignedMembers = await fetchAssignedMembers(viewType);
+      const assignedDate = clanAssignedMembers?.seasonDate;
+
+      renderAssignedDate(viewType, assignedDate);
+
+      const clanAssignedMemberMap = convertArrayToMapByKey(clanAssignedMembers?.players);
+
+      const assignedTableWrapper = document.querySelector('.assigned-table-wrapper');
+      for(const clan of clans) {
+        const clanAssignedTable = drawClanAssignedTable(viewType, clan, clanAssignedMemberMap.get(clan.tag));
+        assignedTableWrapper.appendChild(clanAssignedTable);
+      }
+    }
+
+    window.onload = async () => {
+      await loadLeagues();
+      await drawAssignedMember();
+    }
+  </script>
+
+</head>
+<body>
+<div class="section">
+  <div class="assigned-label"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
+  <div class="assigned-table-wrapper"></div>
+</div>
+</body>
+<template id="assigned-table-template">
+  <table class="table assigned">
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div class="info">
+        <div class="clan-name">{CLAN_NAME}</div>
+      </div>
+    </caption>
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div class="description">{WAR_DESCRIPTION}</div>
+      <div class="description color-yellow"><div class="">{WAR_TYPE}</div> - <div>{IS_OCCUPY}</div></div>
+    </caption>
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div class="assigned-size">배정인원: {ASSIGNED_SIZE} 명</div>
+    </caption>
+    <tbody class="table-tbody"></tbody>
+  </table>
+</template>
+<template id="league-assigned-table-template">
+  <table class="table assigned">
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div class="info">
+        <div class="clan-name">{CLAN_NAME}</div>
+      </div>
+    </caption>
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div class="war-league">
+        <div class="img-icon"></div>
+        <div class="label font-small">{WAR_LEAGUE}</div>
+      </div>
+      <div class="description color-yellow">{IS_OCCUPY}</div>
+    </caption>
+    <caption class="table-caption font-weight-bold text-align-center bg-black">
+      <div>배정인원: {ASSIGNED_SIZE} 명</div>
+    </caption>
+    <tbody class="table-tbody"></tbody>
+  </table>
+</template>
+<template id="assigned-table-row-template">
+  <tr class="table-tr row">
+    <td class="table-td name">{PLAYER_NAME}</td>
+  </tr>
+</template>
+</html>

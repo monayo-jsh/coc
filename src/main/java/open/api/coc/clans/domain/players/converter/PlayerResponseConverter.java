@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerDTO;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
@@ -285,6 +286,14 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
     public PlayerResponse convert(ClanLeagueAssignedPlayerEntity source) {
         return PlayerResponse.builder()
                              .tag(source.getPlayerTag())
+                             .clan(makePlayerClanResponse(source.getClan()))
+                             .build();
+    }
+
+    public PlayerResponse convert(ClanAssignedPlayerDTO source) {
+        return PlayerResponse.builder()
+                             .tag(source.getPlayerTag())
+                             .name(source.getPlayerName())
                              .clan(makePlayerClanResponse(source.getClan()))
                              .build();
     }

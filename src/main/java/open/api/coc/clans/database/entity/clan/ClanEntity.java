@@ -62,6 +62,17 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "visible_yn", nullable = false)
     private YnType visibleYn = YnType.N;
 
+    @Builder.Default
+    @Column(name = "is_max_war", nullable = true)
+    private Boolean isMaxWar = false;
+
+    @Builder.Default
+    @Column(name = "is_occupy", nullable = true)
+    private Boolean isOccupy = false;
+
+    @Column(name = "war_description", nullable = true)
+    private String warDescription;
+
     @Column(name = "reg_date", nullable = false)
     private LocalDateTime regDate;
 

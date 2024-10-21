@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerDTO;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
@@ -382,7 +383,7 @@ public class ClansService {
 
         String latestSeasonDate = clanAssignedPlayerQueryRepository.findLatestSeasonDate();
 
-        List<ClanAssignedPlayerEntity> clanAssignedPlayers = clanAssignedPlayerQueryRepository.findAllBySeasonDate(latestSeasonDate);
+        List<ClanAssignedPlayerDTO> clanAssignedPlayers = clanAssignedPlayerQueryRepository.findAllBySeasonDate(latestSeasonDate);
 
         List<PlayerResponse> players = clanAssignedPlayers.stream()
                                                           .map(playerResponseConverter::convert)
@@ -456,7 +457,7 @@ public class ClansService {
             latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         }
 
-        List<ClanLeagueAssignedPlayerEntity> clanAssignedPlayers = clanLeagueAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
+        List<ClanAssignedPlayerDTO> clanAssignedPlayers = clanLeagueAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
 
         List<PlayerResponse> players = clanAssignedPlayers.stream()
                                                           .map(playerResponseConverter::convert)
@@ -671,5 +672,14 @@ public class ClansService {
         return clanCapitalList.stream()
                               .map(clanResponseConverter::convert)
                               .collect(Collectors.toList());
+    }
+
+    public String getLatestClanAssignedDate() {
+        return clanAssignedPlayerQueryRepository.findLatestSeasonDate();
+    }
+
+
+    public String getLatestLeagueAssignedDate() {
+        return clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
     }
 }

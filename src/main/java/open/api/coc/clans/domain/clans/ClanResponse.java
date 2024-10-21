@@ -20,6 +20,15 @@ public class ClanResponse {
     @Schema(description = "클랜 이름")
     private String name;
 
+    @Schema(description = "맥스쟁 유무")
+    private Boolean isMaxWar;
+
+    @Schema(description = "전쟁 선점 방식")
+    private Boolean isOccupy;
+
+    @Schema(description = "전쟁 설명")
+    private String warDescription;
+
     @Schema(description = "클랜 레벨")
     private Integer clanLevel;
 

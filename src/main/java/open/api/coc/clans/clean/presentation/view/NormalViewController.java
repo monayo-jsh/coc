@@ -44,16 +44,22 @@ public class NormalViewController {
         return "clan/FindMember";
     }
 
+    /** 연구소 */
+    @GetMapping("/lab/links")
+    public String labLinks() {
+        return "lab/Links";
+    }
+
     /** 클랜 목록 */
     @GetMapping("/clan")
     public String clan() {
         return "clan/Clan";
     }
 
-    /** 연구소 */
-    @GetMapping("/lab/links")
-    public String labLinks() {
-        return "lab/Links";
+    /** 클랜 배정표 */
+    @GetMapping("/assigned-member")
+    public String clanAssigned() {
+        return "clan/AssignedMember";
     }
 
     /** 영웅 장비 랭킹 */

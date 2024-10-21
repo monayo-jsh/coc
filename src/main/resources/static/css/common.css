@@ -217,6 +217,12 @@ body::before {
 .color-red {
   color: red !important;
 }
+.color-blue {
+  color: #0080ff !important;
+}
+.color-orange {
+  color: orange; !important;
+}
 .color-deeppink {
   color: deeppink !important;
 }

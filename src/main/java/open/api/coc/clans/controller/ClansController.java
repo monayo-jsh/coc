@@ -229,6 +229,12 @@ public class ClansController {
         return ResponseEntity.ok().body(clan);
     }
 
+    @GetMapping("/assigned/latest")
+    public ResponseEntity<String> getLatestClanAssignedDate() {
+        String clanAssignedDate = clansService.getLatestClanAssignedDate();
+        return ResponseEntity.ok().body(clanAssignedDate);
+    }
+
     @GetMapping("/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestClanAssignedMembers() {
         ClanAssignedMemberListResponse clanAssignedMemberList = clansService.getLatestClanAssignedMembers();
@@ -273,6 +279,11 @@ public class ClansController {
 
 
 
+    @GetMapping("/league/assigned/latest")
+    public ResponseEntity<String> getLatestLeagueAssignedDate() {
+        String leagueAssignedDate = clansService.getLatestLeagueAssignedDate();
+        return ResponseEntity.ok().body(leagueAssignedDate);
+    }
 
     @GetMapping("/league/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestLeagueAssignedMembers() {

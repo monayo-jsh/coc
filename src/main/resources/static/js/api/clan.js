@@ -13,11 +13,13 @@ const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
 
+const URI_LATEST_CLAN_ASSIGNED_DATE = `/clans/assigned/latest` //최신 클랜 배정 날짜 조회
 const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/assigned/members/latest` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
 const URI_CLAN_ASSIGNED_MEMBER_BULK = `/clans/assigned/members` //클랜 일괄 배정
 
+const URI_LATEST_LEAGUE_ASSIGNED_DATE = `/clans/league/assigned/latest` //최신 리그 배정 날짜 조회
 const URI_LATEST_LEAGUE_ASSIGNED_MEMBERS = `/clans/league/assigned/members/latest` //최신 리그 배정 멤버 목록 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/members` //리그 배정 멤버 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
@@ -270,6 +272,18 @@ async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
                     });
 }
 
+async function latestClanAssignedDate() {
+  return await axios.get(URI_LATEST_CLAN_ASSIGNED_DATE)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return null;
+                    });
+}
+
 async function latestClanAssignedMembers() {
   return await axios.get(URI_LATEST_CLAN_ASSIGNED_MEMBERS)
                     .then((response) => {
@@ -278,10 +292,9 @@ async function latestClanAssignedMembers() {
                     })
                     .catch((error) => {
                       console.error(error);
-                      return [];
+                      return {};
                     });
 }
-
 
 async function fetchClanLeagueAssignedMembers(clanTag) {
   const URI = URI_CLAN_LEAGUE_ASSIGNED_MEMBERS.replace(/{clanTag}/, encodeURIComponent(clanTag));
@@ -293,6 +306,18 @@ async function fetchClanLeagueAssignedMembers(clanTag) {
                     .catch((error) => {
                       console.error(error);
                       return [];
+                    });
+}
+
+async function latestLeagueAssignedDate() {
+  return await axios.get(URI_LATEST_LEAGUE_ASSIGNED_DATE)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return null;
                     });
 }
 

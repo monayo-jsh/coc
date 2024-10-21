@@ -220,6 +220,10 @@ function formatYYMMDD(date) {
   return dayjs(date).format('YY-MM-DD');
 }
 
+function formatYYYYMM(date) {
+  return dayjs(date).format('YYYY년 MM월');
+}
+
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
 }

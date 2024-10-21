@@ -25,7 +25,7 @@
   <title>배정표 확인</title>
 
   <script>
-    function convertArrayToMapByKey(array = []) {
+    function convertAssignedMemberArrayToMapByKey(array = []) {
       return array.reduce((map, row) => {
         const key = row.clan.tag;
         if (!map.get(key)) {
@@ -38,12 +38,14 @@
     }
 
     function drawMember(member) {
-      const { name, tag } = member;
+      const { tag, name } = member;
       const rowTemplate = copyTemplateById('assigned-table-row-template');
       const row = rowTemplate.querySelector('.row');
 
       row.innerHTML = row.innerHTML
                          .replace(/{PLAYER_NAME}/, name);
+
+      row.classList.add(`player-${removeHashTag(tag)}`)
 
       return row;
     }
@@ -158,6 +160,19 @@
       return clans.sort((a, b) => a.order - b.order);
     }
 
+    async function renderJoinedFlag(clan, assignedTable, assignedMembers) {
+      const currentJoinedMembers = await fetchClanMembers([{tag: clan.tag}]);
+      const currentJoinedMemberMap = convertArrayToMapByKey(currentJoinedMembers)
+
+      for (const member of assignedMembers) {
+        const isJoined = currentJoinedMemberMap.get(member.tag);
+        if (!isJoined) {
+          const row = assignedTable.querySelector(`.player-${removeHashTag(member.tag)}`);
+          row.classList.add('bg-crimson', 'font-white');
+        }
+      }
+    }
+
     async function drawAssignedMember() {
       const viewType = getUriForClanWarViewType();
 
@@ -169,12 +184,15 @@
 
       renderAssignedDate(viewType, assignedDate);
 
-      const clanAssignedMemberMap = convertArrayToMapByKey(clanAssignedMembers?.players);
+      const clanAssignedMemberMap = convertAssignedMemberArrayToMapByKey(clanAssignedMembers?.players);
 
       const assignedTableWrapper = document.querySelector('.assigned-table-wrapper');
       for(const clan of clans) {
-        const clanAssignedTable = drawClanAssignedTable(viewType, clan, clanAssignedMemberMap.get(clan.tag));
-        assignedTableWrapper.appendChild(clanAssignedTable);
+        const assignedMembers = clanAssignedMemberMap.get(clan.tag);
+        const assignedTable = drawClanAssignedTable(viewType, clan, assignedMembers);
+        assignedTableWrapper.appendChild(assignedTable);
+
+        setTimeout(() => renderJoinedFlag(clan, assignedTable, assignedMembers), 100);
       }
 
       hideWifiLoading(".section");
@@ -209,6 +227,7 @@
 
   <div class="assigned-label loading">배정표 불러오는중 ...</div>
   <div class="assigned-label display-none"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
+  <div class="assigned-legend">배정된 클랜에 가입되지 않은 계정은 <span class="highlight">계정명</span> 표기</div>
   <div class="assigned-table-wrapper"></div>
 </div>
 </body>

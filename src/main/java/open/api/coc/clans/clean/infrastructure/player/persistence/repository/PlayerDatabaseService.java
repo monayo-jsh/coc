@@ -119,4 +119,12 @@ public class PlayerDatabaseService implements PlayerRepository {
         jpaPlayerRepository.deleteById(playerTag);
     }
 
+    @Override
+    public List<Player> findTrophiesRanking(Integer pageSize) {
+        return jpaPlayerCustomRepository.findTrophiesRanking(pageSize)
+                                        .stream()
+                                        .map(playerEntityMapper::toPlayerOnly)
+                                        .toList();
+    }
+
 }

@@ -33,4 +33,13 @@ public class JpaPlayerCustomRepository {
                            .where(condition)
                            .fetch();
     }
+
+    public List<PlayerEntity> findTrophiesRanking(Integer pageSize) {
+        return queryFactory.select(playerEntity)
+                           .from(playerEntity)
+                           .orderBy(playerEntity.trophies.desc())
+                           .offset(0)
+                           .limit(pageSize)
+                           .fetch();
+    }
 }

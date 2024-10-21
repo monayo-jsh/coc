@@ -18,4 +18,7 @@ public interface PlayerRepository {
 
     Player save(Player newPlayer);
     void deleteById(String playerTag);
+
+    List<Player> findTrophiesRanking(Integer pageSize);
+
 }

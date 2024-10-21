@@ -18,7 +18,9 @@ import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
+import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
+import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PlayerUseCase {
 
+    private final HallOfFameConfig hallOfFameConfig;
     private final PlayerClient playerClient;
 
     private final PlayerService playerService;
@@ -197,4 +200,12 @@ public class PlayerUseCase {
         }
     }
 
+    @Transactional(readOnly = true)
+    public List<RankingHallOfFameResponse> getRankingTrophies() {
+        List<Player> players = playerService.findTrophiesRanking(hallOfFameConfig.getRanking());
+
+        return players.stream()
+                      .map(playerUseCaseMapper::toRankingTrophiesResponse)
+                      .toList();
+    }
 }

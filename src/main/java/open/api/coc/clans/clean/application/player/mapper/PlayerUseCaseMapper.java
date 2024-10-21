@@ -5,6 +5,7 @@ import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.league.mapper.LeagueMapper;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
 import org.mapstruct.Mapper;
@@ -29,5 +30,8 @@ public interface PlayerUseCaseMapper {
     @Mapping(target = "playerTag", source = "playerTag")
     @Mapping(target = "supportYn", source = "request.supportYn")
     PlayerSupportUpdateCommand toSupportUpdateCommand(String playerTag, PlayerSupportUpdateRequest request);
+
+    @Mapping(target = "score", source = "trophies")
+    RankingHallOfFameResponse toRankingTrophiesResponse(Player player);
 
 }

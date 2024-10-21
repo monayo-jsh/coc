@@ -42,6 +42,16 @@ public abstract class PlayerEntityMapper {
     @Mapping(target = "tag", source = "playerTag")
     @Mapping(target = "clanTag", source = "clan.tag")
     @Mapping(target = "leagueId", source = "league.id")
+    @Mapping(target = "heroes", ignore = true)
+    @Mapping(target = "heroEquipments", ignore = true)
+    @Mapping(target = "spells", ignore = true)
+    @Mapping(target = "pets", ignore = true)
+    @Mapping(target = "siegeMachines", ignore = true)
+    public abstract Player toPlayerOnly(PlayerEntity playerEntity);
+
+    @Mapping(target = "tag", source = "playerTag")
+    @Mapping(target = "clanTag", source = "clan.tag")
+    @Mapping(target = "leagueId", source = "league.id")
     @Mapping(target = "pets", source = "troops", qualifiedByName = "mapPets")
     @Mapping(target = "siegeMachines", source = "troops", qualifiedByName = "mapSiegeMachines")
     public abstract Player toPlayer(PlayerEntity playerEntity);

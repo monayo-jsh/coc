@@ -63,4 +63,9 @@ public class PlayerService {
 
         playerRepository.deleteById(playerTag);
     }
+
+    @Transactional(readOnly = true)
+    public List<Player> findTrophiesRanking(Integer pageSize) {
+        return playerRepository.findTrophiesRanking(pageSize);
+    }
 }

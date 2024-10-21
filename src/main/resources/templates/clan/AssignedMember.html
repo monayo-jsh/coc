@@ -57,36 +57,51 @@
       }
     }
 
-    function loadTemplate(viewType) {
-      if (viewType === 'league') {
-        return copyTemplateById('league-assigned-table-template')
-      }
-      return copyTemplateById('assigned-table-template');
-    }
-
-    function drawClanAssignedTable(viewType, clan, clanAssignedMembers = []) {
-      const tableTemplate = loadTemplate(viewType);
+    function makeClanTable(clan, clanAssignedMembers) {
+      const tableTemplate = copyTemplateById('assigned-table-template');
       const table = tableTemplate.querySelector('.table');
 
-      const { name, isMaxWar, warDescription, isOccupy, isLeagueOccupy, warLeague } = clan;
+      const { name, isMaxWar, warDescription, isOccupy } = clan;
+
       table.innerHTML = table.innerHTML
                              .replace(/{CLAN_NAME}/, name)
-                             .replace(/{WAR_LEAGUE}/, warLeague.name)
                              .replace(/{WAR_TYPE}/, isMaxWar ? "맥스쟁" : "믹스쟁")
                              .replace(/{WAR_DESCRIPTION}/, warDescription ? warDescription : "&nbsp")
                              .replace(/{IS_OCCUPY}/, isOccupy ? "선점제" : "동번제")
-                             .replace(/{IS_LEAGUE_OCCUPY}/, isLeagueOccupy ? "선점제" : "동번제")
                              .replace(/{ASSIGNED_SIZE}/, clanAssignedMembers.length);
-
-      if (viewType === 'league') {
-        const warLeagueIconClassName = warLeague.name.replace(/\s/g, "");
-        const warLeagueImgIcon = table.querySelector('.img-icon');
-        warLeagueImgIcon.classList.add(warLeagueIconClassName);
-      }
 
       appendMember(table, clanAssignedMembers);
 
       return table;
+    }
+
+    function makeLeagueTable(clan, clanAssignedMembers) {
+      const tableTemplate = copyTemplateById('league-assigned-table-template');
+      const table = tableTemplate.querySelector('.table');
+
+      const { name, isLeagueOccupy, warLeague } = clan;
+
+      table.innerHTML = table.innerHTML
+                             .replace(/{CLAN_NAME}/, name)
+                             .replace(/{WAR_LEAGUE}/, warLeague.name)
+                             .replace(/{IS_LEAGUE_OCCUPY}/, isLeagueOccupy ? "선점제" : "동번제")
+                             .replace(/{ASSIGNED_SIZE}/, clanAssignedMembers.length);
+
+      const warLeagueIconClassName = warLeague.name.replace(/\s/g, "");
+      const imgIconElement = table.querySelector('.war-league .img-icon');
+      imgIconElement.classList.add(warLeagueIconClassName);
+
+      appendMember(table, clanAssignedMembers);
+
+      return table;
+    }
+
+    function drawClanAssignedTable(viewType, clan, clanAssignedMembers = []) {
+      if (viewType === 'league') {
+        return makeLeagueTable(clan, clanAssignedMembers);
+      }
+
+      return makeClanTable(clan, clanAssignedMembers);
     }
 
     function getUriForClanWarViewType() {

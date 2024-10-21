@@ -26,6 +26,9 @@ public class ClanResponse {
     @Schema(description = "전쟁 선점 방식")
     private Boolean isOccupy;
 
+    @Schema(description = "리그 선점 방식")
+    private Boolean isLeagueOccupy;
+
     @Schema(description = "전쟁 설명")
     private String warDescription;
 

@@ -68,13 +68,14 @@
       const tableTemplate = loadTemplate(viewType);
       const table = tableTemplate.querySelector('.table');
 
-      const { name, isMaxWar, warDescription, isOccupy, warLeague } = clan;
+      const { name, isMaxWar, warDescription, isOccupy, isLeagueOccupy, warLeague } = clan;
       table.innerHTML = table.innerHTML
                              .replace(/{CLAN_NAME}/, name)
                              .replace(/{WAR_LEAGUE}/, warLeague.name)
                              .replace(/{WAR_TYPE}/, isMaxWar ? "맥스쟁" : "믹스쟁")
                              .replace(/{WAR_DESCRIPTION}/, warDescription ? warDescription : "&nbsp")
                              .replace(/{IS_OCCUPY}/, isOccupy ? "선점제" : "동번제")
+                             .replace(/{IS_LEAGUE_OCCUPY}/, isLeagueOccupy ? "선점제" : "동번제")
                              .replace(/{ASSIGNED_SIZE}/, clanAssignedMembers.length);
 
       if (viewType === 'league') {
@@ -177,7 +178,7 @@
         <div class="img-icon"></div>
         <div class="label font-small">{WAR_LEAGUE}</div>
       </div>
-      <div class="description color-yellow">{IS_OCCUPY}</div>
+      <div class="description color-yellow">{IS_LEAGUE_OCCUPY}</div>
     </caption>
     <caption class="table-caption font-weight-bold text-align-center bg-black">
       <div>배정인원: {ASSIGNED_SIZE} 명</div>

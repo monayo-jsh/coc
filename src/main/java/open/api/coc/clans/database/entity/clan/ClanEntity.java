@@ -70,6 +70,10 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "is_occupy", nullable = true)
     private Boolean isOccupy = false;
 
+    @Builder.Default
+    @Column(name = "is_league_occupy", nullable = true)
+    private Boolean isLeagueOccupy = false;
+
     @Column(name = "war_description", nullable = true)
     private String warDescription;
 

@@ -75,9 +75,22 @@ public class Player {
                           .sum();
     }
 
+    public void changeSupportType(YnType supportYn) {
+        if (YnType.Y.equals(supportYn)) {
+            changeSupportPlayer();
+            return;
+        }
+
+        changeNormalPlayer();
+    }
+
     public void changeNormalPlayer() {
         // 일반 계정 설정
         this.supportYn = YnType.N;
+    }
+
+    public void changeSupportPlayer() {
+        this.supportYn = YnType.Y;
     }
 
     public void changeInfo(Player latestPlayer) {

@@ -11,7 +11,7 @@ public class ClanAssignService {
 
     private final ClanAssignRepository assignRepository;
 
-    public void cancelRecently(String playerTag) {
+    public void excludeRecently(String playerTag) {
         String latestSeasonDate = assignRepository.findLatestSeasonDate();
         if (Objects.isNull(latestSeasonDate)) return;
 

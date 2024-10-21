@@ -9,16 +9,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.player.PlayerUseCase;
+import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
+import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +36,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PlayerController {
 
     private final PlayerUseCase playerUseCase;
+
+    private final PlayerUseCaseMapper playerUseCaseMapper;
 
     @Operation(
         summary = "플레이어 전체 목록을 조회합니다. version: 1.00, Last Update: 24.09.30",
@@ -124,6 +132,24 @@ public class PlayerController {
     @PostMapping("/{playerTag}/synchronize")
     public ResponseEntity<Void> syncPlayer(@PathVariable String playerTag) {
         playerUseCase.synchronizePlayer(playerTag);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+    @Operation(
+        summary = "플레이어 지원계정 등록/해제 기능을 제공합니다. version: 1.00, Last Update: 24.10.21",
+        description = "이 API는 플레이어를 지원계정으로 등록 또는 해제합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PutMapping("/{playerTag}/support")
+    public ResponseEntity<Void> putPlayerSupport(@PathVariable String playerTag,
+                                                 @Valid @RequestBody PlayerSupportUpdateRequest request) {
+        PlayerSupportUpdateCommand command = playerUseCaseMapper.toSupportUpdateCommand(playerTag, request);
+        playerUseCase.changePlayerSupportType(command);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }

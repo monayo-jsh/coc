@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
+import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
 import open.api.coc.clans.clean.domain.clan.service.ClanLeagueAssignService;
@@ -170,12 +171,30 @@ public class PlayerUseCase {
     @Transactional
     public void removePlayer(String playerTag) {
         // 최근 클랜 배정 삭제
-        clanAssignService.cancelRecently(playerTag);
+        clanAssignService.excludeRecently(playerTag);
 
         // 최근 리그 배정 삭제
-        clanLeagueAssignService.cancelRecently(playerTag);
+        clanLeagueAssignService.excludeRecently(playerTag);
 
         // 플레이어 삭제
         playerService.delete(playerTag);
     }
+
+    @Transactional
+    public void changePlayerSupportType(PlayerSupportUpdateCommand command) {
+        // 플레이어를 조회한다.
+        Player player = playerService.findById(command.playerTag());
+
+        // 플레이어의 지원 계정 유형을 설정한다.
+        player.changeSupportType(command.supportYn());
+
+        // 플레이어 계정 유형을 적용한다.
+        playerService.save(player);
+
+        // 지원 계정 전환 요청 시 배정된 클랜을 제거한다.
+        if (command.isSupportPlayer()) {
+            clanAssignService.excludeRecently(player.getTag());
+        }
+    }
+
 }

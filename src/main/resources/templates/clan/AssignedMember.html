@@ -126,17 +126,34 @@
       viewTypeTarget.innerHTML = viewType === 'league' ? "리그전" : "클랜전"
     }
 
-    let leagueMap = {}
+    let leagueMap = new Map();
     async function loadLeagues() {
       // 리그 목록 조회
       const leagues = await fetchLeagues();
       leagues.map(league => {
-        leagueMap[league.name] = league;
+        leagueMap.set(league.name, league);
       });
     }
+
+    async function fetchViewClans(viewType) {
+      const clans = await fetchWarClans(viewType);
+
+      if (viewType === 'league') {
+        // 리그 & 클랜 정렬
+        return clans.sort((a, b) => {
+          const aWarLeague = leagueMap.get(a.warLeague.name);
+          const bWarLeague = leagueMap.get(b.warLeague.name);
+          return bWarLeague.id - aWarLeague.id || a.order - b.order;
+        });
+      }
+
+      // 클랜 정렬
+      return clans.sort((a, b) => a.order - b.order);
+    }
+
     async function drawAssignedMember() {
       const viewType = getUriForClanWarViewType();
-      const clans = await fetchWarClans(viewType);
+      const clans = await fetchViewClans(viewType);
       const clanAssignedMembers = await fetchAssignedMembers(viewType);
       const assignedDate = clanAssignedMembers?.seasonDate;
 

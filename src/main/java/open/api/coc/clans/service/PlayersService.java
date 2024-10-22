@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.domain.clan.service.ClanGameService;
 import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
@@ -87,6 +88,8 @@ public class PlayersService {
     private final ClanRepository clanRepository;
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
     private final ClanAssignedPlayerQueryRepository clanAssignedPlayerQueryRepository;
+
+    private final ClanGameService clanGameService;
 
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
 
@@ -306,6 +309,9 @@ public class PlayersService {
 
         Player player = clanApiService.findPlayerBy(playerTag)
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
+
+        // 클랜게임 진행 정보 수집
+        clanGameService.collect(player);
 
         processRecordPlayer(traceName, player, playerEntity);
 

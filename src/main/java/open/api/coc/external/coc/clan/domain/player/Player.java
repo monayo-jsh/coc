@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import open.api.coc.clans.common.ExceptionCode;
+import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.database.entity.player.PlayerEntity;
 import open.api.coc.external.coc.clan.domain.common.Hero;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
@@ -48,6 +50,8 @@ public class Player {
     private List<Troops> troops;
     private List<Troops> spells;
 
+    private List<AchievementProgressResponse> achievements;
+
     public boolean isRecoding(PlayerEntity playerEntity) {
         // 공격 성공 수치 다른 경우 기록
         if (!Objects.equals(this.attackWins, playerEntity.getAttackWins())) return true;
@@ -64,5 +68,14 @@ public class Player {
 
     public boolean isNotRecoding(PlayerEntity playerEntity) {
         return !isRecoding(playerEntity);
+    }
+
+    public Integer getClanGamePoint() {
+        return achievements.stream()
+                           .filter(AchievementProgressResponse::isClanGameData)
+                           .findFirst()
+                           .map(AchievementProgressResponse::getValue)
+                           .orElseThrow(() -> new CustomRuntimeException(ExceptionCode.EXTERNAL_ERROR.getCode(), "클랜 게임 데이터 찾지 못함")); // 리팩토링 시 예외 객체 수정
+
     }
 }

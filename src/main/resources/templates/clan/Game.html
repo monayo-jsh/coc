@@ -23,17 +23,17 @@
   <title>클랜게임 현황</title>
 
   <script>
-    function makeClanGame(no, completedPoint, clanGame) {
-      const { playerName, point } = clanGame;
+    function makeClanGameRecord(no, completedPoint, record) {
+      const { name, point } = record;
       const clanGameTemplate = copyTemplateById('clan-game-template');
       const clanGameRow = clanGameTemplate.querySelector('.clan-game');
 
       clanGameRow.innerHTML = clanGameRow.innerHTML
                                          .replace(/{NO}/, no)
-                                         .replace(/{NAME}/, playerName)
+                                         .replace(/{NAME}/, name)
                                          .replace(/{POINT}/, point);
 
-      if (point === completedPoint) {
+      if (point >= completedPoint) {
         clanGameRow.classList.add('completed');
       }
 
@@ -47,12 +47,12 @@
       toggleDisplay(target);
     }
 
-    function drawClanGames(completedPoint, clanGames) {
+    function drawClanGameRecords(completedPoint, records) {
       const target = document.querySelector('.clan-game-wrapper');
       let no = 1;
-      for(const clanGame of clanGames) {
-        const clanGameRow = makeClanGame(no++, completedPoint, clanGame);
-        target.appendChild(clanGameRow);
+      for(const record of records) {
+        const recordRow = makeClanGameRecord(no++, completedPoint, record);
+        target.appendChild(recordRow);
       }
     }
 
@@ -61,9 +61,9 @@
       const latestClanGame = await fetchLatestClanGame();
       hideWifiLoading(".content");
 
-      const { progressDate, completedPoint, clanGames } = latestClanGame;
+      const { progressDate, completedPoint, records } = latestClanGame;
       const formatProgressDate = formatYYYYMM(progressDate);
-      if (!clanGames || !clanGames.length) {
+      if (!records || !records.length) {
         const displayGuide = `${formatProgressDate} 클랜 게임 정보 없음`;
         renderClanGameProgressDate(displayGuide);
         return;
@@ -71,7 +71,7 @@
 
       const displayGuide = `${formatProgressDate} 클랜 게임 현황`;
       renderClanGameProgressDate(displayGuide);
-      drawClanGames(completedPoint, clanGames);
+      drawClanGameRecords(completedPoint, records);
     }
 
     window.onload = async () => {
@@ -103,7 +103,7 @@
       <div class="text" data-text="Searching"></div>
     </div>
 
-    <div class="clan-game-guide display-none"></div>
+    <div class="clan-game-guide description-label display-none"></div>
     <div class="clan-game-wrapper"></div>
   </div>
 </div>

@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.domain.clan.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -50,6 +51,8 @@ public class ClanGame {
     }
 
     public void changeFinishPoint(Integer clanGamePoint) {
+        if (Objects.equals(this.finishPoint, clanGamePoint)) return;
+
         this.finishPoint = clanGamePoint;
         this.lastModifiedAt = LocalDateTime.now();
     }

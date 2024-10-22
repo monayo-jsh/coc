@@ -27,6 +27,8 @@ const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //
 
 const URI_CLAN_CONTENT_STATUS = `/clans/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
+const URL_CLAN_GAME_LATEST = `/api/clan/game/latest`; // 최근 클랜 게임 목록 조회
+
 function divideClanArray(array, size) {
   if (array.length === 1) return [array];
 
@@ -476,5 +478,19 @@ async function fetchCurrentWarLeagueRound(warTags, clanTag, season) {
               .catch((error) => {
                 console.error(error)
                 return [];
+              });
+}
+
+
+async function fetchLatestClanGame() {
+  // 전체 클랜 조회
+  return axios.get(URL_CLAN_GAME_LATEST)
+              .then((response) => {
+                const { data } = response
+                return data;
+              })
+              .catch((error) => {
+                console.error(error);
+                return {};
               });
 }

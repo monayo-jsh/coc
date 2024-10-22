@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanGame;
 import open.api.coc.clans.clean.domain.clan.model.ClanGameDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanGameMeta;
 import open.api.coc.clans.clean.domain.clan.repository.ClanGameRepository;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.entity.ClanGameEntity;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanGameEntityMapper;
@@ -14,9 +15,16 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class ClanGameDatabaseService implements ClanGameRepository {
 
+    private final JpaClanGameMetaRepository jpaClanGameMetaRepository;
     private final JpaClanGameRepository jpaClanGameRepository;
 
     private final ClanGameEntityMapper clanGameEntityMapper;
+
+    @Override
+    public Optional<ClanGameMeta> findClanGameMetaByProgressDate(String progressDate) {
+        return jpaClanGameMetaRepository.findById(progressDate)
+                                        .map(clanGameEntityMapper::toClanGameMeta);
+    }
 
     @Override
     public List<ClanGameDTO> findAllByProgressDate(String progressDate) {

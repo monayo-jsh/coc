@@ -92,4 +92,9 @@ public class NormalViewController {
         return "clan/LeagueNew";
     }
 
+    /** 클랜게임 현황 */
+    @GetMapping("/clan-game")
+    public String clanGame() {
+        return "clan/Game";
+    }
 }

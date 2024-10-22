@@ -14,7 +14,7 @@ public interface JpaClanGameRepository extends JpaRepository<ClanGameEntity, Lon
             + "from ClanGameEntity clanGame "
             + "join PlayerEntity player on player.playerTag = clanGame.playerTag "
             + "where clanGame.progressDate = :progressDate "
-//            + "and clanGame.finishPoint > clanGame.startPoint "
+            + "and clanGame.finishPoint > clanGame.startPoint "
     )
     List<ClanGameDTO> findAllByProgressDate(String progressDate);
 

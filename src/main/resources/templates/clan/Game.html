@@ -24,9 +24,14 @@
 
   <script>
     function makeClanGameRecord(no, completedPoint, record) {
-      const { name, point } = record;
+      let { name, point } = record;
       const clanGameTemplate = copyTemplateById('clan-game-template');
       const clanGameRow = clanGameTemplate.querySelector('.clan-game');
+
+      // 포인트 값 보정
+      if (point > completedPoint) {
+        point = completedPoint;
+      }
 
       clanGameRow.innerHTML = clanGameRow.innerHTML
                                          .replace(/{NO}/, no)

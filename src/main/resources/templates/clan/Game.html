@@ -28,11 +28,6 @@
       const clanGameTemplate = copyTemplateById('clan-game-template');
       const clanGameRow = clanGameTemplate.querySelector('.clan-game');
 
-      // 포인트 값 보정
-      if (point > completedPoint) {
-        point = completedPoint;
-      }
-
       clanGameRow.innerHTML = clanGameRow.innerHTML
                                          .replace(/{NO}/, no)
                                          .replace(/{NAME}/, name)
@@ -52,10 +47,22 @@
       toggleDisplay(target);
     }
 
+    function convertSortedAndCorrectionRecord(completedPoint, records) {
+      return records.map(record => {
+                      if (record.point > completedPoint) {
+                        record.point = completedPoint;
+                      }
+                      return record;
+                    })
+                    .sort((a, b) => b.point - a.point || new Date(a.achievementDate) - new Date(b.achievementDate));
+    }
+
     function drawClanGameRecords(completedPoint, records) {
       const target = document.querySelector('.clan-game-wrapper');
+
+      const sortedRecordWithCorrection = convertSortedAndCorrectionRecord(completedPoint, records);
       let no = 1;
-      for(const record of records) {
+      for(const record of sortedRecordWithCorrection) {
         const recordRow = makeClanGameRecord(no++, completedPoint, record);
         target.appendChild(recordRow);
       }

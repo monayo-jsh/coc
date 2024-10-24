@@ -195,7 +195,7 @@ i.third-place {
   align-items: center;
   margin: 0;
   font-size: 12px;
-  width: 600px;
+  max-width: 600px;
   min-height: 100px;
 
   .leaderboard {

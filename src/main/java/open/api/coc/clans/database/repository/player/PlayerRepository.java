@@ -68,10 +68,10 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
     )
     List<RankingHeroEquipment> selectRankingHeroEquipments(List<String> playerTags);
 
-    @Query("select player.name as name, player.playerTag as tag, player.trophies as score from PlayerEntity player order by player.trophies desc")
+    @Query("select player.name as name, player.playerTag as tag, player.trophies as score, player.townHallLevel as townHallLevel from PlayerEntity player order by player.trophies desc")
     List<RankingHallOfFame> selectRankingTrophiesCurrent(Pageable pageable);
 
-    @Query("select player.name as name, player.playerTag as tag, player.attackWins as score from PlayerEntity player order by player.attackWins desc")
+    @Query("select player.name as name, player.playerTag as tag, player.attackWins as score, player.townHallLevel as townHallLevel from PlayerEntity player order by player.attackWins desc")
     List<RankingHallOfFame> selectRankingAttackWins(Pageable pageable);
 
 }

@@ -8,8 +8,8 @@ public class RankingHallOfFameDonationDTO extends RankingHallOfFameDTO {
 
     private final YnType supportYn;
 
-    public RankingHallOfFameDonationDTO(String tag, String name, Integer score, YnType supportYn) {
-        super(tag, name, score);
+    public RankingHallOfFameDonationDTO(String tag, String name, Integer score, Integer townHallLevel, YnType supportYn) {
+        super(tag, name, score, townHallLevel);
         this.supportYn = supportYn;
     }
 }

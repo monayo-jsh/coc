@@ -6,6 +6,7 @@ public record ClanWarRecordDTO(
     Integer clanOrder,
     String tag,
     String name,
+    Integer townHallLevel,
     Long attackCount,
     Integer totalDestructionPercentage,
     Double avgDuration,

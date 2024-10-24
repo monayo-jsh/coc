@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.infrastructure.capital.persistence.repository;
 
 import static open.api.coc.clans.clean.infrastructure.capital.persistence.entity.QRaidEntity.raidEntity;
 import static open.api.coc.clans.clean.infrastructure.capital.persistence.entity.QRaiderEntity.raiderEntity;
+import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
@@ -23,13 +24,15 @@ public class JpaRaiderCustomRepository {
 
         ConstructorExpression<RaiderRankingDTO> raiderRankingDTO = Projections.constructor(RaiderRankingDTO.class,
                                                                                            raiderEntity.tag.as("tag"),
-                                                                                           raiderEntity.name.as("name"),
+                                                                                           playerEntity.name.as("name"),
+                                                                                           playerEntity.townHallLevel.as("townHallLevel"),
                                                                                            raiderEntity.resourceLooted.as("resourceLooted"));
 
 
         return queryFactory.select(raiderRankingDTO)
                            .from(raiderEntity)
                            .join(raiderEntity.raid, raidEntity)
+                           .join(playerEntity).on(playerEntity.playerTag.eq(raiderEntity.tag))
                            .where(raidEntity.startDate.eq(startDate))
                            .orderBy(raiderEntity.resourceLooted.desc())
                            .offset(pageable.getOffset())
@@ -42,11 +45,13 @@ public class JpaRaiderCustomRepository {
         ConstructorExpression<RaiderRankingDTO> raiderRankingDTO = Projections.constructor(RaiderRankingDTO.class,
                                                                                            raiderEntity.tag.as("tag"),
                                                                                            raiderEntity.name.max().as("name"),
+                                                                                           playerEntity.townHallLevel.as("townHallLevel"),
                                                                                            raiderEntity.resourceLooted.avg().intValue().as("resourceLooted"));
 
         return queryFactory.select(raiderRankingDTO)
                            .from(raiderEntity)
                            .leftJoin(raiderEntity.raid, raidEntity)
+                           .join(playerEntity).on(playerEntity.playerTag.eq(raiderEntity.tag))
                            .where(raidEntity.startDate.in(startDates))
                            .groupBy(raiderEntity.tag)
                            .having(raiderEntity.tag.count().eq((long) startDates.size()))

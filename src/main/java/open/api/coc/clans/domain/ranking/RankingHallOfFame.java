@@ -13,4 +13,7 @@ public interface RankingHallOfFame {
     @Schema(description = "점수")
     Integer getScore();
 
+    @Schema(description = "타운홀 레벨")
+    Integer getTownHallLevel();
+
 }

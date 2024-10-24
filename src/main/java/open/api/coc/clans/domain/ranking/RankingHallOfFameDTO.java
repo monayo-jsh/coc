@@ -17,4 +17,6 @@ public class RankingHallOfFameDTO {
     @Schema(description = "점수")
     private final Integer score;
 
+    @Schema(description = "타운홀 레벨")
+    private final Integer townHallLevel;
 }

@@ -159,6 +159,7 @@ public class ClanWarQueryRepository {
             clanEntity.order.max().as("clanOrder"),
             playerEntity.playerTag.max().as("tag"),
             playerEntity.name.max().as("name"),
+            playerEntity.townHallLevel.max().as("townHallLevel"),
             clanWarMemberAttackEntity.id.tag.count().as("attackCount"),
             clanWarMemberAttackEntity.destructionPercentage.sum().coalesce(0).as("totalDestructionPercentage"),
             clanWarMemberAttackEntity.duration.avg().coalesce(0.0).as("avgDuration"),

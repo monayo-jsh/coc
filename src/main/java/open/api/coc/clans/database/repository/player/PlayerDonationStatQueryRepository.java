@@ -51,6 +51,7 @@ public class PlayerDonationStatQueryRepository {
             playerDonationStatEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
             playerDonationStatEntity.donationsDelta.as("score"),
+            playerEntity.townHallLevel.as("townHallLevel"),
             playerEntity.supportYn.as("supportYn")
         );
 
@@ -73,7 +74,8 @@ public class PlayerDonationStatQueryRepository {
             RankingHallOfFameDTO.class,
             playerDonationStatEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
-            playerDonationStatEntity.donationsReceivedDelta.as("score")
+            playerDonationStatEntity.donationsReceivedDelta.as("score"),
+            playerEntity.townHallLevel.as("townHallLevel")
         );
 
         return queryFactory.select(rankingHallOfFameDTO)

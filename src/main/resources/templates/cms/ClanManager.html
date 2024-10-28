@@ -942,7 +942,7 @@
       const searchResultElement = assignedPlayerForm.querySelector('.player-search-result');
       searchResultElement.innerHTML = ""; //clear
 
-      findPlayer(searchInput.value)
+      findPlayerFromExternal(searchInput.value)
       .then(player => {
         const playerInfoTemplate = document.querySelector('#clan-player-info-template');
         const playerInfoElement = document.importNode(playerInfoTemplate.content, true);

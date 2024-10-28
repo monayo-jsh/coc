@@ -62,10 +62,10 @@ public class PlayerUseCase {
             players = playerService.findAllPlayers(accountType);
         }
 
-        return mapToPlayerRespons(players);
+        return mapToPlayerResponse(players);
     }
 
-    private List<PlayerResponse> mapToPlayerRespons(List<Player> players) {
+    private List<PlayerResponse> mapToPlayerResponse(List<Player> players) {
         // 클랜 정보를 조회한다.
         Map<String, Clan> clanMap = clanService.findAllMapByIds(players.stream().map(Player::getClanTag).distinct().toList());
 
@@ -252,4 +252,13 @@ public class PlayerUseCase {
                         .map(playerUseCaseMapper::toRankingDonationResponse)
                         .toList();
     }
+
+    public PlayerResponse getPlayerFromExternal(String playerTag) {
+        // COC API 조회한다.
+        Player latestPlayer = playerClient.findByTag(playerTag);
+
+        // 플레이어를 응답한다.
+        return mapToPlayerResponse(latestPlayer);
+    }
+
 }

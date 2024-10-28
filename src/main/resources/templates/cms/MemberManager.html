@@ -731,7 +731,7 @@
       const searchResultElement = playerForm.querySelector('.player-search-result');
       searchResultElement.innerHTML = ""; //clear
 
-      findPlayer(searchInput.value)
+      findPlayerFromExternal(searchInput.value)
       .then(player => {
         const playerElement = renderMember(undefined, player);
 

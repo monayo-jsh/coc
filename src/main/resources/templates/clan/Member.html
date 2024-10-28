@@ -186,7 +186,7 @@
 
     async function getClanMembers() {
       showWifiLoading('.clan-members');
-      let players = await fetchAllClanPlayersSummary();
+      let players = await fetchAllPlayersSummary();
       let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
       settingAssignClan(players, latestClanAssignedPlayerObj);
       let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
@@ -208,7 +208,7 @@
     }
 
     function renderHero(memberHtml, hero) {
-      const { name, level, maxLevel, village, equipments } = hero;
+      const { name, koreanNamem, level, maxLevel, village, equipments } = hero;
 
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
@@ -256,7 +256,7 @@
 
       for (const [key, value] of heroEquipmentMap) {
         const sortedEquipments = value.sort((a, b) => b.code - a.code);
-        renderHeroEquipment(innerSectionGroupElement, key, sortedEquipments);
+        renderHeroEquipment(innerSectionGroupElement, convertHeroKoreanName(key), sortedEquipments);
       }
 
       const cardBackElement = memberHtml.querySelector('.card-back .inner-content');

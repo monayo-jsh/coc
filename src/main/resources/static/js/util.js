@@ -103,6 +103,17 @@ function writeExcelFile(fileName, jsonData) {
   XLSX.writeFile(workbook, fileName);
 }
 
+function convertHeroKoreanName(enName) {
+  switch (enName) {
+    case 'Barbarian King': return '바바리안 킹';
+    case 'Archer Queen': return '아처 퀸';
+    case 'Grand Warden': return '그랜드 워든';
+    case 'Royal Champion': return '로얄 챔피언';
+  }
+
+  // not mapping hero english name.
+  return enName;
+}
 /**
  * 클랜 권한 한글명 반환
  * @param role

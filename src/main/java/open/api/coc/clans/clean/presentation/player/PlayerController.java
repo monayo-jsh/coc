@@ -18,6 +18,7 @@ import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateComm
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
+import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -173,7 +174,7 @@ public class PlayerController {
 
     @Operation(
         summary = "현재 플레이어 공성 순위 목록을 제공합니다. version: 1.00, Last Update: 24.10.28",
-        description = "이 API는 서버에 등록된 플레이어의 현재 트로피 공성 순위 목록을 제공합니다."
+        description = "이 API는 서버에 등록된 플레이어의 현재 공성 순위 목록을 제공합니다."
     )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHallOfFameResponse.class)))),
@@ -184,5 +185,20 @@ public class PlayerController {
     public ResponseEntity<List<RankingHallOfFameResponse>> getRankingAttackWins() {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.getRankingAttackWins());
+    }
+
+    @Operation(
+        summary = "현재 플레이어 지원 순위 목록을 제공합니다. version: 1.00, Last Update: 24.10.28",
+        description = "이 API는 서버에 등록된 플레이어의 현재 지원 순위 목록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHallOfFameDonationResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/ranking/donations")
+    public ResponseEntity<List<RankingHallOfFameDonationResponse>> getRankingDonations() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getRankingDonations());
     }
 }

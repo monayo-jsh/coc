@@ -10,9 +10,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -36,17 +36,14 @@ public class JpaPlayerDonationStatQueryRepository {
         return Optional.ofNullable(findEntity);
     }
 
-    public List<RankingHallOfFameDonationDTO> findRankingDonationsBySeasonAndPage(String season, Pageable page) {
-        if (StringUtils.isEmpty(season)) {
-            throw new IllegalArgumentException("season is not empty");
-        }
-
-        ConstructorExpression<RankingHallOfFameDonationDTO> rankingHallOfFameDTO = Projections.constructor(
-            RankingHallOfFameDonationDTO.class,
-            playerDonationStatEntity.playerTag.as("tag"),
+    public List<PlayerDonationDTO> findRankingDonationsBySeasonAndPage(String season, Pageable page) {
+        ConstructorExpression<PlayerDonationDTO> rankingHallOfFameDTO = Projections.constructor(
+            PlayerDonationDTO.class,
+            playerEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
-            playerDonationStatEntity.donationsDelta.as("score"),
-            playerEntity.supportYn.as("supportYn")
+            playerEntity.townHallLevel.as("townHallLevel"),
+            playerEntity.supportYn.as("supportYn"),
+            playerDonationStatEntity.donationsDelta.as("score")
         );
 
         return queryFactory.select(rankingHallOfFameDTO)

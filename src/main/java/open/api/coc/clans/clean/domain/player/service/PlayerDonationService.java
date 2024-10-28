@@ -3,9 +3,12 @@ package open.api.coc.clans.clean.domain.player.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerDonationStat;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.repository.PlayerDonationRepository;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
 import open.api.coc.util.SeasonUtils;
@@ -22,7 +25,7 @@ public class PlayerDonationService {
     @Transactional
     public void collect(Player originPlayer, Player latestPlayer) {
         // 현재 시즌 구하기
-        String season = getLeagueSeason();
+        String season = getFormattedSeasonEndDate();
 
         // 플레이어 지원/지원 받은 유닛 수 수집
         PlayerDonationStat playerDonationStat = PlayerDonationStat.create(originPlayer.getTag(),
@@ -50,7 +53,20 @@ public class PlayerDonationService {
         return playerDonationRepository.save(originDonationStat);
     }
 
-    private String getLeagueSeason() {
+    public LocalDate getLeagueSeasonEndDate() {
+        return getLeagueSeasonEndDateTime().toLocalDate();
+    }
+
+    public String getFormattedSeasonEndDate() {
+        LocalDateTime seasonEndDate = getLeagueSeasonEndDateTime();
+        return formatLeagueSeason(seasonEndDate.toLocalDate());
+    }
+
+    private String formatLeagueSeason(LocalDate seasonEndDate) {
+        return seasonEndDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+    }
+
+    public LocalDateTime getLeagueSeasonEndDateTime() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime seasonEndTime = SeasonUtils.getSeasonEndTime(now.getYear(), now.getMonthValue());
 
@@ -65,6 +81,15 @@ public class PlayerDonationService {
             seasonEndTime = seasonEndTime.plusMonths(1);
         }
 
-        return seasonEndTime.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+        return seasonEndTime;
+    }
+
+    public List<PlayerDonationDTO> findDonationRanking(LocalDate seasonEndDate, Integer pageSize) {
+        if (Objects.isNull(seasonEndDate)) {
+            throw new IllegalArgumentException("season is not empty");
+        }
+
+        String leagueSeason = formatLeagueSeason(seasonEndDate);
+        return playerDonationRepository.findDonationRanking(leagueSeason, pageSize);
     }
 }

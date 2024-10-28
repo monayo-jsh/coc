@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.application.player;
 
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,13 @@ import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
+import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -222,5 +225,18 @@ public class PlayerUseCase {
         return players.stream()
                       .map(playerUseCaseMapper::toRankingAttackWinsResponse)
                       .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<RankingHallOfFameDonationResponse> getRankingDonations() {
+        // 현재 시즌 종료일을 가져온다.
+        LocalDate currentLeagueSeasonEndDate = playerDonationService.getLeagueSeasonEndDate();
+
+        // 플레이어 지원 랭킹 목록을 가져온다.
+        List<PlayerDonationDTO> donations = playerDonationService.findDonationRanking(currentLeagueSeasonEndDate, hallOfFameConfig.getRanking());
+
+        return donations.stream()
+                        .map(playerUseCaseMapper::toRankingDonationResponse)
+                        .toList();
     }
 }

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,13 +17,15 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
 
     @Transactional(readOnly = true)
-    public List<Player> findAllPlayers(String accountType) {
-        return playerRepository.findAll(accountType);
+    public List<Player> findAllPlayers(String accountType, String name) {
+        PlayerSearchQuery query = PlayerSearchQuery.create(accountType, name);
+        return playerRepository.findAll(query);
     }
 
     @Transactional(readOnly = true)
-    public List<Player> findSummarizedPlayers(String accountType) {
-        return playerRepository.findAllSummarized(accountType);
+    public List<Player> findSummarizedPlayers(String accountType, String name) {
+        PlayerSearchQuery query = PlayerSearchQuery.create(accountType, name);
+        return playerRepository.findAllSummarized(query);
     }
 
     @Transactional(readOnly = true)

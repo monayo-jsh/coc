@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanRepository;
 import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
@@ -38,16 +39,16 @@ public class PlayerDatabaseService implements PlayerRepository {
     private final PlayerTroopsEntityMapper troopsEntityMapper;
 
     @Override
-    public List<Player> findAll(String accountType) {
-        return jpaPlayerCustomRepository.findAll(accountType)
+    public List<Player> findAll(PlayerSearchQuery query) {
+        return jpaPlayerCustomRepository.findAll(query)
                                         .stream()
                                         .map(playerEntityMapper::toPlayer)
                                         .toList();
     }
 
     @Override
-    public List<Player> findAllSummarized(String accountType) {
-        return jpaPlayerCustomRepository.findAll(accountType)
+    public List<Player> findAllSummarized(PlayerSearchQuery query) {
+        return jpaPlayerCustomRepository.findAll(query)
                                         .stream()
                                         .map(playerEntityMapper::toSummarizedPlayer)
                                         .toList();

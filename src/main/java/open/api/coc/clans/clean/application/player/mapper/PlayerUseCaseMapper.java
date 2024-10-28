@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.application.player.mapper;
 
+import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.league.mapper.LeagueMapper;
@@ -41,4 +42,8 @@ public interface PlayerUseCaseMapper {
 
     @Mapping(target = "score", source = "count")
     RankingHallOfFameDonationResponse toRankingDonationResponse(PlayerDonationDTO playerDonationDTO);
+
+    // 플레이어 목록 검색 쿼리
+    PlayerListSearchQuery toPlayerListSearchQuery(String accountType, String viewMode, String name);
+
 }

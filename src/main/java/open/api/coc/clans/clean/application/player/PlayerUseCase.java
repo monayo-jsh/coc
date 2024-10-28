@@ -2,11 +2,13 @@ package open.api.coc.clans.clean.application.player;
 
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
+import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
@@ -53,24 +55,26 @@ public class PlayerUseCase {
     private final PlayerUseCaseMapper playerUseCaseMapper;
 
     @Transactional(readOnly = true)
-    public List<PlayerResponse> getAllPlayers(String accountType, String viewMode) {
+    public List<PlayerResponse> getAllPlayers(PlayerListSearchQuery query) {
         // 플레이어 목록을 조회한다.
         List<Player> players;
-        if ("summary".equals(viewMode)) { // 확장될 경우 Enum 등으로 객체 처리
-            players = playerService.findSummarizedPlayers(accountType);
+        if (query.isSummartViewMode()) {
+            players = playerService.findSummarizedPlayers(query.accountType(), query.name());
         } else {
-            players = playerService.findAllPlayers(accountType);
+            players = playerService.findAllPlayers(query.accountType(), query.name());
         }
+
+        if (players.isEmpty()) return Collections.emptyList();
 
         return mapToPlayerResponse(players);
     }
 
     private List<PlayerResponse> mapToPlayerResponse(List<Player> players) {
         // 클랜 정보를 조회한다.
-        Map<String, Clan> clanMap = clanService.findAllMapByIds(players.stream().map(Player::getClanTag).distinct().toList());
+        Map<String, Clan> clanMap = clanService.findAllMapByIds(players.stream().filter(Player::isJoinedClan).map(Player::getClanTag).distinct().toList());
 
         // 리그 정보를 조회한다.
-        Map<Integer, League> leagueMap = leagueService.findAllMapByIds(players.stream().map(Player::getLeagueId).distinct().toList());
+        Map<Integer, League> leagueMap = leagueService.findAllMapByIds(players.stream().filter(Player::isInLeague).map(Player::getLeagueId).distinct().toList());
 
         // 플레이어 목록을 반환한다.
         return players.stream()

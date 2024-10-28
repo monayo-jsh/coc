@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.player.PlayerUseCase;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
+import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
@@ -48,7 +49,8 @@ public class PlayerController {
     @Parameters(
         value = {
             @Parameter(name = "viewMode", description = "조회 모드 (detail: 전체 제공, summary: 플레이어 영웅, 영웅장비까지만 제공)", required = false),
-            @Parameter(name = "accountType", description = "계정 유형 (support: 지원계정)", required = false)
+            @Parameter(name = "accountType", description = "계정 유형 (support: 지원계정)", required = false),
+            @Parameter(name = "name", description = "이름 검색", required = false)
         }
     )
     @ApiResponses(value = {
@@ -57,9 +59,13 @@ public class PlayerController {
     })
     @GetMapping("")
     public ResponseEntity<List<PlayerResponse>> getAllPlayers(@RequestParam(defaultValue = "all") String accountType,
-                                                              @RequestParam(defaultValue = "detail") String viewMode) {
+                                                              @RequestParam(defaultValue = "detail") String viewMode,
+                                                              @RequestParam(required = false) String name) {
+
+        PlayerListSearchQuery query = playerUseCaseMapper.toPlayerListSearchQuery(accountType, viewMode, name);
+
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(playerUseCase.getAllPlayers(accountType, viewMode));
+                             .body(playerUseCase.getAllPlayers(query));
     }
 
     @Operation(

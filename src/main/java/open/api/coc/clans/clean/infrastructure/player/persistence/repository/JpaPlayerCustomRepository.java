@@ -6,6 +6,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import org.springframework.stereotype.Repository;
@@ -22,10 +23,13 @@ public class JpaPlayerCustomRepository {
                            .fetch();
     }
 
-    public List<PlayerEntity> findAll(String accountType) {
+    public List<PlayerEntity> findAll(PlayerSearchQuery query) {
         BooleanBuilder condition = new BooleanBuilder();
-        if ("support".equals(accountType)) {
+        if (query.isFilterSupport()) {
             condition.and(playerEntity.supportYn.eq(YnType.Y));
+        }
+        if (query.isNameSearch()) {
+            condition.and(playerEntity.name.startsWith(query.name()));
         }
 
         return queryFactory.select(playerEntity)

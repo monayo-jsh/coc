@@ -1,7 +1,6 @@
 const PREFIX_PLAYER_API = '/api/players' // 플레이어 API
 
 const URI_PLAYERS_ALL = `${PREFIX_PLAYER_API}`; //전체 클랜원 조회
-const URI_PLAYERS_SUMMARY = '/players/summary'; //클랜원 요약 이름 조회
 const URI_PLAYERS_ALL_TAGS = `${PREFIX_PLAYER_API}/tags`; //전체 클랜원 태그 조회
 
 const URI_PLAYERS_OPEN_API = `${PREFIX_PLAYER_API}/{playerTag}/external`; //멤버 조회 (Open API)
@@ -88,7 +87,7 @@ async function fetchAllPlayersSummary() {
 }
 
 async function fetchPlayersSummaryByName(playerName) {
-  const uri = URI_PLAYERS_SUMMARY + `?name=${encodeURIComponent(playerName)}`
+  const uri = URI_PLAYERS_ALL + `?viewMode=summary&name=${encodeURIComponent(playerName)}`
   return await axios.get(uri)
                     .then(response => {
                       const { data } = response

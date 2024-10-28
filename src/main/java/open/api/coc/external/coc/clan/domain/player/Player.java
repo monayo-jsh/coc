@@ -78,4 +78,28 @@ public class Player {
                            .orElseThrow(() -> new CustomRuntimeException(ExceptionCode.EXTERNAL_ERROR.getCode(), "클랜 게임 데이터 찾지 못함")); // 리팩토링 시 예외 객체 수정
 
     }
+
+    public Integer getDonationTroops() {
+        return achievements.stream()
+                           .filter(AchievementProgressResponse::isDonationTroops)
+                           .findFirst()
+                           .map(AchievementProgressResponse::getValue)
+                           .orElse(0);
+    }
+
+    public Integer getDonationSpell() {
+        return achievements.stream()
+                           .filter(AchievementProgressResponse::isDonationSpell)
+                           .findFirst()
+                           .map(AchievementProgressResponse::getValue)
+                           .orElse(0);
+    }
+
+    public Integer getDonationSiege() {
+        return achievements.stream()
+                           .filter(AchievementProgressResponse::isDonationSiege)
+                           .findFirst()
+                           .map(AchievementProgressResponse::getValue)
+                           .orElse(0);
+    }
 }

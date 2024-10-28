@@ -18,4 +18,17 @@ public class AchievementProgressResponse {
     public boolean isClanGameData() {
         return "Games Champion".equals(this.name);
     }
+
+    public boolean isDonationTroops() {
+        return "Friend in Need".equals(this.name);
+    }
+
+    public boolean isDonationSpell() {
+        return "Sharing is caring".equals(this.name);
+    }
+
+    public boolean isDonationSiege() {
+        return "Siege Sharer".equals(this.name);
+    }
+
 }

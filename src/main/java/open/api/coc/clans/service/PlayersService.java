@@ -373,7 +373,10 @@ public class PlayersService {
                                                                                             playerEntity.getDonations(),
                                                                                             playerEntity.getDonationsReceived(),
                                                                                             player.getDonations(),
-                                                                                            player.getDonationsReceived());
+                                                                                            player.getDonationsReceived(),
+                                                                                            player.getDonationTroops(),
+                                                                                            player.getDonationSpell(),
+                                                                                            player.getDonationSiege());
 
         if (findPlayerDonationStatEntity.isEmpty()) {
             // 신규 통계 생성
@@ -385,6 +388,7 @@ public class PlayersService {
         PlayerDonationStatEntity existingPlayerDonationStatEntity = findPlayerDonationStatEntity.get();
         existingPlayerDonationStatEntity.addDonationsDelta(playerDonationStatEntity.getDonationsDelta());
         existingPlayerDonationStatEntity.addDonationsReceivedDelta(playerDonationStatEntity.getDonationsReceivedDelta());
+        existingPlayerDonationStatEntity.changeDonationInfo(playerDonationStatEntity);
 
         playerDonationStatQueryRepository.save(existingPlayerDonationStatEntity);
     }

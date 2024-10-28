@@ -127,4 +127,12 @@ public class PlayerDatabaseService implements PlayerRepository {
                                         .toList();
     }
 
+    @Override
+    public List<Player> findAttackWinsRanking(Integer pageSize) {
+        return jpaPlayerCustomRepository.findAttackWinsRanking(pageSize)
+                                        .stream()
+                                        .map(playerEntityMapper::toPlayerOnly)
+                                        .toList();
+    }
+
 }

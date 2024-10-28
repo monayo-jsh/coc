@@ -42,4 +42,14 @@ public class JpaPlayerCustomRepository {
                            .limit(pageSize)
                            .fetch();
     }
+
+    public List<PlayerEntity> findAttackWinsRanking(Integer pageSize) {
+        return queryFactory.select(playerEntity)
+                           .from(playerEntity)
+                           .orderBy(playerEntity.attackWins.desc())
+                           .offset(0)
+                           .limit(pageSize)
+                           .fetch();
+    }
+
 }

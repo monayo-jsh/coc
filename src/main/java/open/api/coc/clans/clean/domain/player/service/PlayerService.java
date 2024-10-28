@@ -68,4 +68,9 @@ public class PlayerService {
     public List<Player> findTrophiesRanking(Integer pageSize) {
         return playerRepository.findTrophiesRanking(pageSize);
     }
+
+    @Transactional(readOnly = true)
+    public List<Player> findAttackWinsRanking(Integer pageSize) {
+        return playerRepository.findAttackWinsRanking(pageSize);
+    }
 }

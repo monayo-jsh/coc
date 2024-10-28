@@ -21,4 +21,6 @@ public interface PlayerRepository {
 
     List<Player> findTrophiesRanking(Integer pageSize);
 
+    List<Player> findAttackWinsRanking(Integer pageSize);
+
 }

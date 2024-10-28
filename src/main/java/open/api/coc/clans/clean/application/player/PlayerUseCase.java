@@ -239,4 +239,17 @@ public class PlayerUseCase {
                         .map(playerUseCaseMapper::toRankingDonationResponse)
                         .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<RankingHallOfFameDonationResponse> getRankingDonationReceived() {
+        // 현재 시즌 종료일을 가져온다.
+        LocalDate currentLeagueSeasonEndDate = playerDonationService.getLeagueSeasonEndDate();
+
+        // 플레이어 지원 랭킹 목록을 가져온다.
+        List<PlayerDonationDTO> donations = playerDonationService.findDonationReceivedRanking(currentLeagueSeasonEndDate, hallOfFameConfig.getRanking());
+
+        return donations.stream()
+                        .map(playerUseCaseMapper::toRankingDonationResponse)
+                        .toList();
+    }
 }

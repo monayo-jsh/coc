@@ -8,7 +8,7 @@ public record PlayerDonationDTO(
     String name, // 플레이어 이름
     Integer townHallLevel, // 타운홀 레벨
     YnType supportYn, // 지원계정 여부
-    Integer donationCount // 지원수
+    Integer count // 지원수
 
 ) {
 }

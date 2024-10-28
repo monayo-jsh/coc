@@ -13,4 +13,5 @@ public interface PlayerDonationRepository {
 
     List<PlayerDonationDTO> findDonationRanking(String season, Integer pageSize);
 
+    List<PlayerDonationDTO> findDonationReceivedRanking(String season, Integer pageSize);
 }

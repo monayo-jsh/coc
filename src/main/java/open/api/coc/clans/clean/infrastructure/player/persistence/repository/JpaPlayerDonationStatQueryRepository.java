@@ -12,11 +12,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
-import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-import org.thymeleaf.util.StringUtils;
 
 @Repository
 @RequiredArgsConstructor
@@ -43,7 +40,7 @@ public class JpaPlayerDonationStatQueryRepository {
             playerEntity.name.as("name"),
             playerEntity.townHallLevel.as("townHallLevel"),
             playerEntity.supportYn.as("supportYn"),
-            playerDonationStatEntity.donationsDelta.as("score")
+            playerDonationStatEntity.donationsDelta.as("count")
         );
 
         return queryFactory.select(rankingHallOfFameDTO)
@@ -56,16 +53,14 @@ public class JpaPlayerDonationStatQueryRepository {
                            .fetch();
     }
 
-    public List<RankingHallOfFameDTO> findRankingDonationsReceivedBySeasonAndPage(String season, PageRequest page) {
-        if (StringUtils.isEmpty(season)) {
-            throw new IllegalArgumentException("season is not empty");
-        }
-
-        ConstructorExpression<RankingHallOfFameDTO> rankingHallOfFameDTO = Projections.constructor(
-            RankingHallOfFameDTO.class,
-            playerDonationStatEntity.playerTag.as("tag"),
+    public List<PlayerDonationDTO> findRankingDonationsReceivedBySeasonAndPage(String season, Pageable page) {
+        ConstructorExpression<PlayerDonationDTO> rankingHallOfFameDTO = Projections.constructor(
+            PlayerDonationDTO.class,
+            playerEntity.playerTag.as("tag"),
             playerEntity.name.as("name"),
-            playerDonationStatEntity.donationsReceivedDelta.as("score")
+            playerEntity.townHallLevel.as("townHallLevel"),
+            playerEntity.supportYn.as("supportYn"),
+            playerDonationStatEntity.donationsReceivedDelta.as("count")
         );
 
         return queryFactory.select(rankingHallOfFameDTO)

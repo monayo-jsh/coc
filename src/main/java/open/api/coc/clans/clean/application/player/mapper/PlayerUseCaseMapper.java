@@ -39,6 +39,6 @@ public interface PlayerUseCaseMapper {
     @Mapping(target = "score", source = "attackWins")
     RankingHallOfFameResponse toRankingAttackWinsResponse(Player player);
 
-    @Mapping(target = "score", source = "donationCount")
+    @Mapping(target = "score", source = "count")
     RankingHallOfFameDonationResponse toRankingDonationResponse(PlayerDonationDTO playerDonationDTO);
 }

@@ -43,4 +43,10 @@ public class PlayerDonationDatabaseService implements PlayerDonationRepository {
         return jpaPlayerDonationStatQueryRepository.findRankingDonationsBySeasonAndPage(season, page);
     }
 
+    @Override
+    public List<PlayerDonationDTO> findDonationReceivedRanking(String season, Integer pageSize) {
+        Pageable page = PageRequest.of(0, pageSize);
+        return jpaPlayerDonationStatQueryRepository.findRankingDonationsReceivedBySeasonAndPage(season, page);
+    }
+
 }

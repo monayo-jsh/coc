@@ -84,6 +84,7 @@ public class PlayerDonationService {
         return seasonEndTime;
     }
 
+    @Transactional(readOnly = true)
     public List<PlayerDonationDTO> findDonationRanking(LocalDate seasonEndDate, Integer pageSize) {
         if (Objects.isNull(seasonEndDate)) {
             throw new IllegalArgumentException("season is not empty");
@@ -92,4 +93,15 @@ public class PlayerDonationService {
         String leagueSeason = formatLeagueSeason(seasonEndDate);
         return playerDonationRepository.findDonationRanking(leagueSeason, pageSize);
     }
+
+    @Transactional(readOnly = true)
+    public List<PlayerDonationDTO> findDonationReceivedRanking(LocalDate seasonEndDate, Integer pageSize) {
+        if (Objects.isNull(seasonEndDate)) {
+            throw new IllegalArgumentException("season is not empty");
+        }
+
+        String leagueSeason = formatLeagueSeason(seasonEndDate);
+        return playerDonationRepository.findDonationReceivedRanking(leagueSeason, pageSize);
+    }
+
 }

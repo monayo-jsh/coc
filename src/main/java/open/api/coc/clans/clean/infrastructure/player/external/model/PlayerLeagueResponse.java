@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.domain.player.external.model;
+package open.api.coc.clans.clean.infrastructure.player.external.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

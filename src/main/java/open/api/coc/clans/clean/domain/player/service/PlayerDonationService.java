@@ -30,7 +30,8 @@ public class PlayerDonationService {
                                                                           originPlayer.getDonations(),
                                                                           originPlayer.getDonationsReceived(),
                                                                           latestPlayer.getDonations(),
-                                                                          latestPlayer.getDonationsReceived());
+                                                                          latestPlayer.getDonationsReceived(),
+                                                                          latestPlayer.getDonationInfo());
 
         // 플레이어의 지원 통계를 조회한다.
         playerDonationRepository.findByPlayerTagAndSeason(originPlayer.getTag(), season)
@@ -44,8 +45,7 @@ public class PlayerDonationService {
 
     private PlayerDonationStat updateDonationStat(PlayerDonationStat originDonationStat, PlayerDonationStat newDonationStat) {
         // 기존 통계에 지원/지원 받은 유닛 수 누적
-        originDonationStat.addDonationsDelta(newDonationStat.getDonationsDelta());
-        originDonationStat.addDonationsReceivedDelta(newDonationStat.getDonationsReceivedDelta());
+        originDonationStat.changeDonationInfo(newDonationStat);
 
         return playerDonationRepository.save(originDonationStat);
     }

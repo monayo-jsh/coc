@@ -1,9 +1,8 @@
 package open.api.coc.clans.clean.infrastructure.player.persistence.mapper;
 
-import open.api.coc.clans.clean.domain.player.external.model.PlayerTroopResponse;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerTroopResponse;
 import open.api.coc.clans.clean.domain.player.model.PlayerPet;
 import open.api.coc.clans.clean.domain.player.model.PlayerSiegeMachine;
-import open.api.coc.clans.clean.domain.player.model.PlayerSpell;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerTroopsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

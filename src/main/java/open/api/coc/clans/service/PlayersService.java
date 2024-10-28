@@ -311,7 +311,7 @@ public class PlayersService {
                                       .orElseThrow(() -> createNotFoundException("%s 조회 실패".formatted(playerTag)));
 
         // 클랜게임 진행 정보 수집
-        clanGameService.collect(player);
+//        clanGameService.collect(player);
 
         processRecordPlayer(traceName, player, playerEntity);
 

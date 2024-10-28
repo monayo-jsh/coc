@@ -9,6 +9,7 @@ import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
+import open.api.coc.clans.clean.domain.clan.service.ClanGameService;
 import open.api.coc.clans.clean.domain.clan.service.ClanLeagueAssignService;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.league.model.League;
@@ -34,6 +35,8 @@ public class PlayerUseCase {
     private final PlayerClient playerClient;
 
     private final PlayerService playerService;
+
+    private final ClanGameService clanGameService;
     private final PlayerRecordService playerRecordService;
     private final PlayerDonationService playerDonationService;
 
@@ -154,6 +157,9 @@ public class PlayerUseCase {
 
         // 플레이어의 지원 통계를 기록한다.
         playerDonationService.collect(player, latestPlayer);
+
+        // 클랜 게임 수집
+        clanGameService.collect(latestPlayer);
 
         // 서버의 플레이어 정보를 현행화한다.
         player.changeInfo(latestPlayer);

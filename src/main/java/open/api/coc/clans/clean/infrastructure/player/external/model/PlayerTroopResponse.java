@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.domain.player.external.model;
+package open.api.coc.clans.clean.infrastructure.player.external.model;
 
 import java.util.Objects;
 import lombok.AccessLevel;
@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class PlayerSpellResponse {
+public class PlayerTroopResponse {
 
     private String name; // 이름
     private String village; // 제공 마을

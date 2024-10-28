@@ -2,7 +2,7 @@ package open.api.coc.clans.clean.infrastructure.capital.persistence.repository;
 
 import static open.api.coc.clans.clean.infrastructure.capital.persistence.entity.QRaidEntity.raidEntity;
 import static open.api.coc.clans.clean.infrastructure.capital.persistence.entity.QRaiderEntity.raiderEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
 
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;

@@ -4,16 +4,18 @@ import java.util.List;
 import java.util.Map;
 import open.api.coc.clans.clean.domain.player.config.PetConfig;
 import open.api.coc.clans.clean.domain.player.config.SiegeMachineConfig;
-import open.api.coc.clans.clean.domain.player.external.model.PlayerHeroEquipmentResponse;
-import open.api.coc.clans.clean.domain.player.external.model.PlayerHeroResponse;
-import open.api.coc.clans.clean.domain.player.external.model.PlayerResponse;
-import open.api.coc.clans.clean.domain.player.external.model.PlayerTroopResponse;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.Player.PlayerBuilder;
+import open.api.coc.clans.clean.domain.player.model.PlayerAchievementDonationInfo;
 import open.api.coc.clans.clean.domain.player.model.PlayerHero;
 import open.api.coc.clans.clean.domain.player.model.PlayerHeroEquipment;
 import open.api.coc.clans.clean.domain.player.model.PlayerPet;
 import open.api.coc.clans.clean.domain.player.model.PlayerSiegeMachine;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerAchievementProgressResponse;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerHeroEquipmentResponse;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerHeroResponse;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerResponse;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerTroopResponse;
 import open.api.coc.clans.clean.infrastructure.player.persistence.mapper.PlayerTroopsEntityMapper;
 import open.api.coc.clans.common.config.MapStructConfig;
 import org.mapstruct.AfterMapping;
@@ -51,6 +53,7 @@ public abstract class PlayerClientMapper {
         if (builder == null) return;
 
         convertWearHeroEquipment(playerResponse, builder); // 영웅의 착용중인 장비 매핑
+        convertAchievements(playerResponse, builder); // 수집 대상 업적 데이터 매핑
 
         builder.mappingPlayerTag(); // 플레이어 하위 항목 연관관계 매핑
     }
@@ -67,6 +70,32 @@ public abstract class PlayerClientMapper {
 
         // 영웅의 착용중인 장비 목록을 매핑한다.
         builder.mappingHeroWearEquipments();
+    }
+
+    private void convertAchievements(PlayerResponse playerResponse, PlayerBuilder builder) {
+        Integer clanGamePoint = 0, donationTroopCount = 0, donationSpellCount = 0, donationSiegeMachineCount = 0;
+
+        for (PlayerAchievementProgressResponse achievementProgressResponse : playerResponse.getAchievements()) {
+            if (achievementProgressResponse.isClanGameData()) {
+                clanGamePoint = achievementProgressResponse.getValue();
+            }
+            if (achievementProgressResponse.isDonationTroops()) {
+                donationTroopCount = achievementProgressResponse.getValue();
+            }
+            if (achievementProgressResponse.isDonationSpell()) {
+                donationSpellCount = achievementProgressResponse.getValue();
+            }
+            if (achievementProgressResponse.isDonationSiege()) {
+                donationSiegeMachineCount = achievementProgressResponse.getValue();
+            }
+        }
+
+        // 클랜 게임 데이터
+        builder.clanGamePoint(clanGamePoint);
+
+        // 지원 관련 데이터
+        PlayerAchievementDonationInfo donationInfo = PlayerAchievementDonationInfo.create(donationTroopCount, donationSpellCount, donationSiegeMachineCount);
+        builder.donationInfo(donationInfo);
     }
 
     @Named(value = "mapHeroes")

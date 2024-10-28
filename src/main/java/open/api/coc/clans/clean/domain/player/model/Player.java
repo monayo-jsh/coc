@@ -53,6 +53,10 @@ public class Player {
     private List<PlayerPet> pets; // 펫 목록
     private List<PlayerSiegeMachine> siegeMachines; // 시즈머신 목록
 
+    private Integer clanGamePoint; // 클랜게임 포인트
+
+    private PlayerAchievementDonationInfo donationInfo; // 업적 지원 정보
+
     public boolean isJoinedClan() {
         return StringUtils.hasText(this.clanTag);
     }

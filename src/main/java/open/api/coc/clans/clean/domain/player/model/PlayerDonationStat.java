@@ -1,11 +1,14 @@
 package open.api.coc.clans.clean.domain.player.model;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class PlayerDonationStat {
 
@@ -15,26 +18,31 @@ public class PlayerDonationStat {
     private String season; // 시즌
 
     private int donationsDelta; // 누적 지원수
-
     private int donationsReceivedDelta; // 누적 지원받은수
+
+    private int oldDonationTroops; // 시즌 시작 지원 유닛수
+    private int newDonationTroops; // 시즌 변화 지원 유닛수
+
+    private int oldDonationSpells; // 시즌 시작 지원 마법수
+    private int newDonationSpells; // 시즌 변화 지원 마법수
+
+    private int oldDonationSieges; // 시즌 시작 지원 시즈머신수
+    private int newDonationSieges; // 시즌 변화 지원 시즈머신수
 
     private Long version; // 행 버전값
 
-    @Builder
-    private PlayerDonationStat(Long id, String playerTag, String season, int donationsDelta, int donationsReceivedDelta, Long version) {
-        this.id = id;
-        this.playerTag = playerTag;
-        this.season = season;
-        this.donationsDelta = donationsDelta;
-        this.donationsReceivedDelta = donationsReceivedDelta;
-        this.version = version;
-    }
+    public static PlayerDonationStat create(String playerTag, String season, Integer lastDonations, Integer lastDonationsReceived,
+                                            Integer currentDonations, Integer currentDonationsReceived,
+                                            PlayerAchievementDonationInfo donationInfo) {
 
-    public static PlayerDonationStat create(String playerTag, String season, Integer lastDonations, Integer lastDonationsReceived, Integer currentDonations, Integer currentDonationsReceived) {
         int donationsDelta = calculateDelta(lastDonations, currentDonations);
         int donationsReceivedDelta = calculateDelta(lastDonationsReceived, currentDonationsReceived);
 
-        return new PlayerDonationStat(null, playerTag, season, donationsDelta, donationsReceivedDelta, null);
+        return new PlayerDonationStat(null, playerTag, season, donationsDelta, donationsReceivedDelta,
+                                      donationInfo.getTroopCount(), donationInfo.getTroopCount(),
+                                      donationInfo.getSpellCount(), donationInfo.getSpellCount(),
+                                      donationInfo.getSiegeMachineCount(), donationInfo.getSiegeMachineCount(),
+                                      null);
     }
 
     private static int calculateDelta(int lastValue, int currentValue) {
@@ -49,4 +57,14 @@ public class PlayerDonationStat {
         this.donationsReceivedDelta += donationsReceivedDelta;
     }
 
+    public void changeDonationInfo(PlayerDonationStat newDonationStat) {
+        // 지원유닛수, 지원받은유닛수 추적
+        addDonationsDelta(newDonationStat.getDonationsDelta());
+        addDonationsReceivedDelta(newDonationStat.getDonationsReceivedDelta());
+
+        // 업적 지원 관련 정보 갱신
+        this.newDonationTroops = newDonationStat.getNewDonationTroops();
+        this.newDonationSpells = newDonationStat.getNewDonationSpells();
+        this.newDonationSieges = newDonationStat.getNewDonationSieges();
+    }
 }

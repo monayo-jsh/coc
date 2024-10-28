@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.domain.player.external.model;
+package open.api.coc.clans.clean.infrastructure.player.external.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,8 @@ public class PlayerResponse {
     private List<PlayerTroopResponse> troops; // 유닛 목록 (유닛, 펫, 시즈머신)
     private List<PlayerSpellResponse> spells; // 마법 목록
 
+    private List<PlayerAchievementProgressResponse> achievements; // 업적 목록
+
     public List<PlayerHeroEquipmentResponse> getWearHeroEquipments() {
         // 착용중인 영웅 장비를 반환한다.
         return this.heroes.stream()
@@ -58,5 +60,7 @@ public class PlayerResponse {
 
         private List<PlayerTroopResponse> troops = new ArrayList<>(); // 유닛 목록 (유닛, 펫, 시즈머신)
         private List<PlayerSpellResponse> spells = new ArrayList<>(); // 마법 목록
+        private List<PlayerAchievementProgressResponse> achievements = new ArrayList<>(); // 업적 목록
+
     }
 }

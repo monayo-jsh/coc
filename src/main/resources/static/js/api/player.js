@@ -10,7 +10,7 @@ const URI_PLAYERS_TAGS_LEGEND_RECORD = '/players/legend/record'; // 플레이어
 const URI_PLAYERS_LEGEND_RECORD = '/players/{playerTag}/legend/record'; // 플레이어 전설 기록 조회
 
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
-const URI_PLAYERS_SUPPORT_BULK = '/players/support/bulk'; //지원계정 일괄 등록
+const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
 

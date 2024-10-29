@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.domain.player.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
@@ -56,8 +57,8 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-    public List<String> findAllPlayerTags() {
-        return playerRepository.findAllPlayerTags();
+    public List<String> findAllTag(PlayerSearchQuery query) {
+        return playerRepository.findAllTag(query);
     }
 
     @Transactional
@@ -75,5 +76,15 @@ public class PlayerService {
     @Transactional(readOnly = true)
     public List<Player> findAttackWinsRanking(Integer pageSize) {
         return playerRepository.findAttackWinsRanking(pageSize);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findAllTagNotExists(List<String> playerTags) {
+        PlayerSearchQuery query = PlayerSearchQuery.createWithTags(playerTags);
+        List<String> existsPlayerTags = playerRepository.findAllTag(query);
+
+        return playerTags.stream()
+                         .filter(playerTag -> !existsPlayerTags.contains(playerTag))
+                         .collect(Collectors.toList());
     }
 }

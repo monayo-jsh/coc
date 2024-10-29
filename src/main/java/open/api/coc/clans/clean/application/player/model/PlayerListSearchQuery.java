@@ -13,7 +13,7 @@ public record PlayerListSearchQuery(
 
 ) {
 
-    public boolean isSummartViewMode() {
+    public boolean isSummaryViewMode() {
         return "summary".equals(viewMode);
     }
 

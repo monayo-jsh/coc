@@ -11,7 +11,7 @@ public interface PlayerRepository {
 
     List<Player> findAllSummarized(PlayerSearchQuery query);
 
-    List<String> findAllPlayerTags();
+    List<String> findAllTag(PlayerSearchQuery query);
 
     Optional<Player> findById(String playerTag);
 

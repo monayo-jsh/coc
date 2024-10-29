@@ -54,9 +54,11 @@ public class PlayerDatabaseService implements PlayerRepository {
                                         .toList();
     }
 
+
+
     @Override
-    public List<String> findAllPlayerTags() {
-        return jpaPlayerCustomRepository.findAllPlayerTag();
+    public List<String> findAllTag(PlayerSearchQuery query) {
+        return jpaPlayerCustomRepository.findAllTag(query);
     }
 
     @Override

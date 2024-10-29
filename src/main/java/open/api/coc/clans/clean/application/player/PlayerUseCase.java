@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
 import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
+import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulkCommand;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
@@ -20,9 +21,11 @@ import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
+import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
@@ -40,6 +43,7 @@ public class PlayerUseCase {
     private final PlayerClient playerClient;
 
     private final PlayerService playerService;
+    private final PlayerSupportService supportService;
 
     private final ClanGameService clanGameService;
     private final PlayerRecordService playerRecordService;
@@ -58,7 +62,7 @@ public class PlayerUseCase {
     public List<PlayerResponse> getAllPlayers(PlayerListSearchQuery query) {
         // 플레이어 목록을 조회한다.
         List<Player> players;
-        if (query.isSummartViewMode()) {
+        if (query.isSummaryViewMode()) {
             players = playerService.findSummarizedPlayers(query.accountType(), query.name());
         } else {
             players = playerService.findAllPlayers(query.accountType(), query.name());
@@ -99,7 +103,8 @@ public class PlayerUseCase {
     @Transactional(readOnly = true)
     public List<String> getAllPlayerTags() {
         // 플레이어 태그 목록을 반환한다.
-        return playerService.findAllPlayerTags();
+        PlayerSearchQuery query = PlayerSearchQuery.empty();
+        return playerService.findAllTag(query);
     }
 
     @Transactional(readOnly = true)
@@ -210,6 +215,41 @@ public class PlayerUseCase {
         // 지원 계정 전환 요청 시 배정된 클랜을 제거한다.
         if (command.isSupportPlayer()) {
             clanAssignService.excludeRecently(player.getTag());
+        }
+    }
+
+    @Transactional
+    public void changePlayerSupportTypeBulk(PlayerSupportUpdateBulkCommand command) {
+        // 기존에 설정된 지원계정을 초기화한다.
+        supportService.resetAll();
+
+        // 지원 계정 일괄 설정한다.
+        long updatedSupportPlayerCount = supportService.updateBulk(command.playerTags());
+
+        // 지원계정 전환 시 배정된 클랜 제외한다.
+        clanAssignService.excludeRecently(command.playerTags());
+
+        // 요청한 계정 모두 처리된 경우 프로세스 종료한다.
+        if (command.isRequestCompleted(updatedSupportPlayerCount)) return;
+
+        // 그렇지 않은 경우 미등록 계정 태그가 존재하여 신규 계정 등록 및 지원 계정 설정한다.
+        List<String> tagsThatNeedToBeRegistered = playerService.findAllTagNotExists(command.playerTags());
+        for(String playerTag : tagsThatNeedToBeRegistered) {
+            try {
+                // COC 플레이어 최신 정보를 조회한다.
+                Player latestPlayer = playerClient.findByTag(playerTag);
+
+                // 플레이어가 가입한 클랜 데이터 생성
+                clanService.createIfNotExists(latestPlayer.getClanTag());
+
+                // 지원계정 설정
+                latestPlayer.changeSupportPlayer();
+
+                // 플레리어를 저장한다.
+                playerService.save(latestPlayer);
+            } catch (Exception e) {
+                log.error("[not registered player] tag: {}, reason: {}", playerTag, e.getMessage());
+            }
         }
     }
 

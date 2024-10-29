@@ -18,6 +18,22 @@ public class PlayerService {
     private final PlayerRepository playerRepository;
 
     @Transactional(readOnly = true)
+    public List<String> findAllTag() {
+        PlayerSearchQuery query = PlayerSearchQuery.empty();
+        return playerRepository.findAllTag(query);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findAllTagNotExists(List<String> playerTags) {
+        PlayerSearchQuery query = PlayerSearchQuery.createWithTags(playerTags);
+        List<String> existsPlayerTags = playerRepository.findAllTag(query);
+
+        return playerTags.stream()
+                         .filter(playerTag -> !existsPlayerTags.contains(playerTag))
+                         .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<Player> findAllPlayers(String accountType, String name) {
         PlayerSearchQuery query = PlayerSearchQuery.create(accountType, name);
         return playerRepository.findAll(query);
@@ -27,6 +43,16 @@ public class PlayerService {
     public List<Player> findSummarizedPlayers(String accountType, String name) {
         PlayerSearchQuery query = PlayerSearchQuery.create(accountType, name);
         return playerRepository.findAllSummarized(query);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Player> findTrophiesRanking(Integer pageSize) {
+        return playerRepository.findTrophiesRanking(pageSize);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Player> findAttackWinsRanking(Integer pageSize) {
+        return playerRepository.findAttackWinsRanking(pageSize);
     }
 
     @Transactional(readOnly = true)
@@ -57,34 +83,10 @@ public class PlayerService {
         return playerRepository.save(player);
     }
 
-    public List<String> findAllTag(PlayerSearchQuery query) {
-        return playerRepository.findAllTag(query);
-    }
-
     @Transactional
     public void delete(String playerTag) {
         findById(playerTag);
 
         playerRepository.deleteById(playerTag);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Player> findTrophiesRanking(Integer pageSize) {
-        return playerRepository.findTrophiesRanking(pageSize);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Player> findAttackWinsRanking(Integer pageSize) {
-        return playerRepository.findAttackWinsRanking(pageSize);
-    }
-
-    @Transactional(readOnly = true)
-    public List<String> findAllTagNotExists(List<String> playerTags) {
-        PlayerSearchQuery query = PlayerSearchQuery.createWithTags(playerTags);
-        List<String> existsPlayerTags = playerRepository.findAllTag(query);
-
-        return playerTags.stream()
-                         .filter(playerTag -> !existsPlayerTags.contains(playerTag))
-                         .collect(Collectors.toList());
     }
 }

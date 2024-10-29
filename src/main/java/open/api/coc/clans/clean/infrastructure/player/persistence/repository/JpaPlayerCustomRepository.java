@@ -74,13 +74,6 @@ public class JpaPlayerCustomRepository {
                     .execute();
     }
 
-    public void updateSupport(String playerTag) {
-        queryFactory.update(playerEntity)
-                    .set(playerEntity.supportYn, YnType.Y)
-                    .where(playerEntity.playerTag.eq(playerTag))
-                    .execute();
-    }
-
     public long updateSupport(List<String> playerTags) {
         return queryFactory.update(playerEntity)
                            .set(playerEntity.supportYn, YnType.Y)

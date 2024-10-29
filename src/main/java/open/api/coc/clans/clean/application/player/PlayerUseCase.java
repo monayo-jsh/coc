@@ -21,7 +21,6 @@ import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
-import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
@@ -52,7 +51,6 @@ public class PlayerUseCase {
     private final ClanService clanService;
     private final ClanAssignService clanAssignService;
     private final ClanLeagueAssignService clanLeagueAssignService;
-
 
     private final LeagueService leagueService;
 
@@ -103,8 +101,7 @@ public class PlayerUseCase {
     @Transactional(readOnly = true)
     public List<String> getAllPlayerTags() {
         // 플레이어 태그 목록을 반환한다.
-        PlayerSearchQuery query = PlayerSearchQuery.empty();
-        return playerService.findAllTag(query);
+        return playerService.findAllTag();
     }
 
     @Transactional(readOnly = true)

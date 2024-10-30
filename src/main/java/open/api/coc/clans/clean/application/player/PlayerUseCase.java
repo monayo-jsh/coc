@@ -21,14 +21,16 @@ import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
+import open.api.coc.clans.clean.domain.player.service.PlayerLegendRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRankingService;
-import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHeroEquipmentResponse;
@@ -51,7 +53,7 @@ public class PlayerUseCase {
     private final PlayerRankingService rankingService;
 
     private final ClanGameService clanGameService;
-    private final PlayerRecordService playerRecordService;
+    private final PlayerLegendRecordService legendRecordService;
     private final PlayerDonationService playerDonationService;
 
     private final ClanService clanService;
@@ -168,7 +170,7 @@ public class PlayerUseCase {
         clanService.createIfNotExists(latestPlayer.getClanTag());
 
         // 플레이어의 트로피, 공/방 변화를 기록한다.
-        playerRecordService.createHistory(player, latestPlayer);
+        legendRecordService.createHistory(player, latestPlayer);
 
         // 플레이어의 지원 통계를 기록한다.
         playerDonationService.collect(player, latestPlayer);
@@ -257,6 +259,15 @@ public class PlayerUseCase {
     }
 
     @Transactional(readOnly = true)
+    public List<PlayerLegendRecordResponse> getLegendRecord(String playerTag) {
+        List<PlayerRecordHistory> legendRecords = legendRecordService.findAllLatest(playerTag);
+        return legendRecords.stream()
+                            .map(playerUseCaseMapper::toPlayerLegendRecordResponse)
+                            .toList();
+    }
+
+
+    @Transactional(readOnly = true)
     public List<RankingHallOfFameResponse> getRankingTrophies() {
         List<Player> players = playerService.findTrophiesRanking(hallOfFameConfig.getRanking());
 
@@ -328,4 +339,5 @@ public class PlayerUseCase {
                                        .map(playerUseCaseMapper::toRankingHeroEquipmentResponse)
                                        .toList();
     }
+
 }

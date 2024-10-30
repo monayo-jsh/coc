@@ -27,11 +27,11 @@ public class JpaSeasonEndManagementCustomRepository {
         return Optional.ofNullable(seasonEndDate);
     }
 
-    public List<LocalDate> findLatestSeasonEndDate(int count) {
+    public List<LocalDate> findLatestSeasonEndDate(int limit) {
         return queryFactory.select(seasonEndManagementEntity.endDate)
                            .from(seasonEndManagementEntity)
                            .orderBy(seasonEndManagementEntity.endDate.desc())
-                           .limit(count)
+                           .limit(limit)
                            .fetch();
     }
 }

@@ -344,15 +344,10 @@ public class PlayersService {
         if (recordingPlayer.isEmpty()) return;
 
         // 플레이어 기록
-        PlayerRecordHistoryEntity recordHistoryEntity = new PlayerRecordHistoryEntity(null,
-                                                                                      playerEntity.getPlayerTag(),
-                                                                                      playerEntity.getTrophies(),
-                                                                                      playerEntity.getAttackWins(),
-                                                                                      playerEntity.getDefenseWins(),
-                                                                                      player.getTrophies(),
-                                                                                      player.getAttackWins(),
-                                                                                      player.getDefenseWins(),
-                                                                                      LocalDateTime.now());
+        PlayerRecordHistoryEntity recordHistoryEntity = PlayerRecordHistoryEntity.create(playerEntity,
+                                                                                         player.getTrophies(),
+                                                                                         player.getAttackWins(),
+                                                                                         player.getDefenseWins());
 
         playerRecordHistoryRepository.save(recordHistoryEntity);
 

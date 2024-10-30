@@ -18,6 +18,7 @@ import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulkCommand;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateBulkRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
@@ -195,6 +196,21 @@ public class PlayerController {
         playerUseCase.changePlayerSupportTypeBulk(command);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
+    }
+
+    @Operation(
+        summary = "수집된 플레이어 전설기록을 제공합니다. version: 1.00, Last Update: 24.10.30",
+        description = "이 API는 수집된 플레이어의 전설기록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerLegendRecordResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/{playerTag}/legend/record")
+    public ResponseEntity<List<PlayerLegendRecordResponse>> getLegendRecord(@PathVariable String playerTag) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getLegendRecord(playerTag));
     }
 
     @Operation(

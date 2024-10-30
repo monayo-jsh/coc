@@ -7,7 +7,7 @@ const URI_PLAYERS_OPEN_API = `${PREFIX_PLAYER_API}/{playerTag}/external`; //멤�
 const URI_PLAYERS_DETAIL = `${PREFIX_PLAYER_API}/{playerTag}`; //멤버 등록,삭제
 
 const URI_PLAYERS_TAGS_LEGEND_RECORD = '/players/legend/record'; // 플레이어 전설 기록 플레이어 태그 목록 조회
-const URI_PLAYERS_LEGEND_RECORD = '/players/{playerTag}/legend/record'; // 플레이어 전설 기록 조회
+const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/record`; // 플레이어 전설 기록 조회
 
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
 const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록

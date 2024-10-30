@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.infrastructure.season.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
@@ -15,5 +16,10 @@ public class SeasonDatabaseService implements SeasonRepository {
     @Override
     public Optional<LocalDate> findSeasonEndDateByBaseDate(LocalDate baseDate) {
         return jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(baseDate);
+    }
+
+    @Override
+    public List<LocalDate> findLatestSeasonEndDate(int limit) {
+        return jpaSeasonEndManagementCustomRepository.findLatestSeasonEndDate(limit);
     }
 }

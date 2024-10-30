@@ -9,9 +9,11 @@ import open.api.coc.clans.clean.domain.league.mapper.LeagueMapper;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerHeroEquipment;
+import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateBulkRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
@@ -84,4 +86,6 @@ public interface PlayerUseCaseMapper {
                                     .heroName(playerHeroEquipment.getHeroName())
                                     .build();
     }
+
+    PlayerLegendRecordResponse toPlayerLegendRecordResponse(PlayerRecordHistory playerLegendRecord);
 }

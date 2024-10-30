@@ -8,13 +8,11 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerRecordHistoryRepository;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
 import open.api.coc.clans.domain.players.PlayerRecordResponse;
-import open.api.coc.clans.domain.players.RankingHeroEquipmentResponse;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,12 +25,6 @@ public class PlayersController {
     // 추 후 리팩토링하면서 제거 예정
     private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
     private final JpaPlayerRecordHistoryRepository playerRecordHistoryRepository;
-
-    @GetMapping("/ranking/hero/equipments")
-    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments(@RequestParam String clanTag) {
-        return ResponseEntity.ok()
-                             .body(playersService.getRankingHeroEquipments(clanTag));
-    }
 
     @GetMapping("/legend/record")
     public ResponseEntity<List<String>> getLegendRecordPlayers() {

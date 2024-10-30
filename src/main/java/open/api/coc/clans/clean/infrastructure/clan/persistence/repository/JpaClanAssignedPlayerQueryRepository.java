@@ -4,6 +4,8 @@ import static open.api.coc.clans.database.entity.clan.QClanAssignedPlayerEntity.
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -21,7 +23,7 @@ public class JpaClanAssignedPlayerQueryRepository {
 
     private static final DateTimeFormatter SEASON_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 
-    public String findLatestSeasonDate() {
+    public String findLatestAssignedDate() {
         String maxSeasonDate = queryFactory.select(clanAssignedPlayerEntity.id.seasonDate.max())
                                            .from(clanAssignedPlayerEntity)
                                            .fetchOne();
@@ -31,12 +33,12 @@ public class JpaClanAssignedPlayerQueryRepository {
     }
 
     public List<ClanAssignedPlayerEntity> findAllBySeasonDate(String seasonDate) {
-        return queryFactory.select(clanAssignedPlayerEntity)
-                           .from(clanAssignedPlayerEntity)
-                           .leftJoin(clanAssignedPlayerEntity.clan, clanEntity).fetchJoin()
-                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin()
-                           .where(clanAssignedPlayerEntity.id.seasonDate.eq(seasonDate))
-                           .fetch();
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanAssignedPlayerEntity.id.seasonDate.eq(seasonDate));
+
+        return createBaseQueryWithClan().where(condition)
+                                        .fetch();
+
     }
 
     public long deleteBySeasonDateAndPlayerTags(String seasonDate, List<String> playerTags) {
@@ -45,5 +47,19 @@ public class JpaClanAssignedPlayerQueryRepository {
                                                                         .and(clanAssignedPlayerEntity.id.playerTag.in(playerTags)))
                            .execute();
 
+    }
+
+    public List<ClanAssignedPlayerEntity> findAllByAssignedDateAndClanTag(String assignedDate, String clanTag) {
+        BooleanBuilder condition = ClanAssignedPlayerQueryBuilder.create(assignedDate, clanTag).build();
+
+        return createBaseQueryWithClan().where(condition)
+                                        .fetch();
+    }
+
+    private JPAQuery<ClanAssignedPlayerEntity> createBaseQueryWithClan() {
+        return queryFactory.select(clanAssignedPlayerEntity)
+                           .from(clanAssignedPlayerEntity)
+                           .leftJoin(clanAssignedPlayerEntity.clan, clanEntity).fetchJoin()
+                           .leftJoin(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();
     }
 }

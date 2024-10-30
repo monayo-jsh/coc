@@ -12,4 +12,5 @@ public interface PlayerHeroEquipmentResponseMapper {
 
     PlayerHeroEquipment toPlayerHeroEquipment(PlayerHeroEquipmentResponse heroEquipmentResponse);
 
+
 }

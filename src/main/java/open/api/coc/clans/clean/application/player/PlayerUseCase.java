@@ -12,6 +12,7 @@ import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulkCommand;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanAssignedPlayer;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
 import open.api.coc.clans.clean.domain.clan.service.ClanGameService;
 import open.api.coc.clans.clean.domain.clan.service.ClanLeagueAssignService;
@@ -21,13 +22,16 @@ import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
+import open.api.coc.clans.clean.domain.player.service.PlayerRankingService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
+import open.api.coc.clans.clean.presentation.player.dto.RankingHeroEquipmentResponse;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -43,6 +47,8 @@ public class PlayerUseCase {
 
     private final PlayerService playerService;
     private final PlayerSupportService supportService;
+
+    private final PlayerRankingService rankingService;
 
     private final ClanGameService clanGameService;
     private final PlayerRecordService playerRecordService;
@@ -302,4 +308,24 @@ public class PlayerUseCase {
         return mapToPlayerResponse(latestPlayer);
     }
 
+    public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
+        // 최근 배정일을 가져온다.
+        String latestAssignedDate = clanAssignService.findLatestAssignedDate();
+
+        // 클랜에 최근 배정 목록을 가져온다.
+        List<ClanAssignedPlayer> clanAssignedPlayers = clanAssignService.findAll(latestAssignedDate, clanTag);
+
+        if (clanAssignedPlayers.isEmpty()) return Collections.emptyList();
+
+        // 영웅 장비 랭킹을 구한다.
+        List<String> targetPlayerTags = clanAssignedPlayers.stream()
+                                                           .map(ClanAssignedPlayer::getPlayerTag)
+                                                           .toList();
+        List<RankingHeroEquipmentDTO> rankingHeroEquipmentDTOs = rankingService.findHeroEquipmentRanking(targetPlayerTags);
+
+        // 응답한다.
+        return rankingHeroEquipmentDTOs.stream()
+                                       .map(playerUseCaseMapper::toRankingHeroEquipmentResponse)
+                                       .toList();
+    }
 }

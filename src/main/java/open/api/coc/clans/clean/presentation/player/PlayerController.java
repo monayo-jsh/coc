@@ -19,9 +19,10 @@ import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulk
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateBulkRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
-import open.api.coc.clans.domain.players.SupportPlayerBulkRequest;
+import open.api.coc.clans.clean.presentation.player.dto.RankingHeroEquipmentResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -189,7 +190,7 @@ public class PlayerController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PutMapping("/support/bulk")
-    public ResponseEntity<Void> putPlayerSupportBulk(@Valid @RequestBody SupportPlayerBulkRequest request) {
+    public ResponseEntity<Void> putPlayerSupportBulk(@Valid @RequestBody PlayerSupportUpdateBulkRequest request) {
         PlayerSupportUpdateBulkCommand command = playerUseCaseMapper.toSupportUpdateBulkCommand(request);
         playerUseCase.changePlayerSupportTypeBulk(command);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
@@ -255,4 +256,23 @@ public class PlayerController {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.getRankingDonationReceived());
     }
+
+    @Operation(
+        summary = "플레이어 영웅 장비 착용 순위 목록을 제공합니다. version: 1.00, Last Update: 24.10.29",
+        description = "이 API는 플레이어 영웅 장비 착용 순위 목록을 제공합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHeroEquipmentResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/ranking/hero/equipments")
+    public ResponseEntity<List<RankingHeroEquipmentResponse>> getRankingHeroEquipments(@RequestParam String clanTag) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getRankingHeroEquipments(clanTag));
+    }
+
 }

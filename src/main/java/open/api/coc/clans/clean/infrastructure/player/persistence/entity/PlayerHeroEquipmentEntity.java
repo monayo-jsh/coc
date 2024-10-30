@@ -31,7 +31,9 @@ import org.springframework.data.domain.Persistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "tb_player_hero_equipment")
+@Table(
+    name = "tb_player_hero_equipment"
+)
 public class PlayerHeroEquipmentEntity implements Persistable<PlayerItemInfoPK> {
 
     @EmbeddedId

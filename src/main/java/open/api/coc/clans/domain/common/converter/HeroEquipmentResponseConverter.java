@@ -23,7 +23,6 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
                                     .maxLevel(source.getMaxLevel())
                                     .rarity(heroEquipment.getRarity())
                                     .heroName(heroEquipment.getHero().getKoreanName())
-                                    .heroShortName(heroEquipment.getHero().getKoreanShortName())
                                     .build();
     }
 
@@ -42,7 +41,6 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
                                     .maxLevel(source.getLevelInfo().getMaxLevel())
                                     .rarity(heroEquipment.getRarity())
                                     .heroName(heroEquipment.getHero().getKoreanName())
-                                    .heroShortName(heroEquipment.getHero().getKoreanShortName())
                                     .build();
     }
 }

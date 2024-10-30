@@ -12,7 +12,7 @@ const URI_PLAYERS_LEGEND_RECORD = '/players/{playerTag}/legend/record'; // 플�
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
 const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록
 
-const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = '/players/ranking/hero/equipments'; //영웅 장비 랭킹
+const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = `${PREFIX_PLAYER_API}/ranking/hero/equipments`; //영웅 장비 랭킹
 
 const URI_PLAYERS_RANKING_CURRENT_TROPHIES = `${PREFIX_PLAYER_API}/ranking/trophies` //현재 트로피 순위
 const URI_PLAYERS_RANKING_ATTACK_WINS = `${PREFIX_PLAYER_API}/ranking/attack/wins` //현재 공성 순위

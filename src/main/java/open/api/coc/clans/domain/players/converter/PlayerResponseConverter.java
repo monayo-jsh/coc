@@ -6,18 +6,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerDTO;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.clan.ClanEntity;
-import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
+import open.api.coc.clans.clean.domain.player.config.SpellConfig;
 import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEquipmentEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerSpellEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerTroopsEntity;
-import open.api.coc.clans.clean.domain.player.config.SpellConfig;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.TroopConfig;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.WarPreferenceType;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerDTO;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
+import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
@@ -169,6 +170,10 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
     }
 
     public PlayerResponse convert(PlayerEntity source) {
+        String warPreference = WarPreferenceType.out.name();
+        if (Objects.nonNull(source.getWarPreference())) {
+            warPreference = source.getWarPreference().name();
+        }
         PlayerResponse player = PlayerResponse.builder()
                                               .name(source.getName())
                                               .tag(source.getPlayerTag())
@@ -183,7 +188,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                                               .league(makeLeague(source.getLeague()))
                                               .warStars(source.getWarStars())
                                               .role(source.getRole())
-                                              .warPreference(source.getWarPreference().name())
+                                              .warPreference(warPreference)
                                               .supportYn(source.getSupportYn().name())
                                               .clan(makePlayerClanResponse(source.getClan()))
                                               .heroes(makeHeroResponse(source.getHeroes(), source.getHeroEquipments()))

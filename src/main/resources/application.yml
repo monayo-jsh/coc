@@ -1,6 +1,13 @@
 server:
   port: 8080
 
+logging.level.org.springframework.transaction.interceptor: TRACE
+logging:
+  level:
+    org:
+      springframework:
+        transaction: DEBUG
+
 springdoc:
   swagger-ui:
     path: '/clan/cms/docs/apis'

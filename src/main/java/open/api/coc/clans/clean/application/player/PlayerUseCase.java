@@ -125,8 +125,8 @@ public class PlayerUseCase {
         // 플레이어 클랜 정보를 조회한다.
         Clan clan = null;
         if (player.isJoinedClan()) {
+            // 서버에서 등록된 클랜이 아닐 수 있음
             try {
-                // 서버에서 등록된 클랜이 아닐 수 있음
                 clan = clanService.findById(player.getClanTag());
             } catch (Exception ignore) {}
         }

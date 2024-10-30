@@ -53,7 +53,8 @@ public class ClanQueryRepository {
     }
 
     public Optional<ClanEntity> findById(String clanTag) {
-        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanEntity.tag.eq(clanTag));
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanEntity.tag.eq(clanTag));
 
         return Optional.ofNullable(createSelectClanBaseQuery().where(condition)
                                                               .fetchOne());

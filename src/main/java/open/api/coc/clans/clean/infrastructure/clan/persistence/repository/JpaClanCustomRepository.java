@@ -21,7 +21,7 @@ public class JpaClanCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     public Optional<ClanEntity> findById(String tag) {
-        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        BooleanBuilder condition = new BooleanBuilder();
         condition.and(clanEntity.tag.eq(tag));
 
         ClanEntity clanEntity = createSelectClanBaseQuery().where(condition)

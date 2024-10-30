@@ -160,7 +160,6 @@
       return clans.sort((a, b) => a.order - b.order);
     }
 
-    let JOIN_NEEDED_ROW = [];
     async function renderJoinedFlag(clan, assignedTable, assignedMembers) {
       const currentJoinedMembers = await fetchClanMembers([{tag: clan.tag}]);
       const currentJoinedMemberMap = convertArrayToMapByKey(currentJoinedMembers)
@@ -169,7 +168,7 @@
         const isJoined = currentJoinedMemberMap.get(member.tag);
         if (!isJoined) {
           const row = assignedTable.querySelector(`.player-${removeHashTag(member.tag)}`);
-          JOIN_NEEDED_ROW.push(row);
+          row.classList.add('bg-crimson', 'font-white');
         }
       }
     }
@@ -199,19 +198,10 @@
       hideWifiLoading(".section");
     }
 
-    function displayJoinNeeded() {
-      if (!JOIN_NEEDED_ROW.length) return;
-
-      const row = JOIN_NEEDED_ROW.shift();
-      row.classList.add('bg-crimson', 'font-white');
-    }
-
     window.onload = async () => {
       await loadLeagues();
 
       await drawAssignedMember();
-
-      setInterval(() => displayJoinNeeded(), 50); // 5초마다 하나씩 표기
     }
   </script>
 

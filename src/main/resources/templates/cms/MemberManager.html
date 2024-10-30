@@ -331,7 +331,7 @@
 
       for (const [key, value] of heroEquipmentMap) {
         const sortedEquipments = value.sort((a, b) => b.code - a.code);
-        renderHeroEquipment(innerSectionGroupElement, key, sortedEquipments);
+        renderHeroEquipment(innerSectionGroupElement, convertHeroKoreanName(key), sortedEquipments);
       }
 
       const cardBackElement = memberHtml.querySelector('.card-back .inner-content');

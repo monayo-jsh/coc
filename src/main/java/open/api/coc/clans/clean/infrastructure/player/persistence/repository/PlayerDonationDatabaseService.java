@@ -5,6 +5,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.PlayerDonationStat;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.repository.PlayerDonationRepository;
 import open.api.coc.clans.clean.infrastructure.player.persistence.mapper.PlayerDonationStatEntityMapper;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
@@ -44,7 +45,7 @@ public class PlayerDonationDatabaseService implements PlayerDonationRepository {
     }
 
     @Override
-    public List<PlayerDonationDTO> findDonationReceivedRanking(String season, Integer pageSize) {
+    public List<PlayerDonationReceiveDTO> findDonationReceivedRanking(String season, Integer pageSize) {
         Pageable page = PageRequest.of(0, pageSize);
         return jpaPlayerDonationStatQueryRepository.findRankingDonationsReceivedBySeasonAndPage(season, page);
     }

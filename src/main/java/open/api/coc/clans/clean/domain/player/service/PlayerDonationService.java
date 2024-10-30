@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerDonationStat;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.repository.PlayerDonationRepository;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
 import open.api.coc.util.SeasonUtils;
@@ -95,7 +96,7 @@ public class PlayerDonationService {
     }
 
     @Transactional(readOnly = true)
-    public List<PlayerDonationDTO> findDonationReceivedRanking(LocalDate seasonEndDate, Integer pageSize) {
+    public List<PlayerDonationReceiveDTO> findDonationReceivedRanking(LocalDate seasonEndDate, Integer pageSize) {
         if (Objects.isNull(seasonEndDate)) {
             throw new IllegalArgumentException("season is not empty");
         }

@@ -156,10 +156,12 @@ body {
 }
 
 i.fa-star {
-  margin-right: 5px;
   color: gold;
 }
 
+div.icon.Barbarian,
+div.icon.LightningSpell,
+div.icon.WallWrecker,
 div.icon.trophies,
 div.icon-sword,
 div.icon-damage,
@@ -253,6 +255,25 @@ i.third-place {
       font-size: 13px;
     }
 
+    .info {
+      margin-top: 5px;
+
+      .score {
+        display: flex;
+        gap: 5px;
+
+        .icon {
+          margin-right: unset;
+        }
+      }
+
+      .score.column {
+        @media (max-width: 500px) {
+          flex-direction: column;
+        }
+      }
+    }
+
     .icon {
       width: 20px;
       height: 20px;
@@ -298,6 +319,10 @@ i.third-place {
   }
 
   .details {
+    margin-top: 5px;
+  }
+
+  .info {
     margin-top: 5px;
   }
 

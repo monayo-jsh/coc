@@ -11,6 +11,7 @@ import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerHeroEquipment;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
@@ -50,8 +51,10 @@ public interface PlayerUseCaseMapper {
     @Mapping(target = "score", source = "attackWins")
     RankingHallOfFameResponse toRankingAttackWinsResponse(Player player);
 
-    @Mapping(target = "score", source = "count")
     RankingHallOfFameDonationResponse toRankingDonationResponse(PlayerDonationDTO playerDonationDTO);
+
+    @Mapping(target = "score", source = "count")
+    RankingHallOfFameResponse toRankingDonationReceiveResponse(PlayerDonationReceiveDTO playerDonationDTO);
 
     // 플레이어 목록 검색 쿼리
     PlayerListSearchQuery toPlayerListSearchQuery(String accountType, String viewMode, String name);

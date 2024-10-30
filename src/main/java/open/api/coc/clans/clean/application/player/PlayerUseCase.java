@@ -23,6 +23,7 @@ import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerLegendRecordService;
@@ -299,15 +300,15 @@ public class PlayerUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<RankingHallOfFameDonationResponse> getRankingDonationReceived() {
+    public List<RankingHallOfFameResponse> getRankingDonationReceived() {
         // 현재 시즌 종료일을 가져온다.
         LocalDate currentLeagueSeasonEndDate = playerDonationService.getLeagueSeasonEndDate();
 
         // 플레이어 지원 랭킹 목록을 가져온다.
-        List<PlayerDonationDTO> donations = playerDonationService.findDonationReceivedRanking(currentLeagueSeasonEndDate, hallOfFameConfig.getRanking());
+        List<PlayerDonationReceiveDTO> donations = playerDonationService.findDonationReceivedRanking(currentLeagueSeasonEndDate, hallOfFameConfig.getRanking());
 
         return donations.stream()
-                        .map(playerUseCaseMapper::toRankingDonationResponse)
+                        .map(playerUseCaseMapper::toRankingDonationReceiveResponse)
                         .toList();
     }
 

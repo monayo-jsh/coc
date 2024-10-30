@@ -135,6 +135,42 @@
       }
     }
 
+    function makeTopPlayerDonationRow(rank, player) {
+      const { name, townHallLevel, troopCount, spellCount, siegeCount } = player;
+
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-donation-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                     .replace(/{TROOP_COUNT}/, Number(troopCount).toLocaleString())
+                                     .replace(/{SPELL_COUNT}/, Number(spellCount).toLocaleString())
+                                     .replace(/{SIEGE_COUNT}/, Number(siegeCount).toLocaleString());
+
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
+
+      topPlayer.classList.add(`top-player-${rank}`);
+
+      return topPlayer;
+    }
+
+    function makePlayerDonationRow(rank, player) {
+      const { name, troopCount, spellCount, siegeCount } = player;
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-donation-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{TROOP_COUNT}/, Number(troopCount).toLocaleString())
+                                     .replace(/{SPELL_COUNT}/, Number(spellCount).toLocaleString())
+                                     .replace(/{SIEGE_COUNT}/, Number(siegeCount).toLocaleString());
+
+      return topPlayer;
+    }
+
     function drawLeaderboardRecord(leaderboard, rankingRecords, functionMakeTopPlayerRow, functionMakePlayerRow) {
       drawLeaderBoardTopPlayer(leaderboard, rankingRecords.splice(0, 3), functionMakeTopPlayerRow);
       drawLeaderBoardOtherPlayer(leaderboard, rankingRecords, functionMakePlayerRow);
@@ -251,6 +287,22 @@
         targetLeaderboard.remove();
     }
 
+    function renderLeaderboardForDonation(sectionClassName, leaderboardTitle, rankingRecords) {
+      const leaderboard = makeLeaderboard(leaderboardTitle);
+
+      if (rankingRecords.length) {
+        drawLeaderboardRecord(leaderboard, rankingRecords, makeTopPlayerDonationRow, makePlayerDonationRow);
+      } else {
+        // 데이터가 없을 경우
+        // 데이터 없을 경우
+        leaderboard.querySelector('.top-3').innerHTML = `
+          <div class="empty" style="width: 100%;">데이터 집계중</div>
+        `;
+      }
+
+      rendering(sectionClassName, leaderboard);
+    }
+
     function renderLeaderboardForLeague(sectionClassName, leaderboardTitle, rankingRecords) {
       clearLeaderboard(sectionClassName);
 
@@ -329,10 +381,9 @@
     async function fetchCurrentDonations() {
       const targetClassName = 'donations';
       const leaderboardTitle = "현재 지원왕";
-      const displayIcon = "icon icon-caret-up";
       showLoading(targetClassName);
       const rankings = await fetchRankingPlayerDonations();
-      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      renderLeaderboardForDonation(targetClassName, leaderboardTitle, rankings);
       hideLoading(targetClassName);
     }
 
@@ -838,6 +889,40 @@
     <div class="score"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div>
   </li>
 </template>
+<template id="leaderboard-top-player-donation-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="info">
+      <div class="score"><div class="icon Barbarian"></div>{TROOP_COUNT}</div>
+      <div class="score column">
+        <div class="percentages">
+          <div class="score"><div class="icon LightningSpell"></div>{SPELL_COUNT}</div>
+        </div>
+        <div class="durations">
+          <div class="score"><div class="icon WallWrecker"></div>{SIEGE_COUNT}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="leaderboard-player-donation-template">
+  <li class="player with-row">
+    <div class="row">
+      <span class="rank">{RANK}th</span>
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="row">
+      <div class="score"><div class="icon Barbarian"></div>{TROOP_COUNT}</div>
+      <div class="score"><div class="score icon LightningSpell"></div>{SPELL_COUNT}</div>
+      <div class="score"><div class="score icon WallWrecker"></div>{SIEGE_COUNT}</div>
+    </div>
+  </li>
+</template>
 <template id="leaderboard-top-player-clan-war-template">
   <div class="player">
     <div class="avatar">
@@ -846,13 +931,15 @@
     <div class="details">
       <span class="name">{NAME}</span>
     </div>
-    <div class="score"><i class="icon fa-solid fa-star"></i>{STARS}</div>
-    <div class="score info">
-      <div class="percentages">
-        <div class="score"><div class="icon icon-damage"></div>{PERCENTAGES} %</div>
-      </div>
-      <div class="durations">
-        <div class="score"><div class="icon icon-clock"></div>{DURATION}</div>
+    <div class="info">
+      <div class="score"><i class="icon fa-solid fa-star"></i>{STARS}</div>
+      <div class="score column">
+        <div class="percentages">
+          <div class="score"><div class="icon icon-damage"></div>{PERCENTAGES} %</div>
+        </div>
+        <div class="durations">
+          <div class="score"><div class="icon icon-clock"></div>{DURATION}</div>
+        </div>
       </div>
     </div>
   </div>

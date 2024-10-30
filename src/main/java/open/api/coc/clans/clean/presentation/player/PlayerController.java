@@ -263,12 +263,12 @@ public class PlayerController {
         description = "이 API는 서버에 등록된 플레이어의 현재 지원 받은 순위 목록을 제공합니다."
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHallOfFameDonationResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHallOfFameResponse.class)))),
         @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/ranking/donations/received")
-    public ResponseEntity<List<RankingHallOfFameDonationResponse>> getRankingDonationReceived() {
+    public ResponseEntity<List<RankingHallOfFameResponse>> getRankingDonationReceived() {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.getRankingDonationReceived());
     }

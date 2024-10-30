@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.clean.domain.player.model.PlayerDonationStat;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 
 public interface PlayerDonationRepository {
 
@@ -13,5 +14,5 @@ public interface PlayerDonationRepository {
 
     List<PlayerDonationDTO> findDonationRanking(String season, Integer pageSize);
 
-    List<PlayerDonationDTO> findDonationReceivedRanking(String season, Integer pageSize);
+    List<PlayerDonationReceiveDTO> findDonationReceivedRanking(String season, Integer pageSize);
 }

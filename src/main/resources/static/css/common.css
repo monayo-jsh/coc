@@ -571,6 +571,33 @@ body::before {
   background-size: contain;
   background-position: center;
 }
+.icon.Barbarian {
+  width: 35px;
+  height: 35px;
+  background-image: url(/static/images/etc/Icon_Barbarian.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon.LightningSpell {
+  width: 35px;
+  height: 35px;
+  background-image: url(/static/images/etc/Icon_Lightning_Spell.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon.WallWrecker {
+  width: 35px;
+  height: 35px;
+  background-image: url(/static/images/etc/Icon_Wall_Wrecker.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
 
 .icon-caret-up {
   width: 15px;

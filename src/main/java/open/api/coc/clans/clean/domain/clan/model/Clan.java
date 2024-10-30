@@ -1,15 +1,15 @@
 package open.api.coc.clans.clean.domain.clan.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Objects;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import open.api.coc.clans.domain.clans.ClanContentResponse;
-import open.api.coc.clans.domain.clans.LabelResponse;
-import open.api.coc.external.coc.clan.domain.common.IconUrl;
+import open.api.coc.clans.clean.domain.common.model.IconUrl;
+import open.api.coc.clans.clean.domain.common.model.Label;
+import open.api.coc.clans.clean.domain.league.model.League;
 
 @Getter
 @NoArgsConstructor
@@ -30,7 +30,7 @@ public class Clan {
     private Integer clanPoints;
 
     @Schema(description = "클랜 아이콘 객체")
-    private IconUrl badgeUrls;
+    private IconUrl badgeUrl;
 
     @Schema(description = "클랜 설명")
     private String description;
@@ -38,7 +38,7 @@ public class Clan {
     @Schema(description = "클랜 가입유형")
     private String type;
 
-    @Schema(description = "")
+    @Schema(description = "친선전유무")
     private Boolean isFamilyFriendly;
 
     @Schema(description = "전쟁기록 공개여부")
@@ -66,35 +66,37 @@ public class Clan {
     private Integer warTies;
 
     @Schema(description = "클랜 리그 정보")
-    private LabelResponse warLeague;
+    private League warLeague;
 
-//    @Schema(description = "클랜 라벨 정보")
-//    private List<LabelResponse> labels;
+    @Schema(description = "클랜 라벨 정보")
+    private List<Label> labels;
 
-//    @Schema(description = "클랜 캐피탈 리그 정보")
-//    private LabelResponse capitalLeague;
+    @Schema(description = "클랜 캐피탈 리그 정보")
+    private League capitalLeague;
 
     @Schema(description = "클랜 캐피탈 트로피 수")
     private Integer clanCapitalPoints;
 
-//    @Schema(description = "클랜 캐피탈 정보")
-//    private ClanCapitalResponse clanCapital;
+    @Schema(description = "클랜 캐피탈 정보")
+    private ClanCapitalInfo clanCapital;
 
     @Schema(description = "클랜 멤버수")
-    private Integer members;
+    private Integer memberSize;
 
-//    @Schema(description = "클랜 멤버 정보")
-//    private List<ClanMemberResponse> memberList;
+    @Schema(description = "클랜 멤버 정보")
+    private List<ClanMember> members;
 
     @Schema(description = "클랜 정렬 순서")
     private Integer order;
 
     @Schema(description = "클랜 컨텐츠 활성화 정보")
-    private ClanContentResponse clanContent;
+    private ClanContent clanContent;
 
-    public String getWarLeagueName() {
-        if (Objects.isNull(warLeague)) return null;
-        return warLeague.getName();
+    public void changeOrder(Integer order) {
+        this.order = order;
     }
 
+    public void createDefaultContent() {
+        this.clanContent = ClanContent.create(this.tag);
+    }
 }

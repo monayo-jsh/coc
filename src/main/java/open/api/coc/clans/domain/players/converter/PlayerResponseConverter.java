@@ -11,13 +11,13 @@ import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
 import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
-import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
-import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
-import open.api.coc.clans.database.entity.player.PlayerSpellEntity;
-import open.api.coc.clans.database.entity.player.PlayerTroopsEntity;
-import open.api.coc.clans.database.entity.player.common.Spell;
-import open.api.coc.clans.database.entity.player.common.Troop;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerSpellEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerTroopsEntity;
+import open.api.coc.clans.clean.domain.player.config.SpellConfig;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.TroopConfig;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
@@ -107,7 +107,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
 
         return troops.stream()
-                     .filter(troop -> Troop.isPet(troop.getName()))
+                     .filter(troop -> TroopConfig.isPet(troop.getName()))
                      .map(troopseResponseConverter::convert)
                      .collect(Collectors.toList());
     }
@@ -116,7 +116,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         if (CollectionUtils.isEmpty(troops)) return Collections.emptyList();
 
         return troops.stream()
-                     .filter(troop -> Troop.isSiegeMachine(troop.getName()))
+                     .filter(troop -> TroopConfig.isSiegeMachine(troop.getName()))
                      .map(troopseResponseConverter::convert)
                      .collect(Collectors.toList());
     }
@@ -264,14 +264,14 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
 
     private TroopsResponse makeTroopResponse(PlayerSpellEntity playerSpellEntity) {
         TroopsResponse troopResponse = troopseResponseConverter.convert(playerSpellEntity);
-        Spell troop = Spell.findByName(troopResponse.getName());
+        SpellConfig troop = SpellConfig.findByName(troopResponse.getName());
         troopResponse.setKoreanName(troop.getKoreanName());
         return troopResponse;
     }
 
     private TroopsResponse makeTroopResponse(PlayerTroopsEntity playerTroopsEntity) {
         TroopsResponse troopResponse = troopseResponseConverter.convert(playerTroopsEntity);
-        Troop troop = Troop.findByName(troopResponse.getName());
+        TroopConfig troop = TroopConfig.findByName(troopResponse.getName());
         troopResponse.setKoreanName(troop.getKoreanName());
         return troopResponse;
     }

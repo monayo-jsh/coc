@@ -35,7 +35,7 @@ public class MetaRunner implements CommandLineRunner {
         List<LeagueEntity> leagueEntities = leagues.getItems()
                                                    .stream()
                                                    .map(league -> {
-                                                       LeagueEntity leagueEntity = leagueEntityMapper.toEntity(league);
+                                                       LeagueEntity leagueEntity = leagueEntityMapper.toLeagueEntity(league);
                                                        leagueEntity.markedNotNew();
                                                        return leagueEntity;
                                                    })

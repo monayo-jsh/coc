@@ -1,18 +1,18 @@
 package open.api.coc.clans.database.repository.player;
 
 import static open.api.coc.clans.clean.infrastructure.league.persistence.entity.QLeagueEntity.leagueEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerRecordEntity.playerRecordEntity;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerRecordEntity.playerRecordEntity;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository

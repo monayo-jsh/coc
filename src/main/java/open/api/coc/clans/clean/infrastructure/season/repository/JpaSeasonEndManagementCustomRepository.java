@@ -15,7 +15,7 @@ public class JpaSeasonEndManagementCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Optional<LocalDate> findSeasonEndDateBy(LocalDate baseDate) {
+    public Optional<LocalDate> findSeasonEndDateByBaseDate(LocalDate baseDate) {
         LocalDate startOfMonth = baseDate.withDayOfMonth(1);
         LocalDate endOfMonth = baseDate.withDayOfMonth(baseDate.lengthOfMonth());
 
@@ -27,11 +27,11 @@ public class JpaSeasonEndManagementCustomRepository {
         return Optional.ofNullable(seasonEndDate);
     }
 
-    public List<LocalDate> findLatestSeasonEndDate(int count) {
+    public List<LocalDate> findLatestSeasonEndDate(int limit) {
         return queryFactory.select(seasonEndManagementEntity.endDate)
                            .from(seasonEndManagementEntity)
                            .orderBy(seasonEndManagementEntity.endDate.desc())
-                           .limit(count)
+                           .limit(limit)
                            .fetch();
     }
 }

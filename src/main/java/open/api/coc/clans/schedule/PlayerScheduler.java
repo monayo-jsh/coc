@@ -9,8 +9,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.application.player.PlayerUseCase;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.service.PlayersService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,16 +27,18 @@ public class PlayerScheduler {
     private final PlayerQueryRepository playerQueryRepository;
     private final PlayersService playersService;
 
+    private final PlayerUseCase playerUseCase;
+
     /**
-     * 매달 4번째 주 월요일에 시즌 초기화.
+     * 매달 4번째 주 월요일 또는 지정된 시즌 종료일에 시즌 초기화.
      */
-    @Scheduled(cron = "0 0 14 ? * MON")  // 매주 월요일 14시에 실행
+    @Scheduled(cron = "0 1 14 ? * MON")  // 매주 월요일 14시 1분에 초기화 실행
     @Transactional
     public void resetSeasonData() {
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
 
-        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(now)
                                                                         .orElse(null);
 
         if (seasonEndDate != null) {
@@ -60,11 +63,12 @@ public class PlayerScheduler {
         List<String> playerTags = playersService.findAllPlayersToRecord();
         if (playerTags.isEmpty()) return;
         for(String playerTag : playerTags) {
-            playersService.syncPlayerFromCOC("processForPlayerRecordKeeping", playerTag);
+            playerUseCase.synchronizePlayerFromSchedule("processForPlayerRecordKeeping", playerTag);
         }
     }
 
-    @Scheduled(fixedDelay = 1000 * 60 * 5)
+    // 서버 기동 5초 후 실행
+    @Scheduled(initialDelay = 5000, fixedDelay = 1000 * 60 * 5)
     public void syncPlayers() {
 
         // 시즌 초기화 시 데이터 보정을 위해 지정된 시간에는 수집하지 않음.
@@ -91,7 +95,7 @@ public class PlayerScheduler {
             List<PlayerEntity> syncPlayers = players.subList(fromIndex, Math.min(fromIndex + offset, players.size()));
             syncPlayers.stream()
                        .parallel()
-                       .forEach(player -> playersService.syncPlayerFromCOC("processSyncPlayers", player.getPlayerTag()));
+                       .forEach(player -> playerUseCase.synchronizePlayerFromSchedule("processSyncPlayers", player.getPlayerTag()));
         }
 
     }
@@ -101,7 +105,7 @@ public class PlayerScheduler {
         LocalDate now = LocalDate.now();
         LocalDate fourthMonday = now.with(TemporalAdjusters.dayOfWeekInMonth(4, DayOfWeek.MONDAY));
 
-        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateBy(now)
+        LocalDate seasonEndDate = jpaSeasonEndManagementCustomRepository.findSeasonEndDateByBaseDate(now)
                                                                         .orElse(null);
 
         if (seasonEndDate != null) {

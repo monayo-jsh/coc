@@ -16,9 +16,9 @@ import org.mapstruct.ReportingPolicy;
 public interface LeagueEntityMapper {
 
     @Mapping(target = "iconUrl", source = "iconUrls")
-    LeagueEntity toEntity(Label label);
+    LeagueEntity toLeagueEntity(Label label);
 
     @Mapping(target = "iconUrl", source = "iconUrl")
-    League toDomain(LeagueEntity entity);
+    League toLeague(LeagueEntity entity);
 
 }

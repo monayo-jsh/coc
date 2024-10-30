@@ -59,4 +59,9 @@ public class JpaClanCustomRepository {
         return builder;
     }
 
+    public Integer selectMaxOrder() {
+        return queryFactory.select(clanEntity.order.max())
+                           .from(clanEntity)
+                           .fetchOne();
+    }
 }

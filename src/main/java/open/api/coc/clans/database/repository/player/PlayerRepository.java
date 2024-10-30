@@ -2,7 +2,7 @@ package open.api.coc.clans.database.repository.player;
 
 import java.util.List;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.player.RankingHeroEquipment;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import org.springframework.data.domain.Pageable;

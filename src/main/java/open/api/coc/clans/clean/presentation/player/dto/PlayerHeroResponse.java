@@ -2,7 +2,6 @@ package open.api.coc.clans.clean.presentation.player.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +32,4 @@ public class PlayerHeroResponse {
     @Schema(description = "현재 착용 장비 목록")
     private List<PlayerHeroEquipmentResponse> equipments;
 
-    public boolean isHomeHero() {
-        return Objects.equals("home", village);
-    }
 }

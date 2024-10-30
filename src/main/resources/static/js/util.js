@@ -103,6 +103,17 @@ function writeExcelFile(fileName, jsonData) {
   XLSX.writeFile(workbook, fileName);
 }
 
+function convertHeroKoreanName(enName) {
+  switch (enName) {
+    case 'Barbarian King': return '바바리안 킹';
+    case 'Archer Queen': return '아처 퀸';
+    case 'Grand Warden': return '그랜드 워든';
+    case 'Royal Champion': return '로얄 챔피언';
+  }
+
+  // not mapping hero english name.
+  return enName;
+}
 /**
  * 클랜 권한 한글명 반환
  * @param role
@@ -200,6 +211,11 @@ function sortByTrophies(members) {
 function sortByHeroTotalLevel(players) {
   // 영웅레벨 순 -> 이름 순
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
+}
+
+function sortedByCode(arrays) {
+  // order 필드에 따른 정렬
+  return arrays.sort((a, b) => a.code - b.code);
 }
 
 function sortedByOrder(arrays) {

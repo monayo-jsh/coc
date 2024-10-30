@@ -47,4 +47,7 @@ public class ClanBadgeEntity implements Persistable<String> {
         return this.tag;
     }
 
+    public void changeTag(String tag) {
+        this.tag = tag;
+    }
 }

@@ -1,7 +1,7 @@
 package open.api.coc.clans.database.repository.player;
 
-import static open.api.coc.clans.database.entity.player.QPlayerDonationStatEntity.playerDonationStatEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerDonationStatEntity.playerDonationStatEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ConstructorExpression;
@@ -10,7 +10,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.player.PlayerDonationStatEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.repository.JpaPlayerDonationStatRepository;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerDonationStatEntity;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDTO;
 import open.api.coc.clans.domain.ranking.RankingHallOfFameDonationDTO;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +24,7 @@ import org.thymeleaf.util.StringUtils;
 public class PlayerDonationStatQueryRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final PlayerDonationStatRepository playerDonationStatRepository;
+    private final JpaPlayerDonationStatRepository playerDonationStatRepository;
 
     public Optional<PlayerDonationStatEntity> findByPlayerTagAndSeason(String playerTag, String season) {
         BooleanBuilder condition = new BooleanBuilder();

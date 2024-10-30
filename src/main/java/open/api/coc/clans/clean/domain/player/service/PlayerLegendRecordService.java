@@ -5,7 +5,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.league.model.League;
+import open.api.coc.clans.clean.domain.league.repository.LeagueRepository;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordRepository;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlayerLegendRecordService {
 
     private final SeasonRepository seasonRepository;
+    private final LeagueRepository leagueRepository;
     private final PlayerRecordRepository playerRecordRepository;
 
     @Transactional(readOnly = true)
@@ -41,20 +45,30 @@ public class PlayerLegendRecordService {
         // 기록 대상이 아닌 경우 기록하지 않음
         if (latestPlayer.isNotRecoding(originPlayer)) return;
 
-        // 기록 대상 플레이어만 기록한다.
-        if (!playerRecordRepository.existsByTag(originPlayer.getTag())) {
-            return;
+        // 리그 배정 안된 상태면 기록하지 않음
+        if (latestPlayer.isNotInLeague()) return;
+
+        // 레전드 리그여부 검증
+        Optional<League> findLeague = leagueRepository.findById(latestPlayer.getLeagueId());
+        if (findLeague.isEmpty()) return; // 리그 정보 매핑 못한 경우
+        League currentLeague = findLeague.get();
+        if (!currentLeague.isLegend()) {
+            // 기록 대상에서 제외하고 프로세스 종료
+            
         }
+
+        // 기록 대상 플레이어만 기록한다.
+        if (!playerRecordRepository.existsByTag(originPlayer.getTag())) return;
 
         // 플레이어 기록 생성
         PlayerRecordHistory recordHistory = PlayerRecordHistory.builder()
                                                                .tag(originPlayer.getTag())
-                                                               .oldTrophies(latestPlayer.getTrophies())
-                                                               .oldAttackWins(latestPlayer.getAttackWins())
-                                                               .oldDefenceWins(latestPlayer.getDefenseWins())
-                                                               .newTrophies(originPlayer.getTrophies())
-                                                               .newAttackWins(originPlayer.getAttackWins())
-                                                               .newDefenceWins(originPlayer.getDefenseWins())
+                                                               .oldTrophies(originPlayer.getTrophies())
+                                                               .oldAttackWins(originPlayer.getAttackWins())
+                                                               .oldDefenceWins(originPlayer.getDefenseWins())
+                                                               .newTrophies(latestPlayer.getTrophies())
+                                                               .newAttackWins(latestPlayer.getAttackWins())
+                                                               .newDefenceWins(latestPlayer.getDefenseWins())
                                                                .build();
 
         playerRecordRepository.saveHistory(recordHistory);

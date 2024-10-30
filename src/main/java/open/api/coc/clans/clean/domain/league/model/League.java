@@ -18,4 +18,8 @@ public class League {
     private String name; // 이름
     private IconUrl iconUrl; // 아이콘 정보
 
+    public boolean isLegend() {
+        return this.name.toLowerCase().contains("legend");
+    }
+
 }

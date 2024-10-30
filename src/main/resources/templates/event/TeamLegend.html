@@ -173,7 +173,7 @@
       const teamLegendEventElement = makeTeamLegendEventElement(teamLegend);
       drawTargetElement.appendChild(teamLegendEventElement);
 
-      drawEventTeamLegendDailyRanking(teamLegend.id);
+      drawEventTeamLegendDailyRanking(teamLegend);
     }
 
     async function drawEventTeamLegend() {
@@ -183,30 +183,28 @@
       renderTeamLegend(targetClassName, latestTeamLegend);
     }
 
-    function getTargetElement(targetClassName) {
-      return document.querySelector(`.${targetClassName}`);
-    }
-
-    async function drawEventTeamLegendDailyRanking(eventId) {
-      const dailyRankings = await fetchTeamLegendDailyRanking(eventId);
+    async function drawEventTeamLegendDailyRanking(teamLegend) {
+      const dailyRankings = await fetchTeamLegendDailyRanking(teamLegend.id);
 
       if (!dailyRankings || !dailyRankings.length) return;
 
       // 실시간 순위 추가
-      let currentRank = 0;
-      for (const team of SORTED_TEAMS) {
-        const now = dayjs()
-        const currentHour = now.hour();
-        const displayRank = currentHour < 14 ? now : now.add(+1, 'day'); // 현재 랭크 표기
-        const { id, name, trophies } = team;
-        const dailyRank = {
-          rankingDate: formatYYYYMMDD(displayRank),
-          teamId: id,
-          teamName: name,
-          trophies: trophies,
-          dailyRank: ++currentRank
-        };
-        dailyRankings.push(dailyRank);
+      if (teamLegend.status === "ING") {
+        let currentRank = 0;
+        for (const team of SORTED_TEAMS) {
+          const now = dayjs()
+          const currentHour = now.hour();
+          const displayRank = currentHour < 14 ? now : now.add(+1, 'day'); // 현재 랭크 표기
+          const { id, name, trophies } = team;
+          const dailyRank = {
+            rankingDate: formatYYYYMMDD(displayRank),
+            teamId: id,
+            teamName: name,
+            trophies: trophies,
+            dailyRank: ++currentRank
+          };
+          dailyRankings.push(dailyRank);
+        }
       }
 
       renderRankingChart('daily-ranking', dailyRankings);

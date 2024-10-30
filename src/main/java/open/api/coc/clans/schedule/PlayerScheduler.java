@@ -54,7 +54,7 @@ public class PlayerScheduler {
         }
     }
 
-//    @Scheduled(fixedDelay = 1000 * 10)  // 매 10초마다
+    @Scheduled(fixedDelay = 1000 * 10)  // 매 10초마다
     public void processForPlayerRecordKeeping() {
         if (isNotCollectionTime()) {
             return;
@@ -68,7 +68,7 @@ public class PlayerScheduler {
     }
 
     // 서버 기동 5초 후 실행
-//    @Scheduled(initialDelay = 5000, fixedDelay = 1000 * 60 * 5)
+    @Scheduled(initialDelay = 5000, fixedDelay = 1000 * 60 * 5)
     public void syncPlayers() {
 
         // 시즌 초기화 시 데이터 보정을 위해 지정된 시간에는 수집하지 않음.

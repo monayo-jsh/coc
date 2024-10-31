@@ -109,6 +109,6 @@ public class PlayerLegendRecordService {
     public List<PlayerLegendRecordTargetDTO> findAllTagByName(String name) {
         if (!StringUtils.hasText(name)) return Collections.emptyList();
 
-        return recordRepository.findAllByName(name);
+        return recordRepository.findAllByNameOrNickname(name);
     }
 }

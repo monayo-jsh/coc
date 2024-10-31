@@ -356,4 +356,16 @@ public class PlayerUseCase {
     public List<PlayerLegendRecordTargetDTO> findAllLegendRecordTags(String name) {
         return playerLegendRecordService.findAllTagByName(name);
     }
+
+    @Transactional
+    public void settingPlayerNickname(String playerTag, String nickname) {
+        // 플레이어를 조회 및 검증
+        Player player = playerService.findById(playerTag);
+
+        // 닉네임을 변경한다.
+        player.changeNickname(nickname);
+
+        // 닉네임을 저장한다.
+        playerService.save(player);
+    }
 }

@@ -23,6 +23,8 @@ public class Player {
     private String tag; // 태그
     private String name; // 이름
 
+    private String nickname; // 닉네임
+
     private YnType supportYn; // 지원계정 여부 - Y: 지원계정, N: 아님
 
     private Integer expLevel; // 레벨
@@ -250,6 +252,10 @@ public class Player {
 
     public boolean isNotInLeague() {
         return !isInLeague();
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     // 기본값 설정을 위한 빌더 객체

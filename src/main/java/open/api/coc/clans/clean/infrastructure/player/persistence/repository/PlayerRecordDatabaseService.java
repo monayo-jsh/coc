@@ -15,8 +15,8 @@ public class PlayerRecordDatabaseService implements PlayerRecordRepository {
 
 
     @Override
-    public List<PlayerLegendRecordTargetDTO> findAllByName(String playerName) {
-        return jpaPlayerRecordRepository.findAllByName(playerName);
+    public List<PlayerLegendRecordTargetDTO> findAllByNameOrNickname(String playerName) {
+        return jpaPlayerRecordRepository.findAllByNameOrNickname(playerName);
     }
 
     @Override

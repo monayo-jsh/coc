@@ -56,6 +56,10 @@ public class PlayerEntity extends BaseEntity implements Persistable<String> {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
+    @Comment("플레이어 닉네임")
+    @Column(name = "nickname", nullable = true, length = 255)
+    private String nickname;
+
     @Comment("지원계정 여부")
     @Builder.Default
     @Enumerated(EnumType.STRING)

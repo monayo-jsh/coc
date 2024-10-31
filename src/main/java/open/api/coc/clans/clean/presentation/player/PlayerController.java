@@ -133,6 +133,28 @@ public class PlayerController {
     }
 
     @Operation(
+        summary = "플레이어의 닉네임을 설정합니다. version: 1.00, Last Update: 24.10.31",
+        description = "이 API는 서버에 저장된 플레이어의 닉네임을 설정합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "nickname", description = "설정할 닉네임", required = true)
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PutMapping("/{playerTag}/nickname")
+    public ResponseEntity<Void> putPlayerNickname(@PathVariable String playerTag,
+                                                  @RequestParam String nickname) {
+        playerUseCase.settingPlayerNickname(playerTag, nickname);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+    @Operation(
         summary = "플레이어를 삭제합니다. version: 1.00, Last Update: 24.10.17",
         description = "이 API는 서버 등록된 플레이어를 삭제합니다."
     )

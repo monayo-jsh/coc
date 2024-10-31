@@ -5,7 +5,7 @@ import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTarget
 
 public interface PlayerRecordRepository {
 
-    List<PlayerLegendRecordTargetDTO> findAllByName(String playerName);
+    List<PlayerLegendRecordTargetDTO> findAllByNameOrNickname(String playerName);
     boolean existsByTag(String playerTag);
 
     void save(String playerTag);

@@ -234,8 +234,8 @@
       toggleDisplay(playerRecordElement);
     }
 
-    function renderDisplayButton(record) {
-      const { tag, name } = record;
+    function renderDisplayButton(player) {
+      const { tag, name } = player;
 
       const radioItemTemplate = copyTemplateById('radio-item-template');
       const radioItem = radioItemTemplate.querySelector('.radio.item');
@@ -248,13 +248,14 @@
       radioInputs.appendChild(radioItem);
     }
 
-    async function drawLegendRecord(playerTag) {
-      const legendRecords = await fetchPlayerLegendRecord(playerTag);
+    async function drawLegendRecord(player) {
+      const { tag, name } = player
+      const legendRecords = await fetchPlayerLegendRecord(tag);
 
-      if (!legendRecords.length) return;
-
-      const metaData = legendRecords[0];
-      renderDisplayButton(metaData);
+      if (!legendRecords.length) {
+        drawEmptyResult(`${name}(${tag}) 계정의 전설 기록 수집 데이터가 없습니다.`, tag);
+        return;
+      }
 
       // chart dataset initial
       const chartDataset = [];
@@ -262,10 +263,10 @@
       const playerLegendTemplate = copyTemplateById('player-legend-template');
       const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
       playerLegend.innerHTML = playerLegend.innerHTML
-                                           .replace(/{PLAYER_NAME}/, metaData.name)
-                                           .replace(/{PLAYER_TAG}/, metaData.tag);
+                                           .replace(/{PLAYER_NAME}/, name)
+                                           .replace(/{PLAYER_TAG}/, tag);
 
-      playerLegend.classList.add(`player-${removeHashTag(metaData.tag)}`)
+      playerLegend.classList.add(`player-${removeHashTag(tag)}`);
 
       const recordMap = convertArrayToMapByKey(legendRecords, 'baseDate', true);
       for(const [baseDate, records] of recordMap) {
@@ -273,7 +274,7 @@
         addChartDataset(chartDataset, baseDate, records);
       }
 
-      renderLegendRecordChart(playerLegend, playerTag, chartDataset);
+      renderLegendRecordChart(playerLegend, tag, chartDataset);
 
       const targetElement = document.querySelector('.legend-record-wrapper');
       targetElement.appendChild(playerLegend);
@@ -311,20 +312,39 @@
       });
     }
 
-    async function findAllLegendRecordTarget(playerName) {
-      const playerTags = await fetchAllLegendRecordTarget(playerName);
+    function drawEmptyResult(msg, tag) {
+      const legendRecordWrapper = document.querySelector('.legend-record-wrapper');
+      const emptyGuideTemplate = copyTemplateById('empty-guide-template');
+      const emptyGuide = emptyGuideTemplate.querySelector('.description');
+      emptyGuide.innerHTML = msg;
 
-      for (const playerTag of playerTags) {
-        await drawLegendRecord(playerTag);
+      if (tag)
+        emptyGuide.classList.add(`player-${removeHashTag(tag)}`, 'display-none');
+
+      legendRecordWrapper.appendChild(emptyGuide);
+    }
+
+    async function findAllLegendRecordTarget(playerName) {
+      const players = await fetchAllLegendRecordTarget(playerName);
+
+      if (!players.length) {
+        drawEmptyResult(`등록된 계정을 찾지 못했습니다.<br/>기록 확인을 위해서는 계정을 등록하세요.`);
+        return;
       }
 
-      const [first] = playerTags;
-      clickFirstRecord(first);
+      for (const player of players) {
+        renderDisplayButton(player);
+        await drawLegendRecord(player);
+      }
+
+      const [first] = players;
+      clickFirstRecord(first.tag);
     }
 
     function clickFirstRecord(playerTag) {
       const target = document.querySelector(`input[name=checkbox-${removeHashTag(playerTag)}]`);
-      target.click();
+      if (target)
+        target.click();
     }
 
     function clearLegendRecord() {
@@ -495,5 +515,8 @@
   <div class="record-history-chart">
     <canvas></canvas>
   </div>
+</template>
+<template id="empty-guide-template">
+  <div class="description"></div>
 </template>
 </html>

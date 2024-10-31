@@ -14,6 +14,7 @@ import open.api.coc.clans.clean.domain.player.exception.PlayerNotLeagueException
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotLegendLeagueException;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordHistoryRepository;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordRepository;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
@@ -105,7 +106,7 @@ public class PlayerLegendRecordService {
         recordRepository.save(player.getTag());
     }
 
-    public List<String> findAllTagByName(String name) {
+    public List<PlayerLegendRecordTargetDTO> findAllTagByName(String name) {
         if (!StringUtils.hasText(name)) return Collections.emptyList();
 
         return recordRepository.findAllByName(name);

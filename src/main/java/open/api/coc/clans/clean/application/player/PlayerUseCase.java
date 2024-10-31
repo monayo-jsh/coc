@@ -24,6 +24,7 @@ import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.domain.player.service.PlayerDonationService;
 import open.api.coc.clans.clean.domain.player.service.PlayerLegendRecordService;
@@ -352,7 +353,7 @@ public class PlayerUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<String> findAllLegendRecordTags(String name) {
+    public List<PlayerLegendRecordTargetDTO> findAllLegendRecordTags(String name) {
         return playerLegendRecordService.findAllTagByName(name);
     }
 }

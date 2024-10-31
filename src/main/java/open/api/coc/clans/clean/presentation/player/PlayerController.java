@@ -17,6 +17,7 @@ import open.api.coc.clans.clean.application.player.mapper.PlayerUseCaseMapper;
 import open.api.coc.clans.clean.application.player.model.PlayerListSearchQuery;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulkCommand;
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
@@ -301,12 +302,12 @@ public class PlayerController {
         }
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = String.class)))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerLegendRecordTargetDTO.class)))),
         @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @GetMapping("/legend/record/tags")
-    public ResponseEntity<List<String>> getPlayerLegendRecordTags(@RequestParam String name) {
+    @GetMapping("/legend/record/target")
+    public ResponseEntity<List<PlayerLegendRecordTargetDTO>> getPlayerLegendRecordTarget(@RequestParam String name) {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.findAllLegendRecordTags(name));
     }

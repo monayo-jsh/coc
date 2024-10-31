@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.infrastructure.player.persistence.repository;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordRepository;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
 import org.springframework.stereotype.Repository;
@@ -14,7 +15,7 @@ public class PlayerRecordDatabaseService implements PlayerRecordRepository {
 
 
     @Override
-    public List<String> findAllByName(String playerName) {
+    public List<PlayerLegendRecordTargetDTO> findAllByName(String playerName) {
         return jpaPlayerRecordRepository.findAllByName(playerName);
     }
 

@@ -12,4 +12,5 @@ public interface PlayerRecordRepository {
 
     void saveHistory(PlayerRecordHistory recordHistory);
 
+    void deleteById(String playerTag);
 }

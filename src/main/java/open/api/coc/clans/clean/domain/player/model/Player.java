@@ -226,7 +226,7 @@ public class Player {
         this.warPreference = latestPlayer.getWarPreference(); // 전쟁 선호도
     }
 
-    private boolean isRecoding(Player originPlayer) {
+    public boolean isRecoding(Player originPlayer) {
         // 공격 성공 수치 다른 경우 기록
         if (!Objects.equals(this.attackWins, originPlayer.getAttackWins())) return true;
 
@@ -246,10 +246,6 @@ public class Player {
 
         // 그 외는 기록하지 않음
         return false;
-    }
-
-    public boolean isNotRecoding(Player originPlayer) {
-        return !isRecoding(originPlayer);
     }
 
     public boolean isNotInLeague() {

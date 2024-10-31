@@ -40,4 +40,9 @@ public class PlayerRecordDatabaseService implements PlayerRecordRepository {
 
         jpaPlayerRecordHistoryRepository.save(entity);
     }
+
+    @Override
+    public void deleteById(String playerTag) {
+        jpaPlayerRecordRepository.deleteById(playerTag);
+    }
 }

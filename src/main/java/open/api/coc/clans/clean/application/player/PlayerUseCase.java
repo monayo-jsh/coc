@@ -171,7 +171,7 @@ public class PlayerUseCase {
         clanService.createIfNotExists(latestPlayer.getClanTag());
 
         // 플레이어의 트로피, 공/방 변화를 기록한다.
-        legendRecordService.createHistory(player, latestPlayer);
+        legendRecordService.createHistoryIfNotLegendLeagueExcept(player, latestPlayer);
 
         // 플레이어의 지원 통계를 기록한다.
         playerDonationService.collect(player, latestPlayer);

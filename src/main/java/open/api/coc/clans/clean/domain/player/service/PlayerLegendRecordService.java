@@ -41,25 +41,33 @@ public class PlayerLegendRecordService {
     }
 
     @Transactional
-    public void createHistory(Player originPlayer, Player latestPlayer) {
-        // 기록 대상이 아닌 경우 기록하지 않음
-        if (latestPlayer.isNotRecoding(originPlayer)) return;
-
-        // 리그 배정 안된 상태면 기록하지 않음
-        if (latestPlayer.isNotInLeague()) return;
-
-        // 레전드 리그여부 검증
-        Optional<League> findLeague = leagueRepository.findById(latestPlayer.getLeagueId());
-        if (findLeague.isEmpty()) return; // 리그 정보 매핑 못한 경우
-        League currentLeague = findLeague.get();
-        if (!currentLeague.isLegend()) {
-            // 기록 대상에서 제외하고 프로세스 종료
-            
+    public void createHistoryIfNotLegendLeagueExcept(Player originPlayer, Player latestPlayer) {
+        if (isNotRecording(originPlayer, latestPlayer)) return;
+        if (latestPlayer.isNotInLeague()) return;  // 리그 배정 안된 상태면 기록하지 않음 (시즌 초기화 등..)
+        if (isNotLegendLeague(latestPlayer)) {
+            // 전설 리그가 아니면 기록 대상에서 제외하고 프로세스 종료
+            playerRecordRepository.deleteById(originPlayer.getTag());
+            return;
         }
 
-        // 기록 대상 플레이어만 기록한다.
-        if (!playerRecordRepository.existsByTag(originPlayer.getTag())) return;
+        createRecordHistory(originPlayer, latestPlayer);
+    }
 
+    private boolean isNotRecording(Player originPlayer, Player latestPlayer) {
+        // 기록 대상 데이터인 경우
+        if (latestPlayer.isRecoding(originPlayer)) return false;
+
+        // 기록 대상 플레이어만 기록한다.
+        return !playerRecordRepository.existsByTag(originPlayer.getTag());
+    }
+
+    private boolean isNotLegendLeague(Player latestPlayer) {
+        // 레전드 리그여부 검증
+        Optional<League> findLeague = leagueRepository.findById(latestPlayer.getLeagueId());
+        return findLeague.isEmpty() || !findLeague.get().isLegend();
+    }
+
+    private void createRecordHistory(Player originPlayer, Player latestPlayer) {
         // 플레이어 기록 생성
         PlayerRecordHistory recordHistory = PlayerRecordHistory.builder()
                                                                .tag(originPlayer.getTag())
@@ -73,5 +81,4 @@ public class PlayerLegendRecordService {
 
         playerRecordRepository.saveHistory(recordHistory);
     }
-
 }

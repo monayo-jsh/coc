@@ -231,6 +231,13 @@
 
     function displayPlayerRecord(tag) {
       const playerRecordElement = document.querySelector(`.player-${tag}`);
+
+      // 첫번째로 위치 조정
+      const root = document.querySelector('.legend-record-wrapper');
+      if (root.children.length > 1) {
+        root.insertBefore(playerRecordElement, root.firstElementChild);
+      }
+
       toggleDisplay(playerRecordElement);
     }
 

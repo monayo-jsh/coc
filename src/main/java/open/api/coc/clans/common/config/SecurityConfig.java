@@ -51,7 +51,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize.requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers(BLACK_LIST).authenticated()
-                                .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                 .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                 .requestMatchers(HttpMethod.POST, "/api/players/{playerTag}/legend/record").permitAll()
 //                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()

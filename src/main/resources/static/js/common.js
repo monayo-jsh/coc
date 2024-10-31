@@ -2,6 +2,10 @@ function renderPage(uri) {
   location.href = uri;
 }
 
+function newRenderPage(uri) {
+  window.open(uri);
+}
+
 function launchAppWithOpenClanProfile(tag) {
   if (!confirm("게임을 실행하시겠습니까?")) {
     return;

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
 
@@ -101,7 +102,31 @@
         </div>
       </div>
 
-      <div class="card-group">
+      <div class="card-group menu-rule">
+        <div class="title">아카데미 규칙</div>
+        <div class="sub-title color-red">소통방에서 "/ (슬러쉬)" 입력 시 바로 확인 가능</div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1S7QI9UvUpgxv9ytxV_hiAH3yapDD8oPSnrONvkNyuAc/edit#gid=0'); return false;">
+            <p class="tip">클랜전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1FQ6Og-Q5Wybhk919dYaQsjpWjfgsUwwowHvhIBkJNi0/edit#gid=0'); return false;">
+            <p class="tip">리그전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1Z5Ce9zDDIoUgian1aYOyV-STmme1-jLQLPKfA5-UvFc/edit#gid=0'); return false;">
+            <p class="tip">습격전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1cFbo-26Y6MDf2ioVjurMW4G3nvwYUZtgYGIjcoB1qgw/edit?usp=sharing'); return false;">
+            <p class="tip">클랜 링크</p>
+            <p class="second-text"></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-group menu-information">
         <div class="title">아카데미 정보</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/lab/links'); return false;">
@@ -123,8 +148,7 @@
             <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
           </div>
         </div>
-      </div>
-      <div class="card-group">
+
         <div class="title">아카데미 클랜원</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/member'); return false;">
@@ -142,7 +166,7 @@
         </div>
       </div>
 
-      <div class="card-group">
+      <div class="card-group menu-contents">
         <div class="title">아카데미 컨텐츠</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/war?type=none'); return false;">

@@ -80,6 +80,13 @@
 .title {
   text-align: center;
   font-weight: bold;
+  font-size: 1.1em;
+}
+
+.sub-title {
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9em;
 }
 
 .card-inner-group {

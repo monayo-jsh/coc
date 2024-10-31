@@ -27,7 +27,7 @@ public class NormalViewController {
     }
 
     /** 전설 기록 확인용 */
-    @GetMapping("/test/legend/record")
+    @GetMapping("/legend/record")
     public String playerLegendRecord() {
         return "player/legendRecord";
     }

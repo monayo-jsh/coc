@@ -37,4 +37,5 @@ public class LeagueCoreRepository implements LeagueRepository {
         return jpaLeagueRepository.findById(leagueId)
                                   .map(leagueMapper::toLeague);
     }
+
 }

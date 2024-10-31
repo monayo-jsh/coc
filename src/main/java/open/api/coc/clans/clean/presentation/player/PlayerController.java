@@ -291,4 +291,40 @@ public class PlayerController {
                              .body(playerUseCase.getRankingHeroEquipments(clanTag));
     }
 
+    @Operation(
+        summary = "전설 기록 수집 등록된 플레이어 태그 목록을 제공합니다. version: 1.00, Last Update: 24.10.31",
+        description = "이 API는 전설 기록 수집 등록된 플레이어 태그 목록을 제공합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "name", description = "이름 검색", required = true)
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = String.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/legend/record/tags")
+    public ResponseEntity<List<String>> getPlayerLegendRecordTags(@RequestParam String name) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.findAllLegendRecordTags(name));
+    }
+
+    @Operation(
+        summary = "전설 기록 수집 대상 플레이어로 등록합니다. version: 1.00, Last Update: 24.10.31",
+        description = "이 API는 전설 기록 수집 대상 플레이어로 등록합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{playerTag}/legend/record")
+    public ResponseEntity<Void> postPlayerLegendRecord(@PathVariable String playerTag) {
+        playerUseCase.registerPlayerLegendRecord(playerTag);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
 }

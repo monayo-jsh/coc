@@ -51,8 +51,8 @@
         options: {
           plugins: {
             title: {
-                display: true,
-                text: "일자별 순위 그래프"
+              display: true,
+              text: "일자별 순위 그래프"
             },
             legend: {
               display: false,
@@ -163,7 +163,7 @@
 
         if (newDefenceWins > oldDefenceWins) {
           recordRow.querySelector('.table-td').classList.add('bg-green');
-          
+
           // 방어 성공한 경우
           defenceRecordTbody.appendChild(recordRow);
 
@@ -261,7 +261,9 @@
 
       const playerLegendTemplate = copyTemplateById('player-legend-template');
       const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
-      playerLegend.innerHTML = playerLegend.innerHTML.replace(/{PLAYER_NAME}/, metaData.name);
+      playerLegend.innerHTML = playerLegend.innerHTML
+                                           .replace(/{PLAYER_NAME}/, metaData.name)
+                                           .replace(/{PLAYER_TAG}/, metaData.tag);
 
       playerLegend.classList.add(`player-${removeHashTag(metaData.tag)}`)
 
@@ -286,12 +288,65 @@
       }
     }
 
-    window.onload = async () => {
-      const playerTags = await fetchAllLegendRecordPlayers();
+    function displayRegisterForm() {
+      const form = document.querySelector('.register-form');
+      if (!toggleDisplay(form)) {
+        const playerTagInput = document.querySelector('.player-register');
+        playerTagInput.value = ''; //입력값 clear
+      }
+    }
+
+    async function registerPlayer() {
+      const playerTagInput = document.querySelector('.player-register');
+      const playerTag = playerTagInput.value.trim();
+
+      if (!playerTag) {
+        alert('계정 태그를 입력해주세요.');
+        return;
+      }
+
+      registerLegendRecordTarget(playerTag)
+      .then((isResult) => {
+        displayRegisterForm();
+      });
+    }
+
+    async function findAllLegendRecordTarget(playerName) {
+      const playerTags = await fetchAllLegendRecordTarget(playerName);
 
       for (const playerTag of playerTags) {
         await drawLegendRecord(playerTag);
       }
+
+      const [first] = playerTags;
+      clickFirstRecord(first);
+    }
+
+    function clickFirstRecord(playerTag) {
+      const target = document.querySelector(`input[name=checkbox-${removeHashTag(playerTag)}]`);
+      target.click();
+    }
+
+    function clearLegendRecord() {
+      const playerRadioInputs = document.querySelector('.players .radio-inputs');
+      playerRadioInputs.innerHTML = ""; // 라디오버튼 clear
+      const legendRecordWrapper = document.querySelector('.legend-record-wrapper');
+      legendRecordWrapper.innerHTML = ""; // 기록 화면 clear
+    }
+
+    function findSearch() {
+
+      clearLegendRecord();
+
+      const input = document.querySelector('.player-search');
+      const playerName = input.value.trim();
+
+      if (!playerName && !playerName.length) {
+        alert('플레이어 이름을 입력해주세요.');
+        return;
+      }
+
+      findAllLegendRecordTarget(playerName);
     }
   </script>
 
@@ -299,19 +354,69 @@
 </head>
 <body>
 
-    <div class="title">
-      <div class="icon trophies"></div>
-      <span class="label">전설 기록</span>
-    </div>
-    <div class="description">데이터 수집 결과에 따라 차이가 있을 수 있습니다</div>
+<div class="title">
+  <div class="icon trophies"></div>
+  <span class="label">전설 기록</span>
+</div>
 
-    <div class="players">
-      <div class="radio-inputs filter">
+<div class="support-area">
+  <div class="buttons display-flex justify-content-center">
+    <div class="button-chip" onclick="displayRegisterForm()">수집 등록</div>
+  </div>
+  <div class="register-form display-none">
 
+    <div class="search">
+      <div class="search-box">
+        <div class="search-field">
+          <input placeholder="플레이어 태그를 입력 후 등록" class="input player-register" type="text">
+          <div class="search-box-icon">
+            <button class="btn-icon-content" onclick="registerPlayer(); return false;">
+              <i class="search-icon">
+                <i class="fa-regular fa-square-plus"></i>
+              </i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="legend-record-wrapper"></div>
+  </div>
+
+</div>
+<div class="description">
+  <div class="color-red">전설 기록 수집 계정 등록 후 확인 가능<br/>전설 리그 계정만 등록 가능하며, 전설 리그 탈출 시 수집 대상 제외됨</div>
+</div>
+
+<div class="support-area">
+
+  <div class="search-form">
+
+    <div class="search">
+      <div class="search-box">
+        <div class="search-field">
+          <input placeholder="플레이어 이름을 입력해주세요" class="input player-search" type="text">
+          <div class="search-box-icon">
+            <button class="btn-icon-content" onclick="findSearch(); return false;">
+              <i class="search-icon">
+                <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+              </i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div class="description">데이터 수집 결과에 따라 차이가 있을 수 있습니다</div>
+
+<div class="players">
+  <div class="radio-inputs filter">
+
+  </div>
+</div>
+<div class="legend-record-wrapper"></div>
 
 </body>
 <template id="radio-item-template">
@@ -342,8 +447,8 @@
 
     <div class="wrap display-flex justify-content-space-between">
       <div class="summary bg-black">
-          <div class="label">시작</div>
-          <div class="count">{START_TROPHIES}<div class="icon trophies"></div></div>
+        <div class="label">시작</div>
+        <div class="count">{START_TROPHIES}<div class="icon trophies"></div></div>
       </div>
       <div class="summary bg-black">
         <div class="label">종료</div>
@@ -375,7 +480,7 @@
 </template>
 <template id="player-legend-template">
   <div class="player-legend-wrapper display-none">
-    <div class="player-name">{PLAYER_NAME}</div>
+    <div class="player-name">{PLAYER_NAME} <div class="chip">{PLAYER_TAG}</div></div>
     <div class="information">
       <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기되므로 차이가 있을 수 있습니다.</span></div>
     </div>

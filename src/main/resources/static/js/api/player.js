@@ -6,11 +6,11 @@ const URI_PLAYERS_ALL_TAGS = `${PREFIX_PLAYER_API}/tags`; //전체 클랜원 태
 const URI_PLAYERS_OPEN_API = `${PREFIX_PLAYER_API}/{playerTag}/external`; //멤버 조회 (Open API)
 const URI_PLAYERS_DETAIL = `${PREFIX_PLAYER_API}/{playerTag}`; //멤버 등록,삭제
 
-const URI_PLAYERS_TAGS_LEGEND_RECORD = '/players/legend/record'; // 플레이어 전설 기록 플레이어 태그 목록 조회
-const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/record`; // 플레이어 전설 기록 조회
-
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
 const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록
+
+const URI_PLAYERS_LEGEND_RECORD_TARGET = `${PREFIX_PLAYER_API}/legend/record/tags`; //전설 기록 수집 등록 계정 태그 조회
+const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/record`; //전설 기록 수집 등록/조회
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = `${PREFIX_PLAYER_API}/ranking/hero/equipments`; //영웅 장비 랭킹
 
@@ -37,18 +37,6 @@ async function fetchPlayerLegendRecord(playerTag) {
   const uri = `${URI_PLAYERS_LEGEND_RECORD.replace(/{playerTag}/, encodeURIComponent(playerTag))}`;
 
   return await axios.get(uri)
-                    .then(response => {
-                      const { data } = response
-                      return data;
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      return [];
-                    });
-}
-
-async function fetchAllLegendRecordPlayers() {
-  return await axios.get(URI_PLAYERS_TAGS_LEGEND_RECORD)
                     .then(response => {
                       const { data } = response
                       return data;
@@ -134,6 +122,7 @@ async function registerMember(playerTag) {
                       return undefined;
                     });
 }
+
 async function deleteMember(playerTag) {
   const uri = `${URI_PLAYERS_DETAIL.replace(/{playerTag}/, encodeURIComponent(playerTag))}`;
 
@@ -258,5 +247,41 @@ async function fetchRankingPlayerDonationsReceived() {
                     .catch((error) => {
                       console.error(error);
                       return [];
+                    });
+}
+
+async function fetchAllLegendRecordTarget(playerName) {
+  const uri = URI_PLAYERS_LEGEND_RECORD_TARGET + `?name=${encodeURIComponent(playerName)}`
+  return await axios.get(uri)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function registerLegendRecordTarget(playerTag) {
+  const uri = `${URI_PLAYERS_LEGEND_RECORD.replace(/{playerTag}/, encodeURIComponent(playerTag))}`;
+
+  return await axios.post(uri)
+                    .then((response) => {
+                      alert('전설 기록 수집 계정으로 등록되었습니다.\n데이터 수집된 이후에 확인 가능합니다.');
+
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
                     });
 }

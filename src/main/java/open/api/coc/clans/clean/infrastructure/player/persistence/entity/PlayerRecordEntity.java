@@ -7,7 +7,6 @@ import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +14,7 @@ import org.hibernate.annotations.Comment;
 import org.springframework.data.domain.Persistable;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(
     name = "tb_player_record"
@@ -47,5 +44,16 @@ public class PlayerRecordEntity implements Persistable<String> {
     @Override
     public boolean isNew() {
         return isNew;
+    }
+
+    @Builder
+    private PlayerRecordEntity(String tag, boolean isNew) {
+        this.tag = tag;
+        this.isNew = isNew;
+    }
+
+    // 기본값 설정을 위한 빌더 객체
+    public static class PlayerRecordEntityBuilder {
+        private boolean isNew = true;
     }
 }

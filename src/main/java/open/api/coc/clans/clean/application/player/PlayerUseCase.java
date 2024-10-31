@@ -64,6 +64,7 @@ public class PlayerUseCase {
     private final LeagueService leagueService;
 
     private final PlayerUseCaseMapper playerUseCaseMapper;
+    private final PlayerLegendRecordService playerLegendRecordService;
 
     @Transactional(readOnly = true)
     public List<PlayerResponse> getAllPlayers(PlayerListSearchQuery query) {
@@ -341,4 +342,17 @@ public class PlayerUseCase {
                                        .toList();
     }
 
+    @Transactional
+    public void registerPlayerLegendRecord(String playerTag) {
+        // 서버에 등록된 계정 조회 & 검증
+        Player player = playerService.findById(playerTag);
+
+        // 전설 기록 수집 계정으로 등록
+        playerLegendRecordService.registerCollectionTarget(player);
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> findAllLegendRecordTags(String name) {
+        return playerLegendRecordService.findAllTagByName(name);
+    }
 }

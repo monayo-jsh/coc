@@ -25,6 +25,25 @@ body {
   }
 }
 
+.support-area {
+  margin-top: 5px;
+}
+
+.register-form {
+  margin-top: 5px;
+
+  .search {
+    width: 270px;
+  }
+}
+
+.search-form {
+
+  .search {
+    width: 230px;
+  }
+}
+
 .information {
   display: flex;
   justify-content: center;
@@ -59,6 +78,12 @@ body {
   font-weight: bold;
   display: flex;
   justify-content: center;
+  align-items: center;
+
+  .chip {
+    margin-left: 5px;
+    font-size: .8em;
+  }
 }
 
 .players {

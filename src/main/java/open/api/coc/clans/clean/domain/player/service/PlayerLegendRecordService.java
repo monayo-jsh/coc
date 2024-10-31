@@ -9,12 +9,17 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.repository.LeagueRepository;
+import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
+import open.api.coc.clans.clean.domain.player.exception.PlayerNotLeagueException;
+import open.api.coc.clans.clean.domain.player.exception.PlayerNotLegendLeagueException;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
+import open.api.coc.clans.clean.domain.player.repository.PlayerRecordHistoryRepository;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordRepository;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +27,8 @@ public class PlayerLegendRecordService {
 
     private final SeasonRepository seasonRepository;
     private final LeagueRepository leagueRepository;
-    private final PlayerRecordRepository playerRecordRepository;
+    private final PlayerRecordRepository recordRepository;
+    private final PlayerRecordHistoryRepository recordHistoryRepository;
 
     @Transactional(readOnly = true)
     public List<PlayerRecordHistory> findAllLatest(String playerTag) {
@@ -37,7 +43,7 @@ public class PlayerLegendRecordService {
         LocalDateTime endDateTime = LocalDateTime.of(seasonEndDates.get(0), seasonTime);
         LocalDateTime startDateTime = LocalDateTime.of(seasonEndDates.get(1), seasonTime);
 
-        return playerRecordRepository.findAll(playerTag, startDateTime, endDateTime);
+        return recordHistoryRepository.findAll(playerTag, startDateTime, endDateTime);
     }
 
     @Transactional
@@ -46,7 +52,7 @@ public class PlayerLegendRecordService {
         if (latestPlayer.isNotInLeague()) return;  // 리그 배정 안된 상태면 기록하지 않음 (시즌 초기화 등..)
         if (isNotLegendLeague(latestPlayer)) {
             // 전설 리그가 아니면 기록 대상에서 제외하고 프로세스 종료
-            playerRecordRepository.deleteById(originPlayer.getTag());
+            recordRepository.deleteById(originPlayer.getTag());
             return;
         }
 
@@ -55,10 +61,10 @@ public class PlayerLegendRecordService {
 
     private boolean isNotRecording(Player originPlayer, Player latestPlayer) {
         // 기록 대상 데이터인 경우
-        if (latestPlayer.isRecoding(originPlayer)) return false;
+        if (!latestPlayer.isRecoding(originPlayer)) return true;
 
         // 기록 대상 플레이어만 기록한다.
-        return !playerRecordRepository.existsByTag(originPlayer.getTag());
+        return !recordRepository.existsByTag(originPlayer.getTag());
     }
 
     private boolean isNotLegendLeague(Player latestPlayer) {
@@ -79,6 +85,29 @@ public class PlayerLegendRecordService {
                                                                .newDefenceWins(latestPlayer.getDefenseWins())
                                                                .build();
 
-        playerRecordRepository.saveHistory(recordHistory);
+        recordHistoryRepository.save(recordHistory);
+    }
+
+    @Transactional
+    public void registerCollectionTarget(Player player) {
+        if (player.isNotInLeague()) {
+            throw new PlayerNotLeagueException(player.getTag());
+        }
+
+        if (isNotLegendLeague(player)) {
+            throw new PlayerNotLegendLeagueException();
+        }
+
+        if (recordRepository.existsByTag(player.getTag())) {
+            throw new PlayerAlreadyExistsException(player.getTag());
+        }
+
+        recordRepository.save(player.getTag());
+    }
+
+    public List<String> findAllTagByName(String name) {
+        if (!StringUtils.hasText(name)) return Collections.emptyList();
+
+        return recordRepository.findAllByName(name);
     }
 }

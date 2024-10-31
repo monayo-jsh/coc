@@ -41,7 +41,8 @@ public class JpaPlayerCustomRepository {
             condition.and(playerEntity.supportYn.eq(YnType.Y));
         }
         if (query.isNameSearch()) {
-            condition.and(playerEntity.name.startsWith(query.name()));
+            condition.and(playerEntity.name.startsWith(query.name())
+                                           .or(playerEntity.nickname.startsWith(query.name())));
         }
         if (query.isTagSearch()) {
             condition.and(playerEntity.playerTag.in(query.tags()));

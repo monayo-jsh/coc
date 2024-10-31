@@ -20,6 +20,7 @@ import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateComm
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
+import open.api.coc.clans.clean.presentation.player.dto.PlayerNicknameUpdateRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateBulkRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateRequest;
@@ -148,8 +149,8 @@ public class PlayerController {
     })
     @PutMapping("/{playerTag}/nickname")
     public ResponseEntity<Void> putPlayerNickname(@PathVariable String playerTag,
-                                                  @RequestParam String nickname) {
-        playerUseCase.settingPlayerNickname(playerTag, nickname);
+                                                  @Valid @RequestBody PlayerNicknameUpdateRequest request) {
+        playerUseCase.settingPlayerNickname(playerTag, request.getNickname());
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }

@@ -6,6 +6,8 @@ const URI_PLAYERS_ALL_TAGS = `${PREFIX_PLAYER_API}/tags`; //전체 클랜원 태
 const URI_PLAYERS_OPEN_API = `${PREFIX_PLAYER_API}/{playerTag}/external`; //멤버 조회 (Open API)
 const URI_PLAYERS_DETAIL = `${PREFIX_PLAYER_API}/{playerTag}`; //멤버 등록,삭제
 
+const URI_PLAYERS_NICKNAME = `${PREFIX_PLAYER_API}/{playerTag}/nickname`; // 플레이어 닉네임 업데이트
+
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
 const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록
 
@@ -284,4 +286,21 @@ async function registerLegendRecordTarget(playerTag) {
                       alert(message);
                       return false;
                     });
+}
+
+async function updatePlayerNickname(playerTag, nickname) {
+  const requestBody = {
+    nickname: nickname
+  }
+
+  const uri = `${URI_PLAYERS_NICKNAME.replace(/{playerTag}/, encodeURIComponent(playerTag))}`
+  return axios.put(uri, requestBody)
+              .then(response => {
+                alert("닉네임을 변경했습니다.");
+                return true;
+              })
+              .catch((error) => {
+                console.error(error);
+                return false;
+              });
 }

@@ -19,6 +19,9 @@ public class PlayerResponse {
     @Schema(description = "이름")
     private String name;
 
+    @Schema(description = "이름")
+    private String nickname;
+
     @Schema(description = "지원계정 여부 - Y: 지원계정, N: 아님")
     private String supportYn;
 

@@ -362,7 +362,7 @@
       const playerName = input.value.trim();
 
       if (!playerName && !playerName.length) {
-        alert('플레이어 이름을 입력해주세요.');
+        alert('이름 또는 닉네임 입력을 입력해주세요.');
         return;
       }
 
@@ -414,7 +414,7 @@
     <div class="search">
       <div class="search-box">
         <div class="search-field">
-          <input placeholder="플레이어 이름을 입력해주세요" class="input player-search" type="text">
+          <input placeholder="이름 또는 닉네임 입력" class="input player-search" type="text">
           <div class="search-box-icon">
             <button class="btn-icon-content" onclick="findSearch(); return false;">
               <i class="search-icon">

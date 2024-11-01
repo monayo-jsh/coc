@@ -24,7 +24,27 @@
   <title>아카데미 클랜 편의기능</title>
 
   <script>
-    function formatDate(date) {
+    function renderLeagueAssignedPage() {
+      if (isNotLeagueAssigned) {
+        const message = `${formatYYYYMM(dayjs())} 리그 배정 예정입니다.`;
+        alert(message);
+        return;
+      }
+
+      renderPage('/assigned-member?view=league');
+    }
+
+  function renderClanAssignedPage() {
+      if (isNotClanAssigned) {
+        const message = `${formatYYYYMM(dayjs())} 클랜 배정 예정입니다.`;
+        alert(message);
+        return;
+      }
+
+      renderPage('/assigned-member?view=none');
+    }
+
+  function formatDate(date) {
       if (date) {
         const parseDate = dayjs(String(date));
         const formatDate = formatYYYYMM(parseDate)
@@ -33,16 +53,65 @@
       return date;
     }
 
-    async function initAssignedDate() {
+    let isNotClanAssigned = false;
+    async function displayClanAssignedDate() {
       const latestClanAssignedSeasonDate = await latestClanAssignedDate();
-      const clanAssignedDate = formatDate(latestClanAssignedSeasonDate);
-      const clanAssignedDateDisplay = document.querySelector('.clan-assigned-date');
-      clanAssignedDateDisplay.innerHTML = clanAssignedDate;
 
+      const clanAssignedDateDisplay = document.querySelector('.clan-assigned-date');
+      let displayText = formatDate(latestClanAssignedSeasonDate);
+      if (isNotClanAssignedMonth(latestClanAssignedSeasonDate)) {
+        isNotClanAssigned = true;
+        displayText = `(${formatYYYYMM(dayjs())} 배정 예정)`;
+      }
+
+      clanAssignedDateDisplay.innerHTML = displayText;
+
+      function isNotClanAssignedMonth(latestClanAssignedSeasonDate) {
+        const latestSeasonMonth = dayjs(String(latestClanAssignedSeasonDate)).month();
+        const currentMonth = dayjs().month();
+
+        return latestSeasonMonth !== currentMonth;
+      }
+    }
+
+    let isNotLeagueAssigned = false;
+    async function displayLeagueAssignedDate() {
       const latestLeagueAssignedSeasonDate = await latestLeagueAssignedDate();
-      const leagueAssignedDate = formatDate(latestLeagueAssignedSeasonDate);
+
       const leagueAssignedDateDisplay = document.querySelector('.league-assigned-date');
-      leagueAssignedDateDisplay.innerHTML = leagueAssignedDate;
+      let displayText = formatDate(latestLeagueAssignedSeasonDate);
+
+      if (isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate)) {
+        isNotLeagueAssigned = true;
+        displayText = `(${formatYYYYMM(dayjs())} 배정 예정)`;
+      }
+
+      leagueAssignedDateDisplay.innerHTML = displayText;
+
+      function isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate) {
+        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const now = dayjs();
+
+        // 매달 15일 이후인 경우
+        if (now.date() >= 15) {
+          // 이번달 배정인 경우
+          if (latestSeasonMonth === now.month()) {
+            return true;
+          }
+        } else {
+          // 매달 14일까지 기준 지난달 리그전 배정인 경우
+          if (latestSeasonMonth < now.month()) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+    }
+
+    async function initAssignedDate() {
+      await displayClanAssignedDate();
+      await displayLeagueAssignedDate();
     }
 
     window.onload = () => {
@@ -139,11 +208,11 @@
           </div>
         </div>
         <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('/assigned-member?view=none'); return false;">
+          <div class="card bg-black-2" onclick="renderClanAssignedPage(); return false;">
             <p class="tip">클랜 배정표</p>
             <p class="second-text"><span class="clan-assigned-date">(조회중)</span></p>
           </div>
-          <div class="card bg-black-2" onclick="renderPage('/assigned-member?view=league'); return false;">
+          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">
             <p class="tip">리그 배정표</p>
             <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
           </div>

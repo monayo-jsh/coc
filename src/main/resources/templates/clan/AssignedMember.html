@@ -188,7 +188,9 @@
 
       const assignedTableWrapper = document.querySelector('.assigned-table-wrapper');
       for(const clan of clans) {
-        const assignedMembers = clanAssignedMemberMap.get(clan.tag);
+        let assignedMembers = clanAssignedMemberMap.get(clan.tag);
+        if (!assignedMembers) assignedMembers = [];
+
         const assignedTable = drawClanAssignedTable(viewType, clan, assignedMembers);
         assignedTableWrapper.appendChild(assignedTable);
 

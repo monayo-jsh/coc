@@ -182,24 +182,41 @@
   .notice {
     width: 365px;
     text-align: center;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     position: absolute;
     opacity: 0;
     transition: opacity 1s ease-in-out;
-    border-radius: 10px;
+    border-radius: 5px;
     padding: 10px;
-    display: flex;
     border: 3px double darkorange;
     font-size: 13px;
+    display: flex;
+    align-items: center;
 
     .label {
       font-weight: bold;
       margin-right: 5px;
-      padding-right: 5px;
-      border-right: 1px solid;
-      width: 50px;
+      border-radius: 5px;
+      width: 40px;
+    }
+
+    .text {
+      text-align: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .label.NOTICE {
+      border: 1px solid black;
+    }
+
+    .label.EVENT {
+      border: 1px solid purple;
+      color: purple;
+    }
+
+    .timer {
+      white-space: nowrap;
     }
   }
 

@@ -42,7 +42,12 @@ public class Notice {
     @Column(name = "posting_end_date", nullable = false)
     private LocalDateTime postingEndDate;
 
-    public String getTypeName() {
-        return this.type.getName();
+    @Comment("한줄 공지")
+    @Column(name = "timer_enabled", nullable = false)
+    private Boolean timerEnabled;
+
+    // 기본값 설정을 위한 빌더 객체
+    public static class NoticeBuilder {
+        private Boolean timerEnabled = false;
     }
 }

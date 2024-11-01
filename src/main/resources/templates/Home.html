@@ -132,10 +132,38 @@
       const notice = noticeTemplate.querySelector('.notice');
 
       notice.innerHTML = notice.innerHTML
-                               .replace(/{TYPE}/, type)
+                               .replace(/{TYPE}/, convertNoticeName(type))
                                .replace(/{TEXT}/, oneLine);
 
+      const label = notice.querySelector('.label');
+      label.classList.add(type);
+
       return notice;
+    }
+
+    function addTimerEvent(noticeRow, notice) {
+      const { id, postingEndDate, timerEnabled } = notice;
+
+      // 타이머 비활성화인경우
+      if (!timerEnabled) return;
+
+      const timerInterval = setInterval(() => {
+        const timer = noticeRow.querySelector('.timer');
+        const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
+        let displayTime = formatTime(leftUntilTime, "H시간 m분 s초");
+
+        if (leftUntilTime.hours() === 0) {
+          // 0시간이면
+          displayTime = formatTime(leftUntilTime, "m분 s초");
+        }
+
+        timer.innerHTML = `(${displayTime} 전)`;
+
+        if (leftUntilTime <= 0) {
+          timer.innerHTML = "";
+          clearInterval(timerInterval);
+        }
+      }, 1000);
     }
 
     function renderNotices(notices) {
@@ -143,6 +171,8 @@
       for (const notice of notices) {
         const noticeRow = makeNotice(notice);
         target.appendChild(noticeRow);
+
+        addTimerEvent(noticeRow, notice);
       }
 
       if (notices.length) {
@@ -157,7 +187,7 @@
       if (!notices) return;
       if (notices.length === 1) return;
 
-      setInterval(() => showNextNotice(notices), 3000);
+      setInterval(() => showNextNotice(notices), 5000);
     }
 
     let currentNoticeIndex = 0;
@@ -170,21 +200,9 @@
       notices[currentNoticeIndex].classList.add('active');
     }
 
-    let intervalTimer;
     window.onload = async () => {
       await initAssignedDate();
       await drawNotice();
-
-      intervalTimer = setInterval(() => {
-        const timer = document.querySelector('.timer');
-        const leftUntilTime = getLeftUntilByTime(dayjs('2024-11-1 18:00:00'));
-        timer.innerHTML = `(${formatTime(leftUntilTime, "H시간 m분 s초")} 전)`;
-
-        if (leftUntilTime <= 0) {
-          timer.innerHTML = "";
-          clearInterval(intervalTimer);
-        }
-      }, 1000)
     }
   </script>
 </head>
@@ -322,7 +340,9 @@
 </body>
 <template id="notice-template">
   <div class="notice">
-    <div class="label">{TYPE}</div>{TEXT}<div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
+    <div class="label">{TYPE}</div>
+    <div class="text">{TEXT}</div>
+    <div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
   </div>
 </template>
 </html>

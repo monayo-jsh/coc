@@ -103,6 +103,13 @@ function writeExcelFile(fileName, jsonData) {
   XLSX.writeFile(workbook, fileName);
 }
 
+function convertNoticeName(noticeType) {
+  switch (noticeType) {
+    case 'NOTICE': return '공지';
+    case 'EVENT': return '이벤트';
+  }
+  return noticeType;
+}
 function convertHeroKoreanName(enName) {
   switch (enName) {
     case 'Barbarian King': return '바바리안 킹';

@@ -176,7 +176,6 @@
       await drawNotice();
 
       intervalTimer = setInterval(() => {
-        console.log("refresh time");
         const timer = document.querySelector('.timer');
         const leftUntilTime = getLeftUntilByTime(dayjs('2024-11-1 18:00:00'));
         timer.innerHTML = `(${formatTime(leftUntilTime, "H시간 m분 s초")} 전)`;

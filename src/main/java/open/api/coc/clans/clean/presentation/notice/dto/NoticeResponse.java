@@ -1,6 +1,7 @@
 package open.api.coc.clans.clean.presentation.notice.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
 
 public record NoticeResponse(
 
@@ -14,10 +15,10 @@ public record NoticeResponse(
     String oneLine,
 
     @Schema(description = "게시 시작일시")
-    String postingStartDate,
+    LocalDateTime postingStartDate,
 
     @Schema(description = "게시 종료일시")
-    String postingEndDate,
+    LocalDateTime postingEndDate,
 
     @Schema(description = "종료시간까지 타이머 활성화 여부")
     Boolean timerEnabled

@@ -166,6 +166,44 @@
 }
 
 .card-group:hover > .card:not(:hover) {
-  /*filter: blur(10px);*/
   transform: scale(0.9, 0.9);
+}
+
+.notices {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  border-radius: 10px;
+  padding: 10px 0;
+  height: 40px;
+  position: relative;
+
+  .notice {
+    width: 365px;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: absolute;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    border: 3px double darkorange;
+    font-size: 13px;
+
+    .label {
+      font-weight: bold;
+      margin-right: 5px;
+      padding-right: 5px;
+      border-right: 1px solid;
+      width: 50px;
+    }
+  }
+
+  .notice.active {
+    opacity: 1;
+  }
 }

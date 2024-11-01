@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,13 +18,17 @@
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
   <script src="/static/js/api/clan.js"></script>
+  <script src="/static/js/api/notice.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>아카데미 클랜 편의기능</title>
 
   <script>
+    dayjs.extend(dayjs_plugin_duration);
+
     function renderLeagueAssignedPage() {
       if (isNotLeagueAssigned) {
         const message = `${formatYYYYMM(dayjs())} 리그 배정 예정입니다.`;
@@ -114,42 +119,85 @@
       await displayLeagueAssignedDate();
     }
 
-    window.onload = () => {
-      initAssignedDate();
+    async function drawNotice() {
+      const notices = await fetchPostingNotices();
+
+      renderNotices(notices);
+      initSwipeEvent();
+    }
+
+    function makeNotice(noticeInfo) {
+      const { type, oneLine } = noticeInfo;
+      const noticeTemplate = copyTemplateById('notice-template');
+      const notice = noticeTemplate.querySelector('.notice');
+
+      notice.innerHTML = notice.innerHTML
+                               .replace(/{TYPE}/, type)
+                               .replace(/{TEXT}/, oneLine);
+
+      return notice;
+    }
+
+    function renderNotices(notices) {
+      const target = document.querySelector('.notices');
+      for (const notice of notices) {
+        const noticeRow = makeNotice(notice);
+        target.appendChild(noticeRow);
+      }
+
+      if (notices.length) {
+        // 첫번째 공지 노출
+        target.firstElementChild.classList.add('active');
+        toggleDisplay(target);
+      }
+    }
+    
+    function initSwipeEvent() {
+      const notices = document.querySelectorAll('.notices .notice');
+      if (!notices) return;
+      if (notices.length === 1) return;
+
+      setInterval(() => showNextNotice(notices), 3000);
+    }
+
+    let currentNoticeIndex = 0;
+    function showNextNotice(notices) {
+      // 모든 공지 숨김
+      notices.forEach((notice, index) => { notice.classList.remove('active'); });
+
+      // 다음 공지 노출
+      currentNoticeIndex = (currentNoticeIndex + 1) % notices.length;
+      notices[currentNoticeIndex].classList.add('active');
+    }
+
+    let intervalTimer;
+    window.onload = async () => {
+      await initAssignedDate();
+      await drawNotice();
+
+      intervalTimer = setInterval(() => {
+        console.log("refresh time");
+        const timer = document.querySelector('.timer');
+        const leftUntilTime = getLeftUntilByTime(dayjs('2024-11-1 18:00:00'));
+        timer.innerHTML = `(${formatTime(leftUntilTime, "H시간 m분 s초")} 전)`;
+
+        if (leftUntilTime <= 0) {
+          timer.innerHTML = "";
+          clearInterval(intervalTimer);
+        }
+      }, 1000)
     }
   </script>
 </head>
 <body>
-  <div class="error display-none">
-    <div class="card">
-      <div class="header">
-        <div class="top">
-          <div class="circle">
-            <span class="red circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="yellow circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="green circle2"></span>
-          </div>
-          <div class="title">
-            <p id="title2">서버 점검</p>
-          </div>
-        </div>
-      </div>
-      <div class="code-container">
-        <label for="code">
-          <textarea readonly="" name="code" id="code" class="area"></textarea>
-        </label>
-      </div>
-    </div>
 
-  </div>
   <div class="home-wrapper">
     <div class="logo"></div>
 
     <div class="contents">
+      <div class="notice-area">
+        <div class="notices display-none"></div>
+      </div>
 
       <div class="card-group align-items-center flex-row justify-content-center">
         <div class="card bg-black-2 with-icon color-gold w100p" onclick="renderPage('/hall-of-fame'); return false;">
@@ -269,6 +317,13 @@
       </div>
 
     </div>
+
   </div>
+
 </body>
+<template id="notice-template">
+  <div class="notice">
+    <div class="label">{TYPE}</div>{TEXT}<div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
+  </div>
+</template>
 </html>

@@ -81,7 +81,12 @@
       const tableTemplate = copyTemplateById('league-assigned-table-template');
       const table = tableTemplate.querySelector('.table');
 
-      const { name, isLeagueOccupy, warLeague } = clan;
+      let { name, isLeagueOccupy, warLeague } = clan;
+
+      if (clanAssignedMembers.length && clanAssignedMembers.length <= 15) {
+        // 리그전 15인전은 선점제로 진행 정책 적용
+        isLeagueOccupy = true;
+      }
 
       table.innerHTML = table.innerHTML
                              .replace(/{CLAN_NAME}/, name)

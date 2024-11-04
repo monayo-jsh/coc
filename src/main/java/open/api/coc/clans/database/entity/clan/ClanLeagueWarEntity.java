@@ -40,4 +40,8 @@ public class ClanLeagueWarEntity {
     @Column(name = "war_league", nullable = false, length = 100, updatable = false)
     private String warLeague;
 
+    public boolean isUnranked() {
+        return "Unranked".equals(this.warLeague);
+    }
+
 }

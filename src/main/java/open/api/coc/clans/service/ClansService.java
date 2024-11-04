@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
 import open.api.coc.clans.common.exception.handler.ExceptionHandler;
@@ -30,7 +31,6 @@ import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.entity.common.converter.IconUrlEntityConverter;
-import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
@@ -598,13 +598,20 @@ public class ClansService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void createClanLeagueWar(String clanTag, String season) {
-        Optional<ClanLeagueWarEntity> findClanLeagueWar = clanLeagueWarRepository.findByClanTagAndSeason(clanTag, season);
-
-        // 생성된 경우
-        if (findClanLeagueWar.isPresent()) return;
 
         ClanEntity clanEntity = clanRepository.findById(clanTag).orElseGet(null);
         if (Objects.isNull(clanEntity)) return; // 클랜 메타 정보가 없는 경우
+
+        Optional<ClanLeagueWarEntity> findClanLeagueWar = clanLeagueWarRepository.findByClanTagAndSeason(clanTag, season);
+
+        // 생성된 경우
+        if (findClanLeagueWar.isPresent()) {
+            ClanLeagueWarEntity clanLeagueWar = findClanLeagueWar.get();
+            if (clanLeagueWar.isUnranked()) {
+                clanLeagueWarRepository.update(clanLeagueWar.getLeagueWarId(), clanEntity.getWarLeague());
+            }
+            return;
+        }
 
         // 현재 소속된 리그 정보 저장
         ClanLeagueWarEntity clanLeagueWarEntity = ClanLeagueWarEntity.builder()

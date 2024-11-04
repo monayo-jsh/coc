@@ -1,16 +1,21 @@
+:root {
+  --notice-bg-color: #2b2d31;
+  --notice-font-color: #d8d8d8;
+}
+
 body {
   padding: 0;
   display: flex;
   flex-direction: column;
-  background-color: #2b2d31;
-  color: #d8d8d8;
+  background-color: var(--notice-bg-color);
+  color: var(--notice-font-color);
 }
 
 .title {
   display: flex;
   justify-content: center;
   margin-top: 10px;
-  color: #d8d8d8;
+  color: var(--notice-font-color);
   padding: 5px 10px;
   border-bottom: 2px double;
   font-weight: bold;
@@ -21,7 +26,22 @@ body {
   }
 }
 
+.support-area {
+  margin-top: 5px;
+  width: 720px;
+  display: flex;
+  flex-direction: column;
+
+  .buttons {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+  }
+}
+
+
 .notice-wrapper {
+  width: 720px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -79,5 +99,69 @@ body {
 
   .notice.active {
     opacity: 1;
+  }
+}
+
+.table {
+  border-radius: 5px;
+
+  .table-tr:nth-child(odd) {
+    background-color: unset !important;
+  }
+
+  .table-th {
+    color: var(--notice-font-color) !important;
+  }
+
+}
+
+.td-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.input {
+  width: 100%;
+  height: 100%;
+  border: 0 transparent;
+  font-size: 12px;
+  padding: 5px;
+  color: var(--notice-bg-color);
+  background: var(--notice-font-color);
+  border-radius: 5px;
+  outline: none;
+}
+
+.jcalendar {
+  color: black;
+}
+
+.input-date {
+  width: 130px;
+}
+
+.radio-inputs {
+
+  .radio {
+
+    .name {
+      color: var(--notice-font-color);
+    }
+
+    input:checked + .name.NOTICE {
+      color: white;
+      background-color: red;
+    }
+
+    input:checked + .name.EVENT {
+      color: white;
+      background-color: green;
+    }
+
+    input:checked + .name.COUPON {
+      color: black;
+      background-color: yellow;
+    }
+
   }
 }

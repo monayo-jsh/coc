@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/static/css/cms/noticeManager.css" />
+
+  <script src="/static/js/common.js"></script>
+  <script src="/static/js/util.js"></script>
+  <script src="/static/js/api/notice.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>공지 관리</title>
+  <script>
+
+    function makeNoticeRow(notice) {
+      const { id, type, oneLine, postingStartDate, postingEndDate, timerEnabled } = notice
+
+      const noticeTemplate = copyTemplateById('notice-template');
+      const noticeRow = noticeTemplate.querySelector('.notice');
+
+      const postingDate = formatPeriod(formatYYMMDDHHMM(postingStartDate), formatYYMMDDHHMM(postingEndDate));
+
+      noticeRow.innerHTML = noticeRow.innerHTML
+                                     .replace(/{TYPE}/, type)
+                                     .replace(/{LABEL}/, convertNoticeName(type))
+                                     .replace(/{ONELINE_TEXT}/, oneLine)
+                                     .replace(/{POSTING_DATE}/, postingDate);
+
+      if (timerEnabled) {
+        const shutdownTimer = noticeRow.querySelector('.toggle-switch');
+        shutdownTimer.checked = true;
+      }
+
+      noticeRow.dataset.id = id;
+
+      return noticeRow;
+    }
+
+    function renderNotices(notices) {
+      const target = document.querySelector('.notice-wrapper');
+      for(const notice of notices) {
+        const noticeRow = makeNoticeRow(notice);
+        target.appendChild(noticeRow);
+      }
+    }
+
+    async function drawNotice() {
+      const notices = await fetchNotices();
+
+      renderNotices(notices);
+    }
+
+    window.onload = async () => {
+      await drawNotice();
+    }
+  </script>
+</head>
+<body>
+
+  <div class="title">
+    <span class="label">공지 관리</span>
+  </div>
+
+  <div class="notice-wrapper"></div>
+
+</body>
+<template id="notice-template">
+  <div class="notice">
+    <div class="label {TYPE}">{LABEL}</div>
+    <div class="text">{ONELINE_TEXT}</div>
+    <div class="posting-date">{POSTING_DATE}</div>
+    <div class="shutdown-timer">
+      <div class="toggle-switch-cover">
+        <div class="toggle-switch-button">
+          <input type="checkbox" class="toggle-switch"/>
+          <label class="switch-label" data-toggle-on="종료 타이머" data-toggle-off="종료 타이머"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+</html>

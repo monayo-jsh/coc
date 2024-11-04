@@ -140,7 +140,7 @@ public class ClanWarQueryRepository {
 
     public List<ClanWarRecordDTO> findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(String clanTag, ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
-        builder.withClanTag(clanTag);
+        builder = builder.withClanTag(clanTag);
         return fetchClanWarRecords(pageable, builder);
     }
 

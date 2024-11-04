@@ -144,6 +144,8 @@ body {
 
   .battle-type {
     font-size: 13px;
+    padding: 3px 5px;
+    border-radius: 5px;
   }
   .battle-type.bg-orange {
     background-color: unset;

@@ -267,6 +267,10 @@ function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
 }
 
+function formatYYMMDDHHMM(date) {
+  return dayjs(date).format('YY-MM-DD HH:mm');
+}
+
 // 주어진 시간으로부터 현재 시간까지의 차이를 분 단위로 계산
 function getMinutesDifferenceFromNow(dateStr) {
   const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환

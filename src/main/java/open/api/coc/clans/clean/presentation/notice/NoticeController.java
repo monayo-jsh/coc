@@ -26,6 +26,21 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @Operation(
+        summary = "전체 공지사항 목록을 조회합니다. version: 1.00, Last Update: 24.11.04",
+        description = "이 API는 전체 공지사항 목록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = NoticeResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("")
+    public ResponseEntity<List<NoticeResponse>> getNotices() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(noticeService.getNotices());
+    }
+
+
+    @Operation(
         summary = "게시중인 공지사항 목록을 조회합니다. version: 1.00, Last Update: 24.11.01",
         description = "이 API는 게시중인 공지사항 목록을 제공합니다."
     )

@@ -5,6 +5,7 @@ import open.api.coc.clans.clean.domain.notice.model.Notice;
 
 public interface NoticeRepository {
 
+    List<Notice> findAll();
     List<Notice> findAllPosting();
 
 }

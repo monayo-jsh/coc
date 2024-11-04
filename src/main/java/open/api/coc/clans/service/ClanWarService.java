@@ -609,7 +609,7 @@ public class ClanWarService {
             rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(clanTag, ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
         }
 
-        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
+        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);
 
         if ("ALL".equalsIgnoreCase(searchType)) {
             return rankingHallOfFames;

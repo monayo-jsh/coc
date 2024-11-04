@@ -213,6 +213,11 @@ public class ClanWarQueryRepository {
         condition.and(clanWarEntity.type.eq(warType))
                  .and(clanWarEntity.preparationStartTime.between(from, to));
 
+        if (ClanWarType.LEAGUE.equals(warType)) {
+            // 리그전의 경우 준비중인 라운드는 제외하고 완파 대상 라운드를 판단
+            condition.and(clanWarEntity.state.ne("preparation"));
+        }
+
         List<ClanWarCountDTO> results = queryFactory.select(clanWarCountDTO)
                                                     .from(clanWarEntity)
                                                     .where(condition)

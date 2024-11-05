@@ -21,6 +21,12 @@ public class NormalViewController {
     }
 
     /** 팀 전설내기 이벤트 */
+    @GetMapping("/notice")
+    public String noticeTeamLegend() {
+        return "Notice";
+    }
+
+    /** 팀 전설내기 이벤트 */
     @GetMapping("/event/team/legend")
     public String event() {
         return "event/TeamLegend";

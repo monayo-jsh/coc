@@ -36,6 +36,7 @@ public class NoticeService {
 
         return notices.stream()
                       .map(noticeMapper::toNoticeResponse)
+                      .sorted(Comparator.comparing(NoticeResponse::id).reversed())
                       .toList();
     }
 

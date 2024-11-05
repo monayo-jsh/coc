@@ -136,10 +136,54 @@ button.refresh:hover svg {
   }
 }
 
-
 /**
   Toggle Button Style CSS
 */
+.toggle-switch-cover {
+}
+.toggle-switch-button {
+  position: relative;
+  width: 80px;
+  height: 28px;
+  overflow: hidden;
+}
+.toggle-switch {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 3;
+}
+.switch-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: fit-content;
+  padding: 5px 10px;
+  background-color: rgb(46, 46, 46);
+  border-radius: 50px;
+  z-index: 1;
+  cursor: pointer;
+  color: white;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+.switch-label:before {
+  content: attr(data-toggle-off);
+}
+.toggle-switch:checked + .switch-label {
+  background-color: rgb(174, 0, 255);
+  box-shadow: 0px 0px 40px rgba(174, 0, 255, 0.438);
+}
+.toggle-switch:checked + .switch-label:before {
+  content: attr(data-toggle-on);
+}
+
+
 .toggle-button-cover {
   height: 40px;
   display: flex;

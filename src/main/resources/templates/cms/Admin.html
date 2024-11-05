@@ -8,7 +8,6 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
 
   <script src="/static/js/common.js"></script>
   <script src="/static/js/util.js"></script>
@@ -40,36 +39,32 @@
   <title>아카데미 클랜 운영기능</title>
 </head>
 <body>
-  <div class="error display-none">
-    <div class="card">
-      <div class="header">
-        <div class="top">
-          <div class="circle">
-            <span class="red circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="yellow circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="green circle2"></span>
-          </div>
-          <div class="title">
-            <p id="title2">서버 점검</p>
-          </div>
-        </div>
-      </div>
-      <div class="code-container">
-        <label for="code">
-          <textarea readonly="" name="code" id="code" class="area"></textarea>
-        </label>
-      </div>
-    </div>
 
-  </div>
   <div class="home-wrapper">
     <div class="logo"></div>
 
     <div class="contents">
+
+      <div class="card-group">
+        <div class="title">운영 관리</div>
+
+        <div class="card-inner-group">
+
+          <div class="cards">
+            <div class="card bg-black-2" onclick="renderPage('/clan/cms/notice/manager'); return false;">
+              <p class="tip">공지 관리</p>
+              <p class="second-text">(공지사항 등록/삭제)</p>
+            </div>
+
+            <!--<div class="card bg-black-2" onclick="renderPage('/clan/cms/season/manager'); return false;">
+              <p class="tip">시즌 관리</p>
+              <p class="second-text">(시즌종료일 설정/삭제)</p>
+            </div>-->
+          </div>
+
+        </div>
+
+      </div>
 
       <div class="card-group">
         <div class="title">클랜 관리</div>

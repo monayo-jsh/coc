@@ -1,5 +1,6 @@
 package open.api.coc.clans.domain.clans;
 
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,4 +21,13 @@ public class ClanCurrentWarResponse {
     private ClanWarRes clan;
     private ClanWarRes opponent;
 
+    public Integer getTeamSize() {
+        if (Objects.isNull(teamSize)) return 0;
+        return teamSize;
+    }
+
+    public Integer getAttacksPerMember() {
+        if (Objects.isNull(attacksPerMember)) return 0;
+        return attacksPerMember;
+    }
 }

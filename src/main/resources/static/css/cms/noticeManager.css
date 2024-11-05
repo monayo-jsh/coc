@@ -1,0 +1,189 @@
+:root {
+  --notice-bg-color: #2b2d31;
+  --notice-font-color: #d8d8d8;
+}
+
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--notice-bg-color);
+  color: var(--notice-font-color);
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  color: var(--notice-font-color);
+  padding: 5px 10px;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  .label {
+    margin-left: 3px;
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+  width: 720px;
+  display: flex;
+  flex-direction: column;
+
+  .buttons {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+  }
+}
+
+
+.notice-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  border-radius: 10px;
+  padding: 10px 0;
+
+  .notice {
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid white;
+    font-size: 13px;
+
+    .row {
+      display: flex;
+      align-items: center;
+    }
+
+    .detail {
+      margin-top: 5px;
+      border-top: 1px solid;
+      padding-top: 10px;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    .label {
+      font-weight: bold;
+      margin-right: 5px;
+      border-radius: 5px;
+      width: 40px;
+    }
+
+    .label.NOTICE {
+      border: 1px solid red;
+      color: red;
+    }
+
+    .label.EVENT {
+      border: 1px solid green;
+      color: green;
+    }
+
+    .label.COUPON {
+      border: 1px solid gold;
+      color: gold;
+    }
+
+    .text {
+      width: 365px;
+      text-align: left;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin-right: 5px;
+    }
+
+    .posting-date {
+      margin-right: 5px;
+    }
+    .timer {
+      white-space: nowrap;
+    }
+  }
+
+  .notice.active {
+    opacity: 1;
+  }
+}
+
+.table {
+  border-radius: 5px;
+
+  .table-tr:nth-child(odd) {
+    background-color: unset !important;
+  }
+
+  .table-th {
+    color: var(--notice-font-color) !important;
+  }
+
+}
+
+.is-visible .toggle-switch-button {
+  width: 53px;
+}
+
+.td-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.input {
+  width: 100%;
+  height: 100%;
+  border: 0 transparent;
+  font-size: 12px;
+  padding: 5px;
+  color: var(--notice-bg-color);
+  background: var(--notice-font-color);
+  border-radius: 5px;
+  outline: none;
+}
+
+.jcalendar {
+  color: black;
+}
+
+.input-date {
+  width: 130px;
+}
+
+.radio-inputs {
+
+  .radio {
+
+    .name {
+      color: var(--notice-font-color);
+    }
+
+    input:checked + .name.NOTICE {
+      color: white;
+      background-color: red;
+    }
+
+    input:checked + .name.EVENT {
+      color: white;
+      background-color: green;
+    }
+
+    input:checked + .name.COUPON {
+      color: black;
+      background-color: gold;
+    }
+
+  }
+}
+
+.timer {
+  margin-left: 3px;
+  color: orange;
+}

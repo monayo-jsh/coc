@@ -27,7 +27,14 @@
   <title>아카데미 클랜 편의기능</title>
 
   <script>
-    dayjs.extend(dayjs_plugin_duration);
+
+  dayjs.extend(dayjs_plugin_duration);
+
+  function renderNoticeDetail(noticeElement) {
+      const { id } = noticeElement.dataset;
+
+      renderPage(`/notice?id=${id}`);
+  }
 
     function renderLeagueAssignedPage() {
       if (isNotLeagueAssigned) {
@@ -127,9 +134,12 @@
     }
 
     function makeNotice(noticeInfo) {
-      const { type, oneLine } = noticeInfo;
+      const { id, type, oneLine } = noticeInfo;
       const noticeTemplate = copyTemplateById('notice-template');
       const notice = noticeTemplate.querySelector('.notice');
+
+      //dataset
+      notice.dataset.id = id;
 
       notice.innerHTML = notice.innerHTML
                                .replace(/{TYPE}/, convertNoticeName(type))
@@ -339,7 +349,7 @@
 
 </body>
 <template id="notice-template">
-  <div class="notice">
+  <div class="notice cursor-pointer" onclick="renderNoticeDetail(this);">
     <div class="label">{TYPE}</div>
     <div class="text">{TEXT}</div>
     <div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>

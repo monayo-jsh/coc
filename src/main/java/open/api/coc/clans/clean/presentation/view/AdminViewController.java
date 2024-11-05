@@ -20,6 +20,12 @@ public class AdminViewController {
         return "cms/Admin";
     }
 
+    /** 공지 관리 */
+    @GetMapping("/notice/manager")
+    public String noticeManager() {
+        return "cms/NoticeManager";
+    }
+
     /** 클랜원 관리 */
     @GetMapping("/member/manager")
     public String memberManager() {

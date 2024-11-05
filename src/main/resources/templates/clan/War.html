@@ -382,6 +382,9 @@
                    const totalTownhallCount = teamSize * 1;
                    const totalStarCount = teamSize * 3;
 
+                   // 준비중일땐 시작시간까지, 전쟁중일땐 종료시간까지
+                   const warRemainHourMinutes = formatWarRemainHourMinute(state === 'preparation' ? startTime : endTime);
+
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
                                                                             .replace(/{BATTLE_TYPE_COLOR}/g, getBgColorByBattleType(battleModifier))
                                                                             .replace(/{BATTLE_TYPE}/g, convBattleTypeName(battleModifier))
@@ -394,7 +397,7 @@
                                                                             .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
                                                                             .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
                                                                             .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
-                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, warRemainHourMinutes)
                                                                             .replace(/{WAR_STATE}/, convWarState(state))
                                                                             .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
                                                                             .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)

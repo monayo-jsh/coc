@@ -21,7 +21,16 @@ public record NoticeResponse(
     LocalDateTime postingEndDate,
 
     @Schema(description = "종료시간까지 타이머 활성화 여부")
-    Boolean timerEnabled
+    Boolean timerEnabled,
+
+    @Schema(description = "노출 설정 여부")
+    Boolean isVisible,
+
+    @Schema(description = "상세 내용")
+    String content,
+
+    @Schema(description = "등록일시")
+    LocalDateTime createdAt
 
 ) {
 }

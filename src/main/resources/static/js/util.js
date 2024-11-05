@@ -107,6 +107,7 @@ function convertNoticeName(noticeType) {
   switch (noticeType) {
     case 'NOTICE': return '공지';
     case 'EVENT': return '이벤트';
+    case 'COUPON': return '쿠폰';
   }
   return noticeType;
 }
@@ -265,6 +266,10 @@ function formatDD(date) {
 
 function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
+}
+
+function formatYYMMDDHHMM(date) {
+  return dayjs(date).format('YY-MM-DD HH:mm');
 }
 
 // 주어진 시간으로부터 현재 시간까지의 차이를 분 단위로 계산
@@ -462,26 +467,43 @@ function makeDatePickerOption(defaultDate, customOption = {
   return option
 }
 
-function makeMonthPickerOption(firstDayOfMonth, customOption = {
-  validRange: true
+function makeDatePickerOption(defaultDate, customOption = {
 }) {
   // <!-- JavaScript Year and Month Picker -->
   //   <script src="https://jsuites.net/v4/jsuites.js"></script>
   //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
   const option = {
-    type: 'year-month-picker',
-    format: 'YYYY-MM',
+    type: 'default',
+    format: 'YYYY-MM-DD', // default
     controls: false,
     readonly: true,
-    value: firstDayOfMonth, // default
+    value: defaultDate, // default
     months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
     monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
   };
 
-  // setting validRange
-  if (customOption.validRange) {
-    option.validRange = [ firstDayOfMonth ];
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
   }
+  return option
+}
+
+function makeDateTimePickerOption(defaultDate, customOption = {}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    format: 'YYYY-MM-DD HH:MM',
+    time: true,
+    readonly: true,
+    value: defaultDate, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    resetButton: false,
+    textDone: "",
+    textUpdate: "적용"
+  };
 
   // update callback mappings
   if (customOption.onchange) {
@@ -539,4 +561,17 @@ function loadRequestBodyFromForm(formElement) {
   }
 
   return requestBody;
+}
+
+function convertCheckbox(requestBody, key) {
+  // checkbox 체크된 경우 'on' 값이며, 체크되지 않은 경우 값이 없음
+  // 따라서 true | false 로 치환
+  requestBody[key] = !!requestBody[key];
+}
+
+function convertTimestamp(requestBody, key) {
+  // 날짜 값을 타임스탬프로 치환
+  if (requestBody[key]) {
+    requestBody[key] = dayjs(requestBody[key]).valueOf();
+  }
 }

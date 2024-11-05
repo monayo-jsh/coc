@@ -41,7 +41,6 @@ body {
 
 
 .notice-wrapper {
-  width: 720px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -54,9 +53,19 @@ body {
     padding: 15px;
     text-align: center;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     border-bottom: 1px solid white;
     font-size: 13px;
+
+    .row {
+      display: flex;
+      align-items: center;
+    }
+
+    .detail {
+      margin-top: 5px;
+      display: flex;
+    }
 
     .label {
       font-weight: bold;
@@ -115,9 +124,13 @@ body {
 
 }
 
+.is-visible .toggle-switch-button {
+  width: 53px;
+}
+
 .td-wrap {
   display: flex;
-  justify-content: center;
+  align-items: center;
 }
 
 .input {

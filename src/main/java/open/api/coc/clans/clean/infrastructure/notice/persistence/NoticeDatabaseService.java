@@ -12,12 +12,12 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class NoticeDatabaseService implements NoticeRepository {
 
-    private final JpaNoticeRepository jpaNoticeRepository;
+    private final JpaNoticeRepository noticeRepository;
     private final JpaNoticeCustomRepository noticeCustomRepository;
 
     @Override
     public List<Notice> findAll() {
-        return jpaNoticeRepository.findAll();
+        return noticeCustomRepository.findAll();
     }
 
     @Override

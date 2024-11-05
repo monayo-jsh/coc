@@ -16,6 +16,13 @@ public class JpaNoticeCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    public List<Notice> findAll() {
+        return queryFactory.select(notice)
+                           .from(notice)
+                           .leftJoin(notice.detail).fetchJoin()
+                           .fetch();
+    }
+
     public List<Notice> findAllPosting() {
         LocalDateTime now = LocalDateTime.now();
 

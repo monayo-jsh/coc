@@ -498,7 +498,10 @@ function makeDateTimePickerOption(defaultDate, customOption = {}) {
     readonly: true,
     value: defaultDate, // default
     months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    resetButton: false,
+    textDone: "",
+    textUpdate: "적용"
   };
 
   // update callback mappings
@@ -557,4 +560,10 @@ function loadRequestBodyFromForm(formElement) {
   }
 
   return requestBody;
+}
+
+function convertCheckbox(requestBody, checkboxKey) {
+  // checkbox 체크된 경우 'on' 값이며, 체크되지 않은 경우 값이 없음
+  // 따라서 true | false 로 치환
+  requestBody[checkboxKey] = !!requestBody[checkboxKey];
 }

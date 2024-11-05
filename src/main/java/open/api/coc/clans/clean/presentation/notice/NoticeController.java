@@ -80,6 +80,21 @@ public class NoticeController {
     }
 
     @Operation(
+        summary = "공지사항의 종료타이머 여부를 변경합니다. version: 1.00, Last Update: 24.11.05",
+        description = "이 API는 공지사항의 종료타이머 여부를 변경합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PutMapping("{noticeId}/shutdown-timer")
+    public ResponseEntity<Void> putNoticeShutdownTimer(@PathVariable Long noticeId) {
+        noticeService.changeShutdownTimer(noticeId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+    @Operation(
         summary = "공지사항의 노출 여부를 변경합니다. version: 1.00, Last Update: 24.11.05",
         description = "이 API는 공지사항의 노출 여부를 변경합니다."
     )

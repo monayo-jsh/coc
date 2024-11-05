@@ -114,7 +114,11 @@ public class Notice {
     }
 
     public void changeVisible() {
-        this.isVisible = !isVisible;
+        this.isVisible = !this.isVisible;
+    }
+
+    public void changeShutdownTimer() {
+        this.timerEnabled = !this.timerEnabled;
     }
 
     // 기본값 설정을 위한 빌더 객체

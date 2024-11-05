@@ -2,6 +2,7 @@ const PREFIX_NOTICE_API = '/api/notices' // 공지사항 API
 
 const URI_NOTICES = `${PREFIX_NOTICE_API}`; // 전체 공지사항 목록
 const URI_POSTING_NOTICES = `${PREFIX_NOTICE_API}/posting` // 게시중인 공지사항 목록 조회
+const URI_NOTICES_SHUTDOWN_TIMER = `${PREFIX_NOTICE_API}/{noticeId}/shutdown-timer` // 공지사항 종료 타이머 설정 여부 수정
 const URI_NOTICES_VISIBLE = `${PREFIX_NOTICE_API}/{noticeId}/visible` // 공지사항 노출 설정 여부 수정
 
 async function fetchPostingNotices() {
@@ -48,9 +49,19 @@ async function createNotice(requestBody) {
                     });
 }
 
+async function updateNoticeShutdownTimer(noticeId) {
+  const uri = URI_NOTICES_SHUTDOWN_TIMER.replace(/{noticeId}/, noticeId)
+
+  return requestPut(uri);
+}
+
 async function updateNoticeVisible(noticeId) {
   const uri = URI_NOTICES_VISIBLE.replace(/{noticeId}/, noticeId)
 
+  return requestPut(uri);
+}
+
+async function requestPut(uri) {
   return await axios.put(uri)
                     .then((response) => {
                       alert('적용 되었습니다.');
@@ -58,7 +69,7 @@ async function updateNoticeVisible(noticeId) {
                     })
                     .catch((error) => {
                       let message = error.message;
-                      const { response } = error;
+                      const {response} = error;
                       if (response && response.data) {
                         message = response.data;
                       }

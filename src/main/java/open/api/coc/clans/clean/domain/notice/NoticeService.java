@@ -52,6 +52,18 @@ public class NoticeService {
         noticeRepository.save(notice);
     }
 
+    public void changeShutdownTimer(Long noticeId) {
+        // 공지사항 조회
+        Notice notice = noticeRepository.findById(noticeId)
+                                        .orElseThrow(() -> new NoticeNotFoundException(noticeId));
+
+        // 종료 타이머 설정 여부 수정
+        notice.changeShutdownTimer();
+
+        // 업데이트
+        noticeRepository.save(notice);
+    }
+
     public void changeVisible(Long noticeId) {
         // 공지사항 조회
         Notice notice = noticeRepository.findById(noticeId)

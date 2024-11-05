@@ -27,6 +27,23 @@
 
   <title>공지 관리</title>
   <script>
+    function clickShutdownTimer(toggleSwitch) {
+
+      const noticeRow = toggleSwitch.closest('.notice');
+      const { id, timerEnabled } = noticeRow.dataset;
+
+      const currentTimerEnabled = timerEnabled === 'true';
+      const toStatus = !currentTimerEnabled;
+
+      updateNoticeShutdownTimer(id)
+      .then((isResult) => {
+        if (isResult) {
+          noticeRow.dataset.isVisible = String(toStatus);
+          toggleSwitch.checked = toStatus;
+        }
+      })
+    }
+
     function clickVisible(toggleSwitch) {
 
       const noticeRow = toggleSwitch.closest('.notice');
@@ -34,11 +51,6 @@
 
       const currentIsVisible = isVisible === 'true';
       const toStatus = !currentIsVisible;
-      const toStatusName = toStatus ? '노출' : '비노출';
-
-      if (!confirm(`${toStatusName} 상태로 변경하시겠습니까?`)) {
-        return;
-      }
 
       updateNoticeVisible(id)
       .then((isResult) => {
@@ -89,6 +101,7 @@
       //dataset
       noticeRow.dataset.id = id;
       noticeRow.dataset.isVisible = isVisible;
+      noticeRow.dataset.timerEnabled = timerEnabled;
 
       noticeRow.innerHTML = noticeRow.innerHTML
                                      .replace(/{TYPE}/, type)
@@ -266,7 +279,7 @@
       <div class="posting-date">{POSTING_DATE}</div>
       <div class="shutdown-timer">
         <div class="toggle-switch-button">
-          <input type="checkbox" class="toggle-switch"/>
+          <input type="checkbox" class="toggle-switch" onclick="clickShutdownTimer(this); return false;"/>
           <label class="switch-label" data-toggle-on="종료 타이머" data-toggle-off="종료 타이머"></label>
         </div>
       </div>

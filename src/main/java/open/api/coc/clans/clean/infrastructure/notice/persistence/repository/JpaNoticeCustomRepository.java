@@ -28,7 +28,8 @@ public class JpaNoticeCustomRepository {
 
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(notice.postingStartDate.before(now))
-                 .and(notice.postingEndDate.after(now));
+                 .and(notice.postingEndDate.after(now))
+                 .and(notice.isVisible.eq(true));
 
         return queryFactory.select(notice)
                            .from(notice)

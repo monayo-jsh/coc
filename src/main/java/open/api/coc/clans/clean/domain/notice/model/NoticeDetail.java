@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,11 +43,20 @@ public class NoticeDetail {
     @Column(name = "content", nullable = true)
     private String content;
 
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     private NoticeDetail(Long id, Notice notice, String content) {
         this.id = id;
         this.notice = notice;
         this.content = content;
     }
 
+    public static NoticeDetail createNew(String content) {
+        return NoticeDetail.builder()
+                           .content(content)
+                           .build();
+    }
+
+    public void changeNotice(Notice notice) {
+        this.notice = notice;
+    }
 }

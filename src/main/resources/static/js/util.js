@@ -562,8 +562,15 @@ function loadRequestBodyFromForm(formElement) {
   return requestBody;
 }
 
-function convertCheckbox(requestBody, checkboxKey) {
+function convertCheckbox(requestBody, key) {
   // checkbox 체크된 경우 'on' 값이며, 체크되지 않은 경우 값이 없음
   // 따라서 true | false 로 치환
-  requestBody[checkboxKey] = !!requestBody[checkboxKey];
+  requestBody[key] = !!requestBody[key];
+}
+
+function convertTimestamp(requestBody, key) {
+  // 날짜 값을 타임스탬프로 치환
+  if (requestBody[key]) {
+    requestBody[key] = dayjs(requestBody[key]).valueOf();
+  }
 }

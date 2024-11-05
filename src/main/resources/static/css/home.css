@@ -217,6 +217,11 @@
       color: purple;
     }
 
+    .label.COUPON {
+      border: 1px solid gold;
+      color: gold;
+    }
+
     .timer {
       white-space: nowrap;
     }

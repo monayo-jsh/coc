@@ -89,8 +89,8 @@ body {
     }
 
     .label.COUPON {
-      border: 1px solid yellow;
-      color: yellow;
+      border: 1px solid gold;
+      color: gold;
     }
 
     .text {
@@ -177,7 +177,7 @@ body {
 
     input:checked + .name.COUPON {
       color: black;
-      background-color: yellow;
+      background-color: gold;
     }
 
   }

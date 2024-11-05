@@ -107,6 +107,7 @@ function convertNoticeName(noticeType) {
   switch (noticeType) {
     case 'NOTICE': return '공지';
     case 'EVENT': return '이벤트';
+    case 'COUPON': return '쿠폰';
   }
   return noticeType;
 }

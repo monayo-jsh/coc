@@ -38,7 +38,7 @@
       updateNoticeShutdownTimer(id)
       .then((isResult) => {
         if (isResult) {
-          noticeRow.dataset.isVisible = String(toStatus);
+          noticeRow.dataset.timerEnabled = String(toStatus);
           toggleSwitch.checked = toStatus;
         }
       })
@@ -177,7 +177,7 @@
   <div class="notice-registration-wrapper display-none">
     <form class="notice-registration-form">
       <table class="table mt-5">
-        <caption class="table-caption">공지 등록 양식</caption>
+        <caption class="table-caption">공지 등록</caption>
         <colgroup>
           <col width="20%">
           <col width="*">
@@ -231,7 +231,7 @@
         <tr class="table-tr">
           <th class="table-th">종료 타이머 유무</th>
           <td class="table-td">
-            <div class="td-wrap">
+            <div class="td-wrap shutdown-timer">
               <div class="toggle-switch-button">
                 <input type="checkbox" name="shutdownTimer" class="toggle-switch"/>
                 <label class="switch-label" data-toggle-on="표시" data-toggle-off="표시 안함"></label>

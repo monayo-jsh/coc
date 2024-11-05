@@ -32,6 +32,10 @@ body {
   display: flex;
   flex-direction: column;
 
+  @media (max-width: 500px) {
+    width: 400px;
+  }
+
   .buttons {
     width: 100%;
     display: flex;
@@ -75,7 +79,7 @@ body {
       .dynamic {
         display: flex;
         align-items: center;
-        
+
         @media (max-width: 500px) {
           justify-content: flex-start;
           align-items: center;
@@ -160,6 +164,12 @@ body {
 .td-wrap {
   display: flex;
   align-items: center;
+}
+
+.td-wrap.shutdown-timer, .td-wrap.is-visible {
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
 }
 
 .input {

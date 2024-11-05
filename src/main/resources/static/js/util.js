@@ -467,28 +467,6 @@ function makeDatePickerOption(defaultDate, customOption = {
   return option
 }
 
-function makeDatePickerOption(defaultDate, customOption = {
-}) {
-  // <!-- JavaScript Year and Month Picker -->
-  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
-  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
-  const option = {
-    type: 'default',
-    format: 'YYYY-MM-DD', // default
-    controls: false,
-    readonly: true,
-    value: defaultDate, // default
-    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
-    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
-  };
-
-  // update callback mappings
-  if (customOption.onchange) {
-    option.onchange = customOption.onchange;
-  }
-  return option
-}
-
 function makeDateTimePickerOption(defaultDate, customOption = {}) {
   // <!-- JavaScript Year and Month Picker -->
   //   <script src="https://jsuites.net/v4/jsuites.js"></script>
@@ -511,6 +489,34 @@ function makeDateTimePickerOption(defaultDate, customOption = {}) {
   }
   return option
 }
+
+function makeMonthPickerOption(defaultDate, customOption = {
+  validRange: true
+}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    type: 'year-month-picker',
+    format: 'YYYY-MM', // default
+    controls: false,
+    readonly: true,
+    value: defaultDate, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+  };
+
+  if (customOption.validRange) {
+    option.validRange = [defaultDate];
+  }
+
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
+  }
+  return option
+}
+
 
 function isMissingAttack(attacks) {
   const ESSENTIAL_ATTACK_COUNT = 6;

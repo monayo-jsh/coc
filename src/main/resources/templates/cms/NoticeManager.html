@@ -274,22 +274,28 @@
 <template id="notice-template">
   <div class="notice">
     <div class="row">
-      <div class="label {TYPE}">{LABEL}</div>
-      <div class="text cursor-pointer" onclick="showDetail(this);">{ONELINE_TEXT}</div>
-      <div class="posting-date">{POSTING_DATE}</div>
-      <div class="shutdown-timer">
-        <div class="toggle-switch-button">
-          <input type="checkbox" class="toggle-switch" onclick="clickShutdownTimer(this); return false;"/>
-          <label class="switch-label" data-toggle-on="종료 타이머" data-toggle-off="종료 타이머"></label>
+      <div class="dynamic">
+        <div class="label {TYPE}">{LABEL}</div>
+      </div>
+      <div class="dynamic">
+        <div class="text cursor-pointer" onclick="showDetail(this);">{ONELINE_TEXT}</div>
+      </div>
+      <div class="dynamic">
+        <div class="posting-date">{POSTING_DATE}</div>
+        <div class="shutdown-timer">
+          <div class="toggle-switch-button">
+            <input type="checkbox" class="toggle-switch" onclick="clickShutdownTimer(this); return false;"/>
+            <label class="switch-label" data-toggle-on="종료 타이머" data-toggle-off="종료 타이머"></label>
+          </div>
+        </div>
+        <div class="is-visible">
+          <div class="toggle-switch-button">
+            <input type="checkbox" class="toggle-switch" onclick="clickVisible(this); return false;"/>
+            <label class="switch-label" data-toggle-on="노출" data-toggle-off="비노출"></label>
+          </div>
         </div>
       </div>
-      <div class="is-visible">
-        <div class="toggle-switch-button">
-          <input type="checkbox" class="toggle-switch" onclick="clickVisible(this); return false;"/>
-          <label class="switch-label" data-toggle-on="노출" data-toggle-off="비노출"></label>
-        </div>
       </div>
-    </div>
     <div class="detail display-none"></div>
   </div>
 </template>

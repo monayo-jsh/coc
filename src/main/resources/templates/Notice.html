@@ -141,9 +141,13 @@
 <template id="notice-template">
   <div class="notice">
     <div class="row">
-      <div class="label {TYPE}">{LABEL}</div>
-      <div class="text display-flex" onclick="showDetail(this);">{ONELINE_TEXT}<div class="timer"></div></div>
-      <div class="posting-date">{POSTING_DATE}</div>
+      <div class="dynamic">
+        <div class="label {TYPE}">{LABEL}</div>
+      </div>
+      <div class="dynamic">
+        <div class="text display-flex" onclick="showDetail(this);">{ONELINE_TEXT}<div class="timer"></div></div>
+        <div class="posting-date">{POSTING_DATE}</div>
+      </div>
     </div>
     <div class="detail display-none"></div>
   </div>

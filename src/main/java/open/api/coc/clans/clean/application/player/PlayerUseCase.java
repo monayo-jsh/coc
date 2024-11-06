@@ -118,7 +118,7 @@ public class PlayerUseCase {
     @Transactional(readOnly = true)
     public PlayerResponse getPlayer(String playerTag) {
         // 플레이어를 조회한다.
-        Player player = playerService.findById(playerTag);
+        Player player = playerService.findByIdOrThrow(playerTag);
 
         // 응답한다.
         return mapToPlayerResponse(player);
@@ -164,7 +164,7 @@ public class PlayerUseCase {
     @Transactional
     public void synchronizePlayer(String playerTag) {
         // 서버의 플레이어 정보를 조회한다.
-        Player player = playerService.findById(playerTag);
+        Player player = playerService.findByIdOrThrow(playerTag);
 
         // COC 플레이어 최신 정보를 조회한다.
         Player latestPlayer = playerClient.findByTag(playerTag);
@@ -211,8 +211,8 @@ public class PlayerUseCase {
 
     @Transactional
     public void changePlayerSupportType(PlayerSupportUpdateCommand command) {
-        // 플레이어를 조회한다.
-        Player player = playerService.findById(command.playerTag());
+        // 플레이어 조회
+        Player player = playerService.findOrCreate(command.playerTag());
 
         // 플레이어의 지원 계정 유형을 설정한다.
         player.changeSupportType(command.supportYn());
@@ -346,7 +346,7 @@ public class PlayerUseCase {
     @Transactional
     public void registerPlayerLegendRecord(String playerTag) {
         // 서버에 등록된 계정 조회 & 검증
-        Player player = playerService.findById(playerTag);
+        Player player = playerService.findByIdOrThrow(playerTag);
 
         // 전설 기록 수집 계정으로 등록
         playerLegendRecordService.registerCollectionTarget(player);
@@ -360,7 +360,7 @@ public class PlayerUseCase {
     @Transactional
     public void settingPlayerNickname(String playerTag, String nickname) {
         // 플레이어를 조회 및 검증
-        Player player = playerService.findById(playerTag);
+        Player player = playerService.findByIdOrThrow(playerTag);
 
         // 닉네임을 변경한다.
         player.changeNickname(nickname);

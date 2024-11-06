@@ -1,10 +1,12 @@
 package open.api.coc.clans.clean.domain.player.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
+import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PlayerService {
 
+    private final PlayerClient playerClient;
     private final PlayerRepository playerRepository;
 
     @Transactional(readOnly = true)
@@ -56,13 +59,17 @@ public class PlayerService {
     }
 
     @Transactional(readOnly = true)
-    public Player findById(String playerTag) {
+    public Optional<Player> findById(String playerTag) {
         if (playerTag == null || playerTag.isEmpty()) {
             throw new IllegalArgumentException("playerTag can not be null or empty");
         }
 
-        return playerRepository.findById(playerTag)
-                               .orElseThrow(() -> new PlayerNotFoundException(playerTag));
+        return playerRepository.findById(playerTag);
+    }
+
+    @Transactional(readOnly = true)
+    public Player findByIdOrThrow(String playerTag) {
+        return findById(playerTag).orElseThrow(() -> new PlayerNotFoundException(playerTag));
     }
 
     @Transactional(readOnly = true)
@@ -85,8 +92,20 @@ public class PlayerService {
 
     @Transactional
     public void delete(String playerTag) {
-        findById(playerTag);
+        findByIdOrThrow(playerTag);
 
         playerRepository.deleteById(playerTag);
+    }
+
+    @Transactional
+    public Player findOrCreate(String playerTag) {
+        // 사용자를 서버에서 조회
+        return findById(playerTag).orElseGet(() -> fetchAndCreate(playerTag));
+    }
+
+    @Transactional
+    public Player fetchAndCreate(String playerTag) {
+        Player latestPlayer = playerClient.findByTag(playerTag);
+        return create(latestPlayer);
     }
 }

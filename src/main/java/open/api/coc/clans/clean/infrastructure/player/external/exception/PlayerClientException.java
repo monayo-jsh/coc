@@ -6,7 +6,7 @@ import open.api.coc.clans.common.exception.CustomRuntimeException;
 public class PlayerClientException extends CustomRuntimeException {
 
     public PlayerClientException(String playerTag) {
-        super(ExceptionCode.EXTERNAL_ERROR.getCode(), "플레이어 조회 실패: %s".formatted(playerTag));
+        super(ExceptionCode.EXTERNAL_ERROR.getCode(), "COC 플레이어 조회 실패: %s".formatted(playerTag));
     }
 
 }

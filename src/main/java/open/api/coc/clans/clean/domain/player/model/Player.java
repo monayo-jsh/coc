@@ -86,8 +86,6 @@ public class Player {
     public void changeSupportType(YnType supportYn) {
         if (YnType.Y.equals(supportYn)) {
             changeSupportPlayer();
-            // 지원계정 변경 이벤트를 발행한다.
-            Events.raise(new SupportPlayerChangedEvent(this.tag));
             return;
         }
 
@@ -101,6 +99,9 @@ public class Player {
 
     public void changeSupportPlayer() {
         this.supportYn = YnType.Y;
+
+        // 지원계정 변경 이벤트를 발행한다.
+        Events.raise(new SupportPlayerChangedEvent(this.tag));
     }
 
     public void changeInfo(Player latestPlayer) {

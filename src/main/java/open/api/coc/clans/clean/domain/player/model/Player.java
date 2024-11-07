@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import open.api.coc.clans.clean.common.event.Events;
+import open.api.coc.clans.clean.domain.player.event.SupportPlayerChangedEvent;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.external.coc.config.HeroConfig;
 import org.springframework.util.StringUtils;
@@ -84,6 +86,8 @@ public class Player {
     public void changeSupportType(YnType supportYn) {
         if (YnType.Y.equals(supportYn)) {
             changeSupportPlayer();
+            // 지원계정 변경 이벤트를 발행한다.
+            Events.raise(new SupportPlayerChangedEvent(this.tag));
             return;
         }
 

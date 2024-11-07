@@ -219,11 +219,6 @@ public class PlayerUseCase {
 
         // 플레이어 계정 유형을 적용한다.
         playerService.save(player);
-
-        // 지원 계정 전환 요청 시 배정된 클랜을 제거한다.
-        if (command.isSupportPlayer()) {
-            clanAssignService.excludeRecently(player.getTag());
-        }
     }
 
     @Transactional

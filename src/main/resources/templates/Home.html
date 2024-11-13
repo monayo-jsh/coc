@@ -38,7 +38,7 @@
 
     function renderLeagueAssignedPage() {
       if (isNotLeagueAssigned) {
-        const message = `${formatYYYYMM(dayjs())} 리그 배정 예정입니다.`;
+        const message = `${document.querySelector('.league-assigned-date').innerText}`;
         alert(message);
         return;
       }
@@ -95,7 +95,7 @@
 
       if (isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate)) {
         isNotLeagueAssigned = true;
-        displayText = `(${formatYYYYMM(dayjs())} 배정 예정)`;
+        displayText = `(${formatYYYYMM(dayjs().add(1, 'month'))} 배정 예정)`;
       }
 
       leagueAssignedDateDisplay.innerHTML = displayText;
@@ -105,7 +105,7 @@
         const now = dayjs();
 
         // 매달 15일 이후인 경우
-        if (now.date() >= 15) {
+        if (now.date() >= 13) {
           // 이번달 배정인 경우
           if (latestSeasonMonth === now.month()) {
             return true;

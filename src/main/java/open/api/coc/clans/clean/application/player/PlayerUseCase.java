@@ -65,7 +65,6 @@ public class PlayerUseCase {
     private final LeagueService leagueService;
 
     private final PlayerUseCaseMapper playerUseCaseMapper;
-    private final PlayerLegendRecordService playerLegendRecordService;
 
     @Transactional(readOnly = true)
     public List<PlayerResponse> getAllPlayers(PlayerListSearchQuery query) {
@@ -204,6 +203,9 @@ public class PlayerUseCase {
 
         // 최근 리그 배정 삭제
         clanLeagueAssignService.excludeRecently(playerTag);
+
+        // 전설기록 타겟 삭제 -- 등록된 경우
+        legendRecordService.delete(playerTag);
 
         // 플레이어 삭제
         playerService.delete(playerTag);
@@ -344,12 +346,12 @@ public class PlayerUseCase {
         Player player = playerService.findByIdOrThrow(playerTag);
 
         // 전설 기록 수집 계정으로 등록
-        playerLegendRecordService.registerCollectionTarget(player);
+        legendRecordService.registerCollectionTarget(player);
     }
 
     @Transactional(readOnly = true)
     public List<PlayerLegendRecordTargetDTO> findAllLegendRecordTags(String name) {
-        return playerLegendRecordService.findAllTagByName(name);
+        return legendRecordService.findAllTagByName(name);
     }
 
     @Transactional

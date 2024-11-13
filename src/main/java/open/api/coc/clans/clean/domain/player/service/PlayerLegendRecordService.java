@@ -53,7 +53,7 @@ public class PlayerLegendRecordService {
         if (latestPlayer.isNotInLeague()) return;  // 리그 배정 안된 상태면 기록하지 않음 (시즌 초기화 등..)
         if (isNotLegendLeague(latestPlayer)) {
             // 전설 리그가 아니면 기록 대상에서 제외하고 프로세스 종료
-            recordRepository.deleteById(originPlayer.getTag());
+            delete(originPlayer.getTag());
             return;
         }
 
@@ -104,6 +104,11 @@ public class PlayerLegendRecordService {
         }
 
         recordRepository.save(player.getTag());
+    }
+
+    @Transactional
+    public void delete(String playerTag) {
+        recordRepository.deleteById(playerTag);
     }
 
     public List<PlayerLegendRecordTargetDTO> findAllTagByName(String name) {

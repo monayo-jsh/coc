@@ -46,14 +46,9 @@
       const timerInterval = setInterval(() => {
         const timer = noticeRow.querySelector('.timer');
         const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
-        let displayTime = formatTime(leftUntilTime, "H시간 m분 s초");
+        const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
 
-        if (leftUntilTime.hours() === 0) {
-          // 0시간이면
-          displayTime = formatTime(leftUntilTime, "m분 s초");
-        }
-
-        timer.innerHTML = `(${displayTime} 전)`;
+        timer.innerHTML = `(${displayTime} 남음)`;
 
         if (leftUntilTime <= 0) {
           timer.innerHTML = "";
@@ -88,7 +83,8 @@
         noticeRow.classList.add('cursor-pointer');
 
         const detail = noticeRow.querySelector('.detail');
-        detail.innerHTML = content;
+        const noticeContent = convertContainTextToLink(content);
+        detail.innerHTML = noticeContent;
       }
 
       addTimerEvent(noticeRow, notice);

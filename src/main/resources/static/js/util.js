@@ -581,3 +581,32 @@ function convertTimestamp(requestBody, key) {
     requestBody[key] = dayjs(requestBody[key]).valueOf();
   }
 }
+
+function convertContainTextToLink(text) {
+  if (!text) return text;
+
+  const targetWord = text;
+  const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+
+  return targetWord.replace(urlPattern, convertTag);
+
+  function convertTag(url) {
+    return '<a class="link" href="' + url + '">'+ url +'</a>';
+  }
+}
+
+function convertFormatDayHourMinuteSecond(time) {
+  let displayTime = formatTime(time, "D일 H시간 m분 s초");
+
+  if (time.days() === 0) {
+    // 0일이면
+    displayTime = formatTime(time, "H시간 m분 s초");
+  }
+
+  if (time.hours() === 0) {
+    // 0시간이면
+    displayTime = formatTime(time, "m분 s초");
+  }
+
+  return displayTime;
+}

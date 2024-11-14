@@ -38,7 +38,9 @@
 
     function renderLeagueAssignedPage() {
       if (isNotLeagueAssigned) {
-        const message = `${document.querySelector('.league-assigned-date').innerText}`;
+        let formatDate = document.querySelector('.league-assigned-date').innerText;
+        formatDate = formatDate.replace(/[\(\)]/g, "").replace("배정 예정", "리그 배정 예정입니다.");
+        const message = `${formatDate}`;
         alert(message);
         return;
       }
@@ -160,14 +162,9 @@
       const timerInterval = setInterval(() => {
         const timer = noticeRow.querySelector('.timer');
         const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
-        let displayTime = formatTime(leftUntilTime, "H시간 m분 s초");
+        const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
 
-        if (leftUntilTime.hours() === 0) {
-          // 0시간이면
-          displayTime = formatTime(leftUntilTime, "m분 s초");
-        }
-
-        timer.innerHTML = `(${displayTime} 전)`;
+        timer.innerHTML = `(${displayTime} 남음)`;
 
         if (leftUntilTime <= 0) {
           timer.innerHTML = "";

@@ -774,3 +774,8 @@ body::before {
 .font-weight-bold {
   font-weight: bold;
 }
+
+a.link {
+  color: white;
+  text-decoration: none;
+}

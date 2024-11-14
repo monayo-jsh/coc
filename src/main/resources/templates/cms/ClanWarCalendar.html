@@ -357,10 +357,7 @@
     }
 
     async function drawCalendarEvents(startDate, endDate) {
-      const startDt = formatYYYYMMDD(startDate);
-      const endDt = formatYYYYMMDD(endDate);
-
-      const clanWars = await fetchClanWars(startDt, endDt);
+      const clanWars = await fetchClanWars(startDate, endDate);
 
       renderClanWars(clanWars);
     }
@@ -376,7 +373,7 @@
       const calendarStartDate = calendar.getDateRangeStart();
       const calendarEndDate = calendar.getDateRangeEnd();
 
-      await drawCalendarEvents(calendarStartDate, calendarEndDate);
+      await drawCalendarEvents(calendarStartDate.valueOf(), calendarEndDate.valueOf());
 
       hideWifiLoading('.section-wrapper');
     }

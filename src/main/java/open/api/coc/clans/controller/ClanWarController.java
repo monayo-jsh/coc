@@ -28,13 +28,6 @@ public class ClanWarController {
     private final TimeUtils timeUtils;
     private final ClanWarService clanWarService;
 
-    @GetMapping("/period")
-    public ResponseEntity<List<ClanWarResponse>> getClanWars(@RequestParam LocalDate startDate,
-                                                             @RequestParam LocalDate endDate) {
-        return ResponseEntity.ok()
-                             .body(clanWarService.getClanWars(startDate, endDate));
-    }
-
     @GetMapping("/missing/attack/period")
     public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
                                                                                               @RequestParam LocalDate endDate) {

@@ -22,9 +22,6 @@ public class EntityClanWarResponseConverter implements Converter<ClanWarEntity, 
     private final TimeConverter timeConverter;
     private final EntityClanWarMemberResponseConverter entityClanWarMemberResponseConverter;
 
-    public @NonNull ClanWarResponse convertWithoutMember(ClanWarEntity source) {
-        return convert(source);
-    }
     public @NonNull ClanWarResponse convertWithMember(ClanWarEntity source) {
         ClanWarResponse clanWarResponse = convert(source);
         clanWarResponse.setMembers(makeClanWarMemberResponse(source.getMembers()));

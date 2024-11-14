@@ -56,31 +56,6 @@ public class ClanWarQueryRepository {
         return Optional.ofNullable(clanWar);
     }
 
-    public List<ClanWarEntity> findAllByStartTimePeriod(LocalDateTime from, LocalDateTime to) {
-        if (from == null || to == null) {
-            throw new IllegalArgumentException("Date parameters must not be null");
-        }
-
-        List<ClanWarEntity> clanWarEntities = queryFactory.selectFrom(clanWarEntity)
-                                                          .where(clanWarEntity.startTime.between(from, to))
-                                                          .orderBy(clanWarEntity.warId.asc())
-                                                          .fetch();
-
-        if (!clanWarEntities.isEmpty()) {
-            Set<String> clanTags = clanWarEntities.stream().map(ClanWarEntity::getClanTag).collect(Collectors.toSet());
-            Map<String, ClanEntity> clans = buildClanBaseQuery().where(clanEntity.tag.in(clanTags)).fetch()
-                                                                .stream().collect(Collectors.toMap(ClanEntity::getTag, clan -> clan));
-
-
-            clanWarEntities.forEach(clanWarEntity -> {
-                ClanEntity clan = clans.get(clanWarEntity.getClanTag());
-                clanWarEntity.changeClan(clan);
-            });
-        }
-
-        return clanWarEntities;
-    }
-
     private JPAQuery<ClanEntity> buildClanBaseQuery() {
         return queryFactory.selectFrom(clanEntity)
                            .join(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();

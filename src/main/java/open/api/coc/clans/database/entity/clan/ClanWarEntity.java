@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import open.api.coc.clans.clean.domain.clan.model.Clan;
 
 @Builder
 @Getter @Setter
@@ -83,6 +84,9 @@ public class ClanWarEntity {
     @Transient
     private ClanEntity clan;
 
+    @Transient
+    private Clan clanNew;
+
     public void addMember(ClanWarMemberEntity clanWarMemberEntity) {
         this.members.add(clanWarMemberEntity);
         clanWarMemberEntity.changeClanWar(this);
@@ -106,6 +110,10 @@ public class ClanWarEntity {
 
     public void changeClan(ClanEntity clan) {
         this.clan = clan;
+    }
+
+    public void changeClan(Clan clan) {
+        this.clanNew = clan;
     }
 
     public static ClanWarEntity empty() {

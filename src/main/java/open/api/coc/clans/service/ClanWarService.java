@@ -11,9 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -544,28 +542,6 @@ public class ClanWarService {
         }
 
         return Pageable.ofSize(hallOfFameConfig.getRanking());
-    }
-
-    private LocalDateTime getStartTime(LocalDate searchMonth) {
-        LocalDate startDate = searchMonth.with(TemporalAdjusters.firstDayOfMonth());
-        return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
-    }
-
-    private LocalDateTime getEndTime(LocalDate endTime) {
-        LocalDate endDate = endTime.with(TemporalAdjusters.lastDayOfMonth());
-        return LocalDateTime.of(endDate, LocalTime.MAX.withNano(999_999_000));
-    }
-
-    public List<ClanWarResponse> getClanWars(LocalDate startDate, LocalDate endDate) {
-
-        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
-        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
-
-        List<ClanWarEntity> clanWarEntities = clanWarQueryRepository.findAllByStartTimePeriod(fromStartTime, toStartTime);
-
-        return clanWarEntities.stream()
-                              .map(entityClanWarResponseConverter::convertWithoutMember)
-                              .collect(Collectors.toList());
     }
 
     public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayers(LocalDate startDate, LocalDate endDate) {

@@ -8,6 +8,7 @@ import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Service;
@@ -43,4 +44,20 @@ public class ClanWarUseCase {
                        .map(clanWarUseCaseMapper::toClanWarResponse)
                        .toList();
     }
+
+    @Transactional(readOnly = true)
+    public ClanWarDetailResponse getClanWarDetail(Long warId) {
+        // 클랜 전쟁 정보를 조회한다.
+        ClanWarEntity clanWar = clanWarService.findByIdOrThrow(warId);
+
+        // 클랜 정보 조회
+        Clan clan = clanService.findById(clanWar.getClanTag());
+
+        // 클랜 매핑
+        clanWar.changeClan(clan);
+
+        // 응답
+        return clanWarUseCaseMapper.toClanWarDetailResponse(clanWar);
+    }
+
 }

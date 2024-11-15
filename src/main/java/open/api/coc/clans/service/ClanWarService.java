@@ -33,7 +33,7 @@ import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
 import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
@@ -70,7 +70,7 @@ public class ClanWarService {
 
     private final ClanWarWhitelistQueryRepository clanWarWhitelistQueryRepository;
 
-    private final ClanWarMemberRepository clanWarMemberRepository;
+    private final JpaClanWarMemberRepository clanWarMemberRepository;
 
     private final ClanWarQueryRepository clanWarQueryRepository;
     private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;

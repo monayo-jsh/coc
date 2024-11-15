@@ -93,8 +93,8 @@ public class ClanWarEntity {
     }
 
     public void changeMembers(List<ClanWarMemberEntity> clanWarMemberEntities) {
-        clanWarMemberEntities.forEach(clanWarMemberEntity -> clanWarMemberEntity.changeClanWar(this));
-        this.members = clanWarMemberEntities;
+        members.clear();
+        clanWarMemberEntities.forEach(this::addMember);
     }
 
 

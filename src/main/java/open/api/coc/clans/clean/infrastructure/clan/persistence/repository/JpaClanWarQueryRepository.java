@@ -5,6 +5,7 @@ import static open.api.coc.clans.database.entity.clan.QClanWarEntity.clanWarEnti
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Repository;
@@ -22,4 +23,13 @@ public class JpaClanWarQueryRepository {
                            .fetch();
     }
 
+
+    public Optional<ClanWarEntity> findById(Long warId) {
+        ClanWarEntity findClanWar = queryFactory.select(clanWarEntity)
+                                                .from(clanWarEntity)
+                                                .where(clanWarEntity.warId.eq(warId))
+                                                .fetchOne();
+
+        return Optional.ofNullable(findClanWar);
+    }
 }

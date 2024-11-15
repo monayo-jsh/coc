@@ -12,9 +12,11 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +48,18 @@ public class ClanWarController {
                              .body(clanWarUseCase.getClanWarsFromServer(query));
     }
 
+    @Operation(
+        summary = "서버에 수집된 클랜 전쟁 상세 정보를 조회한다. version: 1.00, Last Update: 24.11.15",
+        description = "이 API는 서버에 수집된 클랜 전쟁 상세 정보를 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarDetailResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("{warId}")
+    public ResponseEntity<ClanWarDetailResponse> getClanWarDetail(@PathVariable Long warId) {
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getClanWarDetail(warId));
+    }
 
 }

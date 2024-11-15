@@ -44,17 +44,29 @@
       if (!timerEnabled) return;
 
       const timerInterval = setInterval(() => {
-        const timer = noticeRow.querySelector('.timer');
-        const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
-        const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+        const isFinishTimer = drawTimer(noticeRow, postingEndDate);
 
-        timer.innerHTML = `(${displayTime} 남음)`;
-
-        if (leftUntilTime <= 0) {
-          timer.innerHTML = "";
+        if (isFinishTimer) {
           clearInterval(timerInterval);
         }
       }, 1000);
+    }
+
+    function drawTimer(noticeRow, postingEndDate) {
+      const timer = noticeRow.querySelector('.timer');
+      const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
+
+      const isFinishTimer = leftUntilTime.seconds() <= 0;
+
+      if (isFinishTimer) {
+        timer.innerHTML = "";
+        return isFinishTimer;
+      }
+
+      const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+      timer.innerHTML = `(${displayTime} 남음)`;
+
+      return isFinishTimer;
     }
 
     function makeNoticeRow(notice) {
@@ -78,6 +90,10 @@
                                      .replace(/{POSTING_DATE}/, postingDate);
 
       noticeRow.classList.add(`notice-${id}`);
+
+      if (timerEnabled) {
+        drawTimer(noticeRow, postingEndDate);
+      }
 
       if (content) {
         noticeRow.classList.add('cursor-pointer');

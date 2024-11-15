@@ -22,7 +22,7 @@ function getLeftUntilByTime(endTime) {
   const endDateTime = dayjs(endTime);
 
   if (now > endDateTime) {
-    return "";
+    return dayjs.duration();
   }
 
   return dayjs.duration(endDateTime.diff(now));

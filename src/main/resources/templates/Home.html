@@ -136,7 +136,7 @@
     }
 
     function makeNotice(noticeInfo) {
-      const { id, type, oneLine } = noticeInfo;
+      const { id, type, oneLine, postingEndDate, timerEnabled } = noticeInfo;
       const noticeTemplate = copyTemplateById('notice-template');
       const notice = noticeTemplate.querySelector('.notice');
 
@@ -147,27 +147,43 @@
                                .replace(/{TYPE}/, convertNoticeName(type))
                                .replace(/{TEXT}/, oneLine);
 
+      if (timerEnabled) {
+        drawTimer(notice, postingEndDate);
+      }
+
       const label = notice.querySelector('.label');
       label.classList.add(type);
 
       return notice;
     }
 
-    function addTimerEvent(noticeRow, notice) {
+  function drawTimer(noticeRow, postingEndDate) {
+    const timer = noticeRow.querySelector('.timer');
+    const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
+
+    const isFinishTimer = leftUntilTime.seconds() <= 0;
+
+    if (isFinishTimer) {
+      timer.innerHTML = "";
+      return isFinishTimer;
+    }
+
+    const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+    timer.innerHTML = `(${displayTime} 남음)`;
+
+    return isFinishTimer;
+  }
+
+  function addTimerEvent(noticeRow, notice) {
       const { id, postingEndDate, timerEnabled } = notice;
 
       // 타이머 비활성화인경우
       if (!timerEnabled) return;
 
       const timerInterval = setInterval(() => {
-        const timer = noticeRow.querySelector('.timer');
-        const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
-        const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+        const isFinishTimer = drawTimer(noticeRow, postingEndDate);
 
-        timer.innerHTML = `(${displayTime} 남음)`;
-
-        if (leftUntilTime <= 0) {
-          timer.innerHTML = "";
+        if (isFinishTimer) {
           clearInterval(timerInterval);
         }
       }, 1000);

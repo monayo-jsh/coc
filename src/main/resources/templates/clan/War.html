@@ -285,7 +285,7 @@
       if (!drawState.has(state)) return;
 
       let formattedRemainTime = getLeftUntilByTime(endTime);
-      if (!formattedRemainTime) {
+      if (formattedRemainTime.seconds() === 0) {
         formattedRemainTime = '전쟁 종료';
       } else {
         formattedRemainTime = formatTime(formattedRemainTime, "H시 mm분");

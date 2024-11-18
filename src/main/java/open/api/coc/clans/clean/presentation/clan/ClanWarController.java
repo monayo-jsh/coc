@@ -2,24 +2,29 @@ package open.api.coc.clans.clean.presentation.clan;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberGetRequest;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -31,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController(value = "ClanWarController2")
 @RequiredArgsConstructor
 @RequestMapping("/v2/api/clan/war")
+@Validated
 public class ClanWarController {
 
     private final ClanWarUseCase clanWarUseCase;
@@ -69,13 +75,22 @@ public class ClanWarController {
         summary = "서버에 수집된 클랜 전쟁 참여자 목록을 조회한다. version: 1.00, Last Update: 24.11.18",
         description = "이 API는 서버에 수집된 클랜 전쟁 참여자 목록을 제공합니다."
     )
+    @Parameters(
+        value = {
+            @Parameter(name = "clanTag", description = "클랜 태그"),
+            @Parameter(name = "startTime", description = "전쟁 시작일시"),
+            @Parameter(name = "necessaryAttackYn", description = "필수 참여 여부: YN", required = false),
+        }
+    )
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/members")
-    public ResponseEntity<List<ClanWarMemberResponse>> getClanWarMembers(@Valid ClanWarMemberGetRequest request) {
-        ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(request);
+    public ResponseEntity<List<ClanWarMemberResponse>> getClanWarMembers(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
+                                                                         @RequestParam Long startTime,
+                                                                         @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
+        ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, startTime, necessaryAttackYn);
         return ResponseEntity.status(HttpStatus.OK)
                              .body(clanWarUseCase.getClanWarMembers(query));
     }
@@ -93,5 +108,20 @@ public class ClanWarController {
         clanWarUseCase.changeClanWarMemberAttackNecessaryAttack(warId, playerTag);
         return ResponseEntity.status(HttpStatus.OK)
                              .build();
+    }
+
+    @Operation(
+        summary = "서버에 수집된 클랜 전쟁 미공 참여자 목록을 조회한다. version: 1.00, Last Update: 24.11.18",
+        description = "이 API는 서버에 수집된 클랜 전쟁 미공 참여자 목록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberMissingAttackResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/missing/attack/period")
+    public ResponseEntity<List<ClanWarMemberMissingAttackResponse>> getClanWarMissingAttackPlayers(@RequestParam Long startDate, @RequestParam Long endDate) {
+        ClanWarMissingAttackQuery query = clanWarUseCaseMapper.toClanWarMissingAttackQuery(startDate, endDate);
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getClanWarMissingAttackPlayers(query));
     }
 }

@@ -3,12 +3,16 @@ package open.api.coc.clans.clean.application.clan;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;
+import open.api.coc.clans.clean.domain.clan.service.ClanWarMemberService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
@@ -20,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClanWarUseCase {
 
     private final ClanWarService clanWarService;
+    private final ClanWarMemberService clanWarMemberService;
 
     private final ClanWarUseCaseMapper clanWarUseCaseMapper;
 
@@ -66,5 +71,13 @@ public class ClanWarUseCase {
 
         // 클랜 참여자 정보를 저장한다.
         clanWarService.save(clanWar);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanWarMemberMissingAttackResponse> getClanWarMissingAttackPlayers(ClanWarMissingAttackQuery query) {
+        List<ClanWarMemberMissingAttackDTO> missingAttacks = clanWarMemberService.findMissingAttacks(query.startDate(), query.endDate());
+        return missingAttacks.stream()
+                             .map(clanWarUseCaseMapper::ClanWarMemberMissingAttackResponse)
+                             .toList();
     }
 }

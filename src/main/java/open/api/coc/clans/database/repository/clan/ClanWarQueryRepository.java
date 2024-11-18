@@ -18,14 +18,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
-import open.api.coc.clans.database.repository.clan.condition.ClanWarMissingAttackPlayerConditionBuilder;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.query.ClanWarMemberMissingAttackConditionBuilder;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarRecordConditionBuilder;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.ranking.ClanWarCountDTO;
@@ -62,20 +61,20 @@ public class ClanWarQueryRepository {
     }
 
     public List<ClanWarMissingAttackPlayerDTO> findAllMissingAttackPlayerByStartTimePeriod(LocalDateTime from, LocalDateTime to) {
-        ClanWarMissingAttackPlayerConditionBuilder builder = new ClanWarMissingAttackPlayerConditionBuilder(from, to);
+        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         BooleanBuilder condition = builder.build();
         return buildMissingAttackPlayerQuery(condition).fetch();
     }
 
     public List<ClanWarMissingAttackPlayerDTO> findMissingAttackByNameAndStartTimePeriod(String playerName, LocalDateTime from, LocalDateTime to) {
-        ClanWarMissingAttackPlayerConditionBuilder builder = new ClanWarMissingAttackPlayerConditionBuilder(from, to);
+        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         builder.withPlayerName(playerName);
         BooleanBuilder condition = builder.build();
         return buildMissingAttackPlayerQuery(condition).fetch();
     }
 
     public List<ClanWarMissingAttackPlayerDTO> findMissingAttackByTagAndStartTimePeriod(String playerTag, LocalDateTime from, LocalDateTime to) {
-        ClanWarMissingAttackPlayerConditionBuilder builder = new ClanWarMissingAttackPlayerConditionBuilder(from, to);
+        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         builder.withPlayerTag(playerTag);
         BooleanBuilder condition = builder.build();
         return buildMissingAttackPlayerQuery(condition).fetch();

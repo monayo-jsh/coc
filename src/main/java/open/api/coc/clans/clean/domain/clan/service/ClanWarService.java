@@ -43,4 +43,5 @@ public class ClanWarService {
     public void save(ClanWarEntity clanWar) {
         clanWarRepository.save(clanWar);
     }
+
 }

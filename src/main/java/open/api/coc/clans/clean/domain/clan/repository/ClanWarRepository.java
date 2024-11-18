@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 
 public interface ClanWarRepository {

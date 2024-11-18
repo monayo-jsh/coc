@@ -3,11 +3,13 @@ package open.api.coc.clans.clean.application.clan.mapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberGetRequest;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.common.config.MapStructConfig;
@@ -29,8 +31,8 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarQuery.create(mapToLocalDate(startDate), mapToLocalDate(endDate));
     }
 
-    public ClanWarMemberQuery toClanWarMemberQuery(ClanWarMemberGetRequest request) {
-        return ClanWarMemberQuery.create(request.clanTag(), mapToLocalDateTime(request.startTime()), mapToYnType(request.necessaryAttackYn()));
+    public ClanWarMemberQuery toClanWarMemberQuery(String clanTag, Long startTime, String necessaryAttackYn) {
+        return ClanWarMemberQuery.create(clanTag, mapToLocalDateTime(startTime), mapToYnType(necessaryAttackYn));
     }
 
     public abstract ClanWarResponse toClanWarResponse(ClanWarDTO clanWar);
@@ -38,6 +40,12 @@ public abstract class ClanWarUseCaseMapper {
     public abstract ClanWarDetailResponse toClanWarDetailResponse(ClanWarDTO clanWar);
 
     public abstract ClanWarMemberResponse toClanWarMemberResponse(ClanWarMemberDTO clanWarMemberDTO);
+
+    public ClanWarMissingAttackQuery toClanWarMissingAttackQuery(Long startDate, Long endDate) {
+        return ClanWarMissingAttackQuery.create(mapToLocalDate(startDate), mapToLocalDate(endDate));
+    }
+
+    public abstract ClanWarMemberMissingAttackResponse ClanWarMemberMissingAttackResponse(ClanWarMemberMissingAttackDTO clanWarMemberMissingAttackDTO);
 
     protected LocalDate mapToLocalDate(Long time) {
         return timeConverter.toLocalDate(time);

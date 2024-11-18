@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.repository.clan.condition;
+package open.api.coc.clans.clean.infrastructure.clan.persistence.repository.query;
 
 import static open.api.coc.clans.database.entity.clan.QClanWarEntity.clanWarEntity;
 import static open.api.coc.clans.database.entity.clan.QClanWarMemberEntity.clanWarMemberEntity;
@@ -6,10 +6,10 @@ import static open.api.coc.clans.database.entity.clan.QClanWarMemberEntity.clanW
 import com.querydsl.core.BooleanBuilder;
 import java.time.LocalDateTime;
 
-public class ClanWarMissingAttackPlayerConditionBuilder {
+public class ClanWarMemberMissingAttackConditionBuilder {
     private final BooleanBuilder builder;
 
-    public ClanWarMissingAttackPlayerConditionBuilder(LocalDateTime from, LocalDateTime to) {
+    public ClanWarMemberMissingAttackConditionBuilder(LocalDateTime from, LocalDateTime to) {
         if (from == null || to == null) {
             throw new IllegalArgumentException("Date parameters must not be null");
         }
@@ -19,7 +19,7 @@ public class ClanWarMissingAttackPlayerConditionBuilder {
                .and(clanWarEntity.startTime.between(from, to));
     }
 
-    public ClanWarMissingAttackPlayerConditionBuilder withPlayerName(String playerName) {
+    public ClanWarMemberMissingAttackConditionBuilder withPlayerName(String playerName) {
         if (playerName == null || playerName.trim().isEmpty()) {
             throw new IllegalArgumentException("playerName must not be null or empty");
         }
@@ -28,7 +28,7 @@ public class ClanWarMissingAttackPlayerConditionBuilder {
         return this;
     }
 
-    public ClanWarMissingAttackPlayerConditionBuilder withPlayerTag(String playerTag) {
+    public ClanWarMemberMissingAttackConditionBuilder withPlayerTag(String playerTag) {
         if (playerTag == null || playerTag.trim().isEmpty()) {
             throw new IllegalArgumentException("playerTag must not be null or empty");
         }

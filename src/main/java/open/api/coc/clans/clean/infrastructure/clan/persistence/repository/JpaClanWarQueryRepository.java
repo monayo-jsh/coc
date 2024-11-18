@@ -3,8 +3,10 @@ package open.api.coc.clans.clean.infrastructure.clan.persistence.repository;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.clan.QClanWarEntity.clanWarEntity;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,17 +22,6 @@ public class JpaClanWarQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to) {
-        ConstructorExpression<ClanWarDTO> clanWarDTO = projectionClanWarDTO();
-        return queryFactory.select(clanWarDTO)
-                           .from(clanWarEntity)
-                           .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag))
-                           .where(clanWarEntity.startTime.between(from, to))
-                           .orderBy(clanWarEntity.warId.asc())
-                           .fetch();
-    }
-
-
     public Optional<ClanWarEntity> findById(Long warId) {
         ClanWarEntity findClanWar = queryFactory.select(clanWarEntity)
                                                 .from(clanWarEntity)
@@ -41,15 +32,40 @@ public class JpaClanWarQueryRepository {
     }
 
     public Optional<ClanWarDTO> findDTOById(Long warId) {
-        ConstructorExpression<ClanWarDTO> clanWarDTO = projectionClanWarDTO();
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.warId.eq(warId));
 
-        ClanWarDTO clanWar = queryFactory.select(clanWarDTO)
-                                         .from(clanWarEntity)
-                                         .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag))
-                                         .where(clanWarEntity.warId.eq(warId))
-                                         .fetchOne();
+        ClanWarDTO clanWar = createClanWarDTOQuery().where(condition)
+                                                    .fetchOne();
 
         return Optional.ofNullable(clanWar);
+    }
+
+    public List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to) {
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.startTime.between(from, to));
+
+        return createClanWarDTOQuery().where(condition)
+                                      .orderBy(clanWarEntity.warId.asc())
+                                      .fetch();
+    }
+
+    public Optional<ClanWarDTO> findDTOByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.clanTag.eq(clanTag))
+                 .and(clanWarEntity.startTime.eq(startTime));
+
+        ClanWarDTO clanWar = createClanWarDTOQuery().where(condition).fetchOne();
+
+        return Optional.ofNullable(clanWar);
+    }
+
+    private JPAQuery<ClanWarDTO> createClanWarDTOQuery() {
+        ConstructorExpression<ClanWarDTO> clanWarDTO = projectionClanWarDTO();
+
+        return queryFactory.select(clanWarDTO)
+                           .from(clanWarEntity)
+                           .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag));
     }
 
     private ConstructorExpression<ClanWarDTO> projectionClanWarDTO() {

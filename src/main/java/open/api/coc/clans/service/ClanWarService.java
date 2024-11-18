@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanWarMemberRepository;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
@@ -33,15 +34,12 @@ import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
-import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
 import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
 import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
-import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarMemberResponseConverter;
-import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -76,7 +74,6 @@ public class ClanWarService {
     private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
 
     private final TimeConverter timeConverter;
-    private final EntityClanWarResponseConverter entityClanWarResponseConverter;
     private final EntityClanWarMemberResponseConverter entityClanWarMemberResponseConverter;
 
     private final String CLAN_WAR_ROOT_DIR = "./clan-war";
@@ -563,15 +560,6 @@ public class ClanWarService {
         LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
 
         return clanWarQueryRepository.findMissingAttackByTagAndStartTimePeriod(playerTag, fromStartTime, toStartTime);
-    }
-
-    public ClanWarResponse getClanWarDetail(Long warId) {
-        ClanWarEntity clanWarEntity = clanWarQueryRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
-
-        List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWarEntity.getWarId());
-        clanWarEntity.changeMembers(clanWarMemberEntities);
-
-        return entityClanWarResponseConverter.convertWithMember(clanWarEntity);
     }
 
     public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {

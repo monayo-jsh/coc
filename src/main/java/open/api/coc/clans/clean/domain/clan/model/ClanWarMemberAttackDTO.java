@@ -8,9 +8,8 @@ import lombok.Getter;
 public class ClanWarMemberAttackDTO {
 
     private Long warId;
-    private Integer order;
-
     private String tag;
+    private Integer order;
 
     private Integer stars;
     private Integer destructionPercentage;

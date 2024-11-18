@@ -7,13 +7,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberGetRequest;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,8 +45,7 @@ public class ClanWarController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/period")
-    public ResponseEntity<List<ClanWarResponse>> getClanWarsFromServer(@RequestParam Long startDate,
-                                                             @RequestParam Long endDate) {
+    public ResponseEntity<List<ClanWarResponse>> getClanWarsFromServer(@RequestParam Long startDate, @RequestParam Long endDate) {
 
         ClanWarQuery query = clanWarUseCaseMapper.toClanWarQuery(startDate, endDate);
 
@@ -62,4 +67,20 @@ public class ClanWarController {
                              .body(clanWarUseCase.getClanWarDetail(warId));
     }
 
+    @Operation(
+        summary = "서버에 수집된 클랜 전쟁 참여자 목록을 조회한다. version: 1.00, Last Update: 24.11.18",
+        description = "이 API는 서버에 수집된 클랜 전쟁 참여자 목록을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/members")
+    public ResponseEntity<List<ClanWarMemberResponse>> getClanWarMembers(@Valid ClanWarMemberGetRequest request) {
+
+        ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(request);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(clanWarUseCase.getClanWarMembers(query));
+    }
 }

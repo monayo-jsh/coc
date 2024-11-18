@@ -1,14 +1,12 @@
 package open.api.coc.clans.controller;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
 import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
-import open.api.coc.clans.domain.clans.ClanWarResponse;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.clans.service.ClanWarService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -48,13 +46,6 @@ public class ClanWarController {
 
         return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName, queryDate));
 
-    }
-
-
-    @GetMapping("{warId}")
-    public ResponseEntity<ClanWarResponse> getClanWarDetail(@PathVariable Long warId) {
-        return ResponseEntity.ok()
-                             .body(clanWarService.getClanWarDetail(warId));
     }
 
     @GetMapping("/members")

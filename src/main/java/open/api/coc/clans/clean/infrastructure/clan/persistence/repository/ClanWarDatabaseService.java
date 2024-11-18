@@ -27,6 +27,11 @@ public class ClanWarDatabaseService implements ClanWarRepository {
         return queryRepository.findDTOById(warId).map(this::fetchMemberDTOs);
     }
 
+    @Override
+    public Optional<ClanWarDTO> findDTOWithAllByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
+        return queryRepository.findDTOByClanTagAndStartTime(clanTag, startTime).map(this::fetchMemberDTOs);
+    }
+
     private ClanWarDTO fetchMemberDTOs(ClanWarDTO clanWar) {
         // 클랜 참여자 목록
         List<ClanWarMemberDTO> members = memberQueryRepository.findDTOByIdWarId(clanWar.getWarId());

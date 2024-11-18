@@ -1,7 +1,7 @@
 const URI_CLAN_WARS = "/v2/api/clan/war/period" //클랜전 목록 기간 조회
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = "/api/clan/war/missing/attack/period" //클랜전 미공 사용자 목록 기간 조회
 const URI_CLAN_WAR_DETAIL = "/v2/api/clan/war/{warId}" //클랜전 상세 조회
-const URI_CLAN_WAR_MEMBERS = "/api/clan/war/members" //클랜전 참여 계정 목록 조회
+const URI_CLAN_WAR_MEMBERS = "/v2/api/clan/war/members" //클랜전 참여 계정 목록 조회
 const URI_RANKING_CLAN_WAR_STARS = "/api/clan/war/ranking/stars" //월 클랜전 획득별 순위
 
 const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" //월 리그전 획득별 순위

@@ -10,4 +10,6 @@ public interface ClanWarRepository {
     List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to);
 
     Optional<ClanWarDTO> findDTOWithAllById(Long warId);
+    Optional<ClanWarDTO> findDTOWithAllByClanTagAndStartTime(String clanTag, LocalDateTime startTime);
+
 }

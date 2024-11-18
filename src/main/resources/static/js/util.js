@@ -598,15 +598,19 @@ function convertContainTextToLink(text) {
 function convertFormatDayHourMinuteSecond(time) {
   let displayTime = formatTime(time, "D일 H시간 m분 s초");
 
-  if (time.days() === 0) {
-    // 0일이면
-    displayTime = formatTime(time, "H시간 m분 s초");
+  if (time.days() > 0) {
+    // 0일 이상이면
+    return displayTime;
   }
 
-  if (time.hours() === 0) {
-    // 0시간이면
-    displayTime = formatTime(time, "m분 s초");
+  displayTime = formatTime(time, "H시간 m분 s초");
+
+  if (time.hours() > 0) {
+    // 0시간 이상이면
+    return displayTime;
   }
+
+  displayTime = formatTime(time, "m분 s초");
 
   return displayTime;
 }

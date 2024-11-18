@@ -73,16 +73,14 @@ public class PlayerScheduler {
 
         // 시즌 초기화 시 데이터 보정을 위해 지정된 시간에는 수집하지 않음.
         if (isNotCollectionTime()) {
-            log.info("not collection players on : {}", LocalDateTime.now());
+            log.info("not synchronized players on time: {}", LocalDateTime.now());
             return;
         }
 
-        log.info("collection players start");
-        long before = System.nanoTime();
+        long startTime = System.currentTimeMillis();
         processSyncPlayers();
-        log.info("collection players ended");
-        long after = System.nanoTime();
-        log.info("collection elapsed time : {}", (double) (after - before) / 1_000_000_000);
+        long endTime = System.currentTimeMillis();
+        log.info("synchronized players elapsed time : {}", (double) (endTime - startTime) / 1000);
     }
 
     private void processSyncPlayers() {

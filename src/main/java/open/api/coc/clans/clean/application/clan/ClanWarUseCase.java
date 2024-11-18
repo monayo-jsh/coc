@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
@@ -48,13 +49,7 @@ public class ClanWarUseCase {
     @Transactional(readOnly = true)
     public ClanWarDetailResponse getClanWarDetail(Long warId) {
         // 클랜 전쟁 정보를 조회한다.
-        ClanWarEntity clanWar = clanWarService.findByIdOrThrow(warId);
-
-        // 클랜 정보 조회
-        Clan clan = clanService.findById(clanWar.getClanTag());
-
-        // 클랜 매핑
-        clanWar.changeClan(clan);
+        ClanWarDTO clanWar = clanWarService.findDTOWithAllByIdOrThrow(warId);
 
         // 응답
         return clanWarUseCaseMapper.toClanWarDetailResponse(clanWar);

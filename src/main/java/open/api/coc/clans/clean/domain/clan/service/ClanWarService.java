@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.exception.ClanWarNotExistsException;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRepository;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
@@ -18,11 +19,6 @@ public class ClanWarService {
     private final ClanWarRepository clanWarRepository;
 
     @Transactional(readOnly = true)
-    public ClanWarEntity findByIdOrThrow(Long warId) {
-        return clanWarRepository.findWithAllById(warId).orElseThrow(() -> new ClanWarNotExistsException(warId));
-    }
-
-    @Transactional(readOnly = true)
     public List<ClanWarEntity> findAll(LocalDate startDate, LocalDate endDate) {
         LocalDateTime from = TimeUtils.withMinTime(startDate);
         LocalDateTime to = TimeUtils.withMaxTime(endDate);
@@ -30,4 +26,8 @@ public class ClanWarService {
         return clanWarRepository.findAllByStartTime(from, to);
     }
 
+    @Transactional(readOnly = true)
+    public ClanWarDTO findDTOWithAllByIdOrThrow(Long warId) {
+        return clanWarRepository.findDTOWithAllById(warId).orElseThrow(() -> new ClanWarNotExistsException(warId));
+    }
 }

@@ -7,15 +7,22 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRepository;
+import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class ClanWarDatabaseService implements ClanWarRepository {
 
+    private final JpaClanWarRepository repository;
     private final JpaClanWarQueryRepository queryRepository;
 
     private final JpaClanWarMemberQueryRepository memberQueryRepository;
+
+    @Override
+    public Optional<ClanWarEntity> findById(Long warId) {
+        return queryRepository.findById(warId);
+    }
 
     @Override
     public List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to) {
@@ -30,6 +37,11 @@ public class ClanWarDatabaseService implements ClanWarRepository {
     @Override
     public Optional<ClanWarDTO> findDTOWithAllByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
         return queryRepository.findDTOByClanTagAndStartTime(clanTag, startTime).map(this::fetchMemberDTOs);
+    }
+
+    @Override
+    public ClanWarEntity save(ClanWarEntity clanWar) {
+        return repository.save(clanWar);
     }
 
     private ClanWarDTO fetchMemberDTOs(ClanWarDTO clanWar) {

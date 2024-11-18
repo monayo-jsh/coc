@@ -11,6 +11,7 @@ import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
+import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,5 +54,17 @@ public class ClanWarUseCase {
         return members.stream()
                       .map(clanWarUseCaseMapper::toClanWarMemberResponse)
                       .toList();
+    }
+
+    @Transactional
+    public void changeClanWarMemberAttackNecessaryAttack(Long warId, String playerTag) {
+        // 클랜 전쟁 정보를 조회한다.
+        ClanWarEntity clanWar = clanWarService.findByIdOrThrow(warId);
+
+        // 클랜 참여자의 필수 참석 여부를 전환한다.
+        clanWar.changeMemberNecessaryAttack(playerTag);
+
+        // 클랜 참여자 정보를 저장한다.
+        clanWarService.save(clanWar);
     }
 }

@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.exception.ClanWarNotExistsException;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRepository;
+import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,9 @@ public class ClanWarService {
 
     private final ClanWarRepository clanWarRepository;
 
+    public ClanWarEntity findByIdOrThrow(Long warId) {
+        return clanWarRepository.findById(warId).orElseThrow(() -> new ClanWarNotExistsException(warId));
+    }
     @Transactional(readOnly = true)
     public List<ClanWarDTO> findAllDTO(LocalDate startDate, LocalDate endDate) {
         LocalDateTime from = TimeUtils.withMinTime(startDate);
@@ -33,5 +37,10 @@ public class ClanWarService {
     @Transactional(readOnly = true)
     public ClanWarDTO findDTOWithAllByClanTagAndStartTimeOrThrow(String clanTag, LocalDateTime startTime) {
         return clanWarRepository.findDTOWithAllByClanTagAndStartTime(clanTag, startTime).orElseThrow(() -> new ClanWarNotExistsException(clanTag, startTime));
+    }
+
+    @Transactional
+    public void save(ClanWarEntity clanWar) {
+        clanWarRepository.save(clanWar);
     }
 }

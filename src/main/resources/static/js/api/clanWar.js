@@ -9,7 +9,7 @@ const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" /
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME = "/api/clan/war/missing/attack/playerName"
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG = "/api/clan/war/missing/attack/{playerTag}"
 
-const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = "/api/clan/war/{warId}/{playerTag}/necessary"
+const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = "/v2/api/clan/war/{warId}/{playerTag}/necessary"
 
 async function fetchClanWars(startDt, endDt) {
   const uri = URI_CLAN_WARS + `?startDate=${startDt}&endDate=${endDt}`;

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
-import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
 import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/clan/war")
 public class ClanWarController {
 
-    private final TimeUtils timeUtils;
     private final ClanWarService clanWarService;
 
     @GetMapping("/missing/attack/period")
@@ -46,17 +44,6 @@ public class ClanWarController {
 
         return ResponseEntity.ok(clanWarService.getClanWarMissingAttackPlayersWithName(playerName, queryDate));
 
-    }
-
-    @GetMapping("/members")
-    public ResponseEntity<List<ClanWarMemberResponse>> getClanWarMembers(@RequestParam String clanTag,
-                                                                         @RequestParam Long startTime,
-                                                                         @RequestParam(required = false) String necessaryAttackYn) {
-
-        ClanWarMemberQuery clanWarMemberQuery = ClanWarMemberQuery.create(clanTag, timeUtils.toLocalDateTime(startTime), necessaryAttackYn);
-
-        return ResponseEntity.ok()
-                             .body(clanWarService.getClanWarMembers(clanWarMemberQuery));
     }
 
     @GetMapping("/ranking/stars")

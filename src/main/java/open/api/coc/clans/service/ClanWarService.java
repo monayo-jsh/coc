@@ -33,10 +33,8 @@ import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
-import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
 import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.converter.EntityClanWarMemberResponseConverter;
@@ -71,7 +69,6 @@ public class ClanWarService {
     private final JpaClanWarMemberRepository clanWarMemberRepository;
 
     private final ClanWarQueryRepository clanWarQueryRepository;
-    private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
 
     private final TimeConverter timeConverter;
     private final EntityClanWarMemberResponseConverter entityClanWarMemberResponseConverter;
@@ -607,22 +604,4 @@ public class ClanWarService {
         return entityClanWarMemberResponseConverter.convert(clanWarMemberEntity);
     }
 
-    @Transactional(readOnly = true)
-    public List<ClanWarMemberResponse> getClanWarMembers(ClanWarMemberQuery clanWarMemberQuery) {
-
-        ClanWarEntity clanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanWarMemberQuery.getClanTag(), clanWarMemberQuery.getStartTime())
-                                                      .orElseThrow(() -> createNotFoundException("클랜전(%s) 시작시간(%s) 정보 없음".formatted(clanWarMemberQuery.getClanTag(), clanWarMemberQuery.getStartTime())));
-
-        List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWar.getWarId());
-
-        if (clanWarMemberQuery.isConditionWithNecessaryAttackYn()) {
-            clanWarMemberEntities = clanWarMemberEntities.stream()
-                                                         .filter(clanWarMember -> Objects.equals(clanWarMember.getNecessaryAttackYn(), clanWarMemberQuery.getNecessaryAttackYn()))
-                                                         .toList();
-        }
-
-        return clanWarMemberEntities.stream()
-                                    .map(entityClanWarMemberResponseConverter::convert)
-                                    .toList();
-    }
 }

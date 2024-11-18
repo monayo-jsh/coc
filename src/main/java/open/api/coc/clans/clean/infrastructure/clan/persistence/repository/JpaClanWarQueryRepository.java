@@ -20,8 +20,11 @@ public class JpaClanWarQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarEntity> findAllByStartTime(LocalDateTime from, LocalDateTime to) {
-        return queryFactory.selectFrom(clanWarEntity)
+    public List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to) {
+        ConstructorExpression<ClanWarDTO> clanWarDTO = projectionClanWarDTO();
+        return queryFactory.select(clanWarDTO)
+                           .from(clanWarEntity)
+                           .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag))
                            .where(clanWarEntity.startTime.between(from, to))
                            .orderBy(clanWarEntity.warId.asc())
                            .fetch();
@@ -38,18 +41,7 @@ public class JpaClanWarQueryRepository {
     }
 
     public Optional<ClanWarDTO> findDTOById(Long warId) {
-        ConstructorExpression<ClanWarDTO> clanWarDTO = Projections.constructor(ClanWarDTO.class,
-                                                                               clanWarEntity.warId,
-                                                                               clanEntity.name.as("clanName"),
-                                                                               clanWarEntity.state,
-                                                                               clanWarEntity.type,
-                                                                               clanWarEntity.battleType,
-                                                                               clanWarEntity.preparationStartTime,
-                                                                               clanWarEntity.startTime,
-                                                                               clanWarEntity.endTime,
-                                                                               clanWarEntity.teamSize,
-                                                                               clanWarEntity.attacksPerMember,
-                                                                               clanWarEntity.warTag);
+        ConstructorExpression<ClanWarDTO> clanWarDTO = projectionClanWarDTO();
 
         ClanWarDTO clanWar = queryFactory.select(clanWarDTO)
                                          .from(clanWarEntity)
@@ -58,6 +50,21 @@ public class JpaClanWarQueryRepository {
                                          .fetchOne();
 
         return Optional.ofNullable(clanWar);
+    }
+
+    private ConstructorExpression<ClanWarDTO> projectionClanWarDTO() {
+        return Projections.constructor(ClanWarDTO.class,
+                                       clanWarEntity.warId,
+                                       clanEntity.name.as("clanName"),
+                                       clanWarEntity.state,
+                                       clanWarEntity.type,
+                                       clanWarEntity.battleType,
+                                       clanWarEntity.preparationStartTime,
+                                       clanWarEntity.startTime,
+                                       clanWarEntity.endTime,
+                                       clanWarEntity.teamSize,
+                                       clanWarEntity.attacksPerMember,
+                                       clanWarEntity.warTag);
     }
 
 }

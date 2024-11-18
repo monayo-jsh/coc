@@ -7,10 +7,8 @@ import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.common.config.MapStructConfig;
-import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper(
@@ -25,8 +23,7 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarQuery.create(map(startDate), map(endDate));
     }
 
-    @Mapping(target = "clanName", source = "clanNew.name")
-    public abstract ClanWarResponse toClanWarResponse(ClanWarEntity clanWar);
+    public abstract ClanWarResponse toClanWarResponse(ClanWarDTO clanWar);
 
     public abstract ClanWarDetailResponse toClanWarDetailResponse(ClanWarDTO clanWar);
 

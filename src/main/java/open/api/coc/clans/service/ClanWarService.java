@@ -1,8 +1,6 @@
 
 package open.api.coc.clans.service;
 
-import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
@@ -35,9 +33,7 @@ import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
-import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
 import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
-import open.api.coc.clans.domain.clans.converter.EntityClanWarMemberResponseConverter;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -71,7 +67,6 @@ public class ClanWarService {
     private final ClanWarQueryRepository clanWarQueryRepository;
 
     private final TimeConverter timeConverter;
-    private final EntityClanWarMemberResponseConverter entityClanWarMemberResponseConverter;
 
     private final String CLAN_WAR_ROOT_DIR = "./clan-war";
     private final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
@@ -586,22 +581,6 @@ public class ClanWarService {
         Long clanWarCount = clanWarCountMap.get(ranking.clanTag());
         Long completedStarCount = clanWarCount * 3;
         return Objects.equals(ranking.totalStars(), completedStarCount.intValue());
-    }
-
-    @Transactional
-    public ClanWarMemberResponse updateClanWarMemberAttackNecessaryAttack(Long warId, String playerTag) {
-
-        ClanWarMemberEntity clanWarMemberEntity = clanWarMemberRepository.findById(ClanWarMemberPKEntity.builder()
-                                                                                                        .warId(warId)
-                                                                                                        .tag(playerTag)
-                                                                                                        .build())
-                                                                         .orElseThrow(() -> createNotFoundException("클랜전(%s) 계정(%s) 정보 없음".formatted(warId, playerTag)));
-
-        YnType currentNecessaryAttackYn = clanWarMemberEntity.getNecessaryAttackYn();
-        YnType toNecessaryAttackYn = Objects.equals(currentNecessaryAttackYn, YnType.Y) ? YnType.N : YnType.Y;
-        clanWarMemberEntity.changeNecessaryAttack(toNecessaryAttackYn);
-
-        return entityClanWarMemberResponseConverter.convert(clanWarMemberEntity);
     }
 
 }

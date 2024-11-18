@@ -89,12 +89,6 @@ public class ClanWarEntity {
         clanWarMemberEntity.changeClanWar(this);
     }
 
-    public void changeMembers(List<ClanWarMemberEntity> clanWarMemberEntities) {
-        members.clear();
-        clanWarMemberEntities.forEach(this::addMember);
-    }
-
-
     public boolean isCollected() {
         return STATE_WAR_COLLECTED.equals(this.state);
     }

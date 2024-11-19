@@ -363,9 +363,11 @@
 </body>
 <template id="notice-template">
   <div class="notice cursor-pointer" onclick="renderNoticeDetail(this);">
-    <div class="label">{TYPE}</div>
-    <div class="text">{TEXT}</div>
-    <div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
+    <div class="slide-animation">
+      <div class="label">{TYPE}</div>
+      <div class="text">{TEXT}</div>
+      <div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
+    </div>
   </div>
 </template>
 </html>

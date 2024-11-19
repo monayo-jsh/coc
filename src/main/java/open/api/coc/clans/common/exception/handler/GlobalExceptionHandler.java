@@ -1,5 +1,6 @@
 package open.api.coc.clans.common.exception.handler;
 
+import jakarta.validation.ConstraintViolationException;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
 import open.api.coc.clans.common.exception.NotFoundException;
@@ -50,6 +51,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> missingServletRequestParameterException(MissingServletRequestParameterException e) {
         BadRequestException badRequestException = BadRequestException.create(ExceptionCode.INVALID_PARAMETER)
                                                                      .addExtraMessage(formatMessage(e.getParameterName(), " must not be null"));
+
+        return badRequestException(badRequestException);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<String> constraintViolationException(ConstraintViolationException e) {
+        BadRequestException badRequestException = BadRequestException.create(ExceptionCode.INVALID_PARAMETER);
+        e.getConstraintViolations().forEach(constraintViolation -> {
+            badRequestException.addExtraMessage(constraintViolation.getMessage());
+        });
 
         return badRequestException(badRequestException);
     }

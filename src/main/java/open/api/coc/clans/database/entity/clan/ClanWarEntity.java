@@ -23,6 +23,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import open.api.coc.clans.clean.domain.clan.exception.ClanWarMemberNotExistsException;
 
 @Builder
 @Getter @Setter
@@ -88,12 +89,6 @@ public class ClanWarEntity {
         clanWarMemberEntity.changeClanWar(this);
     }
 
-    public void changeMembers(List<ClanWarMemberEntity> clanWarMemberEntities) {
-        clanWarMemberEntities.forEach(clanWarMemberEntity -> clanWarMemberEntity.changeClanWar(this));
-        this.members = clanWarMemberEntities;
-    }
-
-
     public boolean isCollected() {
         return STATE_WAR_COLLECTED.equals(this.state);
     }
@@ -114,5 +109,17 @@ public class ClanWarEntity {
 
     public boolean isLeagueWar() {
         return Objects.equals(type, ClanWarType.LEAGUE);
+    }
+
+    public void changeMemberNecessaryAttack(String playerTag) {
+        ClanWarMemberEntity member = findMemberOrThrow(playerTag);
+        member.switchingNecessaryAttack();
+    }
+
+    private ClanWarMemberEntity findMemberOrThrow(String playerTag) {
+        return members.stream()
+                      .filter(member -> member.isEqualsPlayerTag(playerTag))
+                      .findFirst()
+                      .orElseThrow(() -> new ClanWarMemberNotExistsException(this.warId, playerTag));
     }
 }

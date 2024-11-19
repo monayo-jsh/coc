@@ -65,10 +65,16 @@ external:
         round-tag: /{roundTag}
         war-tag: /{warTag}
 
+# CMS 어드민 계정 설정
 cms:
   admin-id: ${ADMIN_ID}
   admin-password: ${ADMIN_PASSWORD}
 
+# 스케쥴링 활성화 여부
+scheduling:
+  enabled: false
+
+# 명예의전당 랭킹 표기 설정값
 hall-of-fame:
   ranking: 11
   average: 3

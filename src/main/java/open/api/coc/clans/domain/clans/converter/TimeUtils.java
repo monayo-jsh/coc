@@ -47,7 +47,10 @@ public class TimeUtils implements TimeConverter {
         return getZonedDateTime(epochMilli).toLocalDateTime();
     }
 
-    private ZonedDateTime getZonedDateTime(long epochMilli) {
+    public static LocalDate parseLocalDate(Long epochMilli) {
+        return getZonedDateTime(epochMilli).toLocalDate();
+    }
+    private static ZonedDateTime getZonedDateTime(long epochMilli) {
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"));
     }
 

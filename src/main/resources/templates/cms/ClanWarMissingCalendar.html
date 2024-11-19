@@ -48,7 +48,7 @@
     }
 
     function sortedByWarTypeAndPlayerName(raw) {
-      return raw.sort((a, b) => a.warType.localeCompare(b.warType)|| a.playerName.length - b.playerName.length);
+      return raw.sort((a, b) => a.warType.localeCompare(b.warType)|| a.name.length - b.name.length);
     }
 
     function getWithoutNecessaryAttackPlayers(players) {
@@ -82,10 +82,10 @@
 
             const sortedPlayers = sortedByWarTypeAndPlayerName(filteredPlayers);
             for (const player of sortedPlayers) {
-              const { warType, playerName } = player;
+              const { warType, name } = player;
 
               const bgColor = getBgColorByWarType(warType);
-              const playerRow = `<span class="chip m-1 ${bgColor}">${playerName}</span>`;
+              const playerRow = `<span class="chip m-1 ${bgColor}">${name}</span>`;
               players.push(playerRow);
             }
 
@@ -152,9 +152,7 @@
     }
 
     async function drawCalendarEvents(startDate, endDate) {
-      const startDt = formatYYYYMMDD(startDate);
-      const endDt = formatYYYYMMDD(endDate);
-      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(startDt, endDt);
+      const clanWarMissingAttackPlayers = await fetchClanWarMissingAttackPlayers(startDate.valueOf(), endDate.valueOf());
 
       renderClanWars(clanWarMissingAttackPlayers);
     }
@@ -212,13 +210,13 @@
       const listGroupByClan = convertArrayToMapByKey(players, 'clanName', true);
       let message = [];
       let totalPlayerLength = 0;
-      for (const [clanName, players]of sortedByWarTypeAndClanOrder(listGroupByClan)) {
+      for (const [clanName, players] of sortedByWarTypeAndClanOrder(listGroupByClan)) {
         const missingPlayers = getWithoutNecessaryAttackPlayers(players);
         const [player] = players;
         const { warState, warType, endTime } = player;
         const warStateName = warState === 'inWar' ? ' 진행중': '';
         const warTypeName = convWarTypeName(warType);
-        const playerNames = missingPlayers.map(player => player.playerName).join(", ");
+        const playerNames = missingPlayers.map(player => player.name).join(", ");
 
         // 미공 없으면 표기 X
         if (!playerNames.length) continue;

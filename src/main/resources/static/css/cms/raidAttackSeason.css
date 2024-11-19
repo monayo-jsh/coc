@@ -83,7 +83,11 @@
 }
 
 .table-tr {
-  .name, .tag {
+  .name {
+    max-width: 130px;
+    vertical-align: baseline;
+  }
+  .tag {
     vertical-align: baseline;
   }
 

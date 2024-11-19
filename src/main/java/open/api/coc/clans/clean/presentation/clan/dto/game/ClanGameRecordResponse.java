@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.presentation.clan.dto;
+package open.api.coc.clans.clean.presentation.clan.dto.game;
 
 import java.time.LocalDateTime;
 

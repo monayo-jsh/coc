@@ -61,8 +61,7 @@
         }
 
         function callBackMonthPicker(monthPickerElement, selectedValue) {
-            const searchMonth = formatYYYYMMDD(selectedValue);
-            fetchClanWarStatistics(searchMonth);
+            fetchClanWarStatistics(dayjs(selectedValue).valueOf());
         }
         function initMonthPicker() {
             let defaultFirstDayOfMonth = dayjs().date(1);
@@ -82,15 +81,15 @@
                                     || b.avgDuration - a.avgDuration
                           })
                           .map((player) => {
-                const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
-                const completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
+                const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+                const completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
                 return {
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
                     '완파율': Number(completeStarRatio).toFixed(1),
-                    '총 공격수': Number(attackCount).toLocaleString(),
+                    '총 공격수': Number(totalAttackCount).toLocaleString(),
                     '평균 파괴율': Number(totalDestructionPercentage).toLocaleString(),
                     '평균 완파시간': formatMinuteSecond(Number(avgDuration)),
                     '총 획득별': Number(totalStars).toLocaleString(),
@@ -153,16 +152,16 @@
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
             const row = rankingRow.querySelector('.table-tr');
 
-            const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+            const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
 
-            let completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
+            let completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_TAG_COLOR}/, isPageTypeClanWar() ? 'bg-green' : 'bg-crimson')
                                .replace(/{CLAN_NAME}/, clanName)
-                               .replace(/{ATTACK_COUNT}/, attackCount)
+                               .replace(/{ATTACK_COUNT}/, totalAttackCount)
                                .replace(/{RATIO}/g, Number(completeStarRatio).toFixed(2))
                                .replace(/{STARS}/g, Number(totalStars).toLocaleString())
                                .replace(/{THREE_STARS}/, Number(threeStars).toLocaleString())

@@ -21,6 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -95,5 +96,17 @@ public class ClanWarMemberEntity implements Persistable<ClanWarMemberPKEntity> {
 
     public void changeNecessaryAttack(YnType necessaryAttackYn) {
         this.necessaryAttackYn = necessaryAttackYn;
+    }
+
+    public boolean isEqualsPlayerTag(String playerTag) {
+        return Objects.equals(id.getTag(), playerTag);
+    }
+
+    public void switchingNecessaryAttack() {
+        if (YnType.Y.equals(this.necessaryAttackYn)) {
+            this.necessaryAttackYn = YnType.N;
+        } else {
+            this.necessaryAttackYn = YnType.Y;
+        }
     }
 }

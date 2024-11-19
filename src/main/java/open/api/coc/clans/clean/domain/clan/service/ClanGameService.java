@@ -12,7 +12,7 @@ import open.api.coc.clans.clean.domain.clan.model.ClanGameDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanGameMeta;
 import open.api.coc.clans.clean.domain.clan.repository.ClanGameRepository;
 import open.api.coc.clans.clean.domain.player.model.Player;
-import open.api.coc.clans.clean.presentation.clan.dto.ClanGameResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.game.ClanGameResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

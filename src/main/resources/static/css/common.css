@@ -681,15 +681,6 @@ body::before {
     padding: 5px 5px 5px 10px;
   }
 
-  .table-tbody {
-
-    .table-tr:nth-child(odd) {
-      background-color: #f9f9f9;
-    }
-
-  }
-
-
   .table-tr {
 
     .table-th, .table-td {

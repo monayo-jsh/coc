@@ -401,7 +401,7 @@
       const baseMonth = dayjs();
       const targetClassName = 'this-month-clan-war-stars';
       showLoading(targetClassName);
-      const rankings = await fetchRankingClanWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
+      const rankings = await fetchRankingClanWarStars(baseMonth.valueOf(), clanTag);
 
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 순위`;
       renderLeaderboardForClanWar(targetClassName, leaderboardTitle, rankings);
@@ -412,7 +412,7 @@
       const baseMonth = dayjs().add(-1, 'month');
       const targetClassName = 'last-month-clan-war-stars';
       showLoading(targetClassName);
-      const rankings = await fetchRankingClanWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
+      const rankings = await fetchRankingClanWarStars(baseMonth.valueOf(), clanTag);
 
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 순위`;
       renderLeaderboardForClanWar(targetClassName, leaderboardTitle, rankings);
@@ -427,7 +427,7 @@
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
       showLoading(targetClassName);
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
 
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
       renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);
@@ -439,7 +439,7 @@
       const targetClassName = 'last-month-league-war';
       showLoading(targetClassName);
 
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
 
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
       renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);

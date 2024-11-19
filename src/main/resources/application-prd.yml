@@ -27,3 +27,6 @@ spring:
         format_sql: false
     hibernate:
       ddl-auto: update
+
+scheduling:
+  enabled: true

@@ -2,11 +2,14 @@ package open.api.coc.clans.clean.infrastructure.clan.persistence.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRepository;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.dto.LeagueWarRoundCountDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Repository;
 
@@ -39,11 +42,6 @@ public class ClanWarDatabaseService implements ClanWarRepository {
         return queryRepository.findDTOByClanTagAndStartTime(clanTag, startTime).map(this::fetchMemberDTOs);
     }
 
-    @Override
-    public ClanWarEntity save(ClanWarEntity clanWar) {
-        return repository.save(clanWar);
-    }
-
     private ClanWarDTO fetchMemberDTOs(ClanWarDTO clanWar) {
         // 클랜 참여자 목록
         List<ClanWarMemberDTO> members = memberQueryRepository.findDTOByIdWarId(clanWar.getWarId());
@@ -54,4 +52,19 @@ public class ClanWarDatabaseService implements ClanWarRepository {
         // 반환
         return clanWar;
     }
+
+    @Override
+    public ClanWarEntity save(ClanWarEntity clanWar) {
+        return repository.save(clanWar);
+    }
+
+    public Map<String, Integer> findLeagueWarRoundCountMap(LocalDateTime from, LocalDateTime to) {
+        List<LeagueWarRoundCountDTO> leagueWarRoundCounts = queryRepository.findLeagueWarRoundCounts(from, to);
+
+        return leagueWarRoundCounts.stream()
+                                   .collect(Collectors.toMap(LeagueWarRoundCountDTO::clanTag,
+                                                             LeagueWarRoundCountDTO::roundCount));
+
+    }
+
 }

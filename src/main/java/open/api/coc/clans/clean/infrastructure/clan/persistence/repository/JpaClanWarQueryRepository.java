@@ -13,7 +13,10 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarStatus;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.dto.LeagueWarRoundCountDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -83,4 +86,20 @@ public class JpaClanWarQueryRepository {
                                        clanWarEntity.warTag);
     }
 
+    public List<LeagueWarRoundCountDTO> findLeagueWarRoundCounts(LocalDateTime from, LocalDateTime to) {
+        ConstructorExpression<LeagueWarRoundCountDTO> leagueWarRoundCountDTO = Projections.constructor(LeagueWarRoundCountDTO.class,
+                                                                                                       clanWarEntity.clanTag,
+                                                                                                       clanWarEntity.clanTag.count().intValue());
+
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.type.eq(ClanWarType.LEAGUE))
+                 .and(clanWarEntity.state.ne(ClanWarStatus.preparation.name()))
+                 .and(clanWarEntity.preparationStartTime.between(from, to));
+
+        return queryFactory.select(leagueWarRoundCountDTO)
+                           .from(clanWarEntity)
+                           .where(condition)
+                           .groupBy(clanWarEntity.clanTag)
+                           .fetch();
+    }
 }

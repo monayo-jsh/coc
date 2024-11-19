@@ -2,21 +2,26 @@ package open.api.coc.clans.clean.application.clan.mapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberLeagueRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberRecordDTO;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.common.config.MapStructConfig;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
@@ -50,7 +55,18 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarMissingAttackPlayerQuery.create(tag, name, queryDate);
     }
 
+    public ClanWarMemberRecordQuery toClanWarRecordQuery(String type, Long month, String clanTag) {
+        return ClanWarMemberRecordQuery.create(type, month, clanTag);
+    }
+
+    public ClanWarMemberLeagueRecordQuery toLeagueWarRecordQuery(String type, Long month, String clanTag) {
+        return ClanWarMemberLeagueRecordQuery.create(type, month, clanTag);
+    }
+
     public abstract ClanWarMemberMissingAttackResponse toClanWarMemberMissingAttackResponse(ClanWarMemberMissingAttackDTO clanWarMemberMissingAttackDTO);
+
+    @Mapping(target = "totalAttackCount", source = "attackCount")
+    public abstract ClanWarMemberRecordResponse toClanWarMemberRecordResponse(ClanWarMemberRecordDTO clanWarMemberRecordDTO);
 
     protected LocalDate mapToLocalDate(Long time) {
         return timeConverter.toLocalDate(time);

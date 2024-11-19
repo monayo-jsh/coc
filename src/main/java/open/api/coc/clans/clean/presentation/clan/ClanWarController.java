@@ -14,13 +14,16 @@ import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberLeagueRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import org.springframework.http.HttpStatus;
@@ -34,10 +37,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "클랜 전쟁 기능", description = "클랜 전쟁 기능 관련")
-@RestController(value = "ClanWarController2")
-@RequiredArgsConstructor
-@RequestMapping("/v2/api/clan/war")
 @Validated
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/clan/war")
 public class ClanWarController {
 
     private final ClanWarUseCase clanWarUseCase;
@@ -148,5 +151,53 @@ public class ClanWarController {
         ClanWarMissingAttackPlayerQuery query = clanWarUseCaseMapper.toClanWarMissingAttackPlayerQuery(tag, name, queryDate);
         return ResponseEntity.ok()
                              .body(clanWarUseCase.getClanWarMissingAttacks(query));
+    }
+
+    @Operation(
+        summary = "서버에 수집된 클랜전 획득별 랭킹을 조회한다. version: 1.00, Last Update: 24.11.19",
+        description = "이 API는 서버에 수집된 클랜전 획득별 랭킹을 제공합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "type", description = "조회 유형, all: 전체 순위 제공", required = false),
+            @Parameter(name = "month", description = "조회 기준 월"),
+            @Parameter(name = "clanTag", description = "클랜 태그")
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberRecordResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/record")
+    public ResponseEntity<List<ClanWarMemberRecordResponse>> getClanWarRecords(@RequestParam(required = false) String type,
+                                                                               @RequestParam Long month,
+                                                                               @RequestParam String clanTag) {
+        ClanWarMemberRecordQuery query = clanWarUseCaseMapper.toClanWarRecordQuery(type, month, clanTag);
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getClanWarMemberRecords(query));
+    }
+
+    @Operation(
+        summary = "서버에 수집된 리그전 획득별 랭킹을 조회한다. version: 1.00, Last Update: 24.11.19",
+        description = "이 API는 서버에 수집된 리그전 획득별 랭킹을 제공합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "type", description = "조회 유형, all: 전체 순위 제공", required = false),
+            @Parameter(name = "month", description = "조회 기준 월"),
+            @Parameter(name = "clanTag", description = "클랜 태그")
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberRecordResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/league/record")
+    public ResponseEntity<List<ClanWarMemberRecordResponse>> getLeagueWarRecords(@RequestParam(required = false) String type,
+                                                                                 @RequestParam Long month,
+                                                                                 @RequestParam String clanTag) {
+        ClanWarMemberLeagueRecordQuery query = clanWarUseCaseMapper.toLeagueWarRecordQuery(type, month, clanTag);
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getLeagueWarMemberRecords(query));
     }
 }

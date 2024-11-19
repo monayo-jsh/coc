@@ -15,18 +15,18 @@ public class ClanWarMemberService {
     private final ClanWarMemberAttackRepository memberAttackRepository;
 
     @Transactional(readOnly = true)
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttacks(ClanWarMissingAttackSearchCriteria criteria) {
+    public List<ClanWarMemberMissingAttackDTO> getMissingAttacks(ClanWarMissingAttackSearchCriteria criteria) {
         if (criteria.hasTag()) {
             // 태그 검색
-            return memberAttackRepository.findMissingAttacksByTag(criteria.tag(), criteria.from(), criteria.to());
+            return memberAttackRepository.findAllByTag(criteria.tag(), criteria.from(), criteria.to());
         }
 
         if (criteria.hasName()) {
             // 이름 검색
-            return memberAttackRepository.findMissingAttacksByName(criteria.name(), criteria.from(), criteria.to());
+            return memberAttackRepository.findAllByName(criteria.name(), criteria.from(), criteria.to());
         }
 
         // 기간 검색
-        return memberAttackRepository.findMissingAttacksByPeriod(criteria.from(), criteria.to());
+        return memberAttackRepository.findAllByPeriod(criteria.from(), criteria.to());
     }
 }

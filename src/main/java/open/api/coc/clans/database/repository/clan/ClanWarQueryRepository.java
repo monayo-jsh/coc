@@ -1,34 +1,14 @@
 package open.api.coc.clans.database.repository.clan;
 
-import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
-import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
-import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 import static open.api.coc.clans.database.entity.clan.QClanWarEntity.clanWarEntity;
-import static open.api.coc.clans.database.entity.clan.QClanWarMemberAttackEntity.clanWarMemberAttackEntity;
-import static open.api.coc.clans.database.entity.clan.QClanWarMemberEntity.clanWarMemberEntity;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
-import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
-import open.api.coc.clans.database.entity.clan.ClanWarType;
-import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.query.ClanWarMemberMissingAttackConditionBuilder;
-import open.api.coc.clans.database.repository.clan.condition.ClanWarRecordConditionBuilder;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
-import open.api.coc.clans.domain.ranking.ClanWarCountDTO;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -37,104 +17,6 @@ public class ClanWarQueryRepository {
 
     private final ClanWarRepository clanWarRepository;
     private final JPAQueryFactory queryFactory;
-
-    public List<ClanWarRecordDTO> findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
-        ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
-        return fetchClanWarRecords(pageable, builder);
-    }
-
-    public List<ClanWarRecordDTO> findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(String clanTag, ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
-        ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
-        builder = builder.withClanTag(clanTag);
-        return fetchClanWarRecords(pageable, builder);
-    }
-
-    private List<ClanWarRecordDTO> fetchClanWarRecords(Pageable pageable, ClanWarRecordConditionBuilder builder) {
-        BooleanBuilder condition = builder.build();
-        JPAQuery<ClanWarRecordDTO> clanWarRecordQuery = buildClanWarRecord(condition, pageable);
-
-        return clanWarRecordQuery.fetch();
-    }
-
-    private JPAQuery<ClanWarRecordDTO> buildClanWarRecord(BooleanBuilder condition, Pageable pageable) {
-        ConstructorExpression<ClanWarRecordDTO> clanWarRecordDTO = Projections.constructor(
-            ClanWarRecordDTO.class,
-            clanEntity.tag.max().as("clanTag"),
-            clanEntity.name.max().as("clanName"),
-            clanEntity.order.max().as("clanOrder"),
-            playerEntity.playerTag.max().as("tag"),
-            playerEntity.name.max().as("name"),
-            playerEntity.townHallLevel.max().as("townHallLevel"),
-            clanWarMemberAttackEntity.id.tag.count().as("attackCount"),
-            clanWarMemberAttackEntity.destructionPercentage.sum().coalesce(0).as("totalDestructionPercentage"),
-            clanWarMemberAttackEntity.duration.avg().coalesce(0.0).as("avgDuration"),
-            clanWarMemberAttackEntity.stars.sum().coalesce(0).as("totalStars"),
-            getStartSumByStarCount(3, "threeStars"),
-            getStartSumByStarCount(2, "twoStars"),
-            getStartSumByStarCount(1, "oneStars"),
-            getStartSumByStarCount(0, "zeroStars")
-        );
-
-        JPAQuery<ClanWarRecordDTO> query = queryFactory.select(clanWarRecordDTO)
-                                                                          .from(clanWarEntity)
-                                                                          .join(clanWarEntity.members, clanWarMemberEntity)
-                                                                          .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
-                                                                          .join(playerEntity)
-                                                                          .on(playerEntity.playerTag.eq(clanWarMemberEntity.id.tag))
-                                                                          .join(clanEntity)
-                                                                          .on(clanEntity.tag.eq(clanWarEntity.clanTag))
-                                                                          .where(condition)
-                                                                          .groupBy(clanWarMemberAttackEntity.id.tag)
-                                                                          .orderBy(clanWarMemberAttackEntity.stars.sum().desc(),
-                                                                                   clanWarMemberAttackEntity.destructionPercentage.sum().desc(),
-                                                                                   clanWarMemberAttackEntity.duration.avg().asc());
-
-        if (pageable != null && pageable.isPaged()) {
-            query.offset(pageable.getOffset())
-                 .limit(pageable.getPageSize());
-        }
-
-        return query;
-    }
-
-    private NumberExpression<Integer> getStartSumByStarCount(Integer starCount, String alias) {
-        return new CaseBuilder().when(clanWarMemberAttackEntity.stars.eq(starCount))
-                                .then(1)
-                                .otherwise(0)
-                                .sum()
-                                .as(alias);
-    }
-
-
-    public Map<String, Long> findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to) {
-
-        ConstructorExpression<ClanWarCountDTO> clanWarCountDTO = Projections.constructor(
-            ClanWarCountDTO.class,
-            clanWarEntity.clanTag.as("clanTag"),
-            clanWarEntity.clanTag.count().as("warCount")
-        );
-
-        BooleanBuilder condition = new BooleanBuilder();
-        condition.and(clanWarEntity.type.eq(warType))
-                 .and(clanWarEntity.preparationStartTime.between(from, to));
-
-        if (ClanWarType.LEAGUE.equals(warType)) {
-            // 리그전의 경우 준비중인 라운드는 제외하고 완파 대상 라운드를 판단
-            condition.and(clanWarEntity.state.ne("preparation"));
-        }
-
-        List<ClanWarCountDTO> results = queryFactory.select(clanWarCountDTO)
-                                                    .from(clanWarEntity)
-                                                    .where(condition)
-                                                    .groupBy(clanWarEntity.clanTag)
-                                                    .fetch();
-
-        return results.stream()
-                      .collect(Collectors.toMap(
-                          ClanWarCountDTO::clanTag,
-                          ClanWarCountDTO::warCount
-                      ));
-    }
 
     public Optional<ClanWarEntity> findByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
         BooleanBuilder condition = new BooleanBuilder();

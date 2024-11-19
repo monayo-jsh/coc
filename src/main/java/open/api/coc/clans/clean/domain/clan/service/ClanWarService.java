@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.domain.clan.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.exception.ClanWarNotExistsException;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
@@ -44,4 +45,8 @@ public class ClanWarService {
         clanWarRepository.save(clanWar);
     }
 
+    @Transactional(readOnly = true)
+    public Map<String, Integer> findLeagueWarRoundCountMap(LocalDateTime from, LocalDateTime to) {
+        return clanWarRepository.findLeagueWarRoundCountMap(from, to);
+    }
 }

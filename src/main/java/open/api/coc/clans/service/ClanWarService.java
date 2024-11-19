@@ -533,13 +533,6 @@ public class ClanWarService {
         return Pageable.ofSize(hallOfFameConfig.getRanking());
     }
 
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayers(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
-        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
-
-        return clanWarQueryRepository.findAllMissingAttackPlayerByStartTimePeriod(fromStartTime, toStartTime);
-    }
-
     public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithName(String playerName, Integer queryDate) {
         LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
         LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);

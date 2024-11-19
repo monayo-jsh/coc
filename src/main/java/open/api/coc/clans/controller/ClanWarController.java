@@ -21,13 +21,6 @@ public class ClanWarController {
 
     private final ClanWarService clanWarService;
 
-    @GetMapping("/missing/attack/period")
-    public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayers(@RequestParam LocalDate startDate,
-                                                                                              @RequestParam LocalDate endDate) {
-        return ResponseEntity.ok()
-                             .body(clanWarService.getClanWarMissingAttackPlayers(startDate, endDate));
-    }
-
     @GetMapping("/missing/attack/{playerTag}")
     public ResponseEntity<List<ClanWarMissingAttackPlayerDTO>> getClanWarMissingAttackPlayerWithTagForRecentDays(@PathVariable String playerTag,
                                                                                                                  @RequestParam(value = "queryDate", defaultValue = "90") Integer queryDate) {

@@ -38,34 +38,6 @@ public class ClanWarQueryRepository {
     private final ClanWarRepository clanWarRepository;
     private final JPAQueryFactory queryFactory;
 
-    public Optional<ClanWarEntity> findByWarId(Long warId) {
-        if (warId == null) {
-            throw new IllegalArgumentException("warId must not be null");
-        }
-
-        ClanWarEntity clanWar = queryFactory.selectFrom(clanWarEntity)
-                                            .where(clanWarEntity.warId.eq(warId))
-                                            .fetchOne();
-
-        if (clanWar != null) {
-            ClanEntity clan = buildClanBaseQuery().where(clanEntity.tag.eq(clanWar.getClanTag())).fetchOne();
-            clanWar.changeClan(clan);
-        }
-
-        return Optional.ofNullable(clanWar);
-    }
-
-    private JPAQuery<ClanEntity> buildClanBaseQuery() {
-        return queryFactory.selectFrom(clanEntity)
-                           .join(clanEntity.badgeUrl, clanBadgeEntity).fetchJoin();
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> findAllMissingAttackPlayerByStartTimePeriod(LocalDateTime from, LocalDateTime to) {
-        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
-        BooleanBuilder condition = builder.build();
-        return buildMissingAttackPlayerQuery(condition).fetch();
-    }
-
     public List<ClanWarMissingAttackPlayerDTO> findMissingAttackByNameAndStartTimePeriod(String playerName, LocalDateTime from, LocalDateTime to) {
         ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         builder.withPlayerName(playerName);

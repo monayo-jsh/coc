@@ -25,9 +25,9 @@ public record ClanWarMemberRecordDTO(
 
 ) {
 
-    public boolean isAllRoundDestroy(Map<String, Integer> leagueWarRoundMap) {
-        if (leagueWarRoundMap == null || leagueWarRoundMap.isEmpty()) { return false; }
-        Integer leagueWarRoundCount = leagueWarRoundMap.get(this.clanTag);
+    public boolean isAllRoundDestroy(Map<String, Integer> leagueWarRoundMapByClan) {
+        if (leagueWarRoundMapByClan == null || leagueWarRoundMapByClan.isEmpty()) { return false; }
+        Integer leagueWarRoundCount = leagueWarRoundMapByClan.get(this.clanTag);
         Integer totalStarCount = leagueWarRoundCount * 3;
 
         return Objects.equals(this.totalStars, totalStarCount);

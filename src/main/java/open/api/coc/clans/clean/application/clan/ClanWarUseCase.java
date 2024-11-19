@@ -142,11 +142,12 @@ public class ClanWarUseCase {
                           .toList();
         }
 
-        Map<String, Integer> leagueWarRoundMap = clanWarService.findLeagueWarRoundCountMap(criteria.from(), criteria.to());
+        // 클랜별 리그전 라운드 수를 조회한다.
+        Map<String, Integer> leagueWarRoundMapByClan = clanWarService.findLeagueWarRoundCountMap(criteria.from(), criteria.to());
 
         // 응답
         return records.stream()
-                      .filter(record -> record.isAllRoundDestroy(leagueWarRoundMap))
+                      .filter(record -> record.isAllRoundDestroy(leagueWarRoundMapByClan))
                       .map(clanWarUseCaseMapper::toClanWarMemberRecordResponse)
                       .toList();
     }

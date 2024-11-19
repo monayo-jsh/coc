@@ -38,47 +38,6 @@ public class ClanWarQueryRepository {
     private final ClanWarRepository clanWarRepository;
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarMissingAttackPlayerDTO> findMissingAttackByNameAndStartTimePeriod(String playerName, LocalDateTime from, LocalDateTime to) {
-        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
-        builder.withPlayerName(playerName);
-        BooleanBuilder condition = builder.build();
-        return buildMissingAttackPlayerQuery(condition).fetch();
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> findMissingAttackByTagAndStartTimePeriod(String playerTag, LocalDateTime from, LocalDateTime to) {
-        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
-        builder.withPlayerTag(playerTag);
-        BooleanBuilder condition = builder.build();
-        return buildMissingAttackPlayerQuery(condition).fetch();
-    }
-
-    private JPAQuery<ClanWarMissingAttackPlayerDTO> buildMissingAttackPlayerQuery(BooleanBuilder condition) {
-        ConstructorExpression<ClanWarMissingAttackPlayerDTO> clanWarMissingAttackPlayerDTO = Projections.constructor(
-            ClanWarMissingAttackPlayerDTO.class,
-            clanEntity.name.as("clanName"),
-            clanEntity.order.as("clanOrder"),
-            clanWarEntity.warId.as("warId"),
-            clanWarEntity.type.as("warType"),
-            clanWarEntity.state.as("warState"),
-            clanWarEntity.startTime.as("startTime"),
-            clanWarEntity.endTime.as("endTime"),
-            clanWarMemberEntity.id.tag.as("playerTag"),
-            clanWarMemberEntity.name.as("playerName"),
-            clanWarMemberEntity.necessaryAttackYn.as("necessaryAttackYn")
-        );
-
-        return queryFactory.select(clanWarMissingAttackPlayerDTO)
-                           .from(clanWarEntity)
-                           .join(clanEntity).on(clanEntity.tag.eq(clanWarEntity.clanTag))
-                           .join(clanWarEntity.members, clanWarMemberEntity)
-                           .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
-                           .where(condition)
-                           .groupBy(clanWarMemberEntity.id.warId, clanWarMemberEntity.id.tag)
-                           .having(clanWarMemberAttackEntity.id.order.count()
-                                                                     .lt(clanWarEntity.attacksPerMember))
-                           .orderBy(clanWarEntity.warId.asc(), clanWarMemberEntity.mapPosition.asc());
-    }
-
     public List<ClanWarRecordDTO> findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType warType, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         ClanWarRecordConditionBuilder builder = new ClanWarRecordConditionBuilder(warType, from, to);
         return fetchClanWarRecords(pageable, builder);

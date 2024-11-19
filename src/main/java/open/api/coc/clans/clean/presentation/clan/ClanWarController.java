@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
@@ -123,5 +124,29 @@ public class ClanWarController {
         ClanWarMissingAttackQuery query = clanWarUseCaseMapper.toClanWarMissingAttackQuery(startDate, endDate);
         return ResponseEntity.ok()
                              .body(clanWarUseCase.getClanWarMissingAttackPlayers(query));
+    }
+
+    @Operation(
+        summary = "서버에 수집된 플레이어의 클랜 전쟁 미공 기록을 조회한다. version: 1.00, Last Update: 24.11.19",
+        description = "이 API는 서버에 수집된 플레이어의 클랜 전쟁 미공 기록을 제공합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "tag", description = "플레이어 태그", required = false),
+            @Parameter(name = "name", description = "플레이어 이름", required = false),
+            @Parameter(name = "queryDate", description = "조회 기간, default: 90일", required = false),
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberMissingAttackResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/missing/attack")
+    public ResponseEntity<List<ClanWarMemberMissingAttackResponse>> getClanWarMissingAttacks(@RequestParam(required = false) @Pattern(regexp = "^#.*", message = "#으로 시작해야합니다.") String tag,
+                                                                                             @RequestParam(required = false) String name,
+                                                                                             @RequestParam(defaultValue = "90") Integer queryDate) {
+        ClanWarMissingAttackPlayerQuery query = clanWarUseCaseMapper.toClanWarMissingAttackPlayerQuery(tag, name, queryDate);
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getClanWarMissingAttacks(query));
     }
 }

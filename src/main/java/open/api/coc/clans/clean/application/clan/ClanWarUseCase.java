@@ -1,14 +1,17 @@
 package open.api.coc.clans.clean.application.clan;
 
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;
+import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMissingAttackSearchCriteria;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarMemberService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
@@ -75,9 +78,32 @@ public class ClanWarUseCase {
 
     @Transactional(readOnly = true)
     public List<ClanWarMemberMissingAttackResponse> getClanWarMissingAttackPlayers(ClanWarMissingAttackQuery query) {
-        List<ClanWarMemberMissingAttackDTO> missingAttacks = clanWarMemberService.findMissingAttacks(query.startDate(), query.endDate());
+        // 조회를 위한 조회 크리테리아 획득
+        ClanWarMissingAttackSearchCriteria criteria = query.toSearchCriteria();
+
+        // 미공 기록 조회
+        List<ClanWarMemberMissingAttackDTO> missingAttacks = clanWarMemberService.findMissingAttacks(criteria);
+
+        // 응
         return missingAttacks.stream()
-                             .map(clanWarUseCaseMapper::ClanWarMemberMissingAttackResponse)
+                             .map(clanWarUseCaseMapper::toClanWarMemberMissingAttackResponse)
                              .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<ClanWarMemberMissingAttackResponse> getClanWarMissingAttacks(ClanWarMissingAttackPlayerQuery query) {
+        // 조회를 위한 조회 크리테리아 획득
+        ClanWarMissingAttackSearchCriteria criteria = query.toSearchCriteria();
+
+        // 미공 기록 조회
+        List<ClanWarMemberMissingAttackDTO> missingAttacks = clanWarMemberService.findMissingAttacks(criteria);
+
+        // 응답
+        return missingAttacks.stream()
+                             .map(clanWarUseCaseMapper::toClanWarMemberMissingAttackResponse)
+                             .sorted(Comparator.comparing(ClanWarMemberMissingAttackResponse::getTag)
+                                               .thenComparing(ClanWarMemberMissingAttackResponse::getStartTime).reversed())
+                             .toList();
+    }
+
 }

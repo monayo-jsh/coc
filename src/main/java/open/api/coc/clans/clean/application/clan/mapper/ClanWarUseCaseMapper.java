@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.application.clan.mapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
 import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
@@ -45,7 +46,11 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarMissingAttackQuery.create(mapToLocalDate(startDate), mapToLocalDate(endDate));
     }
 
-    public abstract ClanWarMemberMissingAttackResponse ClanWarMemberMissingAttackResponse(ClanWarMemberMissingAttackDTO clanWarMemberMissingAttackDTO);
+    public ClanWarMissingAttackPlayerQuery toClanWarMissingAttackPlayerQuery(String tag, String name, Integer queryDate) {
+        return ClanWarMissingAttackPlayerQuery.create(tag, name, queryDate);
+    }
+
+    public abstract ClanWarMemberMissingAttackResponse toClanWarMemberMissingAttackResponse(ClanWarMemberMissingAttackDTO clanWarMemberMissingAttackDTO);
 
     protected LocalDate mapToLocalDate(Long time) {
         return timeConverter.toLocalDate(time);
@@ -59,5 +64,4 @@ public abstract class ClanWarUseCaseMapper {
     protected long map(LocalDateTime time) {
         return timeConverter.toEpochMilliSecond(time);
     }
-
 }

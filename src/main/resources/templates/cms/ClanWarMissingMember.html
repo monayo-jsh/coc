@@ -99,18 +99,18 @@
         }
 
         function renderClanWarMissingAttackPlayer(player) {
-            const { warId, clanName, startTime, playerName, playerTag, warType } = player;
+            const { warId, clanName, startTime, name, tag, warType } = player;
 
             const raidRowEmptyTemplate = document.querySelector('#raid-row-template');
             const raidRowEmptyElement = document.importNode(raidRowEmptyTemplate.content, true);
             const tableRow = raidRowEmptyElement.querySelector('.table-tr');
 
             // dataset
-            tableRow.dataset.tag = playerTag;
+            tableRow.dataset.tag = tag;
 
             tableRow.innerHTML = tableRow.innerHTML
-                .replace(/{NAME}/, playerName)
-                .replace(/{TAG}/, playerTag)
+                .replace(/{NAME}/, name)
+                .replace(/{TAG}/, tag)
                 .replace(/{CLAN_NAME}/, clanName)
                 .replace(/{DATE}/, dayjs(startTime).format('YYYY년 MM월 DD일'));
 
@@ -119,7 +119,7 @@
             clan.classList.add(getBgColorByWarType(warType));
 
             // 테이블에 행 입력
-            drawRow(tableRow, playerTag);
+            drawRow(tableRow, tag);
         }
 
         function renderMissingAttackPlayers(clanWarMissingAttackPlayers) {
@@ -148,27 +148,20 @@
             target.classList.remove('opacity-01');
         }
 
-        async function searchMissingAttackPlayerWithTag(element) {
+        async function searchMissingAttackPlayerWithTag(tag) {
             showLoading('.table-tbody');
-            const missingAttack = await fetchMissingAttackPlayerInLast90DaysWithTag(element);
+            const missingAttack = await fetchMissingAttacksByTag(tag);
             hideLoading('.table-tbody');
 
             renderMissingAttackPlayers(missingAttack);
         }
 
-        async function searchMissingAttackPlayerWithName(element) {
+        async function searchMissingAttackPlayerWithName(name) {
             showLoading('.table-tbody');
-            const missingAttack = await fetchMissingAttackPlayerInLast90DaysWithName(element);
+            const missingAttack = await fetchMissingAttacksByName(name);
             hideLoading('.table-tbody');
 
             renderMissingAttackPlayers(missingAttack);
-        }
-
-        async function refreshClanRaidSeason() {
-            showWifiLoading('.body');
-            await collectRaidSeason()
-                .then(updatePlaceholder);
-            hideWifiLoading('.body');
         }
 
         document.addEventListener('DOMContentLoaded', () => {

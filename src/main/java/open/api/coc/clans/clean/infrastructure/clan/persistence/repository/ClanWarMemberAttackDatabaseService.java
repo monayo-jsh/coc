@@ -15,8 +15,18 @@ public class ClanWarMemberAttackDatabaseService implements ClanWarMemberAttackRe
     private final CLanWarMemberAttackQueryRepository queryRepository;
 
     @Override
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttackPlayers(LocalDateTime from, LocalDateTime to) {
-        return queryRepository.findMissingAttackPlayers(from, to);
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByPeriod(LocalDateTime from, LocalDateTime to) {
+        return queryRepository.findMissingAttacksByStartTime(from, to);
+    }
+
+    @Override
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByTag(String tag, LocalDateTime from, LocalDateTime to) {
+        return queryRepository.findMissingAttacksByTagAndStartTime(tag, from, to);
+    }
+
+    @Override
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByName(String name, LocalDateTime from, LocalDateTime to) {
+        return queryRepository.findMissingAttacksByNameAndStartTime(name, from, to);
     }
 
 }

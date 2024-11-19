@@ -23,10 +23,21 @@ public class CLanWarMemberAttackQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttackPlayers(LocalDateTime from, LocalDateTime to) {
-        ClanWarMemberMissingAttackConditionBuilder builder = new ClanWarMemberMissingAttackConditionBuilder(from, to);
-        BooleanBuilder condition = builder.build();
-        return buildMissingAttackQuery(condition).fetch();
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByStartTime(LocalDateTime from, LocalDateTime to) {
+        ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
+        return buildMissingAttackQuery(condition.build()).fetch();
+    }
+
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByTagAndStartTime(String tag, LocalDateTime from, LocalDateTime to) {
+        ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
+        condition = condition.withPlayerTag(tag);
+        return buildMissingAttackQuery(condition.build()).fetch();
+    }
+
+    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByNameAndStartTime(String name, LocalDateTime from, LocalDateTime to) {
+        ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
+        condition = condition.withPlayerName(name);
+        return buildMissingAttackQuery(condition.build()).fetch();
     }
 
     private JPAQuery<ClanWarMemberMissingAttackDTO> buildMissingAttackQuery(BooleanBuilder condition) {
@@ -54,4 +65,5 @@ public class CLanWarMemberAttackQueryRepository {
                            .having(clanWarMemberAttackEntity.id.order.count().lt(clanWarEntity.attacksPerMember))
                            .orderBy(clanWarEntity.warId.asc(), clanWarMemberEntity.mapPosition.asc());
     }
+
 }

@@ -1,7 +1,10 @@
 package open.api.coc.clans.clean.application.clan.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMissingAttackSearchCriteria;
 import open.api.coc.clans.common.exception.BadRequestException;
+import open.api.coc.clans.domain.clans.converter.TimeUtils;
 
 public record ClanWarMissingAttackQuery(
 
@@ -20,5 +23,12 @@ public record ClanWarMissingAttackQuery(
         if (startDate.isAfter(endDate)) {
             throw new BadRequestException("요청 조회 기간을 확인해주세요");
         }
+    }
+
+    public ClanWarMissingAttackSearchCriteria toSearchCriteria() {
+        LocalDateTime from = TimeUtils.withMinTime(startDate);
+        LocalDateTime to = TimeUtils.withMaxTime(endDate);
+
+        return new ClanWarMissingAttackSearchCriteria(null, null, from ,to);
     }
 }

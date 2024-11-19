@@ -33,7 +33,6 @@ import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
 import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -531,20 +530,6 @@ public class ClanWarService {
         }
 
         return Pageable.ofSize(hallOfFameConfig.getRanking());
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithName(String playerName, Integer queryDate) {
-        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
-        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
-
-        return clanWarQueryRepository.findMissingAttackByNameAndStartTimePeriod(playerName, fromStartTime, toStartTime);
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithTag(String playerTag, Integer queryDate) {
-        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
-        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
-
-        return clanWarQueryRepository.findMissingAttackByTagAndStartTimePeriod(playerTag, fromStartTime, toStartTime);
     }
 
     public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {

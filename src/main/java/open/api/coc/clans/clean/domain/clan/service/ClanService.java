@@ -88,7 +88,7 @@ public class ClanService {
 
     @Transactional
     public Clan createOrActivate(String clanTag) {
-        // 클랜 최신 정보를 조회한다.
+        // COC API 요청으로 클랜의 최신 정보를 조회한다.
         Clan latestClan = clanClient.findByTag(clanTag);
 
         // 클랜 정보를 생성하거나 활성화한다.

@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.common.model.IconUrl;
 import open.api.coc.clans.clean.domain.common.model.Label;
 import open.api.coc.clans.clean.domain.league.model.League;
-import open.api.coc.clans.clean.infrastructure.clan.persistence.entity.ClanLeagueWarEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 
 @Getter
@@ -163,7 +162,7 @@ public class Clan {
 
         updates.forEach((type, yn) -> {
             if (yn != null) {
-                this.clanContent.update(type, yn);
+                this.clanContent.changeActivation(type, yn);
             }
         });
 

@@ -43,28 +43,13 @@ public class ClanContent {
                           .build();
     }
 
-    public void update(ClanContentType type, YnType yn) {
+    public void changeActivation(ClanContentType type, YnType yn) {
         switch (type) {
-            case CLAN_WAR -> this.changeClanWar(yn);
-            case CLAN_WAR_LEAGUE -> this.changeClanWarLeague(yn);
-            case CLAN_WAR_PARALLEL -> this.changeClanWarParallel(yn);
-            case CLAN_CAPITAL -> this.changeClanCapital(yn);
+            case CLAN_WAR -> this.clanWarYn = yn;
+            case CLAN_WAR_LEAGUE -> this.clanWarLeagueYn = yn;
+            case CLAN_WAR_PARALLEL -> this.clanWarParallelYn = yn;
+            case CLAN_CAPITAL -> this.clanCapitalYn = yn;
         }
     }
 
-    public void changeClanWar(YnType clanWarYn) {
-        this.clanWarYn = clanWarYn;
-    }
-
-    public void changeClanWarLeague(YnType clanWarLeagueYn) {
-        this.clanWarLeagueYn = clanWarLeagueYn;
-    }
-
-    public void changeClanWarParallel(YnType clanWarParallelYn) {
-        this.clanWarParallelYn = clanWarParallelYn;
-    }
-
-    public void changeClanCapital(YnType clanCapitalYn) {
-        this.clanCapitalYn = clanCapitalYn;
-    }
 }

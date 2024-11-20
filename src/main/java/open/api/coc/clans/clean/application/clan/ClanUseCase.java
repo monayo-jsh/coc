@@ -27,7 +27,6 @@ public class ClanUseCase {
                     .toList();
     }
 
-    @Transactional
     public ClanResponse registerClan(String clanTag) {
         // 클랜을 등록하거나 활성화한다.
         Clan savedClan = clanService.createOrActivate(clanTag);
@@ -36,8 +35,7 @@ public class ClanUseCase {
         return clanUseCaseMapper.toClanResponse(savedClan);
     }
 
-    @Transactional
     public void deleteClan(String clanTag) {
-        clanService.delete(clanTag);
+        clanService.deactivateClan(clanTag);
     }
 }

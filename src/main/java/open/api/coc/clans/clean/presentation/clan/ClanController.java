@@ -9,11 +9,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanUseCase;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "클랜", description = "클랜 기능 관련")
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/clans")
@@ -39,7 +43,7 @@ public class ClanController {
     })
     @GetMapping("")
     public ResponseEntity<List<ClanResponse>> getClans() {
-        return ResponseEntity.ok()
+        return ResponseEntity.status(HttpStatus.OK)
                              .body(clanUseCase.getClans());
     }
 
@@ -51,13 +55,13 @@ public class ClanController {
         @Parameter(name = "clanTag", description = "클랜 태그", required = true)
     })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "201", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "클랜 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PostMapping("/{clanTag}")
-    public ResponseEntity<ClanResponse> registerClan(@PathVariable String clanTag) {
-
-        return ResponseEntity.ok()
+    public ResponseEntity<ClanResponse> registerClan(@PathVariable @NotBlank String clanTag) {
+        return ResponseEntity.status(HttpStatus.CREATED)
                              .body(clanUseCase.registerClan(clanTag));
     }
 
@@ -70,11 +74,13 @@ public class ClanController {
     })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
+        @ApiResponse(responseCode = "404", description = "클랜 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @DeleteMapping("/{clanTag}")
-    public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
+    public ResponseEntity<Void> deleteClan(@PathVariable @NotBlank String clanTag) {
         clanUseCase.deleteClan(clanTag);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
     }
 }

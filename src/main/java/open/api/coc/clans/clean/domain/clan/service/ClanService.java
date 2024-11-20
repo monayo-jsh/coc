@@ -60,11 +60,11 @@ public class ClanService {
         if (clanRepository.exists(clanTag)) return;
 
         Clan clan = clanClient.findByTag(clanTag);
-        clan.deactivate(); // 비활성화 상태로 생성
+        clan.deactivate(); // 비활성화 설정
+
         create(clan);
     }
 
-    @Transactional
     public Clan create(Clan clan) {
         clan.changeOrder(getClanMaxOrders()); // 클랜 정렬 순서 설정
         clan.createDefaultContent(); // 컨텐츠 활성화 기본 상태 설정
@@ -83,34 +83,19 @@ public class ClanService {
         // 클랜 최신 정보를 조회한다.
         Clan latestClan = clanClient.findByTag(clanTag);
 
-        // 활성화 상태로 설정
-        latestClan.activate();
-
         // 클랜 정보를 생성하거나 활성화한다.
         return clanRepository.findById(clanTag)
-                             .map(existingClan -> update(existingClan, latestClan))
-                             .orElseGet(() -> create(latestClan));
+                             .map(existingClan -> activateClan(existingClan, latestClan))
+                             .orElseGet(() -> createClan(latestClan));
     }
 
-    private Clan update(Clan existingClan, Clan latestClan) {
-        // 클랜 리그 정보 갱신
-        existingClan.changeWarLeague(latestClan.getWarLeague());
-        // 캐피탈 홀 레벨 갱신
-        existingClan.changeClanCapital(latestClan.getClanCapital());
-        // 캐피탈 트로피 점수 갱신
-        existingClan.changeCapitalPoints(latestClan.getClanCapitalPoints());
-        // 캐피탈 리그 갱신
-        existingClan.changeCapitalLeague(latestClan.getCapitalLeague());
-
-        // 클랜 활성화
-        existingClan.activate();
-
-        clanRepository.save(existingClan);
-        return existingClan;
+    private Clan activateClan(Clan existingClan, Clan latestClan) {
+        existingClan.activateWithLatestInfo(latestClan);
+        return clanRepository.save(existingClan);
     }
 
     @Transactional
-    public void delete(String clanTag) {
+    public void deactivateClan(String clanTag) {
         // 클랜을 조회한다.
         Clan clan = clanRepository.findById(clanTag)
                                   .orElseThrow(() -> new ClanNotExistsException(clanTag));
@@ -120,5 +105,10 @@ public class ClanService {
 
         // 클랜 정보를 저장한다.
         clanRepository.save(clan);
+    }
+
+    private Clan createClan(Clan latestClan) {
+        latestClan.activate(); // 활성화 설정
+        return create(latestClan);
     }
 }

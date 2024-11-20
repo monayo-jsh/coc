@@ -139,4 +139,12 @@ public class Clan {
     public void deactivate() {
         this.visibleYn = YnType.N;
     }
+
+    public void activateWithLatestInfo(Clan latestClan) {
+        this.changeWarLeague(latestClan.getWarLeague()); // 클랜 리그 정보 갱신
+        this.changeClanCapital(latestClan.getClanCapital()); // 캐피탈 홀 레벨 갱신
+        this.changeCapitalPoints(latestClan.getClanCapitalPoints()); // 캐피탈 트로피 점수 갱신
+        this.changeCapitalLeague(latestClan.getCapitalLeague()); // 캐피탈 리그 갱신
+        this.activate(); // 활성화 설정
+    }
 }

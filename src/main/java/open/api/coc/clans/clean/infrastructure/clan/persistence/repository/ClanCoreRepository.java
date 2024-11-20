@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.infrastructure.clan.persistence.repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
@@ -26,25 +27,24 @@ public class ClanCoreRepository implements ClanRepository {
 
     @Override
     public Optional<Clan> findById(String tag) {
-        if (tag == null) {
-            throw new IllegalArgumentException("tag can not be null");
-        }
         return queryRepository.findById(tag)
                               .map(clanEntityMapper::toClan);
     }
 
     @Override
-    public List<ClanEntity> findByIds(List<String> clanTags) {
-        if (clanTags == null || clanTags.isEmpty()) {
-            throw new IllegalArgumentException("clanTags can not be null or empty");
-        }
-
-        return queryRepository.findByIds(clanTags);
+    public List<Clan> findByIds(List<String> clanTags) {
+        return queryRepository.findByIds(clanTags)
+                              .stream()
+                              .map(clanEntityMapper::toClan)
+                              .collect(Collectors.toList());
     }
 
     @Override
-    public List<ClanEntity> findAllActiveClans() {
-        return queryRepository.findAllActiveClans();
+    public List<Clan> findAllActiveClans() {
+        return queryRepository.findAllActiveClans()
+                              .stream()
+                              .map(clanEntityMapper::toClan)
+                              .collect(Collectors.toList());
     }
 
     @Override
@@ -53,8 +53,11 @@ public class ClanCoreRepository implements ClanRepository {
     }
 
     @Override
-    public List<ClanEntity> findAllActiveCapitalClans() {
-        return queryRepository.findAllActiveCapitalClans();
+    public List<Clan> findAllActiveCapitalClans() {
+        return queryRepository.findAllActiveCapitalClans()
+                              .stream()
+                              .map(clanEntityMapper::toClan)
+                              .collect(Collectors.toList());
     }
 
     @Override

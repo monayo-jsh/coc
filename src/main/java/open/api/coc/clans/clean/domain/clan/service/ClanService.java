@@ -9,8 +9,6 @@ import open.api.coc.clans.clean.domain.clan.exception.ClanNotExistsException;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
-import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanEntityMapper;
-import open.api.coc.clans.database.entity.clan.ClanEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,20 +17,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClanService {
 
     private final ClanClient clanClient;
-
     private final ClanRepository clanRepository;
-    private final ClanEntityMapper clanMapper;
 
     @Transactional(readOnly = true)
     public Clan findById(String clanTag) {
+        if (clanTag == null || clanTag.isEmpty()) {
+            throw new IllegalArgumentException("clanTag can not be null");
+        }
+
         return clanRepository.findById(clanTag)
                              .orElseThrow(() -> new ClanNotExistsException(clanTag));
     }
 
     @Transactional(readOnly = true)
     public List<Clan> findAllByIds(List<String> clanTags) {
-        List<ClanEntity> clanEntities = clanRepository.findByIds(clanTags);
-        return toDomains(clanEntities);
+        if (clanTags == null || clanTags.isEmpty()) {
+            throw new IllegalArgumentException("clanTags is empty");
+        }
+
+        return clanRepository.findByIds(clanTags);
     }
 
     @Transactional(readOnly = true)
@@ -43,23 +46,12 @@ public class ClanService {
 
     @Transactional(readOnly = true)
     public List<Clan> findAllActiveClans() {
-        List<ClanEntity> clans = clanRepository.findAllActiveClans();
-
-        return clans.stream()
-                    .map(clanMapper::toClan)
-                    .toList();
+        return clanRepository.findAllActiveClans();
     }
 
     @Transactional(readOnly = true)
     public List<Clan> findAllActiveCapitalClans() {
-        List<ClanEntity> clanEntities = clanRepository.findAllActiveCapitalClans();
-        return toDomains(clanEntities);
-    }
-
-    private List<Clan> toDomains(List<ClanEntity> clanEntities) {
-        return clanEntities.stream()
-                           .map(clanMapper::toClan)
-                           .toList();
+        return clanRepository.findAllActiveCapitalClans();
     }
 
     @Transactional

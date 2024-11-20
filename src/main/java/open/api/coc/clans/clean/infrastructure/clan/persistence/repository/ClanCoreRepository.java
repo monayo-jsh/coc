@@ -17,8 +17,8 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class ClanCoreRepository implements ClanRepository {
 
-    private final JpaClanRepository jpaClanRepository;
-    private final JpaClanCustomRepository jpaClanCustomRepository;
+    private final JpaClanRepository repository;
+    private final JpaClanQueryRepository queryRepository;
 
     private final ClanEntityMapper clanEntityMapper;
     private final ClanContentEntityMapper contentEntityMapper;
@@ -29,7 +29,7 @@ public class ClanCoreRepository implements ClanRepository {
         if (tag == null) {
             throw new IllegalArgumentException("tag can not be null");
         }
-        return jpaClanCustomRepository.findById(tag);
+        return queryRepository.findById(tag);
     }
 
     @Override
@@ -38,22 +38,27 @@ public class ClanCoreRepository implements ClanRepository {
             throw new IllegalArgumentException("clanTags can not be null or empty");
         }
 
-        return jpaClanCustomRepository.findByIds(clanTags);
+        return queryRepository.findByIds(clanTags);
+    }
+
+    @Override
+    public List<ClanEntity> findAllActiveClans() {
+        return queryRepository.findAllActiveClans();
     }
 
     @Override
     public boolean exists(String tag) {
-        return jpaClanRepository.existsById(tag);
+        return repository.existsById(tag);
     }
 
     @Override
     public List<ClanEntity> findAllActiveCapitalClans() {
-        return jpaClanCustomRepository.findAllActiveCapitalClans();
+        return queryRepository.findAllActiveCapitalClans();
     }
 
     @Override
     public Integer selectMaxOrders() {
-        return jpaClanCustomRepository.selectMaxOrder();
+        return queryRepository.selectMaxOrder();
     }
 
     @Override
@@ -69,7 +74,7 @@ public class ClanCoreRepository implements ClanRepository {
         ClanBadgeEntity badgeEntity = badgeEntityMapper.toClanBadgeEntity(clan.getBadgeUrl());
         clanEntity.changeBadgeUrl(badgeEntity);
 
-        ClanEntity saveEntity = jpaClanRepository.save(clanEntity);
+        ClanEntity saveEntity = repository.save(clanEntity);
         return clanEntityMapper.toClan(saveEntity);
     }
 }

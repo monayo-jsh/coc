@@ -51,6 +51,15 @@ public class ClanService {
     }
 
     @Transactional(readOnly = true)
+    public List<Clan> findAllActiveClans() {
+        List<ClanEntity> clans = clanRepository.findAllActiveClans();
+
+        return clans.stream()
+                    .map(clanMapper::toClan)
+                    .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<Clan> findAllActiveCapitalClans() {
         List<ClanEntity> clanEntities = clanRepository.findAllActiveCapitalClans();
         return toDomains(clanEntities);
@@ -85,4 +94,5 @@ public class ClanService {
                        .orElse(0);
 
     }
+
 }

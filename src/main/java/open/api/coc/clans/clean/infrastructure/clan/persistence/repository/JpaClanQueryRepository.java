@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaClanCustomRepository {
+public class JpaClanQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -34,6 +34,13 @@ public class JpaClanCustomRepository {
         condition.and(clanEntity.tag.in(clanTags));
 
         return createSelectClanBaseQuery().where(condition)
+                                          .fetch();
+    }
+
+    public List<ClanEntity> findAllActiveClans() {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
                                           .fetch();
     }
 
@@ -64,4 +71,5 @@ public class JpaClanCustomRepository {
                            .from(clanEntity)
                            .fetchOne();
     }
+
 }

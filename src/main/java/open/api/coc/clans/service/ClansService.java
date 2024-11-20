@@ -241,15 +241,6 @@ public class ClansService {
          clanContentRepository.save(clanContent);
     }
 
-    @Transactional
-    public void deactivateClan(String clanTag) {
-        ClanEntity clan = clanRepository.findById(clanTag)
-                                        .orElseThrow(() -> createNotFoundException("클랜(%s) 조회 정보 없음".formatted(clanTag)));
-
-        clan.setVisibleYn(YnType.N);
-        clanRepository.save(clan);
-    }
-
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {
         String latestSeasonDate = clanAssignedPlayerQueryRepository.findLatestSeasonDate();
 

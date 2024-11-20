@@ -46,23 +46,6 @@ public class ClansController {
     private final ClanWarLeagueScheduler scheduler;
 
     @Operation(
-        summary = "클랜 정보를 삭제합니다., version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 클랜 정보를 삭제합니다."
-    )
-    @Parameters(value = {
-        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @DeleteMapping("/{clanTag}")
-    public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
-        clansService.deactivateClan(clanTag);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(
         summary = "클랜의 컨텐츠 정보를 수정합니다. version: 1.00, Last Update: 24.08.22",
         description = "이 API는 클랜의 컨텐츠 정보를 업데이트합니다. <br/>클랜 태그를 기반으로 해당 클랜의 다양한 컨텐츠 설정을 수정할 수 있습니다.",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(

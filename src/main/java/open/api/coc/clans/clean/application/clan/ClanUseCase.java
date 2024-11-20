@@ -36,4 +36,8 @@ public class ClanUseCase {
         return clanUseCaseMapper.toClanResponse(savedClan);
     }
 
+    @Transactional
+    public void deleteClan(String clanTag) {
+        clanService.delete(clanTag);
+    }
 }

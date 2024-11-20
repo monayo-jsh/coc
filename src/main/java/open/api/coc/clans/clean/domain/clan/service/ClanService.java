@@ -116,4 +116,17 @@ public class ClanService {
         clanRepository.save(existingClan);
         return existingClan;
     }
+
+    @Transactional
+    public void delete(String clanTag) {
+        // 클랜을 조회한다.
+        Clan clan = clanRepository.findById(clanTag)
+                                  .orElseThrow(() -> new ClanNotExistsException(clanTag));
+
+        // 클랜을 비활성화한다.
+        clan.deactivate();
+
+        // 클랜 정보를 저장한다.
+        clanRepository.save(clan);
+    }
 }

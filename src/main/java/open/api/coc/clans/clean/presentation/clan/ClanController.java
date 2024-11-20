@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanUseCase;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,7 @@ public class ClanController {
     }
 
     @Operation(
-        summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.08.14",
+        summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.11.20",
         description = "이 API는 클랜 정보를 등록합니다."
     )
     @Parameters(value = {
@@ -60,4 +61,20 @@ public class ClanController {
                              .body(clanUseCase.registerClan(clanTag));
     }
 
+    @Operation(
+        summary = "클랜 정보를 삭제합니다., version: 1.00, Last Update: 24.11.20",
+        description = "이 API는 클랜 정보를 삭제합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @DeleteMapping("/{clanTag}")
+    public ResponseEntity<Void> deleteClan(@PathVariable String clanTag) {
+        clanUseCase.deleteClan(clanTag);
+        return ResponseEntity.noContent().build();
+    }
 }

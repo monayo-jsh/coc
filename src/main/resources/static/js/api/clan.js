@@ -9,6 +9,7 @@ const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜
 
 const URI_CLAN = `${PREFIX_CLAN_API}`; //클랜 목록 조회
 const URI_CLAN_REGISTER = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 등록
+const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
@@ -79,7 +80,8 @@ async function fetchClan(clanTag) {
 }
 
 async function deleteClan(clanTag) {
-  const uri = `${URI_CLAN}/${encodeURIComponent(clanTag)}`
+  const uri = URI_CLAN_DELETE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+
   return await axios.delete(uri)
                     .then((response) => {
                       alert('삭제 되었습니다.');

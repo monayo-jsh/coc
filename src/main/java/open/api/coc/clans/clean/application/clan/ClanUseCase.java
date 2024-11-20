@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ClanUseCase {
 
     private final ClanService clanService;
+
     private final ClanUseCaseMapper clanUseCaseMapper;
 
     @Transactional(readOnly = true)
@@ -50,5 +51,15 @@ public class ClanUseCase {
                                      command.clanCapitalYn());
 
         clanService.save(clan);
+    }
+
+    public List<ClanResponse> getWarClans(String warType) {
+        // 클랜 목록을 조회한다.
+        List<Clan> clans = clanService.findAllByWarType(warType);
+
+        // 응답
+        return clans.stream()
+                    .map(clanUseCaseMapper::toClanResponse)
+                    .toList();
     }
 }

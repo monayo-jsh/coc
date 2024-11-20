@@ -12,11 +12,12 @@ import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanEntit
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ClanCoreRepository implements ClanRepository {
+public class ClanDatabaseService implements ClanRepository {
 
     private final JpaClanRepository repository;
     private final JpaClanQueryRepository queryRepository;
@@ -40,8 +41,8 @@ public class ClanCoreRepository implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllActiveClans() {
-        return queryRepository.findAllActiveClans()
+    public List<Clan> findAllClans() {
+        return queryRepository.findAllActiveClan()
                               .stream()
                               .map(clanEntityMapper::toClan)
                               .collect(Collectors.toList());
@@ -53,8 +54,18 @@ public class ClanCoreRepository implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllActiveCapitalClans() {
-        return queryRepository.findAllActiveCapitalClans()
+    public List<Clan> findAllCapitalClans() {
+        return queryRepository.findAllActiveCapitalClan()
+                              .stream()
+                              .map(clanEntityMapper::toClan)
+                              .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Clan> findAllByWarType(String warType) {
+        ClanWarType clanWarType = ClanWarType.from(warType);
+
+        return queryRepository.findAllActiveClanByWarType(clanWarType)
                               .stream()
                               .map(clanEntityMapper::toClan)
                               .collect(Collectors.toList());

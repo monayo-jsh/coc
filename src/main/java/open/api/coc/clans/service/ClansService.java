@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.entity.ClanLeagueWarEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
@@ -24,7 +25,6 @@ import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPK;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanLeagueAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.clan.ClanLeagueWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
@@ -47,7 +47,6 @@ import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupRespon
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
-import open.api.coc.clans.domain.clans.query.WarClanQuery;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
@@ -68,7 +67,6 @@ public class ClansService {
 
     private final ClanApiService clanApiService;
     private final ClanWarService clanWarService;
-    private final LeagueWarService leagueWarService;
 
     private final ClanRepository clanRepository;
     private final ClanQueryRepository clanQueryRepository;
@@ -462,10 +460,6 @@ public class ClansService {
                                              .build();
     }
 
-    public Optional<ClanEntity> findClanEntityBy(String clanTag) {
-        return clanRepository.findById(clanTag);
-    }
-
     @Transactional
     public ClanCurrentWarLeagueGroupResponse getClanCurrentWarLeagueGroup(String clanTag) {
         String season = getCurrentSeason();
@@ -553,21 +547,6 @@ public class ClansService {
                 log.error("클랜원 자동 등록 실패 : {}", e.getMessage());
             }
         }
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanResponse> getWarClans(String warType) {
-        WarClanQuery query = WarClanQuery.create(warType);
-        List<ClanEntity> clans = clanQueryRepository.findActiveWarClanBy(query);
-
-        if (query.isLeagueWar()) {
-            // 리그전 클랜 목록 조회 시 리그전 정보는 현재 시즌 리그전 정보로 설정
-            leagueWarService.assignCurrentSeasonLeagueInfo(clans);
-        }
-
-        return clans.stream()
-                    .map(clanResponseConverter::convert)
-                    .collect(Collectors.toList());
     }
 
     public List<ClanResponse> getActiveCompetitionClans() {

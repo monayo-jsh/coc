@@ -28,6 +28,10 @@ public enum ClanWarType {
         }
     };
 
+    public static ClanWarType from(String warType) {
+        return valueOf(warType.toUpperCase());
+    }
+
     public abstract BooleanExpression getCondition();
 
 }

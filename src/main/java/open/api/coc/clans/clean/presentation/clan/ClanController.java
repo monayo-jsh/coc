@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanUseCase;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "클랜", description = "클랜 기능 관련")
@@ -122,4 +124,23 @@ public class ClanController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }
+
+    @Operation(
+        summary = "전쟁 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.11.20",
+        description = "이 API는 전쟁 활성화 클랜 목록을 제공합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "type", description = "조회 유형 (none: 클랜전 (기본값), parallel: 병행클랜전, league: 리그전)", example = "none")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/war")
+    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "none") @Pattern(regexp = "none|parallel|league", message = "조회 유형 (none: 클랜전 (기본값), parallel: 병행클랜전, league: 리그전) 값으로 요청해주세요.") String type) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(clanUseCase.getWarClans(type));
+    }
+
 }

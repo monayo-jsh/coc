@@ -59,14 +59,6 @@ public class ClanQueryRepository {
                                           .fetch();
     }
 
-    public List<ClanEntity> findActiveWarClanBy(WarClanQuery query) {
-        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(query.getType().getCondition());
-
-        return createSelectClanBaseQuery().where(condition)
-                                          .orderBy(clanEntity.order.asc())
-                                          .fetch();
-    }
-
     public void saveAll(List<ClanEntity> clanEntities) {
         clanRepository.saveAll(clanEntities);
     }
@@ -79,4 +71,5 @@ public class ClanQueryRepository {
                                           .orderBy(clanEntity.order.asc())
                                           .fetch();
     }
+
 }

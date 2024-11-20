@@ -1,4 +1,4 @@
-package open.api.coc.clans.database.entity.clan;
+package open.api.coc.clans.clean.infrastructure.clan.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,25 +1,21 @@
-package open.api.coc.clans.database.repository.clan;
+package open.api.coc.clans.clean.infrastructure.clan.persistence.repository;
 
-import static open.api.coc.clans.database.entity.clan.QClanLeagueWarEntity.clanLeagueWarEntity;
+import static open.api.coc.clans.clean.infrastructure.clan.persistence.entity.QClanLeagueWarEntity.clanLeagueWarEntity;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.clan.ClanLeagueWarEntity;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.entity.ClanLeagueWarEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ClanLeagueWarQueryRepository {
+public class JpaClanLeagueWarQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
     public List<ClanLeagueWarEntity> findAllBySeason(String season) {
-        if (season == null || season.isBlank()) {
-            throw new IllegalArgumentException("startDate is not null.");
-        }
-
         BooleanBuilder leagueWarCondition = new BooleanBuilder();
         leagueWarCondition.and(clanLeagueWarEntity.season.eq(season));
 

@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <script src="/static/js/api/clan.js"></script>
   <script src="/static/js/api/clanWar.js"></script>
   <script src="/static/js/util.js"></script>
   <script type="text/javascript">
@@ -456,8 +457,7 @@
 
     function getUriForClanWarViewType() {
       const urlSearchParams = new URLSearchParams(location.search);
-      const warType = urlSearchParams.get('type');
-      return `/clans/war?warType=${warType}`;
+      return urlSearchParams.get('type');
     }
 
     let clanWarSize = -1;
@@ -468,51 +468,49 @@
     function getClans() {
       showWifiLoading('.card-container');
 
-      const uri = getUriForClanWarViewType();
-      axios.get(uri)
-           .then((response) => {
-             const { data } = response;
+      const warType = getUriForClanWarViewType();
+      fetchWarClans(warType)
+      .then((clans) => {
+        if (!clans || !clans.length) {
+          hideWifiLoading('.card-container');
+          const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+          clanWarCard.classList.add('display-none');
+          const clanWarEmptyCard = document.querySelector('.empty-clan');
+          clanWarEmptyCard.classList.remove('display-none');
+          return;
+        }
 
-             if (!data || !data.length) {
-               hideWifiLoading('.card-container');
-               const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
-               clanWarCard.classList.add('display-none');
-               const clanWarEmptyCard = document.querySelector('.empty-clan');
-               clanWarEmptyCard.classList.remove('display-none');
-               return;
-             }
+        clanWarSize = clans.length;
 
-             clanWarSize = data.length;
+        clans.forEach(clan => ClanWarMap.set(clan.tag, clan));
 
-             data.forEach(clan => ClanWarMap.set(clan.tag, clan));
+        const carousel = document.querySelector(".carousel");
+        for (const clan of clans) {
+          const { tag, name } = clan;
 
-             const carousel = document.querySelector(".carousel");
-             for (let index = 0; index<data.length; index++) {
-               const { tag, name } = data[index];
+          const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+          const clanWarContents = templateClanWar.querySelector('.card-contents');
 
-               const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-               const clanWarContents = templateClanWar.querySelector('.card-contents');
+          clanWarContents.classList.add('display-none');
+          clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                     .replace(/{CLAN_TAG}/, tag)
+                                                     .replace(/{CLAN_NAME}/g, name);
 
-               clanWarContents.classList.add('display-none');
-               clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                          .replace(/{CLAN_TAG}/, tag)
-                                                          .replace(/{CLAN_NAME}/g, name);
+          settingClanWar(clanWarContents, tag)
+          .then(() => {
+            clanWarContents.classList.remove('display-none');
+            complatedDrawClanWarSet.add(tag);
+          });
 
-               settingClanWar(clanWarContents, tag)
-               .then(() => {
-                 clanWarContents.classList.remove('display-none');
-                 complatedDrawClanWarSet.add(tag);
-               });
+          carousel.appendChild(templateClanWar);
+        }
 
-               carousel.appendChild(templateClanWar);
-             }
-
-             //initCardSlide();
-             hideWifiLoading('.card-container');
-           })
-           .catch((error) => {
-             console.error(error);
-           });
+        //initCardSlide();
+        hideWifiLoading('.card-container');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     }
 
     function switchAttacks(element) {

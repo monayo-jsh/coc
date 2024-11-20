@@ -18,6 +18,10 @@ public class League {
     private String name; // 이름
     private IconUrl iconUrl; // 아이콘 정보
 
+    public static League create(String warLeague) {
+        return League.builder().name(warLeague).build();
+    }
+
     public boolean isLegend() {
         return this.name.toLowerCase().contains("legend");
     }

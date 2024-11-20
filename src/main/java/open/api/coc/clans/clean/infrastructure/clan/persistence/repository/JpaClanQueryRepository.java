@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import org.springframework.stereotype.Repository;
 
@@ -38,16 +39,24 @@ public class JpaClanQueryRepository {
                                           .fetch();
     }
 
-    public List<ClanEntity> findAllActiveClans() {
+    public List<ClanEntity> findAllActiveClan() {
         BooleanBuilder condition = createSelectClanBaseConditionBuilder();
         return createSelectClanBaseQuery().where(condition)
                                           .orderBy(clanEntity.order.asc())
                                           .fetch();
     }
 
-    public List<ClanEntity> findAllActiveCapitalClans() {
+    public List<ClanEntity> findAllActiveCapitalClan() {
         BooleanBuilder condition = createSelectClanBaseConditionBuilder();
         condition.and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
+
+    public List<ClanEntity> findAllActiveClanByWarType(ClanWarType clanWarType) {
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanWarType.getCondition());
 
         return createSelectClanBaseQuery().where(condition)
                                           .orderBy(clanEntity.order.asc())

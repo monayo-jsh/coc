@@ -42,26 +42,6 @@ public class ClansController {
     private final ClanWarLeagueScheduler scheduler;
 
     @Operation(
-        summary = "전쟁 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 조회 유형에 따라 전쟁 활성화 클랜 목록을 반환합니다."
-            + "<br>'none'은 클랜전, 'parallel'은 병행클랜전, 'league'는 리그전 클랜 목록을 조회합니다."
-            + "<br> 리그전 클랜 목록의 리그전 정보는 현재 시즌 참여한 리그전 정보로 제공됩니다."
-    )
-    @Parameters(value = {
-        @Parameter(name = "warType", description = "조회 유형 (none: 클랜전, parallel: 병행클랜전, league: 리그전)", example = "none")
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/war")
-    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "none") String warType) {
-        return ResponseEntity.ok()
-                             .body(clansService.getWarClans(warType));
-    }
-
-    @Operation(
         summary = "대회 활성화된 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",
         description = "이 API는 대회 활성화된 클랜 목록을 반환합니다."
     )

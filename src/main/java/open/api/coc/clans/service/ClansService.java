@@ -145,14 +145,6 @@ public class ClansService {
         return clanCurrentWarResConverter.convert(leagueWar);
     }
 
-    public List<ClanResponse> getActiveClans() {
-        List<ClanEntity> clans = clanQueryRepository.findAllActiveClans();
-
-        return clans.stream()
-                    .map(clanResponseConverter::convert)
-                    .collect(Collectors.toList());
-    }
-
     public List<ClanResponse> getActiveCapitalClans() {
         List<ClanEntity> clanCapitalList = clanQueryRepository.findAllActiveCapitalClans();
 

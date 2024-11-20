@@ -22,14 +22,6 @@ public class ClanQueryRepository {
     private final ClanRepository clanRepository;
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanEntity> findAllActiveClans() {
-        BooleanBuilder condition = createSelectClanBaseConditionBuilder();
-
-        return createSelectClanBaseQuery().where(condition)
-                                          .orderBy(clanEntity.order.asc())
-                                          .fetch();
-    }
-
     public List<ClanEntity> findAllActiveCapitalClans() {
         BooleanBuilder condition = createSelectClanBaseConditionBuilder();
         condition.and(clanContentEntity.clanCapitalYn.eq(YnType.Y.name()));

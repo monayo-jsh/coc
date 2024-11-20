@@ -49,20 +49,6 @@ public class ClansController {
     private final ClanWarLeagueScheduler scheduler;
 
     @Operation(
-        summary = "클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.14",
-        description = "이 API는 클랜 목록을 제공합니다."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("")
-    public ResponseEntity<List<ClanResponse>> getClans() {
-        return ResponseEntity.ok()
-                             .body(clansService.getActiveClans());
-    }
-
-    @Operation(
         summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.08.14",
         description = "이 API는 클랜 정보를 등록합니다.",
         requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(

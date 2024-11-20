@@ -7,7 +7,7 @@ const URI_COMPETITION_CLANS = "/clans/competition"; //대회 클랜 목록 조�
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
-const URI_CLANS = '/clans'; //전체 클랜 목록 조회
+const URI_CLANS = `${PREFIX_CLAN_API}`; //클랜 목록 조회
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회

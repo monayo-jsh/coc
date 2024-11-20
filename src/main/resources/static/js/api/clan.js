@@ -10,6 +10,9 @@ const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜
 const URI_CLAN = `${PREFIX_CLAN_API}`; //클랜 목록 조회
 const URI_CLAN_REGISTER = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 등록
 const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
+
+const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
+
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
@@ -26,8 +29,6 @@ const URI_LATEST_LEAGUE_ASSIGNED_MEMBERS = `/clans/league/assigned/members/lates
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/members` //리그 배정 멤버 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //리그 일괄 배정
-
-const URI_CLAN_CONTENT_STATUS = `/clans/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
 const URL_CLAN_GAME_LATEST = `/api/clan/game/latest`; // 최근 클랜 게임 목록 조회
 
@@ -102,7 +103,7 @@ async function deleteClan(clanTag) {
 }
 
 async function updateClanContent(clanTag, requestBody) {
-  const uri = URI_CLAN_CONTENT_STATUS.replace(/{clanTag}/, encodeURIComponent(clanTag))
+  const uri = URI_CLAN_CONTENT_ACTIVATION.replace(/{clanTag}/, encodeURIComponent(clanTag))
 
   return await axios.put(uri, requestBody)
                     .then((response) => {

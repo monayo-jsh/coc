@@ -16,21 +16,17 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
-import open.api.coc.clans.domain.clans.ClanContentCommand;
-import open.api.coc.clans.domain.clans.ClanContentRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,35 +40,6 @@ public class ClansController {
 
     private final ClansService clansService;
     private final ClanWarLeagueScheduler scheduler;
-
-    @Operation(
-        summary = "클랜의 컨텐츠 정보를 수정합니다. version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 클랜의 컨텐츠 정보를 업데이트합니다. <br/>클랜 태그를 기반으로 해당 클랜의 다양한 컨텐츠 설정을 수정할 수 있습니다.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "클랜 컨텐츠 수정 객체",
-            required = true,
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ClanContentRequest.class)
-            )
-        )
-    )
-    @Parameters(value = {
-        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "성공 (No Content)"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @PutMapping("/{clanTag}/content")
-    public ResponseEntity<Void> putContent(@PathVariable String clanTag,
-                                                         @RequestBody ClanContentRequest clanContentRequest) {
-
-        ClanContentCommand command = ClanContentCommand.create(clanTag, clanContentRequest);
-        clansService.updateClanContentStatus(command);
-
-        return ResponseEntity.noContent().build();
-    }
 
     @Operation(
         summary = "전쟁 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.08.22",

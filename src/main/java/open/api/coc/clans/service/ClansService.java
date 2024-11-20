@@ -39,7 +39,6 @@ import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
-import open.api.coc.clans.domain.clans.ClanContentCommand;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
@@ -61,7 +60,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -214,31 +212,6 @@ public class ClansService {
         return clanQueryRepository.findAllByID(clanTags)
                                   .stream()
                                   .collect(Collectors.toMap(ClanEntity::getTag, entity -> entity));
-    }
-
-    @Transactional
-    public void updateClanContentStatus(ClanContentCommand command) {
-
-        ClanContentEntity clanContent = clanContentRepository.findById(command.getClanTag())
-                                                             .orElseThrow(() -> createNotFoundException("클랜[%s] 컨텐츠 정보".formatted(command.getClanTag())));
-
-        if (StringUtils.hasText(command.getClanWarYn())) {
-            clanContent.setClanWarYn(command.getClanWarYn());
-        }
-
-        if (StringUtils.hasText(command.getClanWarLeagueYn())) {
-            clanContent.setWarLeagueYn(command.getClanWarLeagueYn());
-        }
-
-        if (StringUtils.hasText(command.getClanCapitalYn())) {
-            clanContent.setClanCapitalYn(command.getClanCapitalYn());
-        }
-
-        if (StringUtils.hasText(command.getClanWarParallelYn())) {
-            clanContent.setClanWarParallelYn(command.getClanWarParallelYn());
-        }
-
-         clanContentRepository.save(clanContent);
     }
 
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {

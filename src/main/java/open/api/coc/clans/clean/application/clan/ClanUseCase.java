@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.application.clan;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
@@ -37,5 +38,17 @@ public class ClanUseCase {
 
     public void deleteClan(String clanTag) {
         clanService.deactivateClan(clanTag);
+    }
+
+    @Transactional
+    public void updateContentActivation(ClanContentUpdateCommand command) {
+        Clan clan = clanService.findById(command.clanTag());
+
+        clan.changeContentActivation(command.clanWarYn(),
+                                     command.clanWarLeagueYn(),
+                                     command.clanWarParallelYn(),
+                                     command.clanCapitalYn());
+
+        clanService.save(clan);
     }
 }

@@ -1,7 +1,9 @@
 package open.api.coc.clans.clean.domain.clan.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -146,5 +148,23 @@ public class Clan {
         this.changeCapitalPoints(latestClan.getClanCapitalPoints()); // 캐피탈 트로피 점수 갱신
         this.changeCapitalLeague(latestClan.getCapitalLeague()); // 캐피탈 리그 갱신
         this.activate(); // 활성화 설정
+    }
+
+    public void changeContentActivation(YnType clanWarYn, YnType clanWarLeagueYn, YnType clanWarParallelYn, YnType clanCapitalYn) {
+        Map<ClanContentType, YnType> updates = new HashMap<>(){
+            {
+                put(ClanContentType.CLAN_WAR, clanWarYn);
+                put(ClanContentType.CLAN_WAR_LEAGUE, clanWarLeagueYn);
+                put(ClanContentType.CLAN_WAR_PARALLEL, clanWarParallelYn);
+                put(ClanContentType.CLAN_CAPITAL, clanCapitalYn);
+            }
+        };
+
+        updates.forEach((type, yn) -> {
+            if (yn != null) {
+                this.clanContent.update(type, yn);
+            }
+        });
+
     }
 }

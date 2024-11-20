@@ -111,4 +111,8 @@ public class ClanService {
         latestClan.activate(); // 활성화 설정
         return create(latestClan);
     }
+
+    public void save(Clan clan) {
+        clanRepository.save(clan);
+    }
 }

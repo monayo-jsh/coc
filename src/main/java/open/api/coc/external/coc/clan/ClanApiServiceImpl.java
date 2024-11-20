@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
@@ -34,15 +33,6 @@ public class ClanApiServiceImpl implements ClanApiService {
                                              .uri(clashOfClanConfig.getClansClanTagUri(), clanTag)
                                              .retrieve()
                                              .body(Clan.class));
-    }
-
-    @Override
-    public Optional<ClanCapitalRaidSeasons> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
-        String uri = clashOfClanConfig.getClansClanTagCapitalRaidSeasonsUri() + "?limit=" + limit;
-        return Optional.ofNullable(restClient.get()
-                                             .uri(uri, clanTag)
-                                             .retrieve()
-                                             .body(ClanCapitalRaidSeasons.class));
     }
 
     @Override

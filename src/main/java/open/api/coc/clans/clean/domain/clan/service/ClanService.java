@@ -23,18 +23,9 @@ public class ClanService {
     private final ClanRepository clanRepository;
     private final ClanEntityMapper clanMapper;
 
-    public void validateClanExists(String clanTag) {
-        if (clanRepository.exists(clanTag)) {
-            return;
-        }
-
-        throw new ClanNotExistsException(clanTag);
-    }
-
     @Transactional(readOnly = true)
     public Clan findById(String clanTag) {
         return clanRepository.findById(clanTag)
-                             .map(clanMapper::toClan)
                              .orElseThrow(() -> new ClanNotExistsException(clanTag));
     }
 
@@ -76,13 +67,13 @@ public class ClanService {
         if (clanTag == null || clanTag.isEmpty()) return;
         if (clanRepository.exists(clanTag)) return;
 
-        create(clanTag);
+        Clan clan = clanClient.findByTag(clanTag);
+        clan.deactivate(); // 비활성화 상태로 생성
+        create(clan);
     }
 
     @Transactional
-    public Clan create(String clanTag) {
-        Clan clan = clanClient.findByTag(clanTag);
-
+    public Clan create(Clan clan) {
         clan.changeOrder(getClanMaxOrders()); // 클랜 정렬 순서 설정
         clan.createDefaultContent(); // 컨텐츠 활성화 기본 상태 설정
 
@@ -95,4 +86,34 @@ public class ClanService {
 
     }
 
+    @Transactional
+    public Clan createOrActivate(String clanTag) {
+        // 클랜 최신 정보를 조회한다.
+        Clan latestClan = clanClient.findByTag(clanTag);
+
+        // 활성화 상태로 설정
+        latestClan.activate();
+
+        // 클랜 정보를 생성하거나 활성화한다.
+        return clanRepository.findById(clanTag)
+                             .map(existingClan -> update(existingClan, latestClan))
+                             .orElseGet(() -> create(latestClan));
+    }
+
+    private Clan update(Clan existingClan, Clan latestClan) {
+        // 클랜 리그 정보 갱신
+        existingClan.changeWarLeague(latestClan.getWarLeague());
+        // 캐피탈 홀 레벨 갱신
+        existingClan.changeClanCapital(latestClan.getClanCapital());
+        // 캐피탈 트로피 점수 갱신
+        existingClan.changeCapitalPoints(latestClan.getClanCapitalPoints());
+        // 캐피탈 리그 갱신
+        existingClan.changeCapitalLeague(latestClan.getCapitalLeague());
+
+        // 클랜 활성화
+        existingClan.activate();
+
+        clanRepository.save(existingClan);
+        return existingClan;
+    }
 }

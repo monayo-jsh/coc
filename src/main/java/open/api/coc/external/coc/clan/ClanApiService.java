@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
 import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Component;
 public interface ClanApiService {
 
     Optional<Clan> findClanByClanTag(String clanTag);
-
-    Optional<ClanCapitalRaidSeasons> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit);
 
     Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag);
 

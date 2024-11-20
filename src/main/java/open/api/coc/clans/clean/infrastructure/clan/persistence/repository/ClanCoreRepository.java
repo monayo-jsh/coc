@@ -25,11 +25,12 @@ public class ClanCoreRepository implements ClanRepository {
     private final ClanBadgeEntityMapper badgeEntityMapper;
 
     @Override
-    public Optional<ClanEntity> findById(String tag) {
+    public Optional<Clan> findById(String tag) {
         if (tag == null) {
             throw new IllegalArgumentException("tag can not be null");
         }
-        return queryRepository.findById(tag);
+        return queryRepository.findById(tag)
+                              .map(clanEntityMapper::toClan);
     }
 
     @Override
@@ -65,6 +66,10 @@ public class ClanCoreRepository implements ClanRepository {
     public Clan save(Clan clan) {
         // 클랜 엔티티 생성
         ClanEntity clanEntity = clanEntityMapper.toClanEntity(clan);
+        if (exists(clanEntity.getId())) {
+            // 기존 객체 처리
+            clanEntity.markNotNew();
+        }
 
         // 클랜 컨텐츠 매핑
         ClanContentEntity contentEntity = contentEntityMapper.toClanContentEntity(clan.getClanContent());

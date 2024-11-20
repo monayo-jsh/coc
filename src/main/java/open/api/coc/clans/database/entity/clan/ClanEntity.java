@@ -85,7 +85,7 @@ public class ClanEntity implements Persistable<String> {
     @Column(name = "war_description", nullable = true)
     private String warDescription;
 
-    @Column(name = "reg_date", nullable = false)
+    @Column(name = "reg_date", nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime regDate;
 
@@ -108,7 +108,7 @@ public class ClanEntity implements Persistable<String> {
 
     @PrePersist
     @PostLoad
-    void markNotNew() {
+    public void markNotNew() {
         this.isNew = false;
     }
 
@@ -139,7 +139,9 @@ public class ClanEntity implements Persistable<String> {
         return YnType.Y.equals(this.visibleYn);
     }
 
-    public void changeWarLeague(String warLeague) {
-        this.warLeague = warLeague;
+    public void changeWarLeague(String warLeagueName) {
+        this.warLeague = warLeagueName;
     }
+
+
 }

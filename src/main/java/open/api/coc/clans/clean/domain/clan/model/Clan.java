@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.domain.common.model.IconUrl;
 import open.api.coc.clans.clean.domain.common.model.Label;
 import open.api.coc.clans.clean.domain.league.model.League;
+import open.api.coc.clans.database.entity.common.YnType;
 
 @Getter
 @NoArgsConstructor
@@ -89,6 +90,21 @@ public class Clan {
     @Schema(description = "클랜 정렬 순서")
     private Integer order;
 
+    @Schema(description = "클랜 활성화여부")
+    private YnType visibleYn;
+
+    @Schema(description = "클랜전 맥스쟁 여부")
+    private boolean isMaxWar = false;
+
+    @Schema(description = "클랜전 선점제 여부")
+    private boolean isOccupy = false;
+
+    @Schema(description = "리그 선점제 여부")
+    private boolean isLeagueOccupy = false;
+
+    @Schema(description = "전쟁 설명글")
+    private String warDescription;
+
     @Schema(description = "클랜 컨텐츠 활성화 정보")
     private ClanContent clanContent;
 
@@ -98,5 +114,29 @@ public class Clan {
 
     public void createDefaultContent() {
         this.clanContent = ClanContent.create(this.tag);
+    }
+
+    public void changeWarLeague(League warLeague) {
+        this.warLeague = warLeague;
+    }
+
+    public void changeClanCapital(ClanCapitalInfo clanCapitalInfo) {
+        this.clanCapital = clanCapitalInfo;
+    }
+
+    public void changeCapitalPoints(Integer clanCapitalPoints) {
+        this.clanCapitalPoints = clanCapitalPoints;
+    }
+
+    public void changeCapitalLeague(League capitalLeague) {
+        this.capitalLeague = capitalLeague;
+    }
+
+    public void activate() {
+        this.visibleYn = YnType.Y;
+    }
+
+    public void deactivate() {
+        this.visibleYn = YnType.N;
     }
 }

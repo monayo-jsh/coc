@@ -1,7 +1,6 @@
-package open.api.coc.clans.clean.application.clan.dto;
+package open.api.coc.clans.clean.application.clan.dto.war;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import open.api.coc.clans.database.entity.common.YnType;
 
 public record ClanWarMemberQuery(

@@ -1,4 +1,4 @@
-package open.api.coc.clans.clean.application.clan.dto;
+package open.api.coc.clans.clean.application.clan.dto.war;
 
 import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMissingAttackSearchCriteria;
 import open.api.coc.clans.common.exception.BadRequestException;

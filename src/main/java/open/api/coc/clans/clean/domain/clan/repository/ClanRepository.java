@@ -8,7 +8,7 @@ import open.api.coc.clans.database.entity.clan.ClanEntity;
 public interface ClanRepository {
 
     boolean exists(String tag);
-    Optional<ClanEntity> findById(String tag);
+    Optional<Clan> findById(String tag);
     List<ClanEntity> findByIds(List<String> clanTags);
 
     List<ClanEntity> findAllActiveClans();

@@ -20,6 +20,7 @@ public interface ClanEntityMapper {
     @Mapping(target = "clanCapital.capitalHallLevel", source = "capitalHallLevel")
     @Mapping(target = "clanCapitalPoints", source = "capitalPoints")
     @Mapping(target = "badgeUrl", source = "badgeUrl.iconUrl")
+    @Mapping(target = "clanContent.clanWarLeagueYn", source = "clanContent.warLeagueYn")
     Clan toClan(ClanEntity clanEntity);
 
     @Mapping(target = "warLeague", source = "warLeague.name")

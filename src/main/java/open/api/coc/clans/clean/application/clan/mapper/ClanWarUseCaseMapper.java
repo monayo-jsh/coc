@@ -2,12 +2,12 @@ package open.api.coc.clans.clean.application.clan.mapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberLeagueRecordQuery;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberQuery;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarMemberRecordQuery;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackPlayerQuery;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarMissingAttackQuery;
-import open.api.coc.clans.clean.application.clan.dto.ClanWarQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberLeagueRecordQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarQuery;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;

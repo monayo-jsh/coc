@@ -25,7 +25,8 @@ public class JpaClanQueryRepository {
         condition.and(clanEntity.tag.eq(tag));
 
         ClanEntity clanEntity = createSelectClanBaseQuery().where(condition)
-                                                            .fetchOne();
+                                                           .fetchOne();
+
         return Optional.ofNullable(clanEntity);
     }
 

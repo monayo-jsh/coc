@@ -7,7 +7,8 @@ const URI_COMPETITION_CLANS = "/clans/competition"; //대회 클랜 목록 조�
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
-const URI_CLANS = `${PREFIX_CLAN_API}`; //클랜 목록 조회
+const URI_CLAN = `${PREFIX_CLAN_API}`; //클랜 목록 조회
+const URI_CLAN_REGISTER = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 등록
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
@@ -39,10 +40,10 @@ function divideClanArray(array, size) {
   return result;
 }
 
-async function registerClan(requestBody) {
-  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(requestBody.tag));
+async function registerClan(clanTag) {
+  const uri = URI_CLAN_REGISTER.replace(/{clanTag}/, encodeURIComponent(clanTag));
 
-  return await axios.post(uri, requestBody)
+  return await axios.post(uri)
                     .then((response) => {
                       alert('등록 되었습니다.');
 
@@ -78,7 +79,7 @@ async function fetchClan(clanTag) {
 }
 
 async function deleteClan(clanTag) {
-  const uri = `${URI_CLANS}/${encodeURIComponent(clanTag)}`
+  const uri = `${URI_CLAN}/${encodeURIComponent(clanTag)}`
   return await axios.delete(uri)
                     .then((response) => {
                       alert('삭제 되었습니다.');
@@ -122,7 +123,7 @@ async function updateClanContent(clanTag, requestBody) {
 
 async function fetchClans() {
   // 전체 클랜 조회
-  return axios.get(URI_CLANS)
+  return axios.get(URI_CLAN)
               .then((response) => {
                 const { data } = response
                 if (!data) {

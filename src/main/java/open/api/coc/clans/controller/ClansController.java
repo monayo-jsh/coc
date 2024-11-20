@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,6 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanContentCommand;
 import open.api.coc.clans.domain.clans.ClanContentRequest;
-import open.api.coc.clans.domain.clans.ClanCreateCommand;
-import open.api.coc.clans.domain.clans.ClanCreateRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
@@ -47,36 +44,6 @@ public class ClansController {
 
     private final ClansService clansService;
     private final ClanWarLeagueScheduler scheduler;
-
-    @Operation(
-        summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.08.14",
-        description = "이 API는 클랜 정보를 등록합니다.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "클랜 등록 객체",
-            required = true,
-            content = @Content(
-                mediaType = MediaType.APPLICATION_JSON_VALUE,
-                schema = @Schema(implementation = ClanCreateRequest.class)
-            )
-        )
-    )
-    @Parameters(value = {
-        @Parameter(name = "clanTag", description = "클랜 태그", required = true)
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @PostMapping("/{clanTag}")
-    public ResponseEntity<ClanResponse> registerClan(@PathVariable String clanTag,
-                                                     @Valid @RequestBody ClanCreateRequest request) {
-
-        ClanCreateCommand command = ClanCreateCommand.create(clanTag, request);
-        ClanResponse clan = clansService.registerClan(command);
-
-        return ResponseEntity.ok()
-                             .body(clan);
-    }
 
     @Operation(
         summary = "클랜 정보를 삭제합니다., version: 1.00, Last Update: 24.08.22",

@@ -26,4 +26,14 @@ public class ClanUseCase {
                     .map(clanUseCaseMapper::toClanResponse)
                     .toList();
     }
+
+    @Transactional
+    public ClanResponse registerClan(String clanTag) {
+        // 클랜을 등록하거나 활성화한다.
+        Clan savedClan = clanService.createOrActivate(clanTag);
+
+        // 응답
+        return clanUseCaseMapper.toClanResponse(savedClan);
+    }
+
 }

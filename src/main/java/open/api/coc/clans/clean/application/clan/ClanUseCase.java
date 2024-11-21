@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.stereotype.Service;
@@ -20,8 +21,8 @@ public class ClanUseCase {
 
     @Transactional(readOnly = true)
     public List<ClanResponse> getClans() {
-        // 활성화된 클랜 목록을 조회한다.
-        List<Clan> clans = clanService.findAllActiveClans();
+        // 활성화된 전체 클랜 목록을 조회한다.
+        List<Clan> clans = clanService.findAll();
 
         // 응답
         return clans.stream()
@@ -56,6 +57,16 @@ public class ClanUseCase {
     public List<ClanResponse> getWarClans(String warType) {
         // 클랜 목록을 조회한다.
         List<Clan> clans = clanService.findAllByWarType(warType);
+
+        // 응답
+        return clans.stream()
+                    .map(clanUseCaseMapper::toClanResponse)
+                    .toList();
+    }
+
+    public List<ClanResponse> getCompetitionClans() {
+        // 클랜 목록을 조회한다.
+        List<Clan> clans = clanService.findAllByClanContentType(ClanContentType.CLAN_COMPETITION);
 
         // 응답
         return clans.stream()

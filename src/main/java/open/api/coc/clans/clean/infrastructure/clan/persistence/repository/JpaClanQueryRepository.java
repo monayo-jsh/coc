@@ -5,11 +5,13 @@ import static open.api.coc.clans.database.entity.clan.QClanContentEntity.clanCon
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.condition.ClanContentTypeCondition;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
@@ -55,12 +57,28 @@ public class JpaClanQueryRepository {
                                           .fetch();
     }
 
-    public List<ClanEntity> findAllActiveClanByWarType(ClanWarType clanWarType) {
+    public List<ClanEntity> findAllActiveClanByWarType(String warType) {
+        ClanWarType clanWarType = ClanWarType.from(warType);
+
         BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanWarType.getCondition());
 
         return createSelectClanBaseQuery().where(condition)
                                           .orderBy(clanEntity.order.asc())
                                           .fetch();
+    }
+
+    public List<ClanEntity> findAllByClanContentTypeByName(String clanContentTypeName) {
+        BooleanExpression clanContentTypeCondition = createClanContentTypeCondition(clanContentTypeName);
+        BooleanBuilder condition = createSelectClanBaseConditionBuilder().and(clanContentTypeCondition);
+
+        return createSelectClanBaseQuery().where(condition)
+                                          .orderBy(clanEntity.order.asc())
+                                          .fetch();
+    }
+
+    private BooleanExpression createClanContentTypeCondition(String clanContentTypeName) {
+        ClanContentTypeCondition clanContentTypeCondition = ClanContentTypeCondition.valueOf(clanContentTypeName);
+        return clanContentTypeCondition.getCondition();
     }
 
     private JPAQuery<ClanEntity> createSelectClanBaseQuery() {

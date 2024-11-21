@@ -549,14 +549,6 @@ public class ClansService {
         }
     }
 
-    public List<ClanResponse> getActiveCompetitionClans() {
-        List<ClanEntity> clanCapitalList = clanQueryRepository.findAllActiveCompetitionClans();
-
-        return clanCapitalList.stream()
-                              .map(clanResponseConverter::convert)
-                              .collect(Collectors.toList());
-    }
-
     public String getLatestClanAssignedDate() {
         return clanAssignedPlayerQueryRepository.findLatestSeasonDate();
     }

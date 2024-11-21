@@ -18,6 +18,7 @@ import open.api.coc.clans.clean.domain.capital.model.ClanCapitalRaidMemberRankin
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalMemberService;
 import open.api.coc.clans.clean.domain.capital.service.ClanCapitalService;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.raid.dto.ClanCapitalRaidResponse;
@@ -79,7 +80,7 @@ public class RaidUseCase {
     @Transactional
     public void collectClanCapitalCurrentSeason() {
         // 캐피탈 컨텐츠 활성화 클랜 목록을 조회한다.
-        List<Clan> clans = clanService.findAllActiveCapitalClans();
+        List<Clan> clans = clanService.findAllByClanContentType(ClanContentType.CLAN_CAPITAL);
 
         for(Clan clan : clans) {
             try {

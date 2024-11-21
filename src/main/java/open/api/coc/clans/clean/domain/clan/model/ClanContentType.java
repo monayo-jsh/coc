@@ -4,5 +4,6 @@ public enum ClanContentType {
     CLAN_WAR,
     CLAN_WAR_LEAGUE,
     CLAN_WAR_PARALLEL,
-    CLAN_CAPITAL
+    CLAN_CAPITAL,
+    CLAN_COMPETITION
 }

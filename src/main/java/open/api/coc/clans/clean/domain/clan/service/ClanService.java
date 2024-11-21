@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.exception.ClanNotExistsException;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.repository.ClanLeagueWarRepository;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.domain.league.model.League;
@@ -53,13 +54,8 @@ public class ClanService {
     }
 
     @Transactional(readOnly = true)
-    public List<Clan> findAllActiveClans() {
+    public List<Clan> findAll() {
         return clanRepository.findAllClans();
-    }
-
-    @Transactional(readOnly = true)
-    public List<Clan> findAllActiveCapitalClans() {
-        return clanRepository.findAllCapitalClans();
     }
 
     @Transactional
@@ -154,4 +150,9 @@ public class ClanService {
         });
     }
 
+    @Transactional(readOnly = true)
+    public List<Clan> findAllByClanContentType(ClanContentType clanContentType) {
+        // 클랜 목록을 조회한다.
+        return clanRepository.findAllByClanContentTypeName(clanContentType.name());
+    }
 }

@@ -11,9 +11,8 @@ public interface ClanRepository {
     List<Clan> findByIds(List<String> clanTags);
 
     List<Clan> findAllClans();
-    List<Clan> findAllCapitalClans();
     List<Clan> findAllByWarType(String warType);
-
+    List<Clan> findAllByClanContentTypeName(String contentTypeName);
 
     Integer selectMaxOrders();
 

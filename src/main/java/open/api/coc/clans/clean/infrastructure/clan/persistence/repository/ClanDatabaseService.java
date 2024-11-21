@@ -12,7 +12,6 @@ import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanEntit
 import open.api.coc.clans.database.entity.clan.ClanBadgeEntity;
 import open.api.coc.clans.database.entity.clan.ClanContentEntity;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
-import open.api.coc.clans.database.entity.clan.ClanWarType;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -54,18 +53,16 @@ public class ClanDatabaseService implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllCapitalClans() {
-        return queryRepository.findAllActiveCapitalClan()
+    public List<Clan> findAllByWarType(String warType) {
+        return queryRepository.findAllActiveClanByWarType(warType)
                               .stream()
                               .map(clanEntityMapper::toClan)
                               .collect(Collectors.toList());
     }
 
     @Override
-    public List<Clan> findAllByWarType(String warType) {
-        ClanWarType clanWarType = ClanWarType.from(warType);
-
-        return queryRepository.findAllActiveClanByWarType(clanWarType)
+    public List<Clan> findAllByClanContentTypeName(String clanContentTypeName) {
+        return queryRepository.findAllByClanContentTypeByName(clanContentTypeName)
                               .stream()
                               .map(clanEntityMapper::toClan)
                               .collect(Collectors.toList());

@@ -123,7 +123,8 @@ public class ClanService {
     @Transactional(readOnly = true)
     public List<Clan> findAllByWarType(String warType) {
         // 클랜 목록을 조회한다.
-        List<Clan> clans = clanRepository.findAllByWarType(warType);
+        ClanContentType clanContentType = ClanContentType.ofWartype(warType);
+        List<Clan> clans = clanRepository.findAllByClanContentTypeName(clanContentType.name());
 
         // 리그전 클랜 조회 시 리그전 정보는 현재 시즌 정보로 응답 구성
         if ("league".equalsIgnoreCase(warType)) {

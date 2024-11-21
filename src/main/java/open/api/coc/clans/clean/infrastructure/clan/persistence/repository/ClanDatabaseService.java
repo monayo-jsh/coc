@@ -53,14 +53,6 @@ public class ClanDatabaseService implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllByWarType(String warType) {
-        return queryRepository.findAllActiveClanByWarType(warType)
-                              .stream()
-                              .map(clanEntityMapper::toClan)
-                              .collect(Collectors.toList());
-    }
-
-    @Override
     public List<Clan> findAllByClanContentTypeName(String clanContentTypeName) {
         return queryRepository.findAllByClanContentTypeByName(clanContentTypeName)
                               .stream()

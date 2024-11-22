@@ -176,7 +176,7 @@
       const cardCurrentPlayerWrapper = cardElement.querySelector('.card-current-player-wrapper');
       cardCurrentPlayerWrapper.classList.remove('display-none');
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
 
       //전체 클랜원 태그 조회
       const allPlayerTags = await fetchAllPlayerTags();
@@ -315,7 +315,7 @@
       // 배정 클랜원 목록
       const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');

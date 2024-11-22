@@ -20,9 +20,6 @@ public record ClanMemberResponse(
     @Schema(description = "EXP 레벨")
     Integer expLevel,
 
-    @Schema(description = "리그 정보")
-    LabelResponse league,
-
     @Schema(description = "트로피 점시")
     Integer trophies,
 
@@ -36,7 +33,10 @@ public record ClanMemberResponse(
     Integer donations,
 
     @Schema(description = "지원받은 수")
-    Integer donationsReceived
+    Integer donationsReceived,
+
+    @Schema(description = "리그 정보")
+    LabelResponse league
 
 ) {
 

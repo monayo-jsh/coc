@@ -19,6 +19,7 @@ import open.api.coc.clans.clean.application.clan.dto.ClanQueryCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanContentRequest;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanDetailResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.ClanMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -71,7 +72,7 @@ public class ClanController {
         @Parameter(name = "clanTag", description = "클랜 태그")
     })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanDetailResponse.class)))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanDetailResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/{clanTag}/external")
@@ -80,6 +81,23 @@ public class ClanController {
                              .body(clanUseCase.getClanDetailFromExternal(clanTag));
     }
 
+    @Operation(
+        summary = "클랜의 가입중인 플레이어 목록을 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.11.22",
+        description = "이 API는 클랜의 가입중인 플레이어 목록을 실시간 연동 결과로 반환합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그 목록")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanMemberResponse.class)))),
+        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("{clanTag}/members/external")
+    public ResponseEntity<List<ClanMemberResponse>> getClanMembersFromExternal(@PathVariable @NotBlank String clanTag) {
+        return ResponseEntity.ok()
+                             .body(clanUseCase.getClanMembersFromExternal(clanTag));
+    }
 
     @Operation(
         summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.11.20",
@@ -89,7 +107,7 @@ public class ClanController {
         @Parameter(name = "clanTag", description = "클랜 태그", required = true)
     })
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "201", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanResponse.class))),
         @ApiResponse(responseCode = "404", description = "클랜 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })

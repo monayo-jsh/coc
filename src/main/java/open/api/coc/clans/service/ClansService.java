@@ -4,7 +4,6 @@ import static open.api.coc.clans.common.exception.handler.ExceptionHandler.creat
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -39,15 +38,12 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayer;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
-import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
-import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
-import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
@@ -73,7 +69,6 @@ public class ClansService {
     private final ClanLeagueWarRepository clanLeagueWarRepository;
 
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
-    private final ClanMemberListResConverter clanMemberListResConverter;
 
     private final PlayerRepository playerRepository;
     private final PlayersService playersService;
@@ -120,23 +115,6 @@ public class ClansService {
 
         leagueWar.swapWarClan(clanTag);
         return clanCurrentWarResConverter.convert(leagueWar);
-    }
-
-    private ClanMemberListRes getClanMembersExternalByClanTag(String clanTag) {
-        ClanMemberList clanMemberList = clanApiService.findClanMembersByClanTag(clanTag);
-
-        ClanMemberListRes clanMemberListRes = clanMemberListResConverter.convert(clanMemberList);
-        clanMemberListRes.setClanTag(clanTag);
-        return clanMemberListRes;
-    }
-
-    public List<ClanMemberListRes> getClanMembersByClanTags(List<String> clanTags) {
-        if (clanTags.isEmpty()) return Collections.emptyList();
-        List<String> uniqueClanTags = clanTags.stream().distinct().toList();
-
-        return uniqueClanTags.stream()
-                             .map(this::getClanMembersExternalByClanTag)
-                             .collect(Collectors.toList());
     }
 
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {

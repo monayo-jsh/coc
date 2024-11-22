@@ -8,10 +8,12 @@ import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.exception.ClanNotExistsException;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanMember;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.domain.clan.service.ClanQueryService;
 import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanDetailResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.ClanMemberResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,6 +59,17 @@ public class ClanUseCase {
 
         // 응답 반환
         return clanUseCaseMapper.toClanDetailResponse(latestClan);
+    }
+
+    @Transactional
+    public List<ClanMemberResponse> getClanMembersFromExternal(String clanTag) {
+        // COC API 연동
+        List<ClanMember> members = clanClient.findMembersByTag(clanTag);
+
+        // 응답 반환
+        return members.stream()
+                      .map(clanUseCaseMapper::toClanMemberResponse)
+                      .toList();
     }
 
     @Transactional

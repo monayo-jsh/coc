@@ -1,9 +1,13 @@
 package open.api.coc.clans.clean.infrastructure.clan.external.client;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanMember;
+import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanMemberListResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.exception.ClanClientException;
 import open.api.coc.clans.clean.infrastructure.clan.external.mapper.ClanClientResponseMapper;
@@ -31,8 +35,29 @@ public class ClanClientImpl implements ClanClient {
 
             return clanResponseMapper.toClan(clanResponse);
         } catch (Exception e) {
-            log.error("클랜 연동 요청 실패: %s, response: %s".formatted(clanTag, e.getMessage()));
-            throw new ClanClientException(clanTag);
+            throw ClanClientException.ofClan(clanTag);
+        }
+    }
+
+    @Override
+    public List<ClanMember> findMembersByTag(String clanTag) {
+        try {
+            ClanMemberListResponse clanResponse = restClient.get()
+                                                            .uri(clashOfClanConfig.getClansClanMembersUri(), clanTag)
+                                                            .retrieve()
+                                                            .body(ClanMemberListResponse.class);
+
+            if (clanResponse == null) {
+                throw ClanClientException.ofClanMember(clanTag);
+            }
+
+            return clanResponse.getItems()
+                               .stream()
+                               .map(clanResponseMapper::toClanMember)
+                               .collect(Collectors.toList());
+
+        } catch (Exception e) {
+            throw ClanClientException.ofClanMember(clanTag);
         }
     }
 

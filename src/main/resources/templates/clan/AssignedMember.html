@@ -166,7 +166,7 @@
     }
 
     async function renderJoinedFlag(clan, assignedTable, assignedMembers) {
-      const currentJoinedMembers = await fetchClanMembers([{tag: clan.tag}]);
+      const currentJoinedMembers = await fetchClanMembers(clan.tag);
       const currentJoinedMemberMap = convertArrayToMapByKey(currentJoinedMembers)
 
       for (const member of assignedMembers) {

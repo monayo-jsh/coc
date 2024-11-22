@@ -1,24 +1,14 @@
 
 package open.api.coc.clans.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
-import open.api.coc.clans.domain.clans.ClanMemberListRes;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
@@ -39,24 +29,6 @@ public class ClansController {
 
     private final ClansService clansService;
     private final ClanWarLeagueScheduler scheduler;
-
-    @Operation(
-        summary = "클랜의 가입중인 플레이어 목록을 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 클랜의 가입중인 플레이어 목록을 실시간 연동 결과로 반환합니다."
-    )
-    @Parameters(value = {
-        @Parameter(name = "clanTags", description = "클랜 태그 목록")
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanMemberListRes.class)))),
-        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/members")
-    public ResponseEntity<List<ClanMemberListRes>> getClanMembersByClanTags(@RequestParam List<String> clanTags) {
-        return ResponseEntity.ok()
-                             .body(clansService.getClanMembersByClanTags(clanTags));
-    }
 
     @GetMapping("/assigned/latest")
     public ResponseEntity<String> getLatestClanAssignedDate() {

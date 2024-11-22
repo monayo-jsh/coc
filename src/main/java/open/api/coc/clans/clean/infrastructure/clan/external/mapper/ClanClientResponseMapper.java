@@ -1,7 +1,9 @@
 package open.api.coc.clans.clean.infrastructure.clan.external.mapper;
 
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanMember;
 import open.api.coc.clans.clean.domain.common.model.Label;
+import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanMemberResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanResponse;
 import open.api.coc.clans.clean.infrastructure.common.external.dto.LabelResponse;
 import open.api.coc.clans.common.config.MapStructConfig;
@@ -20,4 +22,7 @@ public interface ClanClientResponseMapper {
 
     @Mapping(target = "iconUrl", source = "iconUrls")
     Label map(LabelResponse labelResponse);
+
+    ClanMember toClanMember(ClanMemberResponse clanMemberResponse);
+
 }

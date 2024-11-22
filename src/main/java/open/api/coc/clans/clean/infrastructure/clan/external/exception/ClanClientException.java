@@ -5,8 +5,17 @@ import open.api.coc.clans.common.exception.CustomRuntimeException;
 
 public class ClanClientException extends CustomRuntimeException {
 
-    public ClanClientException(String clanTag) {
-        super(ExceptionCode.EXTERNAL_ERROR.getCode(), "클랜 외부 연동 실패: %s".formatted(clanTag));
+    private ClanClientException(String message) {
+        super(ExceptionCode.EXTERNAL_ERROR.getCode(), message);
     }
 
+    public static ClanClientException ofClan(String clanTag) {
+        String errorMessage = "클랜 요청 실패: %s".formatted(clanTag);
+        return new ClanClientException(errorMessage);
+    }
+
+    public static ClanClientException ofClanMember(String clanTag) {
+        String errorMessage = "클랜 멤버 요청 실패: %s".formatted(clanTag);
+        return new ClanClientException(errorMessage);
+    }
 }

@@ -9,8 +9,8 @@ const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 
 const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
-const URI_CLAN_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/external`; //클랜 상세 조회 (실시간 연동)
-const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+const URI_CLAN_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/external`; //클랜 상세 조회 (OPEN API)
+const URI_CLAN_MEMBERS_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/members/external` //클랜 멤버 조회 (OPEN API)
 
 const URI_LATEST_CLAN_ASSIGNED_DATE = `/clans/assigned/latest` //최신 클랜 배정 날짜 조회
 const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/assigned/members/latest` //최신 클랜 배정 멤버 목록 조회
@@ -164,35 +164,18 @@ async function fetchClanDetailsFromExternal(clans) {
   return results
 }
 
-function makeClanMemberRequest(clans) {
-  const uri = `${URI_CLAN_MEMBERS}?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
-  return axios.get(uri);
-}
+async function fetchClanMembers(clanTag) {
+  const uri = URI_CLAN_MEMBERS_EXTERNAL.replace(/{clanTag}/, encodeURIComponent(clanTag));
 
-async function fetchClanMembers(clans) {
-  const requests = divideClanArray(clans, clans.length/2).map(makeClanMemberRequest);
-
-  let allClanMembers = [];
-  await axios.all(requests)
-             .then((responses) => {
-               responses.forEach((response) => {
-
-                 const { data } = response;
-                 data.forEach((response) => {
-                   const { clanTag, members } = response
-                   if (members) {
-                     // concat member
-                     allClanMembers = allClanMembers.concat(members);
-                   }
-                 })
-
-               });
-             })
-             .catch((error) => {
-               console.error(error);
-             })
-
-  return allClanMembers;
+  return await axios.get(uri)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    })
 }
 
 async function fetchClanAssignedMembers(clanTag) {

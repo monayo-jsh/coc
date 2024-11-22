@@ -9,7 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(
     config = MapStructConfig.class
 )
-public interface ClanResponseMapper {
+public interface ClanClientResponseMapper {
 
     @Mapping(target = "badgeUrl", source = "badgeUrls")
     @Mapping(target = "memberSize", source = "members")

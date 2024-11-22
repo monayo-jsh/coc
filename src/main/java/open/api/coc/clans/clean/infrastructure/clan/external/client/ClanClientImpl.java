@@ -6,7 +6,7 @@ import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.exception.ClanClientException;
-import open.api.coc.clans.clean.infrastructure.clan.external.mapper.ClanResponseMapper;
+import open.api.coc.clans.clean.infrastructure.clan.external.mapper.ClanClientResponseMapper;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -19,7 +19,7 @@ public class ClanClientImpl implements ClanClient {
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
 
-    private final ClanResponseMapper clanResponseMapper;
+    private final ClanClientResponseMapper clanResponseMapper;
 
     @Override
     public Clan findByTag(String clanTag) {

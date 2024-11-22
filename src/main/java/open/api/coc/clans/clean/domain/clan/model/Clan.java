@@ -32,9 +32,6 @@ public class Clan {
     @Schema(description = "클랜 트로피 수")
     private Integer clanPoints;
 
-    @Schema(description = "클랜 아이콘 객체")
-    private IconUrl badgeUrl;
-
     @Schema(description = "클랜 설명")
     private String description;
 
@@ -68,33 +65,6 @@ public class Clan {
     @Schema(description = "전쟁 무승부수")
     private Integer warTies;
 
-    @Schema(description = "클랜 리그 정보")
-    private League warLeague;
-
-    @Schema(description = "클랜 라벨 정보")
-    private List<Label> labels;
-
-    @Schema(description = "클랜 캐피탈 리그 정보")
-    private League capitalLeague;
-
-    @Schema(description = "클랜 캐피탈 트로피 수")
-    private Integer clanCapitalPoints;
-
-    @Schema(description = "클랜 캐피탈 정보")
-    private ClanCapitalInfo clanCapital;
-
-    @Schema(description = "클랜 멤버수")
-    private Integer memberSize;
-
-    @Schema(description = "클랜 멤버 정보")
-    private List<ClanMember> members;
-
-    @Schema(description = "클랜 정렬 순서")
-    private Integer order;
-
-    @Schema(description = "클랜 활성화여부")
-    private YnType visibleYn;
-
     @Schema(description = "클랜전 맥스쟁 여부")
     private boolean isMaxWar = false;
 
@@ -107,8 +77,38 @@ public class Clan {
     @Schema(description = "전쟁 설명글")
     private String warDescription;
 
+    @Schema(description = "클랜 멤버수")
+    private Integer memberSize;
+    
+    @Schema(description = "클랜 정렬 순서")
+    private Integer order;
+
+    @Schema(description = "클랜 활성화여부")
+    private YnType visibleYn;
+
+    @Schema(description = "클랜 아이콘 객체")
+    private IconUrl badgeUrl;
+
+    @Schema(description = "클랜 리그 정보")
+    private League warLeague;
+
+    @Schema(description = "클랜 캐피탈 리그 정보")
+    private League capitalLeague;
+
+    @Schema(description = "클랜 캐피탈 트로피 수")
+    private Integer clanCapitalPoints;
+
+    @Schema(description = "클랜 캐피탈 정보")
+    private ClanCapitalInfo clanCapital;
+
     @Schema(description = "클랜 컨텐츠 활성화 정보")
     private ClanContent clanContent;
+
+    @Schema(description = "클랜 라벨 정보")
+    private List<Label> labels;
+
+    @Schema(description = "클랜 멤버 정보")
+    private List<ClanMember> members;
 
     public void changeOrder(Integer order) {
         this.order = order;
@@ -142,12 +142,11 @@ public class Clan {
         this.visibleYn = YnType.N;
     }
 
-    public void activateWithLatestInfo(Clan latestClan) {
+    public void changeLatestInfo(Clan latestClan) {
         this.changeWarLeague(latestClan.getWarLeague()); // 클랜 리그 정보 갱신
         this.changeClanCapital(latestClan.getClanCapital()); // 캐피탈 홀 레벨 갱신
         this.changeCapitalPoints(latestClan.getClanCapitalPoints()); // 캐피탈 트로피 점수 갱신
         this.changeCapitalLeague(latestClan.getCapitalLeague()); // 캐피탈 리그 갱신
-        this.activate(); // 활성화 설정
     }
 
     public void changeContentActivation(YnType clanWarYn, YnType clanWarLeagueYn, YnType clanWarParallelYn, YnType clanCapitalYn) {

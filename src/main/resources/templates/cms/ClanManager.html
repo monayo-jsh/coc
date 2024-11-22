@@ -224,7 +224,7 @@
         return;
       }
 
-      const [clanDetail] = await fetchClansFromExternal([registeredClan]);
+      const [clanDetail] = await fetchClanDetailsFromExternal([registeredClan]);
       clanDetail.order = registeredClan.order;
       clanDetail.clanContent = registeredClan.clanContent;
       const clansListElement = document.querySelector('.clan-list');
@@ -257,7 +257,7 @@
           return;
         }
 
-        fetchClan(searchInput.value)
+        fetchClanDetailFromExternal(searchInput.value)
         .then((clan) => {
           clearSearchResult();
 
@@ -336,10 +336,10 @@
       }, {});
     }
 
-    function renderClanBadge(badgeUrls, card) {
-      if (!badgeUrls) return;
+    function renderClanBadge(badgeUrl, card) {
+      if (!badgeUrl) return;
 
-      const { small } = badgeUrls;
+      const { small } = badgeUrl;
       if (small) {
         const clanBadge = card.querySelector('.clan-badge');
         clanBadge.src = small;
@@ -425,8 +425,8 @@
       const clanLabel = document.importNode(clanLabelTemplate.content, true);
       const labelIcon = clanLabel.querySelector('.label-icon');
 
-      const { iconUrls } = label;
-      const { small } = iconUrls;
+      const { iconUrl } = label;
+      const { small } = iconUrl;
 
       labelIcon.src = small;
 
@@ -442,25 +442,24 @@
       const clanCard = copyTemplateById('clan-card');
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanCapitalPoints, labels, clanContent } = clan;
-      const [leader] = findLeader(memberList);
+      const { name, tag, joinType, badgeUrl, warLeague, capitalLeague, members, points, clanCapitalPoints, labels, clanContent } = clan;
+      const [leader] = findLeader(members);
 
       // dataset
       card.dataset.clanTag = tag;
       card.dataset.clanName = name;
-      card.dataset.badgeUrls = JSON.stringify(badgeUrls);
       card.dataset.clanContent = JSON.stringify(clanContent);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
                            .replace(/{CLAN_TAG}/g, tag)
-                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
+                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(joinType))
                            .replace(/{CLAN_LEADER}/, leader.name)
-                           .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
-                           .replace(/{CLAN_MEMBERS}/, members)
+                           .replace(/{CLAN_TROPHIES}/, Number(points).toLocaleString())
+                           .replace(/{CLAN_MEMBERS}/, members.length)
                            .replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
 
-      renderClanBadge(badgeUrls, card);
+      renderClanBadge(badgeUrl, card);
       renderWarLeagueBadge(warLeague, card);
       renderCapitalLeagueBadge(capitalLeague, card);
 
@@ -507,7 +506,7 @@
     async function getClans() {
       showWifiLoading('.clan-manager');
       let clans = await fetchClans();
-      let clanDetailMap = makeClanMapByTag(await fetchClansFromExternal(clans));
+      let clanDetailMap = makeClanMapByTag(await fetchClanDetailsFromExternal(clans));
 
       let resultClans = [];
       clans.forEach(clan => {

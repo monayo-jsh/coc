@@ -19,7 +19,6 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
@@ -42,25 +41,6 @@ public class ClansController {
     private final ClanWarLeagueScheduler scheduler;
 
     @Operation(
-        summary = "클랜 상세 정보 목록을 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.08.22",
-        description = "이 API는 클랜 상세 정보 목록을 실시간 연동 결과로 반환합니다."
-            + "<br>- 리그전 정보가 변경된 경우 서버에 현행화합니다."
-    )
-    @Parameters(value = {
-        @Parameter(name = "clanTags", description = "클랜 태그 목록")
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "400", description = "잘못된 파라미터 요청", content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/detail")
-    public ResponseEntity<List<ClanResponse>> getClanDetail(@RequestParam List<String> clanTags) {
-        return ResponseEntity.ok()
-                             .body(clansService.getClanDetailByClanTags(clanTags));
-    }
-
-    @Operation(
         summary = "클랜의 가입중인 플레이어 목록을 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.08.22",
         description = "이 API는 클랜의 가입중인 플레이어 목록을 실시간 연동 결과로 반환합니다."
     )
@@ -76,12 +56,6 @@ public class ClansController {
     public ResponseEntity<List<ClanMemberListRes>> getClanMembersByClanTags(@RequestParam List<String> clanTags) {
         return ResponseEntity.ok()
                              .body(clansService.getClanMembersByClanTags(clanTags));
-    }
-
-    @GetMapping("/{clanTag}")
-    public ResponseEntity<ClanResponse> findClan(@PathVariable String clanTag) {
-        ClanResponse clan = clansService.findClanByClanTag(clanTag);
-        return ResponseEntity.ok().body(clan);
     }
 
     @GetMapping("/assigned/latest")

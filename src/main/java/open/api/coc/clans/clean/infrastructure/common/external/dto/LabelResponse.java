@@ -14,6 +14,6 @@ public class LabelResponse {
 
     private Integer id; // 고유키
     private String name; // 이름
-    private IconUrlResponse iconUrl; // 아이콘 정보
+    private IconUrlResponse iconUrls; // 아이콘 정보
 
 }

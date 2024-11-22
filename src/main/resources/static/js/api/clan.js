@@ -9,9 +9,7 @@ const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 
 const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
-const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
-
-const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
+const URI_CLAN_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/external`; //클랜 상세 조회 (실시간 연동)
 const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
 
 const URI_LATEST_CLAN_ASSIGNED_DATE = `/clans/assigned/latest` //최신 클랜 배정 날짜 조회
@@ -62,8 +60,12 @@ async function registerClan(clanTag) {
                     });
 }
 
-async function fetchClan(clanTag) {
-  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+function makeClanDetailURI(clanTag) {
+  return URI_CLAN_EXTERNAL.replace(/{clanTag}/, encodeURIComponent(clanTag));
+}
+
+async function fetchClanDetailFromExternal(clanTag) {
+  const uri = makeClanDetailURI(clanTag)
 
   return await axios.get(uri)
                     .then((response) => {
@@ -137,13 +139,13 @@ async function fetchClans() {
               });
 }
 
-function makeClanDetailRequest(clans) {
-  const uri = `${URI_CLAN_DETAIL}?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
+function makeClanDetailRequest(clan) {
+  const uri = makeClanDetailURI(clan.tag);
   return axios.get(uri);
 }
 
-async function fetchClansFromExternal(clans) {
-  const requests = divideClanArray(clans, 1).map(makeClanDetailRequest);
+async function fetchClanDetailsFromExternal(clans) {
+  const requests = clans.map(makeClanDetailRequest);
 
   let results = [];
 
@@ -151,11 +153,8 @@ async function fetchClansFromExternal(clans) {
   await axios.all(requests)
              .then((responses) => {
                responses.forEach((response) => {
-
                  const { data } = response;
-                 data.forEach((response) => {
-                   results = results.concat(response);
-                 })
+                 results.push(data);
                });
              })
              .catch((error) => {

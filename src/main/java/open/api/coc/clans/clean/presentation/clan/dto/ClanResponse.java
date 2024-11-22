@@ -5,13 +5,13 @@ import open.api.coc.clans.clean.presentation.common.dto.LeagueResponse;
 
 public record ClanResponse(
 
-    @Schema(description = "클랜 태그")
+    @Schema(description = "태그")
     String tag,
 
-    @Schema(description = "클랜 이름")
+    @Schema(description = "이름")
     String name,
 
-    @Schema(description = "리그전 리그 정보")
+    @Schema(description = "리그전 정보")
     LeagueResponse warLeague,
 
     @Schema(description = "캐피탈 리그 정보")

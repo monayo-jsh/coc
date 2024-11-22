@@ -11,6 +11,7 @@ import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.domain.clan.service.ClanQueryService;
 import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
+import open.api.coc.clans.clean.presentation.clan.dto.ClanDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +45,18 @@ public class ClanUseCase {
         return clans.stream()
                     .map(clanUseCaseMapper::toClanResponse)
                     .toList();
+    }
+
+    @Transactional
+    public ClanDetailResponse getClanDetailFromExternal(String clanTag) {
+        // COC API 연동
+        Clan latestClan = clanClient.findByTag(clanTag);
+
+        // 서버에 저장된 클랜이 있다면 클랜 정보 현행화
+        clanRegistrationService.synchronizeIfExists(latestClan);
+
+        // 응답 반환
+        return clanUseCaseMapper.toClanDetailResponse(latestClan);
     }
 
     @Transactional

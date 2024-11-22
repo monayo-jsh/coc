@@ -18,6 +18,7 @@ import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.dto.ClanQueryCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanContentRequest;
+import open.api.coc.clans.clean.presentation.clan.dto.ClanDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +61,25 @@ public class ClanController {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(clanUseCase.getActiveClans(command));
     }
+
+    @Operation(
+        summary = "클랜 상세 정보를 조회합니다. (실시간 연동) version: 1.00, Last Update: 24.11.22",
+        description = "이 API는 클랜 상세 정보를 실시간 연동 결과로 반환합니다."
+                    + "<br>- 리그전 정보가 변경된 경우 서버에 현행화합니다."
+    )
+    @Parameters(value = {
+        @Parameter(name = "clanTag", description = "클랜 태그")
+    })
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanDetailResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/{clanTag}/external")
+    public ResponseEntity<ClanDetailResponse> getClanDetailExternal(@PathVariable @NotBlank String clanTag) {
+        return ResponseEntity.ok()
+                             .body(clanUseCase.getClanDetailFromExternal(clanTag));
+    }
+
 
     @Operation(
         summary = "클랜 정보를 등록합니다., version: 1.00, Last Update: 24.11.20",

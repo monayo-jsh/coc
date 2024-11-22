@@ -104,7 +104,7 @@
     }
 
     async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClan(capitalClan.tag);
+      let clan = await fetchClanDetailFromExternal(capitalClan.tag);
 
       if (!Object.keys(clan).length) {
         renderFailed(capitalCardElement);

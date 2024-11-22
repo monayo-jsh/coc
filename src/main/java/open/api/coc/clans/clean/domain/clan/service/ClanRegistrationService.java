@@ -79,7 +79,8 @@ public class ClanRegistrationService {
         if (existingClan.isPresent()) {
             // 서버에 등록된 클랜인 경우
             Clan clan = existingClan.get();
-            clan.activateWithLatestInfo(latestClan);
+            clan.activate(); // 활성화 설정
+            clan.changeLatestInfo(latestClan); // 현행화
             return clan;
         }
 
@@ -92,4 +93,11 @@ public class ClanRegistrationService {
         clanRepository.save(clan);
     }
 
+    public void synchronizeIfExists(Clan latestClan) {
+        clanRepository.findById(latestClan.getTag())
+                      .ifPresent(existingClan -> {
+                          existingClan.changeLatestInfo(latestClan);
+                          clanRepository.save(existingClan);
+                      });
+    }
 }

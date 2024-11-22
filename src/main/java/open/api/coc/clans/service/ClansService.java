@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -33,7 +32,6 @@ import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
-import open.api.coc.clans.database.repository.clan.ClanQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
 import open.api.coc.clans.database.repository.player.PlayerRepository;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
@@ -42,15 +40,12 @@ import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
 import open.api.coc.clans.domain.clans.ClanMemberListRes;
-import open.api.coc.clans.domain.clans.ClanResponse;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarLeagueGroupResponseConverter;
 import open.api.coc.clans.domain.clans.converter.ClanCurrentWarResConverter;
 import open.api.coc.clans.domain.clans.converter.ClanMemberListResConverter;
-import open.api.coc.clans.domain.clans.converter.ClanResponseConverter;
 import open.api.coc.clans.domain.players.PlayerResponse;
 import open.api.coc.clans.domain.players.converter.PlayerResponseConverter;
 import open.api.coc.external.coc.clan.ClanApiService;
-import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
@@ -69,7 +64,6 @@ public class ClansService {
     private final ClanWarService clanWarService;
 
     private final ClanRepository clanRepository;
-    private final ClanQueryRepository clanQueryRepository;
     private final ClanContentRepository clanContentRepository;
 
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
@@ -78,7 +72,6 @@ public class ClansService {
 
     private final ClanLeagueWarRepository clanLeagueWarRepository;
 
-    private final ClanResponseConverter clanResponseConverter;
     private final ClanCurrentWarResConverter clanCurrentWarResConverter;
     private final ClanMemberListResConverter clanMemberListResConverter;
 
@@ -87,13 +80,6 @@ public class ClansService {
     private final PlayerResponseConverter playerResponseConverter;
 
     private final ClanCurrentWarLeagueGroupResponseConverter clanCurrentWarLeagueGroupResponseConverter;
-
-    public ClanResponse findClanByClanTag(String clanTag) {
-        Clan clan = clanApiService.findClanByClanTag(clanTag)
-                                  .orElseThrow(() -> CustomRuntimeException.create(ExceptionCode.EXTERNAL_ERROR, "클랜 조회 실패"));
-
-        return clanResponseConverter.convert(clan);
-    }
 
     public ClanCurrentWarResponse getClanCurrentWar(String clanTag) {
         ClanWar clanCurrentWar = clanApiService.findClanCurrentWarByClanTag(clanTag)
@@ -151,57 +137,6 @@ public class ClansService {
         return uniqueClanTags.stream()
                              .map(this::getClanMembersExternalByClanTag)
                              .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public List<ClanResponse> getClanDetailByClanTags(List<String> clanTags) {
-        if (clanTags.isEmpty()) return Collections.emptyList();
-        List<String> uniqueClanTags = clanTags.stream().distinct().toList();
-
-        // 요청된 클랜 태그 중 서버에 저장된 목록 획득
-        Map<String, ClanEntity> clanEntityMap = getClanEntityMap(uniqueClanTags);
-
-        // 클랜 상세 정보 실시간 연동 조회
-        List<Clan> clans = getClansByExternal(uniqueClanTags);
-
-        // 클랜 리그전 정보 현행화
-        List<ClanEntity> toUpdateEntities = clans.stream()
-                                                 .map(clan -> changeClanInfo(clan, clanEntityMap))
-                                                 .filter(Objects::nonNull)
-                                                 .toList();
-
-        clanQueryRepository.saveAll(toUpdateEntities);
-
-        return clans.stream()
-                    .map(clanResponseConverter::convert)
-                    .collect(Collectors.toList());
-    }
-
-    private ClanEntity changeClanInfo(Clan clan, Map<String, ClanEntity> clanEntityMap) {
-        ClanEntity clanEntity = clanEntityMap.get(clan.getTag());
-        if (Objects.nonNull(clanEntity)) {
-            clanEntity.setWarLeague(clan.getWarLeagueName());
-
-            clanEntity.setCapitalHallLevel(clan.getClanCapitalHallLevel());
-            clanEntity.setCapitalPoints(clan.getClanCapitalPoints());
-            clanEntity.setCapitalLeague(clan.getClanCapitalLeagueName());
-        }
-
-        return clanEntity;
-    }
-
-    private List<Clan> getClansByExternal(List<String> clanTags) {
-        return clanTags.stream()
-                       .map(clanApiService::findClanByClanTag)
-                       .filter(Optional::isPresent)
-                       .map(Optional::get)
-                       .toList();
-    }
-
-    private Map<String, ClanEntity> getClanEntityMap(List<String> clanTags) {
-        return clanQueryRepository.findAllByID(clanTags)
-                                  .stream()
-                                  .collect(Collectors.toMap(ClanEntity::getTag, entity -> entity));
     }
 
     public ClanAssignedMemberListResponse findClanAssignedMembers(String clanTag) {

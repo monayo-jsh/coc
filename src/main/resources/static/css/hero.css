@@ -8,14 +8,14 @@
 }
 
 .hero.barbarian_king {
-  background-image: url(/static/images/hero/Barbarian_King.png);
+  background-image: url(/images/hero/Barbarian_King.png);
 }
 .hero.archer_queen {
-  background-image: url(/static/images/hero/Archer_Queen.png);
+  background-image: url(/images/hero/Archer_Queen.png);
 }
 .hero.grand_warden {
-  background-image: url(/static/images/hero/Grand_Warden.png);
+  background-image: url(/images/hero/Grand_Warden.png);
 }
 .hero.royal_champion {
-  background-image: url(/static/images/hero/Royal_Champion.png);
+  background-image: url(/images/hero/Royal_Champion.png);
 }

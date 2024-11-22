@@ -220,7 +220,7 @@
   .xp {
     position: relative;
     padding: 16px;
-    background-image: url("/static/images/etc/xp.png");
+    background-image: url("/images/etc/xp.png");
     background-size: contain;
     background-repeat: no-repeat;
 
@@ -292,7 +292,7 @@
         position: absolute;
         width: 36px;
         height: 36px;
-        background-image: url(/static/images/etc/trophies.png);
+        background-image: url(/images/etc/trophies.png);
         background-repeat: no-repeat;
         background-size: contain;
         top: 0;

@@ -64,13 +64,17 @@ public class ClanUseCase {
 
     @Transactional
     public void updateContentActivation(ClanContentUpdateCommand command) {
-        Clan clan = clanService.findById(command.clanTag());
+        // 클랜 조회
+        Clan clan = clanRepository.findById(command.clanTag())
+                                  .orElseThrow(() -> new ClanNotExistsException(command.clanTag()));
 
+        // 클랜 컨텐츠 활성화 업데이트
         clan.changeContentActivation(command.clanWarYn(),
                                      command.clanWarLeagueYn(),
                                      command.clanWarParallelYn(),
                                      command.clanCapitalYn());
 
+        // 클랜 저장
         clanService.save(clan);
     }
 

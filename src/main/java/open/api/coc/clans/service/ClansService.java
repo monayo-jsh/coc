@@ -454,11 +454,6 @@ public class ClansService {
         }
     }
 
-    public String getLatestClanAssignedDate() {
-        return clanAssignedPlayerQueryRepository.findLatestSeasonDate();
-    }
-
-
     public String getLatestLeagueAssignedDate() {
         return clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
     }

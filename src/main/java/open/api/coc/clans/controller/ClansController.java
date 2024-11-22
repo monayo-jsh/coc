@@ -30,12 +30,6 @@ public class ClansController {
     private final ClansService clansService;
     private final ClanWarLeagueScheduler scheduler;
 
-    @GetMapping("/assigned/latest")
-    public ResponseEntity<String> getLatestClanAssignedDate() {
-        String clanAssignedDate = clansService.getLatestClanAssignedDate();
-        return ResponseEntity.ok().body(clanAssignedDate);
-    }
-
     @GetMapping("/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestClanAssignedMembers() {
         ClanAssignedMemberListResponse clanAssignedMemberList = clansService.getLatestClanAssignedMembers();

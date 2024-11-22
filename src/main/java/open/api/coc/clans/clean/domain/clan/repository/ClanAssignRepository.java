@@ -5,7 +5,7 @@ import open.api.coc.clans.clean.domain.clan.model.ClanAssignedPlayer;
 
 public interface ClanAssignRepository {
 
-    String findLatestAssignedDate();
+    String findLatestAssignedMonth();
 
     List<ClanAssignedPlayer> findAll(String assignedDate, String clanTag);
 

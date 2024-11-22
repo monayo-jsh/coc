@@ -321,7 +321,7 @@ public class PlayerUseCase {
 
     public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
         // 최근 배정일을 가져온다.
-        String latestAssignedDate = clanAssignService.findLatestAssignedDate();
+        String latestAssignedDate = clanAssignService.findLatestAssignedMonth();
 
         // 클랜에 최근 배정 목록을 가져온다.
         List<ClanAssignedPlayer> clanAssignedPlayers = clanAssignService.findAll(latestAssignedDate, clanTag);

@@ -152,9 +152,23 @@ public class ClanController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/competition")
-    public ResponseEntity<List<ClanResponse>> getClansCompetition() {
+    public ResponseEntity<List<ClanResponse>> getCompetitionClans() {
         return ResponseEntity.ok()
                              .body(clanUseCase.getCompetitionClans());
+    }
+
+    @Operation(
+        summary = "캐피탈 활성화된 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.11.22",
+        description = "이 API는 캐피탈 활성화된 클랜 목록을 반환합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/capital")
+    public ResponseEntity<List<ClanResponse>> getCapitalClans() {
+        return ResponseEntity.ok()
+                             .body(clanUseCase.getCapitalClans());
     }
 
 }

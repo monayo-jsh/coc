@@ -55,6 +55,15 @@ public class ClanUseCase {
         return mapToClanResponse(clans);
     }
 
+    @Transactional(readOnly = true)
+    public List<ClanResponse> getCapitalClans() {
+        // 캐피탈 클랜 목록을 조회한다.
+        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(ClanContentType.CLAN_CAPITAL);
+
+        // 응답 반환
+        return mapToClanResponse(clans);
+    }
+
     private List<ClanResponse> mapToClanResponse(List<Clan> clans) {
         return clans.stream()
                     .map(clanUseCaseMapper::toClanResponse)

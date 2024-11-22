@@ -1,8 +1,5 @@
 const PREFIX_CLAN_API = '/api/clans'; // 클랜 API
 
-const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
-const URI_COMPETITION_CLANS = "/clans/competition"; //대회 클랜 목록 조회
-
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
@@ -13,6 +10,8 @@ const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
 const URI_WAR_CLANS = `${PREFIX_CLAN_API}/war`; // 진행 클랜 목록 조회 warType - none: 클랜전, parallel: 병행클랜전, league: 리그전
+const URI_CAPITAL_CLANS = `${PREFIX_CLAN_API}/capital`; //습격전 클랜 목록 조회
+const URI_COMPETITION_CLANS = `${PREFIX_CLAN_API}/competition`; //대회 클랜 목록 조회
 
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 

@@ -91,23 +91,9 @@ public class ClanService {
             return clan;
         }
 
-        // 클랜 기본 설정
-        Integer clanOrder = getClanMaxOrders();
-        latestClan.initDefault(clanOrder);
+        // 클랜 생성 기본 설정
+        latestClan.initDefault();
         return latestClan;
-    }
-
-    @Transactional
-    public void deactivateClan(String clanTag) {
-        // 클랜을 조회한다.
-        Clan clan = clanRepository.findById(clanTag)
-                                  .orElseThrow(() -> new ClanNotExistsException(clanTag));
-
-        // 클랜을 비활성화한다.
-        clan.deactivate();
-
-        // 클랜 정보를 저장한다.
-        clanRepository.save(clan);
     }
 
     public void save(Clan clan) {

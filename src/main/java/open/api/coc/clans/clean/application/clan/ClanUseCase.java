@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
+import open.api.coc.clans.clean.domain.clan.exception.ClanNotExistsException;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
@@ -48,8 +49,17 @@ public class ClanUseCase {
         return clanUseCaseMapper.toClanResponse(clan);
     }
 
+    @Transactional
     public void deleteClan(String clanTag) {
-        clanService.deactivateClan(clanTag);
+        // 클랜 조회
+        Clan clan = clanRepository.findById(clanTag)
+                                  .orElseThrow(() -> new ClanNotExistsException(clanTag));
+
+        // 클랜 비활성화
+        clan.deactivate();
+
+        // 클랜 저장
+        clanService.save(clan);
     }
 
     @Transactional

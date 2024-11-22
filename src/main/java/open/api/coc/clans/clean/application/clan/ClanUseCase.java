@@ -6,6 +6,7 @@ import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
+import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.domain.clan.service.ClanService;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ClanUseCase {
 
+    private final ClanRepository clanRepository;
+
     private final ClanService clanService;
 
     private final ClanUseCaseMapper clanUseCaseMapper;
@@ -22,12 +25,10 @@ public class ClanUseCase {
     @Transactional(readOnly = true)
     public List<ClanResponse> getClans() {
         // 활성화된 전체 클랜 목록을 조회한다.
-        List<Clan> clans = clanService.findAll();
+        List<Clan> clans = clanRepository.findAllActiveClans();
 
-        // 응답
-        return clans.stream()
-                    .map(clanUseCaseMapper::toClanResponse)
-                    .toList();
+        // 응답 반환
+        return convertToClanResponse(clans);
     }
 
     public ClanResponse registerClan(String clanTag) {
@@ -59,9 +60,7 @@ public class ClanUseCase {
         List<Clan> clans = clanService.findAllByWarType(warType);
 
         // 응답
-        return clans.stream()
-                    .map(clanUseCaseMapper::toClanResponse)
-                    .toList();
+        return convertToClanResponse(clans);
     }
 
     public List<ClanResponse> getCompetitionClans() {
@@ -69,8 +68,13 @@ public class ClanUseCase {
         List<Clan> clans = clanService.findAllByClanContentType(ClanContentType.CLAN_COMPETITION);
 
         // 응답
+        return convertToClanResponse(clans);
+    }
+
+    private List<ClanResponse> convertToClanResponse(List<Clan> clans) {
         return clans.stream()
                     .map(clanUseCaseMapper::toClanResponse)
                     .toList();
     }
+
 }

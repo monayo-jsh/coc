@@ -55,7 +55,7 @@ public class ClanService {
 
     @Transactional(readOnly = true)
     public List<Clan> findAll() {
-        return clanRepository.findAllClans();
+        return clanRepository.findAllActiveClans();
     }
 
     @Transactional

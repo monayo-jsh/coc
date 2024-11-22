@@ -40,7 +40,7 @@ public class ClanDatabaseService implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllClans() {
+    public List<Clan> findAllActiveClans() {
         return queryRepository.findAllActiveClan()
                               .stream()
                               .map(clanEntityMapper::toClan)

@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanUseCase;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
+import open.api.coc.clans.clean.application.clan.dto.ClanQueryCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanContentRequest;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
@@ -47,14 +47,18 @@ public class ClanController {
         summary = "클랜 목록을 조회합니다. version: 1.00, Last Update: 24.11.20",
         description = "이 API는 클랜 목록을 제공합니다."
     )
+    @Parameters(value = {
+        @Parameter(name = "type", description = "조회 유형 (none: 클랜전, parallel: 병행클랜전, league: 리그전, capital: 습격전, competition: 대회)", required = false)
+    })
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("")
-    public ResponseEntity<List<ClanResponse>> getClans() {
+    public ResponseEntity<List<ClanResponse>> getClans(@RequestParam(required = false) String type) {
+        ClanQueryCommand command = clanUseCaseMapper.toClanQueryCommand(type);
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(clanUseCase.getClans());
+                             .body(clanUseCase.getActiveClans(command));
     }
 
     @Operation(
@@ -123,52 +127,6 @@ public class ClanController {
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
-    }
-
-    @Operation(
-        summary = "전쟁 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.11.20",
-        description = "이 API는 전쟁 활성화 클랜 목록을 제공합니다."
-    )
-    @Parameters(value = {
-        @Parameter(name = "type", description = "조회 유형 (none: 클랜전 (기본값), parallel: 병행클랜전, league: 리그전)", example = "none")
-    })
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content(schema = @Schema(implementation = String.class))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/war")
-    public ResponseEntity<List<ClanResponse>> getWarClans(@RequestParam(defaultValue = "none") @Pattern(regexp = "none|parallel|league", message = "조회 유형 (none: 클랜전 (기본값), parallel: 병행클랜전, league: 리그전) 값으로 요청해주세요.") String type) {
-        return ResponseEntity.status(HttpStatus.OK)
-                             .body(clanUseCase.getWarClans(type));
-    }
-
-    @Operation(
-        summary = "대회 활성화 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.011.21",
-        description = "이 API는 대회 활성화 클랜 목록을 반환합니다."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/competition")
-    public ResponseEntity<List<ClanResponse>> getCompetitionClans() {
-        return ResponseEntity.ok()
-                             .body(clanUseCase.getCompetitionClans());
-    }
-
-    @Operation(
-        summary = "캐피탈 활성화된 클랜 목록을 조회합니다. version: 1.00, Last Update: 24.11.22",
-        description = "이 API는 캐피탈 활성화된 클랜 목록을 반환합니다."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClanResponse.class)))),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
-    })
-    @GetMapping("/capital")
-    public ResponseEntity<List<ClanResponse>> getCapitalClans() {
-        return ResponseEntity.ok()
-                             .body(clanUseCase.getCapitalClans());
     }
 
 }

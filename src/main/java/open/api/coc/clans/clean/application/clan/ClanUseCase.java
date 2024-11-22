@@ -3,11 +3,11 @@ package open.api.coc.clans.clean.application.clan;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
+import open.api.coc.clans.clean.application.clan.dto.ClanQueryCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.exception.ClanNotExistsException;
 import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
-import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.domain.clan.service.ClanQueryService;
 import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
@@ -28,39 +28,15 @@ public class ClanUseCase {
     private final ClanUseCaseMapper clanUseCaseMapper;
 
     @Transactional(readOnly = true)
-    public List<ClanResponse> getClans() {
+    public List<ClanResponse> getActiveClans(ClanQueryCommand command) {
+        if (command.isSearchType()) {
+            // 검색 조건 존재 시
+            List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(command.type());
+            return mapToClanResponse(clans);
+        }
+
         // 활성화된 전체 클랜 목록을 조회한다.
         List<Clan> clans = clanRepository.findAllActiveClans();
-
-        // 응답 반환
-        return mapToClanResponse(clans);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanResponse> getWarClans(String warType) {
-        // 전쟁 클랜 목록을 조회한다.
-        ClanContentType clanContentType = ClanContentType.fromWarType(warType);
-        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(clanContentType);
-
-        // 응답 반환
-        return mapToClanResponse(clans);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanResponse> getCompetitionClans() {
-        // 대회 클랜 목록을 조회한다.
-        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(ClanContentType.CLAN_COMPETITION);
-
-        // 응답 반환
-        return mapToClanResponse(clans);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanResponse> getCapitalClans() {
-        // 캐피탈 클랜 목록을 조회한다.
-        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(ClanContentType.CLAN_CAPITAL);
-
-        // 응답 반환
         return mapToClanResponse(clans);
     }
 

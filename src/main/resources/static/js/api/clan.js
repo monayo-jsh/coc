@@ -9,10 +9,6 @@ const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 
 const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
-const URI_WAR_CLANS = `${PREFIX_CLAN_API}/war`; // 진행 클랜 목록 조회 warType - none: 클랜전, parallel: 병행클랜전, league: 리그전
-const URI_CAPITAL_CLANS = `${PREFIX_CLAN_API}/capital`; //습격전 클랜 목록 조회
-const URI_COMPETITION_CLANS = `${PREFIX_CLAN_API}/competition`; //대회 클랜 목록 조회
-
 const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
 
 const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
@@ -411,7 +407,7 @@ async function fetchWarClans(warType = "none") {
     }
   }
 
-  return await axios.get(URI_WAR_CLANS, option)
+  return await axios.get(URI_CLAN, option)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -423,7 +419,13 @@ async function fetchWarClans(warType = "none") {
 }
 
 async function fetchCompetitionClans() {
-  return await axios.get(URI_COMPETITION_CLANS)
+  const option = {
+    params: {
+      type: 'competition'
+    }
+  }
+
+  return await axios.get(URI_CLAN, option)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -435,7 +437,13 @@ async function fetchCompetitionClans() {
 }
 
 async function fetchCapitalClans() {
-  return await axios.get(URI_CAPITAL_CLANS)
+  const option = {
+    params: {
+      type: 'capital'
+    }
+  }
+
+  return await axios.get(URI_CLAN, option)
                     .then((response) => {
                       const { data } = response
                       return data;

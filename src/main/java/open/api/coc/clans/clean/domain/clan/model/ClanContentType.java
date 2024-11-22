@@ -4,30 +4,31 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public enum ClanContentType {
+
     CLAN_WAR("none"),
     CLAN_WAR_LEAGUE("league"),
     CLAN_WAR_PARALLEL("parallel"),
     CLAN_CAPITAL("capital"),
     CLAN_COMPETITION("competition");
 
-    private final String warType;
+    private final String type;
 
-    ClanContentType(String warType) {
-        this.warType = warType;
+    ClanContentType(String type) {
+        this.type = type;
     }
 
-    public static ClanContentType fromWarType(String warType) {
+    public static ClanContentType fromType(String type) {
         return Arrays.stream(values())
-                     .filter(clanContentType -> clanContentType.warType.equalsIgnoreCase(warType))
+                     .filter(clanContentType -> clanContentType.type.equalsIgnoreCase(type))
                      .findFirst()
                      .orElseThrow(() -> new IllegalArgumentException(
-                         "Invalid warType: " + warType + ". Valid values are: " + validWarTypes()
+                         "Invalid type: " + type + ". Valid values are: " + validTypes()
                      ));
     }
 
-    private static String validWarTypes() {
+    private static String validTypes() {
         return Arrays.stream(values())
-                     .map(clanContentType -> clanContentType.warType)
+                     .map(clanContentType -> clanContentType.type)
                      .collect(Collectors.joining(", "));
     }
 

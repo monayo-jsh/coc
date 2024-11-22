@@ -2,6 +2,7 @@ package open.api.coc.clans.clean.application.clan.mapper;
 
 import jakarta.validation.constraints.NotBlank;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
+import open.api.coc.clans.clean.application.clan.dto.ClanQueryCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanContentRequest;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
@@ -12,6 +13,10 @@ import org.mapstruct.Mapper;
     config = MapStructConfig.class
 )
 public interface ClanUseCaseMapper {
+
+    default ClanQueryCommand toClanQueryCommand(String type) {
+        return ClanQueryCommand.of(type);
+    }
 
     ClanResponse toClanResponse(Clan clan);
 

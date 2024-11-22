@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ClanWarMemberAttackDTO {
+public class ClanWarParticipantAttackDTO {
 
     private Long warId;
     private String tag;

@@ -293,7 +293,7 @@
       }
 
       const clanData = ClanWarMap.get(clan.tag);
-      const forcedParticipatePlayers = await fetchClanWarMembers(clan.tag, startTime, 'N');
+      const forcedParticipatePlayers = await fetchClanWarParticipants(clan.tag, startTime, 'N');
       const forcedParticipatePlayersSet = new Set(forcedParticipatePlayers.map(player => player.tag))
 
       const tableTbodyTemplate = copyTemplateById('table-tbody-template');

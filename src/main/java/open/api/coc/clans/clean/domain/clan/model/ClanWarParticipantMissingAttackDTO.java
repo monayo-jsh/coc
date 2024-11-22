@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 
-public record ClanWarMemberMissingAttackDTO(
+public record ClanWarParticipantMissingAttackDTO(
 
     @Schema(description = "클랜 이름")
     String clanName,

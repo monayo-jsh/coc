@@ -3,7 +3,7 @@ package open.api.coc.clans.clean.domain.clan.model;
 import java.util.Map;
 import java.util.Objects;
 
-public record ClanWarMemberRecordDTO(
+public record ClanWarParticipantRecordDTO(
 
     String clanTag,
     String clanName,

@@ -2,7 +2,7 @@ const PREFIX_CLAN_WAR_API = "/api/clan/war"
 
 const URI_CLAN_WARS = `${PREFIX_CLAN_WAR_API}/period` //클랜전 목록 조회 - 기간
 const URI_CLAN_WAR_DETAIL = `${PREFIX_CLAN_WAR_API}/{warId}` //클랜전 상세 정보 조회
-const URI_CLAN_WAR_MEMBERS = `${PREFIX_CLAN_WAR_API}/members` //클랜전 참여 계정 목록 조회
+const URI_CLAN_WAR_PARTICIPANTS = `${PREFIX_CLAN_WAR_API}/participants` //클랜전 참여 계정 목록 조회
 
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = `${PREFIX_CLAN_WAR_API}/missing/attack` // 클랜전 미공 기록 조회
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_PERIOD = `${PREFIX_CLAN_WAR_API}/missing/attack/period` //클랜전 미공 기록 조회 - 기간
@@ -136,8 +136,8 @@ async function putClanWarNecessaryAttack(warId, playerTag) {
                     })
 }
 
-async function fetchClanWarMembers(clanTag, startTime, necessaryAttackYn) {
-  let URI = URI_CLAN_WAR_MEMBERS + `?clanTag=${encodeURIComponent(clanTag)}&startTime=${startTime}`
+async function fetchClanWarParticipants(clanTag, startTime, necessaryAttackYn) {
+  let URI = URI_CLAN_WAR_PARTICIPANTS + `?clanTag=${encodeURIComponent(clanTag)}&startTime=${startTime}`
   if (necessaryAttackYn) {
     URI += `&necessaryAttackYn=${necessaryAttackYn}`
   }

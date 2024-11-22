@@ -7,7 +7,7 @@ import lombok.Getter;
 import open.api.coc.clans.database.entity.common.YnType;
 
 @Getter
-public class ClanWarMemberDTO {
+public class ClanWarParticipantDTO {
 
     private final Long warId;
     private final String tag;
@@ -16,10 +16,10 @@ public class ClanWarMemberDTO {
     private final Integer mapPosition;
     private final YnType necessaryAttackYn;
 
-    private final List<ClanWarMemberAttackDTO> attacks;
+    private final List<ClanWarParticipantAttackDTO> attacks;
 
-    public ClanWarMemberDTO(Long warId, String tag, String name, Integer mapPosition,
-                            YnType necessaryAttackYn, List<ClanWarMemberAttackDTO> attacks) {
+    public ClanWarParticipantDTO(Long warId, String tag, String name, Integer mapPosition,
+                                 YnType necessaryAttackYn, List<ClanWarParticipantAttackDTO> attacks) {
         this.warId = warId;
         this.tag = tag;
         this.name = name;
@@ -28,18 +28,18 @@ public class ClanWarMemberDTO {
         this.attacks = makeAttacks(attacks);
     }
 
-    private ArrayList<ClanWarMemberAttackDTO> makeAttacks(List<ClanWarMemberAttackDTO> attacks) {
+    private ArrayList<ClanWarParticipantAttackDTO> makeAttacks(List<ClanWarParticipantAttackDTO> attacks) {
         if(attacks == null) {
             return new ArrayList<>();
         }
 
-        List<ClanWarMemberAttackDTO> validAttacks = attacks.stream()
-                                                           .filter(attack -> Objects.nonNull(attack.getWarId()))
-                                                           .toList();
+        List<ClanWarParticipantAttackDTO> validAttacks = attacks.stream()
+                                                                .filter(attack -> Objects.nonNull(attack.getWarId()))
+                                                                .toList();
         return new ArrayList<>(validAttacks);
     }
 
-    public void addAttacks(List<ClanWarMemberAttackDTO> attacks) {
+    public void addAttacks(List<ClanWarParticipantAttackDTO> attacks) {
         this.attacks.addAll(attacks);
     }
 

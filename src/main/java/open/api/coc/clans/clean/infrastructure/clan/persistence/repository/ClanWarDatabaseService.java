@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
-import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantDTO;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRepository;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.dto.LeagueWarRoundCountDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
@@ -44,7 +44,7 @@ public class ClanWarDatabaseService implements ClanWarRepository {
 
     private ClanWarDTO fetchMemberDTOs(ClanWarDTO clanWar) {
         // 클랜 참여자 목록
-        List<ClanWarMemberDTO> members = memberQueryRepository.findDTOByIdWarId(clanWar.getWarId());
+        List<ClanWarParticipantDTO> members = memberQueryRepository.findDTOByIdWarId(clanWar.getWarId());
 
         // 클랜 참여자 매핑
         clanWar.changeMembers(members);

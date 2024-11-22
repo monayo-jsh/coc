@@ -24,7 +24,7 @@ import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,16 +87,16 @@ public class ClanWarController {
         }
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarMemberResponse.class))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarParticipantResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @GetMapping("/members")
-    public ResponseEntity<List<ClanWarMemberResponse>> getClanWarMembers(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
-                                                                         @RequestParam Long startTime,
-                                                                         @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
+    @GetMapping("/participants")
+    public ResponseEntity<List<ClanWarParticipantResponse>> getClanWarParticipants(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
+                                                                                   @RequestParam Long startTime,
+                                                                                   @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
         ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, startTime, necessaryAttackYn);
         return ResponseEntity.status(HttpStatus.OK)
-                             .body(clanWarUseCase.getClanWarMembers(query));
+                             .body(clanWarUseCase.getClanWarParticipants(query));
     }
 
     @Operation(

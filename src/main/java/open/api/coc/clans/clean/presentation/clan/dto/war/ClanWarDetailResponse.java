@@ -43,6 +43,6 @@ public class ClanWarDetailResponse {
     private long endTime;
 
     @Schema(description = "참여 멤버")
-    private List<ClanWarMemberResponse> members;
+    private List<ClanWarParticipantResponse> members;
 
 }

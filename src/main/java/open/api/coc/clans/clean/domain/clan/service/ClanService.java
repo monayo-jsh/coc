@@ -82,20 +82,19 @@ public class ClanService {
 
     }
 
-    @Transactional
-    public Clan createOrActivate(String clanTag) {
-        // COC API 요청으로 클랜의 최신 정보를 조회한다.
-        Clan latestClan = clanClient.findByTag(clanTag);
+    public Clan createOrActivate(Clan latestClan) {
+        Optional<Clan> existingClan = clanRepository.findById(latestClan.getTag());
+        if (existingClan.isPresent()) {
+            // 서버에 등록된 클랜인 경우
+            Clan clan = existingClan.get();
+            clan.activateWithLatestInfo(latestClan);
+            return clan;
+        }
 
-        // 클랜 정보를 생성하거나 활성화한다.
-        return clanRepository.findById(clanTag)
-                             .map(existingClan -> activateClan(existingClan, latestClan))
-                             .orElseGet(() -> createClan(latestClan));
-    }
-
-    private Clan activateClan(Clan existingClan, Clan latestClan) {
-        existingClan.activateWithLatestInfo(latestClan);
-        return clanRepository.save(existingClan);
+        // 클랜 기본 설정
+        Integer clanOrder = getClanMaxOrders();
+        latestClan.initDefault(clanOrder);
+        return latestClan;
     }
 
     @Transactional
@@ -109,11 +108,6 @@ public class ClanService {
 
         // 클랜 정보를 저장한다.
         clanRepository.save(clan);
-    }
-
-    private Clan createClan(Clan latestClan) {
-        latestClan.activate(); // 활성화 설정
-        return create(latestClan);
     }
 
     public void save(Clan clan) {

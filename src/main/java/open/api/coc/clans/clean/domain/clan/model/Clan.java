@@ -167,4 +167,11 @@ public class Clan {
         });
 
     }
+
+    // 클랜 초기 상태 설정
+    public void initDefault(Integer clanOrder) {
+        this.order = clanOrder;
+        this.createDefaultContent(); // 컨텐츠 활성화 기본값 설정
+        this.activate(); // 활성화
+    }
 }

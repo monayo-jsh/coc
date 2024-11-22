@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.ClanContentUpdateCommand;
 import open.api.coc.clans.clean.application.clan.mapper.ClanUseCaseMapper;
+import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ClanUseCase {
 
+    private final ClanClient clanClient;
     private final ClanRepository clanRepository;
 
     private final ClanService clanService;
@@ -31,12 +33,19 @@ public class ClanUseCase {
         return convertToClanResponse(clans);
     }
 
+    @Transactional
     public ClanResponse registerClan(String clanTag) {
-        // 클랜을 등록하거나 활성화한다.
-        Clan savedClan = clanService.createOrActivate(clanTag);
+        // COC API 요청으로 클랜의 최신 정보를 조회한다.
+        Clan latestClan = clanClient.findByTag(clanTag);
+
+        // 클랜을 생성하거나 활성화 설정
+        Clan clan = clanService.createOrActivate(latestClan);
+
+        // 클랜 저장
+        clanService.save(clan);
 
         // 응답
-        return clanUseCaseMapper.toClanResponse(savedClan);
+        return clanUseCaseMapper.toClanResponse(clan);
     }
 
     public void deleteClan(String clanTag) {

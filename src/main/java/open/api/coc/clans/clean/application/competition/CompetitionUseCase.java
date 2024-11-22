@@ -14,7 +14,7 @@ import open.api.coc.clans.clean.application.competition.model.CompetitionPartici
 import open.api.coc.clans.clean.application.competition.model.CompetitionParticipateCreateCommand;
 import open.api.coc.clans.clean.application.competition.model.CompetitionUpdateCommand;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
-import open.api.coc.clans.clean.domain.clan.service.ClanService;
+import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
 import open.api.coc.clans.clean.domain.competition.model.Competition;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClan;
 import open.api.coc.clans.clean.domain.competition.model.CompetitionClanRoaster;
@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CompetitionUseCase {
 
-    private final ClanService clanService;
+    private final ClanRegistrationService clanService;
 
     private final CompetitionService competitionService;
     private final CompetitionParticipateService competitionParticipateService;

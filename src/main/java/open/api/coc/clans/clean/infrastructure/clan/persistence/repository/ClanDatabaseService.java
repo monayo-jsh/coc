@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanBadgeEntityMapper;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.mapper.ClanContentEntityMapper;
@@ -53,8 +54,8 @@ public class ClanDatabaseService implements ClanRepository {
     }
 
     @Override
-    public List<Clan> findAllByClanContentTypeName(String clanContentTypeName) {
-        return queryRepository.findAllByClanContentTypeByName(clanContentTypeName)
+    public List<Clan> findAllByClanContentType(ClanContentType clanContentType) {
+        return queryRepository.findAllByClanContentTypeByName(clanContentType.name())
                               .stream()
                               .map(clanEntityMapper::toClan)
                               .collect(Collectors.toList());

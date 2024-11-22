@@ -9,7 +9,8 @@ import open.api.coc.clans.clean.domain.clan.external.client.ClanClient;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
 import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 import open.api.coc.clans.clean.domain.clan.repository.ClanRepository;
-import open.api.coc.clans.clean.domain.clan.service.ClanService;
+import open.api.coc.clans.clean.domain.clan.service.ClanQueryService;
+import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
 import open.api.coc.clans.clean.presentation.clan.dto.ClanResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,8 @@ public class ClanUseCase {
     private final ClanClient clanClient;
     private final ClanRepository clanRepository;
 
-    private final ClanService clanService;
+    private final ClanRegistrationService clanRegistrationService;
+    private final ClanQueryService clanQueryService;
 
     private final ClanUseCaseMapper clanUseCaseMapper;
 
@@ -31,7 +33,32 @@ public class ClanUseCase {
         List<Clan> clans = clanRepository.findAllActiveClans();
 
         // 응답 반환
-        return convertToClanResponse(clans);
+        return mapToClanResponse(clans);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanResponse> getWarClans(String warType) {
+        // 전쟁 클랜 목록을 조회한다.
+        ClanContentType clanContentType = ClanContentType.fromWarType(warType);
+        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(clanContentType);
+
+        // 응답 반환
+        return mapToClanResponse(clans);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanResponse> getCompetitionClans() {
+        // 대회 클랜 목록을 조회한다.
+        List<Clan> clans = clanQueryService.findAllActiveContentByClanContentType(ClanContentType.CLAN_COMPETITION);
+
+        // 응답 반환
+        return mapToClanResponse(clans);
+    }
+
+    private List<ClanResponse> mapToClanResponse(List<Clan> clans) {
+        return clans.stream()
+                    .map(clanUseCaseMapper::toClanResponse)
+                    .toList();
     }
 
     @Transactional
@@ -40,10 +67,10 @@ public class ClanUseCase {
         Clan latestClan = clanClient.findByTag(clanTag);
 
         // 클랜을 생성하거나 활성화 설정
-        Clan clan = clanService.createOrActivate(latestClan);
+        Clan clan = clanRegistrationService.createOrActivate(latestClan);
 
         // 클랜 저장
-        clanService.save(clan);
+        clanRegistrationService.save(clan);
 
         // 응답
         return clanUseCaseMapper.toClanResponse(clan);
@@ -59,7 +86,7 @@ public class ClanUseCase {
         clan.deactivate();
 
         // 클랜 저장
-        clanService.save(clan);
+        clanRegistrationService.save(clan);
     }
 
     @Transactional
@@ -75,29 +102,7 @@ public class ClanUseCase {
                                      command.clanCapitalYn());
 
         // 클랜 저장
-        clanService.save(clan);
-    }
-
-    public List<ClanResponse> getWarClans(String warType) {
-        // 클랜 목록을 조회한다.
-        List<Clan> clans = clanService.findAllByWarType(warType);
-
-        // 응답
-        return convertToClanResponse(clans);
-    }
-
-    public List<ClanResponse> getCompetitionClans() {
-        // 클랜 목록을 조회한다.
-        List<Clan> clans = clanService.findAllByClanContentType(ClanContentType.CLAN_COMPETITION);
-
-        // 응답
-        return convertToClanResponse(clans);
-    }
-
-    private List<ClanResponse> convertToClanResponse(List<Clan> clans) {
-        return clans.stream()
-                    .map(clanUseCaseMapper::toClanResponse)
-                    .toList();
+        clanRegistrationService.save(clan);
     }
 
 }

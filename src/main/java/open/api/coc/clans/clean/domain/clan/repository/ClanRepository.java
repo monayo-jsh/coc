@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.domain.clan.repository;
 import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.clean.domain.clan.model.Clan;
+import open.api.coc.clans.clean.domain.clan.model.ClanContentType;
 
 public interface ClanRepository {
 
@@ -11,7 +12,7 @@ public interface ClanRepository {
     List<Clan> findByIds(List<String> clanTags);
 
     List<Clan> findAllActiveClans();
-    List<Clan> findAllByClanContentTypeName(String contentTypeName);
+    List<Clan> findAllByClanContentType(ClanContentType clanContentType);
 
     Integer selectMaxOrders();
 

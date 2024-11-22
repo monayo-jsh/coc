@@ -5,6 +5,7 @@ import static open.api.coc.clans.clean.infrastructure.clan.persistence.entity.QC
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.entity.ClanLeagueWarEntity;
 import org.springframework.stereotype.Repository;
@@ -15,13 +16,15 @@ public class JpaClanLeagueWarQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanLeagueWarEntity> findAllBySeason(String season) {
+    public List<ClanLeagueWarEntity> findAllBySeasonAndClanTagIn(String season, Set<String> clanTags) {
         BooleanBuilder leagueWarCondition = new BooleanBuilder();
-        leagueWarCondition.and(clanLeagueWarEntity.season.eq(season));
+        leagueWarCondition.and(clanLeagueWarEntity.season.eq(season))
+                          .and(clanLeagueWarEntity.clanTag.in(clanTags));
 
         return queryFactory.select(clanLeagueWarEntity)
                            .from(clanLeagueWarEntity)
                            .where(leagueWarCondition)
                            .fetch();
     }
+
 }

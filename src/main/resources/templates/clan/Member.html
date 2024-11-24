@@ -208,7 +208,7 @@
     }
 
     function renderHero(memberHtml, hero) {
-      const { name, koreanNamem, level, maxLevel, village, equipments } = hero;
+      const { name, koreanName, level, maxLevel, village, equipments } = hero;
 
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
@@ -225,6 +225,9 @@
       heroElement.innerHTML = heroElement.innerHTML
                                          .replace(/{LEVEL}/, level)
                                          .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
+
+      // hero name set
+      heroElement.dataset.name = koreanName ? koreanName : name;
 
       heroesElement.appendChild(heroElement);
 

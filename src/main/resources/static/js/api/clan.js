@@ -12,7 +12,7 @@ const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // �
 const URI_CLAN_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/external`; //클랜 상세 조회 (OPEN API)
 const URI_CLAN_MEMBERS_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/members/external` //클랜 멤버 조회 (OPEN API)
 
-const URI_LATEST_CLAN_ASSIGNED_DATE = `/clans/assigned/latest` //최신 클랜 배정 날짜 조회
+const URI_LATEST_CLAN_ASSIGNED_DATE = `/api/clan/assign/latest-month` //최신 클랜 배정 날짜 조회
 const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/assigned/members/latest` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제

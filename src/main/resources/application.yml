@@ -72,7 +72,7 @@ cms:
 
 # 스케쥴링 활성화 여부
 scheduling:
-  enabled: true
+  enabled: false
 
 # 명예의전당 랭킹 표기 설정값
 hall-of-fame:

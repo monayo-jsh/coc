@@ -384,7 +384,7 @@
   transform: rotateY(180deg);
 
   .inner-content {
-    height: 160px;
+    height: 225px;
     overflow-y: scroll;
     scrollbar-width: none;
   }

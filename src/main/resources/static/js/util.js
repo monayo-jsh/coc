@@ -33,7 +33,8 @@ function filterVillage(array, village = 'home') {
 }
 
 function convertArrayToLevelMapByKoreanName(array) {
-  return filterVillage(array).reduce((map, row) => {
+  const sortedArray = sortedByCode(array);
+  return filterVillage(sortedArray).reduce((map, row) => {
     const {koreanName, level} = row;
     map[koreanName] = level
     return map
@@ -117,6 +118,7 @@ function convertHeroKoreanName(enName) {
     case 'Archer Queen': return '아처 퀸';
     case 'Grand Warden': return '그랜드 워든';
     case 'Royal Champion': return '로얄 챔피언';
+    case 'Minion Prince': return '미니언 프린스';
   }
 
   // not mapping hero english name.

@@ -122,3 +122,13 @@
   background-image: url("/images/hero/equipment/Rocket_Spear.png");
   color: rgba(0, 0, 0, 0);
 }
+
+
+.img-icon.henchmen_puppet {
+  background-image: url("/images/hero/equipment/Henchmen_Puppet.png");
+  color: rgba(0, 0, 0, 0);
+}
+.img-icon.dark_orb {
+  background-image: url("/images/hero/equipment/Dark_Orb.png");
+  color: rgba(0, 0, 0, 0);
+}

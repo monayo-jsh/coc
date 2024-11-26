@@ -240,7 +240,7 @@
       const { heroes } = player
       if (!heroes) return;
 
-      for (const hero of heroes) {
+      for (const hero of sortedByCode(heroes)) {
         renderHero(memberHtml, hero);
       }
     }
@@ -250,7 +250,9 @@
       const { heroEquipments } = player
       if (!heroEquipments || !heroEquipments.length) return;
 
-      const heroEquipmentMap = convertArrayToMapByKey(heroEquipments, 'heroName', true);
+      const sortedByHeroCode = heroEquipments.sort((a, b) => a.heroCode - b.heroCode)
+
+      const heroEquipmentMap = convertArrayToMapByKey(sortedByHeroCode, 'heroName', true);
 
       const innerSectionGroupTemplate = document.querySelector('#inner-section-group');
 

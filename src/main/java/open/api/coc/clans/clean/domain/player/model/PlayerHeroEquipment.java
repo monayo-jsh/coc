@@ -63,6 +63,9 @@ public class PlayerHeroEquipment {
         return this.getHeroConfig().getName();
 
     }
+    public Integer getHeroCode() {
+        return this.getHeroConfig().getCode();
+    }
 
     public boolean isWear() {
         return YnType.Y.equals(this.wearYn);

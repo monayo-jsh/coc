@@ -34,4 +34,7 @@ public class PlayerHeroEquipmentResponse {
     @Schema(description = "착용중인 영웅 이름")
     private String heroName;
 
+    @Schema(description = "착용중인 영웅 코드")
+    private Integer heroCode;
+
 }

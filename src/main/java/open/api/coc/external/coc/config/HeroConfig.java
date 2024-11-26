@@ -11,6 +11,7 @@ public enum HeroConfig {
     ARCHER_QUEEN(2, "Archer Queen", "아처 퀸", "퀸"),
     GRAND_WARDEN(3, "Grand Warden", "그랜드 워든", "워든"),
     ROYAL_CHAMPION(4, "Royal Champion", "로얄 챔피언", "로챔"),
+    MINION_PRINCE(5, "Minion Prince", "미니언 프린스", "미프"),
 
     UNKNOWN(Integer.MAX_VALUE, "unknown", "알 수 없음", "알 수 없음");
 

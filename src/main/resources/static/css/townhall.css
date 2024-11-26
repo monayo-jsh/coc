@@ -5,6 +5,9 @@
   background-position: center;
   background-size: contain;
 }
+.town-hall.th17 {
+  background-image: url(/images/townhall/17.png);
+}
 .town-hall.th16 {
   background-image: url(/images/townhall/16.png);
 }

@@ -28,3 +28,7 @@
   background-image: url(/images/hero/Royal_Champion.png);
   color: rgba(0, 0, 0, 0);
 }
+.hero.minion_prince {
+  background-image: url(/images/hero/Minion_Prince.png);
+  color: rgba(0, 0, 0, 0);
+}

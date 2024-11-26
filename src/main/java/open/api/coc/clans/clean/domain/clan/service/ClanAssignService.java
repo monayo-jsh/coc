@@ -14,20 +14,20 @@ public class ClanAssignService {
     private final ClanAssignRepository assignRepository;
 
     @Transactional(readOnly = true)
-    public String findLatestAssignedDate() {
-        return assignRepository.findLatestAssignedDate();
+    public String findLatestAssignedMonth() {
+        return assignRepository.findLatestAssignedMonth();
     }
 
     @Transactional
     public void excludeRecently(String playerTag) {
-        String latestSeasonDate = findLatestAssignedDate();
+        String latestSeasonDate = findLatestAssignedMonth();
 
         assignRepository.cancel(latestSeasonDate, playerTag);
     }
 
     @Transactional
     public void excludeRecently(List<String> playerTags) {
-        String latestSeasonDate = findLatestAssignedDate();
+        String latestSeasonDate = findLatestAssignedMonth();
 
         for (String playerTag : playerTags) {
             assignRepository.cancel(latestSeasonDate, playerTag);

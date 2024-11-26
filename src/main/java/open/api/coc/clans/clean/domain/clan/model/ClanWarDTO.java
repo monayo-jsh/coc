@@ -22,7 +22,7 @@ public class ClanWarDTO {
     private final Integer teamSize;
     private final Integer attacksPerMember;
     private final String warTag;
-    private final List<ClanWarMemberDTO> members;
+    private final List<ClanWarParticipantDTO> members;
 
     public ClanWarDTO(Long warId, String clanName, String state, ClanWarType type,
                       String battleType,
@@ -43,17 +43,17 @@ public class ClanWarDTO {
         this.members = new ArrayList<>();
     }
 
-    public List<ClanWarMemberDTO> getNecessaryAttackMembers(YnType necessaryAttackYn) {
+    public List<ClanWarParticipantDTO> getNecessaryAttackParticipants(YnType necessaryAttackYn) {
         if (Objects.isNull(necessaryAttackYn)) return members;
 
         if (YnType.Y.equals(necessaryAttackYn)) {
-            return members.stream().filter(ClanWarMemberDTO::isNecessaryAttack).toList();
+            return members.stream().filter(ClanWarParticipantDTO::isNecessaryAttack).toList();
         }
 
-        return members.stream().filter(ClanWarMemberDTO::isUnNecessaryAttack).toList();
+        return members.stream().filter(ClanWarParticipantDTO::isUnNecessaryAttack).toList();
     }
 
-    public void changeMembers(List<ClanWarMemberDTO> members) {
+    public void changeMembers(List<ClanWarParticipantDTO> members) {
         this.members.clear();
         this.members.addAll(members);
     }

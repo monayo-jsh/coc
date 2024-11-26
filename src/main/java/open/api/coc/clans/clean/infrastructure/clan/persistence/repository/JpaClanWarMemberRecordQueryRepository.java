@@ -14,7 +14,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantRecordDTO;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarRecordConditionBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -25,9 +25,9 @@ public class JpaClanWarMemberRecordQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarMemberRecordDTO> findAll(ClanWarRecordConditionBuilder condition, Pageable pageable) {
-        ConstructorExpression<ClanWarMemberRecordDTO> clanWarRecordDTO = Projections.constructor(
-            ClanWarMemberRecordDTO.class,
+    public List<ClanWarParticipantRecordDTO> findAll(ClanWarRecordConditionBuilder condition, Pageable pageable) {
+        ConstructorExpression<ClanWarParticipantRecordDTO> clanWarRecordDTO = Projections.constructor(
+            ClanWarParticipantRecordDTO.class,
             clanEntity.tag.max().as("clanTag"),
             clanEntity.name.max().as("clanName"),
             clanEntity.order.max().as("clanOrder"),
@@ -44,17 +44,17 @@ public class JpaClanWarMemberRecordQueryRepository {
             getStartSumByStarCount(0, "zeroStars")
         );
 
-        JPAQuery<ClanWarMemberRecordDTO> query = queryFactory.select(clanWarRecordDTO)
-                                                             .from(clanWarEntity)
-                                                             .join(clanWarEntity.members, clanWarMemberEntity)
-                                                             .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
-                                                             .join(playerEntity)
-                                                             .on(playerEntity.playerTag.eq(clanWarMemberEntity.id.tag))
-                                                             .join(clanEntity)
-                                                             .on(clanEntity.tag.eq(clanWarEntity.clanTag))
-                                                             .where(condition.build())
-                                                             .groupBy(clanWarMemberAttackEntity.id.tag)
-                                                             .orderBy(clanWarMemberAttackEntity.stars.sum().desc(),
+        JPAQuery<ClanWarParticipantRecordDTO> query = queryFactory.select(clanWarRecordDTO)
+                                                                  .from(clanWarEntity)
+                                                                  .join(clanWarEntity.members, clanWarMemberEntity)
+                                                                  .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
+                                                                  .join(playerEntity)
+                                                                  .on(playerEntity.playerTag.eq(clanWarMemberEntity.id.tag))
+                                                                  .join(clanEntity)
+                                                                  .on(clanEntity.tag.eq(clanWarEntity.clanTag))
+                                                                  .where(condition.build())
+                                                                  .groupBy(clanWarMemberAttackEntity.id.tag)
+                                                                  .orderBy(clanWarMemberAttackEntity.stars.sum().desc(),
                                                                       clanWarMemberAttackEntity.destructionPercentage.sum().desc(),
                                                                       clanWarMemberAttackEntity.duration.avg().asc());
 

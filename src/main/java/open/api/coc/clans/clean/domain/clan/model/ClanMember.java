@@ -20,8 +20,6 @@ public class ClanMember {
     private Integer townHallLevel; // 타운홀 레벨
     private Integer expLevel; // EXP 레벨
 
-    private League league; // 리그 정보
-
     private Integer trophies; // 현재 트로피
 
     private Integer clanRank; // 클랜내 순위
@@ -29,5 +27,7 @@ public class ClanMember {
 
     private Integer donations; // 지원 수
     private Integer donationsReceived; // 지원 받은수
+
+    private League league; // 리그 정보
 
 }

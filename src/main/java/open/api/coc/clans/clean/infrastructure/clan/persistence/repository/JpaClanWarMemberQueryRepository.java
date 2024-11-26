@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberAttackDTO;
-import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantAttackDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantDTO;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -22,34 +22,34 @@ public class JpaClanWarMemberQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarMemberDTO> findDTOByIdWarId(Long warId) {
-        ConstructorExpression<ClanWarMemberAttackDTO> attackDTO = Projections.constructor(ClanWarMemberAttackDTO.class,
-                                                                                                clanWarMemberAttackEntity.id.warId,
-                                                                                                clanWarMemberAttackEntity.id.tag,
-                                                                                                clanWarMemberAttackEntity.id.order,
-                                                                                                clanWarMemberAttackEntity.stars,
-                                                                                                clanWarMemberAttackEntity.destructionPercentage,
-                                                                                                clanWarMemberAttackEntity.duration);
+    public List<ClanWarParticipantDTO> findDTOByIdWarId(Long warId) {
+        ConstructorExpression<ClanWarParticipantAttackDTO> attackDTO = Projections.constructor(ClanWarParticipantAttackDTO.class,
+                                                                                               clanWarMemberAttackEntity.id.warId,
+                                                                                               clanWarMemberAttackEntity.id.tag,
+                                                                                               clanWarMemberAttackEntity.id.order,
+                                                                                               clanWarMemberAttackEntity.stars,
+                                                                                               clanWarMemberAttackEntity.destructionPercentage,
+                                                                                               clanWarMemberAttackEntity.duration);
 
-        ConstructorExpression<ClanWarMemberDTO> memberDTO = Projections.constructor(ClanWarMemberDTO.class,
-                                                                                    clanWarMemberEntity.id.warId,
-                                                                                    clanWarMemberEntity.id.tag,
-                                                                                    clanWarMemberEntity.name,
-                                                                                    clanWarMemberEntity.mapPosition,
-                                                                                    clanWarMemberEntity.necessaryAttackYn,
-                                                                                    Projections.list(attackDTO));
+        ConstructorExpression<ClanWarParticipantDTO> memberDTO = Projections.constructor(ClanWarParticipantDTO.class,
+                                                                                         clanWarMemberEntity.id.warId,
+                                                                                         clanWarMemberEntity.id.tag,
+                                                                                         clanWarMemberEntity.name,
+                                                                                         clanWarMemberEntity.mapPosition,
+                                                                                         clanWarMemberEntity.necessaryAttackYn,
+                                                                                         Projections.list(attackDTO));
 
-        List<ClanWarMemberDTO> members = queryFactory.select(memberDTO)
-                                                     .from(clanWarMemberEntity)
-                                                     .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
-                                                     .where(clanWarMemberEntity.id.warId.eq(warId))
-                                                     .fetch();
+        List<ClanWarParticipantDTO> members = queryFactory.select(memberDTO)
+                                                          .from(clanWarMemberEntity)
+                                                          .leftJoin(clanWarMemberEntity.attacks, clanWarMemberAttackEntity)
+                                                          .where(clanWarMemberEntity.id.warId.eq(warId))
+                                                          .fetch();
 
-        Map<String, ClanWarMemberDTO> memberMap = new HashMap<>();
-        for(ClanWarMemberDTO member : members) {
+        Map<String, ClanWarParticipantDTO> memberMap = new HashMap<>();
+        for(ClanWarParticipantDTO member : members) {
             if (memberMap.containsKey(member.getTag())) {
                 // 중복된 플레이어 처리
-                ClanWarMemberDTO existingMember = memberMap.get(member.getTag());
+                ClanWarParticipantDTO existingMember = memberMap.get(member.getTag());
                 existingMember.addAttacks(member.getAttacks());
             } else {
                 // 신규 플레이어 처리
@@ -58,7 +58,7 @@ public class JpaClanWarMemberQueryRepository {
         }
 
         return new ArrayList<>(memberMap.values()).stream()
-                                                  .sorted(Comparator.comparing(ClanWarMemberDTO::getMapPosition))
+                                                  .sorted(Comparator.comparing(ClanWarParticipantDTO::getMapPosition))
                                                   .toList();
     }
 

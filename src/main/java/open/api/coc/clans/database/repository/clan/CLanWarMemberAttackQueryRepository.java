@@ -13,7 +13,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.clean.domain.clan.model.ClanWarMemberMissingAttackDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantMissingAttackDTO;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.query.ClanWarMemberMissingAttackConditionBuilder;
 import org.springframework.stereotype.Repository;
 
@@ -23,26 +23,26 @@ public class CLanWarMemberAttackQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByStartTime(LocalDateTime from, LocalDateTime to) {
+    public List<ClanWarParticipantMissingAttackDTO> findMissingAttacksByStartTime(LocalDateTime from, LocalDateTime to) {
         ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         return buildMissingAttackQuery(condition.build()).fetch();
     }
 
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByTagAndStartTime(String tag, LocalDateTime from, LocalDateTime to) {
+    public List<ClanWarParticipantMissingAttackDTO> findMissingAttacksByTagAndStartTime(String tag, LocalDateTime from, LocalDateTime to) {
         ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         condition = condition.withPlayerTag(tag);
         return buildMissingAttackQuery(condition.build()).fetch();
     }
 
-    public List<ClanWarMemberMissingAttackDTO> findMissingAttacksByNameAndStartTime(String name, LocalDateTime from, LocalDateTime to) {
+    public List<ClanWarParticipantMissingAttackDTO> findMissingAttacksByNameAndStartTime(String name, LocalDateTime from, LocalDateTime to) {
         ClanWarMemberMissingAttackConditionBuilder condition = new ClanWarMemberMissingAttackConditionBuilder(from, to);
         condition = condition.withPlayerName(name);
         return buildMissingAttackQuery(condition.build()).fetch();
     }
 
-    private JPAQuery<ClanWarMemberMissingAttackDTO> buildMissingAttackQuery(BooleanBuilder condition) {
-        ConstructorExpression<ClanWarMemberMissingAttackDTO> missingAttackDTO = Projections.constructor(
-            ClanWarMemberMissingAttackDTO.class,
+    private JPAQuery<ClanWarParticipantMissingAttackDTO> buildMissingAttackQuery(BooleanBuilder condition) {
+        ConstructorExpression<ClanWarParticipantMissingAttackDTO> missingAttackDTO = Projections.constructor(
+            ClanWarParticipantMissingAttackDTO.class,
             clanEntity.name,
             clanEntity.order,
             clanWarEntity.warId,

@@ -5,6 +5,10 @@ import lombok.Getter;
 @Getter
 public enum YnType {
 
-    Y,N
+    Y,N;
 
+    public static YnType from(String type) {
+        if (type == null) return null;
+        return valueOf(type.toUpperCase());
+    }
 }

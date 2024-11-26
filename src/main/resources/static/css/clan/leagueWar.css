@@ -7,19 +7,19 @@
   height: 15px;
 }
 .icon.promoted {
-  background-image: url("/static/images/etc/wl_icon_promoted.png");
+  background-image: url("/images/etc/wl_icon_promoted.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 .icon.demoted {
-  background-image: url("/static/images/etc/wl_icon_demoted.png");
+  background-image: url("/images/etc/wl_icon_demoted.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 .icon.stay {
-  background-image: url("/static/images/etc/wl_icon_stay.png");
+  background-image: url("/images/etc/wl_icon_stay.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;

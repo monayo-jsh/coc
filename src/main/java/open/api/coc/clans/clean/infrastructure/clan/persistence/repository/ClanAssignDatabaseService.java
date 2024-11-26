@@ -17,7 +17,7 @@ public class ClanAssignDatabaseService implements ClanAssignRepository {
 
     private final ClanAssignedPlayerEntityMapper clanAssignedPlayerEntityMapper;
 
-    public String findLatestAssignedDate() {
+    public String findLatestAssignedMonth() {
         return jpaClanAssignedPlayerQueryRepository.findLatestAssignedDate();
     }
 

@@ -42,4 +42,15 @@ public class ClanContent {
                           .clanCompetitionYn(YnType.N)
                           .build();
     }
+
+    public void changeActivation(ClanContentType type, YnType yn) {
+        switch (type) {
+            case CLAN_WAR -> this.clanWarYn = yn;
+            case CLAN_WAR_LEAGUE -> this.clanWarLeagueYn = yn;
+            case CLAN_WAR_PARALLEL -> this.clanWarParallelYn = yn;
+            case CLAN_CAPITAL -> this.clanCapitalYn = yn;
+            case CLAN_COMPETITION -> this.clanCompetitionYn = yn;
+        }
+    }
+
 }

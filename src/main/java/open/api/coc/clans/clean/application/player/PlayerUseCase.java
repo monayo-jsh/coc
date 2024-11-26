@@ -16,7 +16,7 @@ import open.api.coc.clans.clean.domain.clan.model.ClanAssignedPlayer;
 import open.api.coc.clans.clean.domain.clan.service.ClanAssignService;
 import open.api.coc.clans.clean.domain.clan.service.ClanGameService;
 import open.api.coc.clans.clean.domain.clan.service.ClanLeagueAssignService;
-import open.api.coc.clans.clean.domain.clan.service.ClanService;
+import open.api.coc.clans.clean.domain.clan.service.ClanRegistrationService;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
@@ -58,7 +58,7 @@ public class PlayerUseCase {
     private final PlayerLegendRecordService legendRecordService;
     private final PlayerDonationService playerDonationService;
 
-    private final ClanService clanService;
+    private final ClanRegistrationService clanService;
     private final ClanAssignService clanAssignService;
     private final ClanLeagueAssignService clanLeagueAssignService;
 
@@ -321,7 +321,7 @@ public class PlayerUseCase {
 
     public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
         // 최근 배정일을 가져온다.
-        String latestAssignedDate = clanAssignService.findLatestAssignedDate();
+        String latestAssignedDate = clanAssignService.findLatestAssignedMonth();
 
         // 클랜에 최근 배정 목록을 가져온다.
         List<ClanAssignedPlayer> clanAssignedPlayers = clanAssignService.findAll(latestAssignedDate, clanTag);

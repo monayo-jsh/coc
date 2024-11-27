@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/seasonManager.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/season.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>시즌종료일 관리</title>
+  <script>
+    dayjs.extend(dayjs_plugin_duration);
+
+    async function removeSeasonEndDate(element) {
+      const seasonRow = element.closest('.season');
+      const endDateElement = seasonRow.querySelector('.end-date');
+
+      const endDate = endDateElement.innerHTML;
+      if (!confirm(`시즌 종료일: "${endDate}" 를 제거하시겠습니까?`)) {
+        return;
+      }
+
+      const result = await deleteSeasonEndDate(dayjs(endDate).valueOf());
+      if (result) {
+        location.reload();
+      }
+    }
+
+    async function registerSeasonEndDate() {
+      const form = document.querySelector('form.register-form');
+      const formData = loadRequestBodyFromForm(form);
+
+      const { date, hour } = formData;
+
+      if (!date) { alert("종료일까지 남은 일수를 입력해주세요."); return; }
+      if (!hour) { alert("종료일까지 남은 시간를 입력해주세요."); return; }
+
+      const seasonEndDate = dayjs().add(date, 'day').add(hour, 'hour');
+
+      const formatSeasonEndDate = formatYYYYMMDD(seasonEndDate);
+      if (!confirm(`신규 시즌 종료일: "${formatSeasonEndDate}" 로 설정하시겠습니까?`)) {
+        return;
+      }
+
+      const result = await createSeasonEndDate(seasonEndDate.valueOf());
+      if (result) {
+        location.reload();
+      }
+    }
+
+    function drawSeason(season) {
+      const template = copyTemplateById('season-template');
+      const seasonRow = template.querySelector('.season');
+
+      seasonRow.innerHTML = seasonRow.innerHTML
+                                     .replace(/{END_DATE}/, season);
+
+      return seasonRow;
+    }
+
+    function drawSeasons(seasons) {
+      const target = document.querySelector('.season-wrapper');
+      for(const season of seasons) {
+        const seasonRow = drawSeason(season);
+        target.appendChild(seasonRow);
+      }
+    }
+
+    async function drawLatestSeasonEndDate() {
+      const seasons = await fetchLatestSeasons();
+      drawSeasons(seasons);
+    }
+
+    window.onload = async () => {
+      await drawLatestSeasonEndDate();
+    }
+  </script>
+</head>
+<body>
+
+<div class="title">
+  <span class="label">시즌종료일 관리</span>
+</div>
+<div class="support-area">
+  <span class="description">* 현재 시즌 종료까지 남은 기간을 입력</span>
+  <form class="register-form">
+    <div class="row">
+      <div class="cell">
+        <input type="number" class="input" name="date" min="0">
+        <div class="label">일</div>
+      </div>
+      <div class="cell">
+        <input type="number" class="input" name="hour" min="0">
+        <div class="label">시간</div>
+      </div>
+      <div class="cell">
+        <div class="button-chip" onclick="registerSeasonEndDate();">설정</div>
+      </div>
+    </div>
+
+  </form>
+</div>
+<div class="season-wrapper"></div>
+
+</body>
+<template id="season-template">
+  <div class="season">
+    <div class="row">
+      <div class="cell">
+        <div class="end-date">{END_DATE}</div>
+      </div>
+      <div class="cell">
+        <i class="fa-solid fa-trash cursor-pointer" onclick="removeSeasonEndDate(this);"></i>
+      </div>
+    </div>
+  </div>
+</template>
+</html>

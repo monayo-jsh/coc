@@ -26,6 +26,12 @@ public class AdminViewController {
         return "cms/NoticeManager";
     }
 
+    /** 시즌종료일 관리 */
+    @GetMapping("/season/manager")
+    public String seasonManager() {
+        return "cms/SeasonManager";
+    }
+
     /** 클랜원 관리 */
     @GetMapping("/member/manager")
     public String memberManager() {

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class JpaSeasonEndManagementCustomRepository {
+public class JpaSeasonEndManagementQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -34,4 +34,5 @@ public class JpaSeasonEndManagementCustomRepository {
                            .limit(limit)
                            .fetch();
     }
+
 }

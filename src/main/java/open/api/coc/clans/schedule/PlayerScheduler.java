@@ -10,7 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.player.PlayerUseCase;
-import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementCustomRepository;
+import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementQueryRepository;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.repository.player.PlayerQueryRepository;
 import open.api.coc.clans.service.PlayersService;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PlayerScheduler {
 
-    private final JpaSeasonEndManagementCustomRepository jpaSeasonEndManagementCustomRepository;
+    private final JpaSeasonEndManagementQueryRepository jpaSeasonEndManagementCustomRepository;
 
     private final PlayerQueryRepository playerQueryRepository;
     private final PlayersService playersService;

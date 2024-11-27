@@ -10,4 +10,8 @@ public interface SeasonRepository {
 
     List<LocalDate> findLatestSeasonEndDate(int limit);
 
+    void save(LocalDate endDate);
+
+    void remove(LocalDate localDate);
+
 }

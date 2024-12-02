@@ -103,7 +103,16 @@
 
       if (isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate)) {
         isNotLeagueAssigned = true;
-        displayText = `(${formatYYYYMM(dayjs().add(1, 'month'))} 배정 예정)`;
+
+        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const now = dayjs();
+
+        let displayDate = dayjs();
+        if (latestSeasonMonth >= now.month()) {
+          // 최근 배정월이 이번달과 같거나 미래인 경우 다음달로 표기
+          displayDate = displayDate.add(1, 'month');
+        }
+        displayText = `(${formatYYYYMM(displayDate)} 배정 예정)`;
       }
 
       leagueAssignedDateDisplay.innerHTML = displayText;

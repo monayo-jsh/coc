@@ -47,6 +47,9 @@ body {
   white-space: nowrap;
   overflow-x: auto;
 
+  .radio-inputs.league-clan-list {
+    max-width: 600px;
+  }
   .radio-inputs {
     flex-wrap: nowrap;
     max-width: 1200px;

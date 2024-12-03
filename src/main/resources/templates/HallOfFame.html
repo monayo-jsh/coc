@@ -423,11 +423,33 @@
       return document.querySelector(`.${targetClassName}`);
     }
 
+    function renderLeagueWarClans(targetClassName, rankings) {
+      // 리그전 완파클랜원이 존재하는 클랜 Set 획득
+      const clans = rankings.map(data => convertClanInfo(data)).sort((a, b) => a.order - b.order);
+      const clanMap = new Map();
+      clans.forEach(clan => clanMap.set(clan.tag, clan));
+
+      renderClans(Array.from(clanMap.values()), 'league', targetClassName);
+
+      function convertClanInfo(data) {
+        return {
+          tag:data.clanTag,
+          name:data.clanName,
+          order:data.clanOrder
+        }
+      }
+    }
+
     async function fetchThisMonthClanLeagueWar(clanTag) {
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
       showLoading(targetClassName);
       const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
+
+      if (clanTag === '') {
+        // 리그전 완파 클랜원이 존재하는 클랜 목록 표기
+        renderLeagueWarClans(targetClassName, rankings);
+      }
 
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
       renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);
@@ -441,22 +463,27 @@
 
       const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
 
+      if (clanTag === '') {
+        // 리그전 완파 클랜원이 존재하는 클랜 목록 표기
+        renderLeagueWarClans(targetClassName, rankings);
+      }
+
       const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
       renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);
       hideLoading(targetClassName);
     }
 
-    function renderClan(clan, type = 'clan') {
+    function renderClan(clan, type = 'clan', targetClassRootName) {
       const { tag, name } = clan;
       const radioItem = getRadioItemTemplateByType();
       const radio = radioItem.querySelector('.radio.item');
 
       radio.innerHTML = radio.innerHTML
-                             .replace(/{TYPE}/, type)
+                             .replace(/{TYPE}/, targetClassRootName)
                              .replace(/{CLAN_TAG}/, tag)
                              .replace(/{CLAN_NAME}/, name);
 
-      const radioInputs = getRadioInputsByType();
+      const radioInputs = getRadioInputsByType(targetClassRootName);
       radioInputs.appendChild(radio);
 
       function getRadioItemTemplateByType() {
@@ -465,17 +492,17 @@
 
         return copyTemplateById('league-war-radio-item-template');
       }
-
-      function getRadioInputsByType() {
-        if (type === 'clan')
-          return document.querySelector('.clan-list.radio-inputs');
-
-        return document.querySelector('.league-clan-list.radio-inputs');
-      }
     }
-    function renderClans(clans, type) {
+
+    function getRadioInputsByType(targetClassRootName) {
+      return document.querySelector(`.${targetClassRootName} .radio-inputs`);
+    }
+
+    function renderClans(clans, type, targetClassRootName) {
+      const target = getRadioInputsByType(targetClassRootName);
+      if (target.children.length > 1) return; // 초기 구성 완료된 경우 더이상 그리지 않음
       for(const clan of clans) {
-        renderClan(clan, type);
+        renderClan(clan, type, targetClassRootName);
       }
     }
 
@@ -531,12 +558,10 @@
 
       //클랜전 부문
       const warClans = await fetchWarClans('none');
-      await renderClans(warClans, 'clan');
+      await renderClans(warClans, 'clan', 'clan-war');
       fetchClanWarStars('all');
 
       //리그전 부문
-      const leagueWarClans = await fetchWarClans('league');
-      renderClans(leagueWarClans, 'league')
       fetchClanLeagueWar('all');
 
       //습격전 부문
@@ -717,7 +742,7 @@
           <div class="support-area">
             <div class="clan-list radio-inputs">
               <label class="radio item">
-                <input type="radio" name="clan-radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+                <input type="radio" name="clan-war-radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
                 <span class="name">전체</span>
               </label>
             </div>
@@ -767,18 +792,19 @@
       <div class="section-wrapper sections league-war swipe">
 
         <div class="section-title">리그전 부문</div>
-        <div class="support-area">
-          <div class="league-clan-list radio-inputs">
-            <label class="radio item">
-              <input type="radio" name="league-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
-              <span class="name">전체</span>
-            </label>
-          </div>
-        </div>
 
         <div class="section-contents">
 
           <div class="section leaderboard-wrapper this-month-league-war">
+            <div class="support-area">
+              <div class="league-clan-list radio-inputs">
+                <label class="radio item">
+                  <input type="radio" name="this-month-league-war-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
+                  <span class="name">전체</span>
+                </label>
+              </div>
+            </div>
+
             <div class="loader-circle display-none">
               <div class="bar1"></div>
               <div class="bar2"></div>
@@ -796,6 +822,15 @@
           </div>
 
           <div class="section leaderboard-wrapper last-month-league-war">
+            <div class="support-area">
+              <div class="league-clan-list radio-inputs">
+                <label class="radio item">
+                  <input type="radio" name="last-month-league-war-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
+                  <span class="name">전체</span>
+                </label>
+              </div>
+            </div>
+
             <div class="loader-circle display-none">
               <div class="bar1"></div>
               <div class="bar2"></div>

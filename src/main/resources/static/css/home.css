@@ -250,6 +250,9 @@
     visibility: visible;
     pointer-events: auto;
 
+    .slide-animation.deactivate {
+      animation: none !important;
+    }
     .slide-animation {
       display: flex;
       align-items: center;

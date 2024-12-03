@@ -216,6 +216,11 @@
       if (notices.length) {
         // 첫번째 공지 노출
         target.firstElementChild.classList.add('active');
+
+        if (notices.length === 1) {
+          // 공지가 1건인 경우 애니메이션 비활성화
+          target.firstElementChild.querySelector('.slide-animation').classList.add('deactivate');
+        }
         toggleDisplay(target);
       }
     }

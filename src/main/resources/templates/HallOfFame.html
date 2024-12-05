@@ -440,7 +440,10 @@
       }
     }
 
-    async function fetchThisMonthClanLeagueWar(clanTag) {
+    async function fetchThisMonthClanLeagueWar(tag) {
+      let clanTag = tag;
+      if (clanTag === 'all') clanTag = '';
+
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
       showLoading(targetClassName);
@@ -456,7 +459,10 @@
       hideLoading(targetClassName);
     }
 
-    async function fetchLastMonthClanLeagueWar(clanTag) {
+    async function fetchLastMonthClanLeagueWar(tag) {
+      let clanTag = tag;
+      if (clanTag === 'all') clanTag = '';
+
       const baseMonth = dayjs().add(-1, 'month');
       const targetClassName = 'last-month-league-war';
       showLoading(targetClassName);
@@ -482,6 +488,12 @@
                              .replace(/{TYPE}/, targetClassRootName)
                              .replace(/{CLAN_TAG}/, tag)
                              .replace(/{CLAN_NAME}/, name);
+
+      if (type === 'league') {
+        // add click event
+        const radioButton = radio.querySelector('input[type="radio"]');
+        radioButton.onclick = () => targetClassRootName.startsWith('this') ? fetchThisMonthClanLeagueWar(tag) : fetchLastMonthClanLeagueWar(tag);
+      }
 
       const radioInputs = getRadioInputsByType(targetClassRootName);
       radioInputs.appendChild(radio);
@@ -511,13 +523,6 @@
       if (clanTag === 'all') clanTag = '';
       fetchThisMonthClanWarStars(clanTag);
       fetchLastMonthClanWarStars(clanTag);
-    }
-
-    async function fetchClanLeagueWar(type) {
-      let clanTag = type;
-      if (clanTag === 'all') clanTag = '';
-      fetchThisMonthClanLeagueWar(clanTag);
-      fetchLastMonthClanLeagueWar(clanTag);
     }
 
     function displaySections(targetClassName) {
@@ -562,7 +567,8 @@
       fetchClanWarStars('all');
 
       //리그전 부문
-      fetchClanLeagueWar('all');
+      fetchThisMonthClanLeagueWar('all');
+      fetchLastMonthClanLeagueWar('all');
 
       //습격전 부문
       fetchRaidCurrentSeason();
@@ -799,7 +805,7 @@
             <div class="support-area">
               <div class="league-clan-list radio-inputs">
                 <label class="radio item">
-                  <input type="radio" name="this-month-league-war-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
+                  <input type="radio" name="this-month-league-war-radio-clan" onchange="fetchThisMonthClanLeagueWar('all'); return false;" checked>
                   <span class="name">전체</span>
                 </label>
               </div>
@@ -825,7 +831,7 @@
             <div class="support-area">
               <div class="league-clan-list radio-inputs">
                 <label class="radio item">
-                  <input type="radio" name="last-month-league-war-radio-clan" onchange="fetchClanLeagueWar('all'); return false;" checked>
+                  <input type="radio" name="last-month-league-war-radio-clan" onchange="fetchLastMonthClanLeagueWar('all'); return false;" checked>
                   <span class="name">전체</span>
                 </label>
               </div>
@@ -891,7 +897,7 @@
 </template>
 <template id="league-war-radio-item-template">
   <label class="radio item">
-    <input type="radio" name="{TYPE}-radio-clan" onchange="fetchClanLeagueWar('{CLAN_TAG}'); return false;">
+    <input type="radio" name="{TYPE}-radio-clan">
     <span class="name">{CLAN_NAME}</span>
   </label>
 </template>

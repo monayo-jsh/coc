@@ -59,8 +59,8 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarMemberRecordQuery.create(type, month, clanTag);
     }
 
-    public ClanWarMemberLeagueRecordQuery toLeagueWarRecordQuery(String type, Long month, String clanTag) {
-        return ClanWarMemberLeagueRecordQuery.create(type, month, clanTag);
+    public ClanWarMemberLeagueRecordQuery toLeagueWarRecordQuery(String type, Long month, String clanTag, Boolean isPerfect) {
+        return ClanWarMemberLeagueRecordQuery.create(type, month, clanTag, isPerfect);
     }
 
     public abstract ClanWarMemberMissingAttackResponse toClanWarMemberMissingAttackResponse(

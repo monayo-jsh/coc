@@ -136,11 +136,14 @@ public class ClanWarUseCase {
         // 전쟁 기록을 조회한다.
         List<ClanWarParticipantRecordDTO> records = recordService.getMemberRecords(criteria);
 
-        if (query.searchAll()) {
+        if (query.isNotPerfect()) {
+            // 완파와 관계 없이 모든 기록 제공
             return records.stream()
                           .map(clanWarUseCaseMapper::toClanWarMemberRecordResponse)
                           .toList();
         }
+
+        // 완파 기록만 제공
 
         // 클랜별 리그전 라운드 수를 조회한다.
         Map<String, Integer> leagueWarRoundMapByClan = clanWarService.findLeagueWarRoundCountMap(criteria.from(), criteria.to());

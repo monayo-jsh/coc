@@ -185,7 +185,8 @@ public class ClanWarController {
         value = {
             @Parameter(name = "type", description = "조회 유형, all: 전체 순위 제공", required = false),
             @Parameter(name = "month", description = "조회 기준 월"),
-            @Parameter(name = "clanTag", description = "클랜 태그")
+            @Parameter(name = "clanTag", description = "클랜 태그"),
+            @Parameter(name = "isPerfect", description = "완파 여부, default: false", required = false)
         }
     )
     @ApiResponses(value = {
@@ -195,8 +196,9 @@ public class ClanWarController {
     @GetMapping("/league/record")
     public ResponseEntity<List<ClanWarMemberRecordResponse>> getLeagueWarRecords(@RequestParam(required = false) String type,
                                                                                  @RequestParam Long month,
-                                                                                 @RequestParam String clanTag) {
-        ClanWarMemberLeagueRecordQuery query = clanWarUseCaseMapper.toLeagueWarRecordQuery(type, month, clanTag);
+                                                                                 @RequestParam String clanTag,
+                                                                                 @RequestParam(required = false, defaultValue = "false") Boolean isPerfect) {
+        ClanWarMemberLeagueRecordQuery query = clanWarUseCaseMapper.toLeagueWarRecordQuery(type, month, clanTag, isPerfect);
         return ResponseEntity.ok()
                              .body(clanWarUseCase.getLeagueWarMemberRecords(query));
     }

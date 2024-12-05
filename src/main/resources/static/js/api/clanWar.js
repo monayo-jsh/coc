@@ -99,11 +99,17 @@ async function fetchRankingClanWarStars(searchMonth, clanTag, searchType) {
                     });
 }
 
-async function fetchRankingClanLeagueWarStars(searchMonth, clanTag, searchType) {
+async function fetchRankingClanLeagueWarStars(searchMonth, clanTag, searchType, isPerfect) {
   let uri = URI_LEAGUE_WAR_MEMBER_RECORD + `?month=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
   if (searchType) {
+    // 조회 유형
     uri += `&type=${searchType}`
   }
+  if (isPerfect) {
+    // 완파 여부
+    uri += `&isPerfect=${isPerfect}`
+  }
+
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response

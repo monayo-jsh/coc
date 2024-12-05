@@ -444,7 +444,7 @@
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
       showLoading(targetClassName);
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag, 'ALL', true);
 
       if (clanTag === '') {
         // 리그전 완파 클랜원이 존재하는 클랜 목록 표기
@@ -461,7 +461,7 @@
       const targetClassName = 'last-month-league-war';
       showLoading(targetClassName);
 
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag);
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag, 'ALL', true);
 
       if (clanTag === '') {
         // 리그전 완파 클랜원이 존재하는 클랜 목록 표기

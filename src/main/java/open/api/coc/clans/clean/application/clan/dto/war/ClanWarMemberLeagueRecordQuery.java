@@ -10,13 +10,14 @@ public record ClanWarMemberLeagueRecordQuery(
 
     String type,
     LocalDate month,
-    String clanTag
+    String clanTag,
+    Boolean isPerfect
 
 ) {
 
-    public static ClanWarMemberLeagueRecordQuery create(String type, Long month, String clanTag) {
+    public static ClanWarMemberLeagueRecordQuery create(String type, Long month, String clanTag, Boolean isPerfect) {
         LocalDate searchMonth = TimeUtils.parseLocalDate(month);
-        return new ClanWarMemberLeagueRecordQuery(type, searchMonth, clanTag);
+        return new ClanWarMemberLeagueRecordQuery(type, searchMonth, clanTag, isPerfect);
     }
 
     public ClanWarMemberRecordSearchCriteria toSearchCriteria() {
@@ -25,7 +26,7 @@ public record ClanWarMemberLeagueRecordQuery(
         return new ClanWarMemberRecordSearchCriteria(ClanWarType.LEAGUE, clanTag, type, from, to);
     }
 
-    public boolean searchAll() {
-        return "ALL".equalsIgnoreCase(type);
+    public boolean isNotPerfect() {
+        return !isPerfect;
     }
 }

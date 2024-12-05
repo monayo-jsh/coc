@@ -78,15 +78,15 @@ public class ClanWarService {
         ClanEntity clanEntity = findClan.get();
         if (clanEntity.isNotUsed()) { return ClanWarEntity.empty(); }
 
-        LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
+        LocalDateTime preparationStartTime = getLocalDateTime(clanWar.getPreparationStartTime());
 
         Optional<ClanWarEntity> findClanWar;
         if (ClanWarType.LEAGUE.equals(clanWarType)) {
             // 리그전의 경우 리그 전쟁 태그로 유일 데이터 판단
             findClanWar = clanWarQueryRepository.findByClanTagAndWarTag(clanWar.getClan().getTag(), clanWar.getWarTag());
         } else {
-            // 일반 클랜전의 경우 클랜태그와 시작 시간으로 유일 데이터 판단
-            findClanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanTag, startTime);
+            // 일반 클랜전의 경우 클랜태그와 준비 시간으로 유일 데이터 판단
+            findClanWar = clanWarQueryRepository.findByClanTagAndPreparationStartTime(clanTag, preparationStartTime);
         }
 
         // 클랜전 신규 기록 생성

@@ -18,10 +18,10 @@ public class ClanWarQueryRepository {
     private final ClanWarRepository clanWarRepository;
     private final JPAQueryFactory queryFactory;
 
-    public Optional<ClanWarEntity> findByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
+    public Optional<ClanWarEntity> findByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(clanWarEntity.clanTag.eq(clanTag))
-                 .and(clanWarEntity.startTime.eq(startTime));
+                 .and(clanWarEntity.preparationStartTime.eq(preparationStartTime));
 
         return Optional.ofNullable(queryFactory.selectFrom(clanWarEntity)
                                                .where(condition)

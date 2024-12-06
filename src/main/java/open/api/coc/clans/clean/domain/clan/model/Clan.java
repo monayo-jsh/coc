@@ -66,13 +66,13 @@ public class Clan {
     private Integer warTies;
 
     @Schema(description = "클랜전 맥스쟁 여부")
-    private boolean isMaxWar = false;
+    private Boolean isMaxWar;
 
     @Schema(description = "클랜전 선점제 여부")
-    private boolean isOccupy = false;
+    private Boolean isOccupy;
 
     @Schema(description = "리그 선점제 여부")
-    private boolean isLeagueOccupy = false;
+    private Boolean isLeagueOccupy;
 
     @Schema(description = "전쟁 설명글")
     private String warDescription;
@@ -122,8 +122,8 @@ public class Clan {
         this.warLeague = warLeague;
     }
 
-    public void changeClanCapital(ClanCapitalInfo clanCapitalInfo) {
-        this.clanCapital = clanCapitalInfo;
+    public void changeClanCapitalInfo(ClanCapitalInfo latestClanCapitalInfo) {
+        this.clanCapital.changeHallLevel(latestClanCapitalInfo.getCapitalHallLevel());
     }
 
     public void changeCapitalPoints(Integer clanCapitalPoints) {
@@ -144,7 +144,7 @@ public class Clan {
 
     public void changeLatestInfo(Clan latestClan) {
         this.changeWarLeague(latestClan.getWarLeague()); // 클랜 리그 정보 갱신
-        this.changeClanCapital(latestClan.getClanCapital()); // 캐피탈 홀 레벨 갱신
+        this.changeClanCapitalInfo(latestClan.getClanCapital()); // 캐피탈 홀 레벨 갱신
         this.changeCapitalPoints(latestClan.getClanCapitalPoints()); // 캐피탈 트로피 점수 갱신
         this.changeCapitalLeague(latestClan.getCapitalLeague()); // 캐피탈 리그 갱신
     }
@@ -172,5 +172,11 @@ public class Clan {
         this.order = Integer.MAX_VALUE;
         this.createDefaultContent(); // 컨텐츠 활성화 기본값 설정
         this.activate(); // 활성화
+    }
+
+    public static class ClanBuilder {
+        private boolean isMaxWar = false; //클랜전 맥스쟁 여부
+        private boolean isOccupy = false; // 클랜전 선점제 여부
+        private boolean isLeagueOccupy = false; // 리그 선점제 여부
     }
 }

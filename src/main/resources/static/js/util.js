@@ -616,3 +616,15 @@ function convertFormatDayHourMinuteSecond(time) {
 
   return displayTime;
 }
+
+function isCapitalHighTier(clan) {
+  if (!clan) {
+    console.warn("clan is defined");
+    return false;
+  }
+
+  const { clanCapital } = clan;
+  const { tier } = clanCapital;
+
+  return tier === 1
+}

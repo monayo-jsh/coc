@@ -102,11 +102,11 @@ public class ClanCapitalRaid {
         if (this.members.isEmpty()) return this.members;
 
         // 위반 규칙
-        // 1. 캐피탈 점수 20000점 기준으로 상위/하위 티어 구분
-        final int highTierMinimumScore = 20000;
+        // 1. 캐피탈 점수 20000점 미만
+        final int minimumScore = 20000;
 
         return this.members.stream()
-                           .filter(member -> member.isLessThenOrEqualsResourceLooted(highTierMinimumScore))
+                           .filter(member -> member.isLessThenOrEqualsResourceLooted(minimumScore))
                            .toList();
     }
 

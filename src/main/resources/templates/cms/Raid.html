@@ -29,8 +29,6 @@
     // 시즌 설정 변수
     let capitalRaidSeason;
 
-    // 강등 / 승격 기준 클랜
-    const legendClanTags = ['#2QJUL08V9', '#2QG0G20RR', '#2LPP8PUCG', '#2L209LC8P'];
     // 지난 주 경고 멤버
     let lastWeekWarningMembers;
 
@@ -104,14 +102,7 @@
     }
 
     async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClanDetailFromExternal(capitalClan.tag);
-
-      if (!Object.keys(clan).length) {
-        renderFailed(capitalCardElement);
-        return;
-      }
-
-      const { capitalLeague, clanCapital, clanCapitalPoints } = clan;
+      const { capitalLeague, clanCapital, clanCapitalPoints } = capitalClan;
 
       renderCapitalLeagueIcon(capitalLeague, capitalCardElement);
       renderCapitalHallLevel(clanCapital, capitalCardElement);
@@ -260,7 +251,7 @@
 
       const capitalRaidElement = document.querySelector('.capital-raid');
       for (const capitalClan of capitalClans) {
-        if(legendClanTags.indexOf(capitalClan.tag) !== -1) {
+        if(isCapitalHighTier(capitalClan)) {
           renderCapitalCard(capitalRaidElement, capitalClan);
         }
       }

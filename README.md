@@ -55,6 +55,11 @@ java -jar -DCOC_API_KEY={COC_API_KEY} -DDB_USERNAME={DB_USERNAME} -DDB_PASSWORD=
 ![img.png](sample/img.png)
 
 ## 기록
+- 공지 배너
+	>  공지, 이벤트, 쿠폰로 등록된 공지를 한 줄로 제공<br/>
+	>  클릭 시 공지 상세 화면으로 이동
+- 클랜 규칙
+	> 각 규칙 및 링크는 운영중인 구글 시트로 포워딩
 1. 명예의전당
 	>개인 기록, 클랜전 기록, 리그전 기록, 습격전 기록 등을 제공
 

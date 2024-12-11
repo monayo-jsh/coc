@@ -122,6 +122,10 @@
   background-image: url("/images/hero/equipment/Rocket_Spear.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.electro_boots {
+  background-image: url("/images/hero/equipment/Electro_Boots.png");
+  color: rgba(0, 0, 0, 0);
+}
 
 
 .img-icon.henchmen_puppet {

@@ -33,10 +33,10 @@ import org.springframework.data.domain.Persistable;
         @Index(name = "TCLAP_IDX_01", columnList = "season_date, clan_tag")
     }
 )
-public class ClanLeagueAssignedPlayerEntity implements Persistable<ClanAssignedPlayerPKEntity> {
+public class ClanLeagueAssignedPlayerEntity implements Persistable<ClanAssignedPlayerPK> {
 
     @EmbeddedId
-    private ClanAssignedPlayerPKEntity id;
+    private ClanAssignedPlayerPK id;
 
     @ManyToOne(fetch = LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "clan_tag", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -53,7 +53,7 @@ public class ClanLeagueAssignedPlayerEntity implements Persistable<ClanAssignedP
     }
 
     @Override
-    public ClanAssignedPlayerPKEntity getId() {
+    public ClanAssignedPlayerPK getId() {
         return id;
     }
 

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/noticeManager.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/notice.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- JavaScript Year and Month Picker -->
+  <script src="https://jsuites.net/v4/jsuites.js"></script>
+  <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>공지 관리</title>
+  <script>
+    function clickShutdownTimer(toggleSwitch) {
+
+      const noticeRow = toggleSwitch.closest('.notice');
+      const { id, timerEnabled } = noticeRow.dataset;
+
+      const currentTimerEnabled = timerEnabled === 'true';
+      const toStatus = !currentTimerEnabled;
+
+      updateNoticeShutdownTimer(id)
+      .then((isResult) => {
+        if (isResult) {
+          noticeRow.dataset.timerEnabled = String(toStatus);
+          toggleSwitch.checked = toStatus;
+        }
+      })
+    }
+
+    function clickVisible(toggleSwitch) {
+
+      const noticeRow = toggleSwitch.closest('.notice');
+      const { id, isVisible } = noticeRow.dataset;
+
+      const currentIsVisible = isVisible === 'true';
+      const toStatus = !currentIsVisible;
+
+      updateNoticeVisible(id)
+      .then((isResult) => {
+        if (isResult) {
+          noticeRow.dataset.isVisible = String(toStatus);
+          toggleSwitch.checked = toStatus;
+        }
+      })
+    }
+
+  function showDetail(noticeElement) {
+      const noticeRow = noticeElement.closest('.notice');
+      const detail = noticeRow.querySelector('.detail');
+      toggleDisplay(detail);
+    }
+
+    function registerNotice() {
+      const registerForm = document.querySelector('form.notice-registration-form');
+      const requestBody = loadRequestBodyFromForm(registerForm);
+
+      convertCheckbox(requestBody, 'shutdownTimer');
+      convertCheckbox(requestBody, 'isVisible');
+      convertTimestamp(requestBody, 'startDateTime');
+      convertTimestamp(requestBody, 'endDateTime');
+
+      // API 호출
+      createNotice(requestBody)
+      .then((isResult) => {
+        if (isResult) {
+          location.reload();
+        }
+      });
+    }
+
+    function checkedToggleSwitch(row, className) {
+      const toggleSwitch = row.querySelector(`.${className} .toggle-switch`);
+      toggleSwitch.checked = true;
+    }
+
+    function makeNoticeRow(notice) {
+      const { id, type, oneLine, content, postingStartDate, postingEndDate, timerEnabled, isVisible } = notice
+
+      const noticeTemplate = copyTemplateById('notice-template');
+      const noticeRow = noticeTemplate.querySelector('.notice');
+
+      const postingDate = formatPeriod(formatYYMMDDHHMM(postingStartDate), formatYYMMDDHHMM(postingEndDate));
+
+      //dataset
+      noticeRow.dataset.id = id;
+      noticeRow.dataset.isVisible = isVisible;
+      noticeRow.dataset.timerEnabled = timerEnabled;
+
+      noticeRow.innerHTML = noticeRow.innerHTML
+                                     .replace(/{TYPE}/, type)
+                                     .replace(/{LABEL}/, convertNoticeName(type))
+                                     .replace(/{ONELINE_TEXT}/, oneLine)
+                                     .replace(/{POSTING_DATE}/, postingDate);
+
+      if (timerEnabled) {
+        checkedToggleSwitch(noticeRow, 'shutdown-timer');
+      }
+
+      if (isVisible) {
+        checkedToggleSwitch(noticeRow, 'is-visible');
+      }
+
+      if (content) {
+        const detail = noticeRow.querySelector('.detail');
+        const noticeContent = convertContainTextToLink(content);
+        detail.innerHTML = noticeContent;
+      }
+
+      return noticeRow;
+    }
+
+    function renderNotices(notices) {
+      const target = document.querySelector('.notice-wrapper');
+      for(const notice of notices) {
+        const noticeRow = makeNoticeRow(notice);
+        target.appendChild(noticeRow);
+      }
+    }
+
+    async function drawNotice() {
+      const notices = await fetchNotices();
+
+      renderNotices(notices);
+    }
+
+    function displayNoticeForm() {
+      const noticeRegistrationWrapper = document.querySelector('.notice-registration-wrapper');
+      toggleDisplay(noticeRegistrationWrapper);
+    }
+
+    function initDatePicker() {
+      const datePickers = document.querySelectorAll('.input-date');
+
+      datePickers.forEach(datePicker => {
+        let defaultValue = dayjs();
+        if (datePicker.classList.contains('end')) {
+          defaultValue = defaultValue.add(1, 'day');
+        }
+
+        jSuites.calendar(datePicker, makeDateTimePickerOption(formatYYYYMMDD(defaultValue)));
+      })
+    }
+
+    window.onload = async () => {
+      await drawNotice();
+
+      initDatePicker();
+    }
+  </script>
+</head>
+<body>
+
+<div class="title">
+  <span class="label">공지 관리</span>
+</div>
+
+<div class="support-area">
+  <div class="buttons">
+    <div class="button-chip" onclick="displayNoticeForm();">공지 등록</div>
+  </div>
+  <div class="notice-registration-wrapper display-none">
+    <form class="notice-registration-form">
+      <table class="table mt-5">
+        <caption class="table-caption">공지 등록</caption>
+        <colgroup>
+          <col width="20%">
+          <col width="*">
+        </colgroup>
+        <tbody class="table-tbody">
+        <tr class="table-tr">
+          <th class="table-th">공지 유형</th>
+          <td class="table-td">
+            <div class="radio-inputs">
+              <label class="radio item">
+                <input type="radio" name="type" class="type" value="NOTICE" checked>
+                <span class="name NOTICE">공지</span>
+              </label>
+              <label class="radio item">
+                <input type="radio" name="type" class="type" value="EVENT">
+                <span class="name EVENT">이벤트</span>
+              </label>
+              <label class="radio item">
+                <input type="radio" name="type" class="type" value="COUPON">
+                <span class="name COUPON">쿠폰</span>
+              </label>
+            </div>
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">한줄 공지</th>
+          <td class="table-td">
+            <input class="input" name="oneLine" type="text" maxlength="20">
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">상세 내용</th>
+          <td class="table-td">
+            <textarea class="input" name="content" rows="5" maxlength="2000"></textarea>
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">게시 일정</th>
+          <td class="table-td">
+            <div class="td-wrap display-flex justify-content-left align-items-center flex-gap">
+              <div class="picker">
+                <input type="text" name="startDateTime" class="input-date start">
+              </div>
+              ~
+              <div class="picker">
+                <input type="text" name="endDateTime" class="input-date end">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">종료 타이머 유무</th>
+          <td class="table-td">
+            <div class="td-wrap shutdown-timer">
+              <div class="toggle-switch-button">
+                <input type="checkbox" name="shutdownTimer" class="toggle-switch"/>
+                <label class="switch-label" data-toggle-on="표시" data-toggle-off="표시 안함"></label>
+              </div>
+              <span class="color-orange">* 한줄 공지에 종료 타이머가 표시됩니다.</span>
+            </div>
+          </td>
+        </tr>
+
+        <tr class="table-tr">
+          <th class="table-th">노출 설정</th>
+          <td class="table-td">
+            <div class="td-wrap is-visible">
+              <div class="toggle-switch-button">
+                <input type="checkbox" name="isVisible" class="toggle-switch"/>
+                <label class="switch-label" data-toggle-on="노출" data-toggle-off="비노출"></label>
+              </div>
+              <span class="color-orange">* 노출 설정 시 게시 일정이 유효한 경우 노출됩니다.</span>
+            </div>
+          </td>
+        </tr>
+
+        </tbody>
+        <tfoot class="table-tfoot">
+        <tr class="table-tr">
+          <td class="table-td" colspan="2">
+            <div class="td-wrap justify-content-center">
+              <div class="button-chip" onclick="registerNotice();">등록</div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </form>
+  </div>
+</div>
+<div class="notice-wrapper"></div>
+
+</body>
+<template id="notice-template">
+  <div class="notice">
+    <div class="row">
+      <div class="dynamic">
+        <div class="label {TYPE}">{LABEL}</div>
+      </div>
+      <div class="dynamic">
+        <div class="text cursor-pointer" onclick="showDetail(this);">{ONELINE_TEXT}</div>
+      </div>
+      <div class="dynamic">
+        <div class="posting-date">{POSTING_DATE}</div>
+        <div class="shutdown-timer">
+          <div class="toggle-switch-button">
+            <input type="checkbox" class="toggle-switch" onclick="clickShutdownTimer(this); return false;"/>
+            <label class="switch-label" data-toggle-on="종료 타이머" data-toggle-off="종료 타이머"></label>
+          </div>
+        </div>
+        <div class="is-visible">
+          <div class="toggle-switch-button">
+            <input type="checkbox" class="toggle-switch" onclick="clickVisible(this); return false;"/>
+            <label class="switch-label" data-toggle-on="노출" data-toggle-off="비노출"></label>
+          </div>
+        </div>
+      </div>
+      </div>
+    <div class="detail display-none"></div>
+  </div>
+</template>
+</html>

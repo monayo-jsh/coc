@@ -7,8 +7,9 @@
 
   <title>클랜전 캘린더</title>
 
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarCalendar.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/ClanWarCalendar.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
   <link rel="stylesheet" href="https://uicdn.toast.com/calendar/latest/toastui-calendar.min.css" />
 
@@ -24,9 +25,9 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/clanWar.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/clanWar.js"></script>
   <script src="https://uicdn.toast.com/calendar/latest/toastui-calendar.ie11.min.js"></script>
   <script type="text/javascript">
     const Calendar = tui.Calendar;
@@ -81,8 +82,15 @@
               clans.push(row);
             }
 
-            //drawBody.push(`<div class="sub-title">총: ${raw.length}</div>`);
-            drawBody.push(`<div class="cell-wrap flex-colum flex-nowrap">${clans.join("")}</div>`);
+            const jsonClans = JSON.stringify(sortedByDate.map(clan => {
+              let clanInfo = {}
+              clanInfo.warId = clan.warId
+              clanInfo.clanName = clan.clanName
+              return clanInfo
+            }));
+            drawBody.push(`<div class="day-wrap cell-wrap flex-colum flex-nowrap" data-clans='${jsonClans}'>
+                            ${clans.join("")}
+                           </div>`);
             return drawBody.join("");
           }
         }
@@ -92,6 +100,46 @@
       calendar.on('complete', (event) => {
         console.log(event)
       })
+    }
+
+    function drawClanListAtDay(ele, warId) {
+
+      const dayWrap = ele.closest('.day-wrap');
+      const { clans } = dayWrap.dataset;
+
+      if (!clans) {
+        console.log("clans is empty...", dayWrap);
+        return;
+      }
+
+      const drawClans = JSON.parse(clans);
+
+      const clanWarDetailWrap = getClanWarDetailWrap();
+      const radioInputs = clanWarDetailWrap.querySelector('.clan-list.radio-inputs');
+      radioInputs.innerHTML = ""; //clear
+
+      for(const clan of drawClans) {
+        const { warId, clanName } = clan;
+        const radioItem = copyTemplateById('clan-war-radio-item-template');
+        const radio = radioItem.querySelector('.radio.item');
+
+        radio.innerHTML = radio.innerHTML
+                               .replace(/{WAR_ID}/g, warId)
+                               .replace(/{CLAN_NAME}/, clanName);
+
+        radioInputs.appendChild(radio);
+      }
+
+      // 캘린더에서 클릭한 클랜 체크 처리
+      const target = radioInputs.querySelector(`.war-${warId}`);
+      if (target) {
+        target.checked = true
+      }
+    }
+
+    async function clickClanWarSchedule(ele, warId) {
+      drawClanListAtDay(ele, warId);
+      renderClanWarDetail(warId);
     }
 
     async function renderClanWarDetail(warId) {
@@ -309,10 +357,7 @@
     }
 
     async function drawCalendarEvents(startDate, endDate) {
-      const startDt = formatYYYYMMDD(startDate);
-      const endDt = formatYYYYMMDD(endDate);
-
-      const clanWars = await fetchClanWars(startDt, endDt);
+      const clanWars = await fetchClanWars(startDate, endDate);
 
       renderClanWars(clanWars);
     }
@@ -328,7 +373,7 @@
       const calendarStartDate = calendar.getDateRangeStart();
       const calendarEndDate = calendar.getDateRangeEnd();
 
-      await drawCalendarEvents(calendarStartDate, calendarEndDate);
+      await drawCalendarEvents(calendarStartDate.valueOf(), calendarEndDate.valueOf());
 
       hideWifiLoading('.section-wrapper');
     }
@@ -350,7 +395,7 @@
         }
 
         // setting click event
-        target.onclick = () => renderClanWarDetail(warId);
+        target.onclick = () => clickClanWarSchedule(target, warId);
 
         // remove
         onClickEventWarIdSet.delete(warId);
@@ -405,6 +450,8 @@
       </div>
       <div id="calendar" class="clan-war-calendar"></div>
       <div id="clan-war-detail" class="clan-war-detail-wrap display-none">
+
+        <div class="clan-list radio-inputs"></div>
 
         <div class="table mt-5 clan-war-info"></div>
 
@@ -495,5 +542,11 @@
   <td class="attack-info" colspan="3">
     <div class="td-wrap">공격 기록 없음</div>
   </td>
+</template>
+<template id="clan-war-radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="radio-clan" class="war-{WAR_ID}" onchange="renderClanWarDetail('{WAR_ID}'); return false;">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
 </template>
 </html>

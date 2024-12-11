@@ -1,0 +1,73 @@
+.section {
+  display: flex;
+  flex-direction: column;
+}
+
+.assigned-label {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: black;
+  color: white;
+  padding: 10px;
+}
+
+.assigned-legend {
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 5px;
+  padding: 10px 5px;
+  font-size: 14px;
+  color: yellow;
+  background-color: black;
+
+  .highlight {
+    margin: 0 3px;
+    color: white;
+    border-radius: 5px;
+    background-color: crimson;
+    padding: 3px 5px;
+  }
+}
+
+.assigned-table-wrapper {
+  margin-top: 5px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.table.assigned {
+  width: 200px;
+
+  .table-tr:nth-child(odd) {
+    background-color: unset;
+  }
+
+  .table-td {
+    font-size: 12px;
+  }
+}
+
+.war-league {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.table-caption {
+  .description {
+    display: flex;
+    justify-content: center;
+    gap: 3px;
+  }
+}

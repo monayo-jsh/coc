@@ -1,17 +1,18 @@
 package open.api.coc.clans.database.repository.player;
 
+import static open.api.coc.clans.clean.infrastructure.league.persistence.entity.QLeagueEntity.leagueEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerEntity.playerEntity;
+import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.QPlayerRecordEntity.playerRecordEntity;
 import static open.api.coc.clans.database.entity.clan.QClanBadgeEntity.clanBadgeEntity;
 import static open.api.coc.clans.database.entity.clan.QClanEntity.clanEntity;
-import static open.api.coc.clans.database.entity.league.QLeagueEntity.leagueEntity;
-import static open.api.coc.clans.database.entity.player.QPlayerEntity.playerEntity;
 
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -73,5 +74,20 @@ public class PlayerQueryRepository {
 
     public PlayerEntity save(PlayerEntity playerEntity) {
         return playerRepository.save(playerEntity);
+    }
+
+    public long resetAllPlayerDonations() {
+        return queryFactory.update(playerEntity)
+                           .set(playerEntity.donations, 0)
+                           .set(playerEntity.donationsReceived, 0)
+                           .execute();
+    }
+
+    public List<PlayerEntity> findAllWithoutRecordTarget() {
+        return queryFactory.select(playerEntity)
+                           .from(playerEntity)
+                           .leftJoin(playerRecordEntity).on(playerRecordEntity.tag.eq(playerEntity.playerTag))
+                           .where(playerRecordEntity.tag.isNull())
+                           .fetch();
     }
 }

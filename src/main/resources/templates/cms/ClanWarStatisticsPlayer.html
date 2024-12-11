@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
     <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-    <link rel="icon" href="/static/favicon.ico" />
+    <link rel="icon" href="/favicon.ico" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/cms/ClanWarStatisticsPlayer.css" />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+    <link rel="stylesheet" type="text/css" href="/css/button.css" />
+    <link rel="stylesheet" type="text/css" href="/css/cms/ClanWarStatisticsPlayer.css" />
 
-    <script src="/static/js/common.js"></script>
-    <script src="/static/js/util.js"></script>
-    <script src="/static/js/api/clanWar.js"></script>
+    <script src="/js/common.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/api/clanWar.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
     <!-- table withe pagination, filter library -->
-    <link rel="stylesheet" type="text/css" href="/static/lib/sortable/sortable.min.css" />
-    <script src="/static/lib/sortable/sortable.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/lib/sortable/sortable.min.css" />
+    <script src="/lib/sortable/sortable.min.js"></script>
 
 
     <!-- JavaScript Year and Month Picker -->
@@ -61,8 +61,7 @@
         }
 
         function callBackMonthPicker(monthPickerElement, selectedValue) {
-            const searchMonth = formatYYYYMMDD(selectedValue);
-            fetchClanWarStatistics(searchMonth);
+            fetchClanWarStatistics(dayjs(selectedValue).valueOf());
         }
         function initMonthPicker() {
             let defaultFirstDayOfMonth = dayjs().date(1);
@@ -82,15 +81,15 @@
                                     || b.avgDuration - a.avgDuration
                           })
                           .map((player) => {
-                const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
-                const completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
+                const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+                const completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
                 return {
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
                     '완파율': Number(completeStarRatio).toFixed(1),
-                    '총 공격수': Number(attackCount).toLocaleString(),
+                    '총 공격수': Number(totalAttackCount).toLocaleString(),
                     '평균 파괴율': Number(totalDestructionPercentage).toLocaleString(),
                     '평균 완파시간': formatMinuteSecond(Number(avgDuration)),
                     '총 획득별': Number(totalStars).toLocaleString(),
@@ -153,16 +152,16 @@
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
             const row = rankingRow.querySelector('.table-tr');
 
-            const { name, tag, clanName, attackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+            const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
 
-            let completeStarRatio = calcCompleteStarRatio(totalStars, attackCount);
+            let completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
                                .replace(/{TAG}/, tag)
                                .replace(/{CLAN_TAG_COLOR}/, isPageTypeClanWar() ? 'bg-green' : 'bg-crimson')
                                .replace(/{CLAN_NAME}/, clanName)
-                               .replace(/{ATTACK_COUNT}/, attackCount)
+                               .replace(/{ATTACK_COUNT}/, totalAttackCount)
                                .replace(/{RATIO}/g, Number(completeStarRatio).toFixed(2))
                                .replace(/{STARS}/g, Number(totalStars).toLocaleString())
                                .replace(/{THREE_STARS}/, Number(threeStars).toLocaleString())

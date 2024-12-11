@@ -1,0 +1,223 @@
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  color: black;
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  .icon.trophies {
+    width: 30px;
+    height: 30px;
+  }
+
+  .label {
+    margin-left: 3px;
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+}
+
+.register-form {
+  margin-top: 5px;
+
+  .search {
+    width: 270px;
+  }
+}
+
+.search-form {
+
+  .search {
+    width: 230px;
+  }
+}
+
+.information {
+  display: flex;
+  justify-content: center;
+}
+
+.description {
+  width: fit-content;
+  margin-top: 5px;
+  padding: 5px 15px;
+  font-size: 12px;
+  border-radius: 5px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 5px 10px;
+  border: 1px solid lightgray;
+}
+
+
+.legend-record-wrapper {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.player-legend-wrapper {
+  padding: 10px;
+  border: 1px solid lightgray;
+  border-radius: 5px;
+}
+
+.player-name {
+  font-weight: bold;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .chip {
+    margin-left: 5px;
+    font-size: .8em;
+  }
+}
+
+.players {
+  width: 870px;
+
+  .radio-inputs {
+    padding: 10px;
+    box-shadow: none;
+    display: flex;
+    gap: 1px;
+
+    .radio.item {
+      display: contents;
+    }
+  }
+
+  @media (max-width: 870px) {
+    width: 380px !important;
+  }
+
+  @media (max-width: 380px) {
+    width: 320px !important;
+  }
+}
+
+.player-records {
+  width: 870px;
+  display: flex;
+  overflow-y: auto;
+
+  @media (max-width: 870px) {
+    width: 380px !important;
+  }
+
+  @media (max-width: 380px) {
+    width: 320px !important;
+  }
+}
+
+.player-record {
+  margin: 3px;
+
+  .label, .count {
+    font-weight: bold;
+  }
+
+  .wrap {
+    .summary {
+      width: 139px;
+    }
+  }
+
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    background-color: #939393;
+    box-shadow: rgba(0, 0, 0, 0.1) 0 5px 10px;
+    margin-bottom: 5px;
+    text-align: left;
+    font-size: 15px;
+    color: white;
+    border-width: 1px 1px 1px 3px;
+    border-style: solid;
+    border-color: transparent;
+    border-image: initial;
+    border-left: 3px solid transparent;
+    border-radius: 5px;
+    padding: 5px 5px 5px 10px;
+    gap: 5px;
+
+    .count {
+      display: flex;
+    }
+
+    .icon.trophies {
+      margin-left: 3px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .detail {
+    display: flex;
+    align-items: flex-start;
+
+    .table {
+      width: 140px;
+      border: 1px solid transparent;
+
+      .table-td {
+        display: flex;
+        justify-content: space-between;
+        border-radius: 7px;
+        border: 1px solid white;
+        padding: 10px;
+      }
+    }
+
+    .table.attack {
+      .table-td {
+        background-color: green;
+        color: white;
+      }
+    }
+    .table.defence {
+      .table-td {
+        background-color: crimson;
+        color: white;
+      }
+    }
+  }
+
+  .td-wrap {
+    width: 100%;
+    display: flex;
+
+    .record-info {
+      display: flex;
+      align-items: center;
+
+      .icon.trophies {
+        margin-left: 3px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+  }
+}
+
+.table-tbody {
+
+  .table-tr:nth-child(odd) {
+    background-color: unset !important;
+  }
+
+}

@@ -2,7 +2,7 @@ package open.api.coc.clans.database.repository.player;
 
 import java.util.List;
 import open.api.coc.clans.database.entity.common.YnType;
-import open.api.coc.clans.database.entity.player.PlayerEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.player.RankingHeroEquipment;
 import open.api.coc.clans.domain.ranking.RankingHallOfFame;
 import org.springframework.data.domain.Pageable;
@@ -68,10 +68,10 @@ public interface PlayerRepository extends JpaRepository<PlayerEntity, String> {
     )
     List<RankingHeroEquipment> selectRankingHeroEquipments(List<String> playerTags);
 
-    @Query("select player.name as name, player.playerTag as tag, player.trophies as score from PlayerEntity player order by player.trophies desc")
+    @Query("select player.name as name, player.playerTag as tag, player.trophies as score, player.townHallLevel as townHallLevel from PlayerEntity player order by player.trophies desc")
     List<RankingHallOfFame> selectRankingTrophiesCurrent(Pageable pageable);
 
-    @Query("select player.name as name, player.playerTag as tag, player.attackWins as score from PlayerEntity player order by player.attackWins desc")
+    @Query("select player.name as name, player.playerTag as tag, player.attackWins as score, player.townHallLevel as townHallLevel from PlayerEntity player order by player.attackWins desc")
     List<RankingHallOfFame> selectRankingAttackWins(Pageable pageable);
 
 }

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/noticeManager.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/notice.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <title>공지사항</title>
+  <script>
+    dayjs.extend(dayjs_plugin_duration);
+
+    function showDetail(noticeElement) {
+      const noticeRow = noticeElement.closest('.notice');
+
+      const { isContent } = noticeRow.dataset;
+
+      if (isContent === 'true') {
+        const detail = noticeRow.querySelector('.detail');
+        toggleDisplay(detail);
+      }
+    }
+
+    function addTimerEvent(noticeRow, notice) {
+      const { id, postingEndDate, timerEnabled } = notice;
+
+      // 타이머 비활성화인경우
+      if (!timerEnabled) return;
+
+      const timerInterval = setInterval(() => {
+        const isFinishTimer = drawTimer(noticeRow, postingEndDate);
+
+        if (isFinishTimer) {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    }
+
+    function drawTimer(noticeRow, postingEndDate) {
+      const timer = noticeRow.querySelector('.timer');
+      const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
+
+      const isFinishTimer = leftUntilTime.seconds() <= 0;
+
+      if (isFinishTimer) {
+        timer.innerHTML = "";
+        return isFinishTimer;
+      }
+
+      const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+      timer.innerHTML = `(${displayTime} 남음)`;
+
+      return isFinishTimer;
+    }
+
+    function makeNoticeRow(notice) {
+      const { id, type, oneLine, content, postingStartDate, postingEndDate, timerEnabled, isVisible } = notice
+
+      const noticeTemplate = copyTemplateById('notice-template');
+      const noticeRow = noticeTemplate.querySelector('.notice');
+
+      const postingDate = "~ " + formatYYMMDDHHMM(postingEndDate);
+
+      //dataset
+      noticeRow.dataset.id = id;
+      noticeRow.dataset.isContent = !!content;
+      noticeRow.dataset.isVisible = isVisible;
+      noticeRow.dataset.timerEnabled = timerEnabled;
+
+      noticeRow.innerHTML = noticeRow.innerHTML
+                                     .replace(/{TYPE}/, type)
+                                     .replace(/{LABEL}/, convertNoticeName(type))
+                                     .replace(/{ONELINE_TEXT}/, oneLine)
+                                     .replace(/{POSTING_DATE}/, postingDate);
+
+      noticeRow.classList.add(`notice-${id}`);
+
+      if (timerEnabled) {
+        drawTimer(noticeRow, postingEndDate);
+      }
+
+      if (content) {
+        noticeRow.classList.add('cursor-pointer');
+
+        const detail = noticeRow.querySelector('.detail');
+        const noticeContent = convertContainTextToLink(content);
+        detail.innerHTML = noticeContent;
+      }
+
+      addTimerEvent(noticeRow, notice);
+
+      return noticeRow;
+    }
+
+    function renderNotices(notices) {
+      const target = document.querySelector('.notice-wrapper');
+      for(const notice of notices) {
+        const noticeRow = makeNoticeRow(notice);
+        target.appendChild(noticeRow);
+      }
+    }
+
+    async function drawNotice() {
+      const notices = await fetchPostingNotices();
+
+      renderNotices(notices);
+    }
+
+    function showDetailPage() {
+      const urlSearchParams = new URLSearchParams(location.search);
+      const id = urlSearchParams.get('id');
+
+      if (id) {
+        const targetNotice = document.querySelector(`.notice-${id}`);
+        if (targetNotice) {
+          showDetail(targetNotice);
+        }
+      }
+    }
+
+    window.onload = async () => {
+      await drawNotice();
+
+      showDetailPage();
+    }
+  </script>
+</head>
+<body>
+
+<div class="title">
+  <span class="label">공지사항</span>
+</div>
+
+<div class="notice-wrapper"></div>
+
+</body>
+<template id="notice-template">
+  <div class="notice">
+    <div class="row">
+      <div class="dynamic">
+        <div class="label {TYPE}">{LABEL}</div>
+      </div>
+      <div class="dynamic">
+        <div class="text display-flex" onclick="showDetail(this);">{ONELINE_TEXT}<div class="timer"></div></div>
+        <div class="posting-date">{POSTING_DATE}</div>
+      </div>
+    </div>
+    <div class="detail display-none"></div>
+  </div>
+</template>
+</html>

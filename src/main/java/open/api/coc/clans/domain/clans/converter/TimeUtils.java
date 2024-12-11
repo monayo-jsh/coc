@@ -16,7 +16,7 @@ import org.thymeleaf.util.StringUtils;
 public class TimeUtils implements TimeConverter {
 
     private static final String TIME_PATTERN = "yyyyMMdd'T'HHmmss.SSSX";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
     @Override
     public long toEpochMilliSecond(String time) {
@@ -47,7 +47,10 @@ public class TimeUtils implements TimeConverter {
         return getZonedDateTime(epochMilli).toLocalDateTime();
     }
 
-    private ZonedDateTime getZonedDateTime(long epochMilli) {
+    public static LocalDate parseLocalDate(Long epochMilli) {
+        return getZonedDateTime(epochMilli).toLocalDate();
+    }
+    private static ZonedDateTime getZonedDateTime(long epochMilli) {
         return Instant.ofEpochMilli(epochMilli).atZone(ZoneId.of("Asia/Seoul"));
     }
 
@@ -87,5 +90,9 @@ public class TimeUtils implements TimeConverter {
 
     private static LocalDate toLastDayOfMonth(LocalDate date) {
         return date.with(TemporalAdjusters.lastDayOfMonth());
+    }
+
+    public static String formattedISODate(LocalDate date) {
+        return date.format(DateTimeFormatter.ISO_DATE);
     }
 }

@@ -1,0 +1,132 @@
+.content-wrapper {
+  width: 100%;
+  max-width: 1920px;
+  height: 100%;
+  padding: 10px 0;
+}
+
+.header-card {
+  height: 30px;
+  border-radius: 10px;
+  padding: 5px;
+  background: black;
+  box-shadow: rgba(100, 100, 111, 0.2) 0 7px 20px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .title {
+    display: block;
+    font-size: 17px;
+    font-weight: bolder;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+
+  .buttons {
+    display: flex;
+    gap: 5px;
+
+    a {
+      text-decoration: unset;
+    }
+  }
+
+  .chip {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+
+  .table {
+    margin-top: 5px;
+
+    .td-wrap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+}
+
+.container {
+  margin-top: 5px;
+}
+
+.competitions thead {
+  background-color: silver;
+}
+.competition.table-tbody {
+  border-top: 1px solid darkgray;
+}
+
+.input {
+  border-bottom: 1px darkgray solid;
+  width: 100%;
+}
+
+.table {
+  font-size: 14px;
+
+  .chip {
+    font-size: 12px;
+  }
+}
+
+.share {
+  margin: 0 5px;
+  display: flex;
+  justify-content: center;
+  gap: 1em;
+
+  a {
+    color: black;
+    transition: .4s ease-in-out;
+  }
+
+  a:hover {
+    color: red;
+  }
+
+}
+
+.info-label {
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  background-color: green;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 5px;
+  text-align: left;
+  color: white;
+  padding: 5px 5px 5px 10px;
+}
+
+.label {
+  font-weight: bold;
+  border-bottom: 1px solid darkgray;
+}
+
+.table.roaster {
+
+
+  .button-chip {
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: .7;
+  }
+
+  .button-chip.is-roaster {
+    background-color: black;
+    opacity: 1;
+  }
+
+}

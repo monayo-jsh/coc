@@ -1,18 +1,19 @@
-const URI_CLAN_WARS = "/api/clan/war/period" //클랜전 목록 기간 조회
-const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = "/api/clan/war/missing/attack/period" //클랜전 미공 사용자 목록 기간 조회
-const URI_CLAN_WAR_DETAIL = "/api/clan/war/{warId}" //클랜전 상세 조회
-const URI_CLAN_WAR_MEMBERS = "/api/clan/war/members" //클랜전 참여 계정 목록 조회
-const URI_RANKING_CLAN_WAR_STARS = "/api/clan/war/ranking/stars" //월 클랜전 획득별 순위
+const PREFIX_CLAN_WAR_API = "/api/clan/war"
 
-const URI_RANKING_CLAN_LEAGUE_WAR_STARS = "/api/clan/war/league/ranking/stars" //월 리그전 획득별 순위
+const URI_CLAN_WARS = `${PREFIX_CLAN_WAR_API}/period` //클랜전 목록 조회 - 기간
+const URI_CLAN_WAR_DETAIL = `${PREFIX_CLAN_WAR_API}/{warId}` //클랜전 상세 정보 조회
+const URI_CLAN_WAR_PARTICIPANTS = `${PREFIX_CLAN_WAR_API}/participants` //클랜전 참여 계정 목록 조회
 
-const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME = "/api/clan/war/missing/attack/playerName"
-const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG = "/api/clan/war/missing/attack/{playerTag}"
+const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = `${PREFIX_CLAN_WAR_API}/missing/attack` // 클랜전 미공 기록 조회
+const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_PERIOD = `${PREFIX_CLAN_WAR_API}/missing/attack/period` //클랜전 미공 기록 조회 - 기간
 
-const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = "/api/clan/war/{warId}/{playerTag}/necessary"
+const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = `${PREFIX_CLAN_WAR_API}/{warId}/{playerTag}/necessary` // 클랜전 참여 계정 강제 참여 여부 설정
 
-async function fetchClanWars(startDt, endDt) {
-  const uri = URI_CLAN_WARS + `?startDate=${encodeURIComponent(startDt)}&endDate=${encodeURIComponent(endDt)}`;
+const URI_CLAN_WAR_MEMBER_RECORD = `${PREFIX_CLAN_WAR_API}/record` //월 클랜전 기록 순위
+const URI_LEAGUE_WAR_MEMBER_RECORD = `${PREFIX_CLAN_WAR_API}/league/record` //월 리그전 기록 순위
+
+async function fetchClanWars(startDate, endDate) {
+  const uri = URI_CLAN_WARS + `?startDate=${startDate}&endDate=${endDate}`;
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
@@ -24,8 +25,8 @@ async function fetchClanWars(startDt, endDt) {
                     });
 }
 
-async function fetchClanWarMissingAttackPlayers(startDt, endDt) {
-  const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS + `?startDate=${encodeURIComponent(startDt)}&endDate=${encodeURIComponent(endDt)}`;
+async function fetchClanWarMissingAttackPlayers(startDate, endDate) {
+  const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_PERIOD + `?startDate=${startDate}&endDate=${endDate}`;
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
@@ -37,11 +38,12 @@ async function fetchClanWarMissingAttackPlayers(startDt, endDt) {
                     });
 }
 
-async function fetchMissingAttackPlayerInLast90DaysWithTag(playerTag) {
-    const uri = URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_TAG
-        .replace(/{playerTag}/, encodeURIComponent(playerTag));
-
-    return await axios.get(uri)
+async function fetchMissingAttacksByTag(playerTag) {
+    return await axios.get(URI_CLAN_WAR_MISSING_ATTACK_PLAYERS, {
+          params: {
+            tag: playerTag
+          }
+        })
         .then((response) => {
             const { data } = response;
             return data;
@@ -52,11 +54,10 @@ async function fetchMissingAttackPlayerInLast90DaysWithTag(playerTag) {
         });
 }
 
-async function fetchMissingAttackPlayerInLast90DaysWithName(playerName) {
-
-    return await axios.get(URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_IN_LAST_90_DAYS_WITH_NAME, {
+async function fetchMissingAttacksByName(playerName) {
+    return await axios.get(URI_CLAN_WAR_MISSING_ATTACK_PLAYERS, {
         params: {
-            playerName: playerName
+            name: playerName
         }
     })
         .then((response) => {
@@ -83,9 +84,9 @@ async function fetchClanWarDetail(warId) {
 }
 
 async function fetchRankingClanWarStars(searchMonth, clanTag, searchType) {
-  let uri = URI_RANKING_CLAN_WAR_STARS + `?searchMonth=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
+  let uri = URI_CLAN_WAR_MEMBER_RECORD + `?month=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
   if (searchType) {
-    uri += `&searchType=${searchType}`
+    uri += `&type=${searchType}`
   }
   return await axios.get(uri)
                     .then((response) => {
@@ -98,11 +99,17 @@ async function fetchRankingClanWarStars(searchMonth, clanTag, searchType) {
                     });
 }
 
-async function fetchRankingClanLeagueWarStars(searchMonth, clanTag, searchType) {
-  let uri = URI_RANKING_CLAN_LEAGUE_WAR_STARS + `?searchMonth=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
+async function fetchRankingClanLeagueWarStars(searchMonth, clanTag, searchType, isPerfect) {
+  let uri = URI_LEAGUE_WAR_MEMBER_RECORD + `?month=${searchMonth}&clanTag=${encodeURIComponent(clanTag)}`;
   if (searchType) {
-    uri += `&searchType=${searchType}`
+    // 조회 유형
+    uri += `&type=${searchType}`
   }
+  if (isPerfect) {
+    // 완파 여부
+    uri += `&isPerfect=${isPerfect}`
+  }
+
   return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
@@ -135,8 +142,8 @@ async function putClanWarNecessaryAttack(warId, playerTag) {
                     })
 }
 
-async function fetchClanWarMembers(clanTag, startTime, necessaryAttackYn) {
-  let URI = URI_CLAN_WAR_MEMBERS + `?clanTag=${encodeURIComponent(clanTag)}&startTime=${startTime}`
+async function fetchClanWarParticipants(clanTag, startTime, necessaryAttackYn) {
+  let URI = URI_CLAN_WAR_PARTICIPANTS + `?clanTag=${encodeURIComponent(clanTag)}&startTime=${startTime}`
   if (necessaryAttackYn) {
     URI += `&necessaryAttackYn=${necessaryAttackYn}`
   }

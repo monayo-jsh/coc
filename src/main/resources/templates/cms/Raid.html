@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/clan/raid.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/clan/raid.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/league.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/raid.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/raid.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
@@ -29,8 +29,6 @@
     // 시즌 설정 변수
     let capitalRaidSeason;
 
-    // 강등 / 승격 기준 클랜
-    const legendClanTags = ['#2QJUL08V9', '#2QG0G20RR', '#2LPP8PUCG'];
     // 지난 주 경고 멤버
     let lastWeekWarningMembers;
 
@@ -70,18 +68,6 @@
     launchAppWithOpenClanProfile(clanTag);
   }
 
-    async function fetchCapitalClans() {
-      return await axios.get("/clan/cms/capital")
-          .then((response) => {
-            const { data } = response
-            return data;
-          })
-          .catch((error) => {
-            console.error(error)
-            return [];
-          });
-    }
-
     function renderFailed(capitalCardElement) {
       const errorContentTemplate = document.querySelector("#error-content");
       const errorContent = document.importNode(errorContentTemplate.content, true);
@@ -116,14 +102,7 @@
     }
 
     async function renderCapital(capitalCardElement, capitalClan) {
-      let clan = await fetchClan(capitalClan.tag);
-
-      if (!Object.keys(clan).length) {
-        renderFailed(capitalCardElement);
-        return;
-      }
-
-      const { capitalLeague, clanCapital, clanCapitalPoints } = clan;
+      const { capitalLeague, clanCapital, clanCapitalPoints } = capitalClan;
 
       renderCapitalLeagueIcon(capitalLeague, capitalCardElement);
       renderCapitalHallLevel(clanCapital, capitalCardElement);
@@ -267,13 +246,12 @@
     }
 
     async function writeCapitalClans() {
-      const data = await fetchCapitalClans();
-      const capitalClans = data.clanResponses;
-      lastWeekWarningMembers = data.raiderResponse;
+      const capitalClans = await fetchCapitalClans();
+      lastWeekWarningMembers = await fetchCapitalViolationRaiders();
 
       const capitalRaidElement = document.querySelector('.capital-raid');
       for (const capitalClan of capitalClans) {
-        if(legendClanTags.indexOf(capitalClan.tag) !== -1) {
+        if(isCapitalHighTier(capitalClan)) {
           renderCapitalCard(capitalRaidElement, capitalClan);
         }
       }

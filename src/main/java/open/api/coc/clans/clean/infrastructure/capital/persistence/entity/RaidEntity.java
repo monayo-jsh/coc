@@ -1,0 +1,80 @@
+package open.api.coc.clans.clean.infrastructure.capital.persistence.entity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
+
+@Getter
+@NoArgsConstructor
+@Entity
+@Table(
+    name = "tb_raid",
+    indexes = @Index(name = "idx_raid_start_date", columnList = "start_date")
+)
+@Comment("습격전 테이블")
+public class RaidEntity {
+
+    @Comment("습격전 고유키")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="RAID_ID", nullable = false)
+    private Long id;
+
+    @Comment("습격전 상태")
+    @Column(name = "state", nullable = true)
+    private String state;
+
+    @Comment("습격전 시작일")
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Comment("습격전 종료일")
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
+
+    @Comment("클랜 태그")
+    @Column(name = "clan_tag", nullable = false)
+    private String clanTag;
+
+    @OneToMany(mappedBy = "raid", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RaiderEntity> raiders;
+
+    @Builder
+    private RaidEntity(Long id, String state, LocalDate startDate, LocalDate endDate, String clanTag, List<RaiderEntity> raiders) {
+        this.id = id;
+        this.state = state;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.clanTag = clanTag;
+        this.raiders = raiders;
+    }
+
+    public void addRadier(RaiderEntity raider) {
+        raider.changeRaid(this);
+        this.raiders.add(raider);
+    }
+
+    public void changeRaiders(List<RaiderEntity> raiders) {
+        this.raiders.clear();
+        raiders.forEach(this::addRadier);
+    }
+
+    // 기본값 설정을 위한 빌더 객체
+    public static class RaidEntityBuilder {
+        private List<RaiderEntity> raiders = new ArrayList<>();
+    }
+
+}

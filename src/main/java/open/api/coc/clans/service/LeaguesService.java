@@ -3,8 +3,8 @@ package open.api.coc.clans.service;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.league.LeagueEntity;
-import open.api.coc.clans.database.repository.common.LeagueRepository;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.clans.domain.clans.converter.LabelResponseConverter;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LeaguesService {
 
-    private final LeagueRepository leagueRepository;
+    private final JpaLeagueRepository leagueRepository;
     private final LabelResponseConverter labelResponseConverter;
 
     public List<LabelResponse> getLeagues() {

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/clan/game.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/clan.js"></script>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <title>클랜게임 현황</title>
+
+  <script>
+    function makeClanGameRecord(no, completedPoint, record) {
+      let { name, point } = record;
+      const clanGameTemplate = copyTemplateById('clan-game-template');
+      const clanGameRow = clanGameTemplate.querySelector('.clan-game');
+
+      clanGameRow.innerHTML = clanGameRow.innerHTML
+                                         .replace(/{NO}/, no)
+                                         .replace(/{NAME}/, name)
+                                         .replace(/{POINT}/, point);
+
+      if (point >= completedPoint) {
+        clanGameRow.classList.add('completed');
+      }
+
+      return clanGameRow;
+    }
+
+    function renderClanGameProgressDate(message) {
+      const target = document.querySelector('.clan-game-guide');
+      target.innerHTML = message;
+
+      toggleDisplay(target);
+    }
+
+    function convertSortedAndCorrectionRecord(completedPoint, records) {
+      return records.map(record => {
+                      if (record.point > completedPoint) {
+                        record.point = completedPoint;
+                      }
+                      return record;
+                    })
+                    .sort((a, b) => b.point - a.point || new Date(a.achievementDate) - new Date(b.achievementDate));
+    }
+
+    function drawClanGameRecords(completedPoint, records) {
+      const target = document.querySelector('.clan-game-wrapper');
+
+      const sortedRecordWithCorrection = convertSortedAndCorrectionRecord(completedPoint, records);
+      let no = 1;
+      for(const record of sortedRecordWithCorrection) {
+        const recordRow = makeClanGameRecord(no++, completedPoint, record);
+        target.appendChild(recordRow);
+      }
+    }
+
+    async function renderLatestClanGames() {
+      showWifiLoading(".content");
+      const latestClanGame = await fetchLatestClanGame();
+      hideWifiLoading(".content");
+
+      const { progressDate, completedPoint, records } = latestClanGame;
+      const formatProgressDate = formatYYYYMM(progressDate);
+      if (!records || !records.length) {
+        const displayGuide = `${formatProgressDate} 클랜 게임 정보 없음`;
+        renderClanGameProgressDate(displayGuide);
+        return;
+      }
+
+      const displayGuide = `${formatProgressDate} 클랜 게임 현황`;
+      renderClanGameProgressDate(displayGuide);
+      drawClanGameRecords(completedPoint, records);
+    }
+
+    window.onload = async () => {
+        await renderLatestClanGames();
+    }
+  </script>
+
+</head>
+<body>
+<div class="content">
+  <div class="logo-wrapper">
+    <div class="clan-game-logo"></div>
+  </div>
+  <div class="section">
+    <div id="wifi-loader" class="display-none">
+      <svg class="circle-outer" viewBox="0 0 86 86">
+        <circle class="back" cx="43" cy="43" r="40"></circle>
+        <circle class="front" cx="43" cy="43" r="40"></circle>
+        <circle class="new" cx="43" cy="43" r="40"></circle>
+      </svg>
+      <svg class="circle-middle" viewBox="0 0 60 60">
+        <circle class="back" cx="30" cy="30" r="27"></circle>
+        <circle class="front" cx="30" cy="30" r="27"></circle>
+      </svg>
+      <svg class="circle-inner" viewBox="0 0 34 34">
+        <circle class="back" cx="17" cy="17" r="14"></circle>
+        <circle class="front" cx="17" cy="17" r="14"></circle>
+      </svg>
+      <div class="text" data-text="Searching"></div>
+    </div>
+
+    <div class="clan-game-guide description-label display-none"></div>
+    <div class="clan-game-wrapper"></div>
+  </div>
+</div>
+</body>
+<template id="clan-game-template">
+  <div class="clan-game">
+    <div class="no">{NO}</div>
+    <div class="name">{NAME}</div>
+    <div class="point">{POINT}<div class="icon-clan-game-point"></div></div>
+  </div>
+</template>
+</html>

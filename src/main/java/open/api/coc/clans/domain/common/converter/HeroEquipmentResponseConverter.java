@@ -1,6 +1,6 @@
 package open.api.coc.clans.domain.common.converter;
 
-import open.api.coc.clans.database.entity.player.PlayerHeroEquipmentEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEquipmentEntity;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.external.coc.clan.domain.common.HeroEquipment;
 import open.api.coc.external.coc.config.HeroEquipmentConfig;
@@ -23,7 +23,6 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
                                     .maxLevel(source.getMaxLevel())
                                     .rarity(heroEquipment.getRarity())
                                     .heroName(heroEquipment.getHero().getKoreanName())
-                                    .heroShortName(heroEquipment.getHero().getKoreanShortName())
                                     .build();
     }
 
@@ -42,7 +41,6 @@ public class HeroEquipmentResponseConverter implements Converter<HeroEquipment, 
                                     .maxLevel(source.getLevelInfo().getMaxLevel())
                                     .rarity(heroEquipment.getRarity())
                                     .heroName(heroEquipment.getHero().getKoreanName())
-                                    .heroShortName(heroEquipment.getHero().getKoreanShortName())
                                     .build();
     }
 }

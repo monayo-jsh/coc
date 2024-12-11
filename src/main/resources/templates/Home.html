@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,93 +7,303 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="아카데미"/>
+  <meta property="og:description" content="클랜 편의기능 사이트"/>
+  <meta property="og:url" content="http://146.56.103.211"/>
+  <meta property="og:image" content="http://146.56.103.211/images/logo.png"/>
+
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/home.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/error.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/home.css" />
+  <link rel="stylesheet" type="text/css" href="/css/error.css" />
 
-  <script src="/static/js/common.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/notice.js"></script>
+
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script>
-    async function checkClashOfClanServer() {
-      axios.get("/leagues")
-           .then((response) => {})
-           .catch((error) => {
-             const { response } = error;
-             const { status, data } = response;
-
-             let msg = 'Clash of Clan API Server\n'
-             const { reason, message } = data;
-             if (reason) {
-               msg += `\nreason: ${reason}`;
-             }
-             if (message) {
-               msg += `\nmessage: ${message}`;
-             }
-
-             msg += `\n\n위와 같은 사유로 편의기능을 제공 불가`;
-
-             const codeContainerElement = document.querySelector('#code');
-             codeContainerElement.value = msg;
-
-             const homeWrapperElement = document.querySelector('.home-wrapper');
-             homeWrapperElement.classList.add('display-none');
-
-             const errorElement = document.querySelector('.error');
-             errorElement.classList.remove('display-none');
-           })
-    }
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>아카데미 클랜 편의기능</title>
+
+  <script>
+
+  dayjs.extend(dayjs_plugin_duration);
+
+  function renderNoticeDetail(noticeElement) {
+      const { id } = noticeElement.dataset;
+
+      renderPage(`/notice?id=${id}`);
+  }
+
+    function renderLeagueAssignedPage() {
+      if (isNotLeagueAssigned) {
+        let formatDate = document.querySelector('.league-assigned-date').innerText;
+        formatDate = formatDate.replace(/[\(\)]/g, "").replace("배정 예정", "리그 배정 예정입니다.");
+        const message = `${formatDate}`;
+        alert(message);
+        return;
+      }
+
+      renderPage('/assigned-member?view=league');
+    }
+
+  function renderClanAssignedPage() {
+      if (isNotClanAssigned) {
+        const message = `${formatYYYYMM(dayjs())} 클랜 배정 예정입니다.`;
+        alert(message);
+        return;
+      }
+
+      renderPage('/assigned-member?view=none');
+    }
+
+  function formatDate(date) {
+      if (date) {
+        const parseDate = dayjs(String(date));
+        const formatDate = formatYYYYMM(parseDate)
+        return `(${formatDate})`;
+      }
+      return date;
+    }
+
+    let isNotClanAssigned = false;
+    async function displayClanAssignedDate() {
+      const latestClanAssignedSeasonDate = await latestClanAssignedDate();
+
+      const clanAssignedDateDisplay = document.querySelector('.clan-assigned-date');
+      let displayText = formatDate(latestClanAssignedSeasonDate);
+      if (isNotClanAssignedMonth(latestClanAssignedSeasonDate)) {
+        isNotClanAssigned = true;
+        displayText = `(${formatYYYYMM(dayjs())} 배정 예정)`;
+      }
+
+      clanAssignedDateDisplay.innerHTML = displayText;
+
+      function isNotClanAssignedMonth(latestClanAssignedSeasonDate) {
+        const latestSeasonMonth = dayjs(String(latestClanAssignedSeasonDate)).month();
+        const currentMonth = dayjs().month();
+
+        return latestSeasonMonth !== currentMonth;
+      }
+    }
+
+    let isNotLeagueAssigned = false;
+    async function displayLeagueAssignedDate() {
+      const latestLeagueAssignedSeasonDate = await latestLeagueAssignedDate();
+
+      const leagueAssignedDateDisplay = document.querySelector('.league-assigned-date');
+      let displayText = formatDate(latestLeagueAssignedSeasonDate);
+
+      if (isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate)) {
+        isNotLeagueAssigned = true;
+
+        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const now = dayjs();
+
+        let displayDate = dayjs();
+        if (latestSeasonMonth >= now.month()) {
+          // 최근 배정월이 이번달과 같거나 미래인 경우 다음달로 표기
+          displayDate = displayDate.add(1, 'month');
+        }
+        displayText = `(${formatYYYYMM(displayDate)} 배정 예정)`;
+      }
+
+      leagueAssignedDateDisplay.innerHTML = displayText;
+
+      function isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate) {
+        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const now = dayjs();
+
+        // 매달 15일 이후인 경우
+        if (now.date() >= 13) {
+          // 이번달 배정인 경우
+          if (latestSeasonMonth === now.month()) {
+            return true;
+          }
+        } else {
+          // 매달 14일까지 기준 지난달 리그전 배정인 경우
+          if (latestSeasonMonth < now.month()) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+    }
+
+    async function initAssignedDate() {
+      await displayClanAssignedDate();
+      await displayLeagueAssignedDate();
+    }
+
+    async function drawNotice() {
+      const notices = await fetchPostingNotices();
+
+      renderNotices(notices);
+      initSwipeEvent();
+    }
+
+    function makeNotice(noticeInfo) {
+      const { id, type, oneLine, postingEndDate, timerEnabled } = noticeInfo;
+      const noticeTemplate = copyTemplateById('notice-template');
+      const notice = noticeTemplate.querySelector('.notice');
+
+      //dataset
+      notice.dataset.id = id;
+
+      notice.innerHTML = notice.innerHTML
+                               .replace(/{TYPE}/, convertNoticeName(type))
+                               .replace(/{TEXT}/, oneLine);
+
+      if (timerEnabled) {
+        drawTimer(notice, postingEndDate);
+      }
+
+      const label = notice.querySelector('.label');
+      label.classList.add(type);
+
+      return notice;
+    }
+
+  function drawTimer(noticeRow, postingEndDate) {
+    const timer = noticeRow.querySelector('.timer');
+    const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
+
+    const isFinishTimer = leftUntilTime.seconds() <= 0;
+
+    if (isFinishTimer) {
+      timer.innerHTML = "";
+      return isFinishTimer;
+    }
+
+    const displayTime = convertFormatDayHourMinuteSecond(leftUntilTime);
+    timer.innerHTML = `(${displayTime} 남음)`;
+
+    return isFinishTimer;
+  }
+
+  function addTimerEvent(noticeRow, notice) {
+      const { id, postingEndDate, timerEnabled } = notice;
+
+      // 타이머 비활성화인경우
+      if (!timerEnabled) return;
+
+      const timerInterval = setInterval(() => {
+        const isFinishTimer = drawTimer(noticeRow, postingEndDate);
+
+        if (isFinishTimer) {
+          clearInterval(timerInterval);
+        }
+      }, 1000);
+    }
+
+    function renderNotices(notices) {
+      const target = document.querySelector('.notices');
+      for (const notice of notices) {
+        const noticeRow = makeNotice(notice);
+        target.appendChild(noticeRow);
+
+        addTimerEvent(noticeRow, notice);
+      }
+
+      if (notices.length) {
+        // 첫번째 공지 노출
+        target.firstElementChild.classList.add('active');
+
+        if (notices.length === 1) {
+          // 공지가 1건인 경우 애니메이션 비활성화
+          target.firstElementChild.querySelector('.slide-animation').classList.add('deactivate');
+        }
+        toggleDisplay(target);
+      }
+    }
+    
+    function initSwipeEvent() {
+      const notices = document.querySelectorAll('.notices .notice');
+      if (!notices) return;
+      if (notices.length === 1) return;
+
+      setInterval(() => showNextNotice(notices), 5000);
+    }
+
+    let currentNoticeIndex = 0;
+    function showNextNotice(notices) {
+      // 모든 공지 숨김
+      notices.forEach((notice, index) => { notice.classList.remove('active'); });
+
+      // 다음 공지 노출
+      currentNoticeIndex = (currentNoticeIndex + 1) % notices.length;
+      notices[currentNoticeIndex].classList.add('active');
+    }
+
+    window.onload = async () => {
+      await initAssignedDate();
+      await drawNotice();
+    }
+  </script>
 </head>
 <body>
-  <div class="error display-none">
-    <div class="card">
-      <div class="header">
-        <div class="top">
-          <div class="circle">
-            <span class="red circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="yellow circle2"></span>
-          </div>
-          <div class="circle">
-            <span class="green circle2"></span>
-          </div>
-          <div class="title">
-            <p id="title2">서버 점검</p>
-          </div>
-        </div>
-      </div>
-      <div class="code-container">
-        <label for="code">
-          <textarea readonly="" name="code" id="code" class="area"></textarea>
-        </label>
-      </div>
-    </div>
 
-  </div>
   <div class="home-wrapper">
     <div class="logo"></div>
 
     <div class="contents">
+      <div class="notice-area">
+        <div class="notices display-none"></div>
+      </div>
 
       <div class="card-group align-items-center flex-row justify-content-center">
-        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('/hall-of-fame'); return false;">
+        <div class="card bg-black-2 with-icon color-gold w100p" onclick="renderPage('/hall-of-fame'); return false;">
           <i class="fa-solid fa-trophy"></i>
           <p class="tip">명예의전당</p>
           <i class="fa-solid fa-medal"></i>
         </div>
+      </div>
+      <div class="card-group align-items-center flex-row justify-content-center">
         <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('https://www.youtube.com/@nomicoc'); return false;">
           <i class="fa-brands fa-youtube fa-lg" style="color: gold;"></i>
           <p class="tip">뱃튜브</p>
         </div>
+<!--        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('/event/team/legend'); return false;">-->
+        <div class="card bg-black-2 with-icon color-gold w90" onclick="alert('Coming Soon !'); return false;">
+          <i class="fa-solid fa-star" style="color: gold;"></i>
+          <p class="tip">이벤트</p>
+          <i class="fa-solid fa-star" style="color: gold;"></i>
+        </div>
       </div>
 
-      <div class="card-group">
+      <div class="card-group menu-rule">
+        <div class="title">아카데미 규칙</div>
+        <div class="sub-title color-red">소통방에서 "/ (슬러쉬)" 입력 시 바로 확인 가능</div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1S7QI9UvUpgxv9ytxV_hiAH3yapDD8oPSnrONvkNyuAc/edit#gid=0'); return false;">
+            <p class="tip">클랜전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1FQ6Og-Q5Wybhk919dYaQsjpWjfgsUwwowHvhIBkJNi0/edit#gid=0'); return false;">
+            <p class="tip">리그전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1Z5Ce9zDDIoUgian1aYOyV-STmme1-jLQLPKfA5-UvFc/edit#gid=0'); return false;">
+            <p class="tip">습격전 규칙</p>
+            <p class="second-text"></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1cFbo-26Y6MDf2ioVjurMW4G3nvwYUZtgYGIjcoB1qgw/edit?usp=sharing'); return false;">
+            <p class="tip">클랜 링크</p>
+            <p class="second-text"></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-group menu-information">
         <div class="title">아카데미 정보</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/lab/links'); return false;">
@@ -104,31 +315,43 @@
             <p class="second-text"></p>
           </div>
         </div>
-      </div>
-      <div class="card-group">
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderClanAssignedPage(); return false;">
+            <p class="tip">클랜 배정표</p>
+            <p class="second-text"><span class="clan-assigned-date">(조회중)</span></p>
+          </div>
+          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">
+            <p class="tip">리그 배정표</p>
+            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
+          </div>
+        </div>
+
         <div class="title">아카데미 클랜원</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/member'); return false;">
             <p class="tip">전체 클랜원</p>
           </div>
-          <div class="card bg-black-2" onclick="renderPage('/find/member'); return false;">
-            <p class="tip">클랜원 검색</p>
-          </div>
-        </div>
-        <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/hero/equipments'); return false;">
             <p class="tip">영웅 장비 현황</p>
             <p class="second-text"></p>
           </div>
         </div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('/find/member'); return false;">
+            <p class="tip">클랜원 검색</p>
+          </div>
+          <div class="card bg-black-2" onclick="renderPage('/legend/record'); return false;">
+            <p class="tip">전설 기록 검색</p>
+          </div>
+        </div>
       </div>
 
-      <div class="card-group">
+      <div class="card-group menu-contents">
         <div class="title">아카데미 컨텐츠</div>
         <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=normal'); return false;">
+          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=none'); return false;">
             <p class="tip">클랜전 현황</p>
-            <p class="second-text">(토,월,수 매칭)</p>
+            <p class="second-text">(매주 토,월,수 매칭)</p>
           </div>
           <div class="card bg-black-2" onclick="renderPage('/capital/raid'); return false;">
             <p class="tip">습격전 현황</p>
@@ -142,12 +365,29 @@
           </div>
           <div class="card bg-black-2" onclick="renderPage('/clan/war?type=parallel'); return false;">
             <p class="tip">병행클랜전 현황</p>
-            <p class="second-text">(월초 리그전 진행)</p>
+            <p class="second-text">(매월 리그전 진행 시 공지)</p>
+          </div>
+        </div>
+        <div class="cards">
+          <div class="card bg-black-2" onclick="renderPage('/clan-game'); return false;">
+            <p class="tip">클랜게임 현황</p>
+            <p class="second-text">(매월 22일 ~ 28일 진행)</p>
           </div>
         </div>
       </div>
 
     </div>
+
   </div>
+
 </body>
+<template id="notice-template">
+  <div class="notice cursor-pointer" onclick="renderNoticeDetail(this);">
+    <div class="slide-animation">
+      <div class="label">{TYPE}</div>
+      <div class="text">{TEXT}</div>
+      <div class="timer" style="margin-left: 3px; color: red; font-size: 12px;"></div>
+    </div>
+  </div>
+</template>
 </html>

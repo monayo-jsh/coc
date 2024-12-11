@@ -8,10 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.external.coc.clan.domain.capital.ClanCapitalRaidSeasons;
-import open.api.coc.external.coc.clan.domain.clan.Clan;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
-import open.api.coc.external.coc.clan.domain.clan.ClanMemberList;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
@@ -29,36 +26,11 @@ public class ClanApiServiceImpl implements ClanApiService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public Optional<Clan> findClanByClanTag(String clanTag) {
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getClansClanTagUri(), clanTag)
-                                             .retrieve()
-                                             .body(Clan.class));
-    }
-
-    @Override
-    public Optional<ClanCapitalRaidSeasons> findClanCapitalRaidSeasonsByClanTagAndLimit(String clanTag, int limit) {
-        String uri = clashOfClanConfig.getClansClanTagCapitalRaidSeasonsUri() + "?limit=" + limit;
-        return Optional.ofNullable(restClient.get()
-                                             .uri(uri, clanTag)
-                                             .retrieve()
-                                             .body(ClanCapitalRaidSeasons.class));
-    }
-
-    @Override
     public Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag) {
         return Optional.ofNullable(restClient.get()
                                              .uri(clashOfClanConfig.getClansClanTagCurrentWarUri(), clanTag)
                                              .retrieve()
                                              .body(ClanWar.class));
-    }
-
-    @Override
-    public Optional<ClanMemberList> findClanMembersByClanTag(String clanTag) {
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getClansClanMembersUri(), clanTag)
-                                             .retrieve()
-                                             .body(ClanMemberList.class));
     }
 
     @Override

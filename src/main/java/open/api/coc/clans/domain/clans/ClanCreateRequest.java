@@ -9,7 +9,6 @@ import open.api.coc.external.coc.clan.domain.common.IconUrl;
 public record ClanCreateRequest(
 
     @Schema(description = "클랜 이름")
-    @JsonProperty("name")
     @NotNull @NotEmpty
     String name,
 

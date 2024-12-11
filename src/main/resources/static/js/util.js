@@ -22,7 +22,7 @@ function getLeftUntilByTime(endTime) {
   const endDateTime = dayjs(endTime);
 
   if (now > endDateTime) {
-    return "";
+    return dayjs.duration();
   }
 
   return dayjs.duration(endDateTime.diff(now));
@@ -33,7 +33,8 @@ function filterVillage(array, village = 'home') {
 }
 
 function convertArrayToLevelMapByKoreanName(array) {
-  return filterVillage(array).reduce((map, row) => {
+  const sortedArray = sortedByCode(array);
+  return filterVillage(sortedArray).reduce((map, row) => {
     const {koreanName, level} = row;
     map[koreanName] = level
     return map
@@ -103,6 +104,26 @@ function writeExcelFile(fileName, jsonData) {
   XLSX.writeFile(workbook, fileName);
 }
 
+function convertNoticeName(noticeType) {
+  switch (noticeType) {
+    case 'NOTICE': return '공지';
+    case 'EVENT': return '이벤트';
+    case 'COUPON': return '쿠폰';
+  }
+  return noticeType;
+}
+function convertHeroKoreanName(enName) {
+  switch (enName) {
+    case 'Barbarian King': return '바바리안 킹';
+    case 'Archer Queen': return '아처 퀸';
+    case 'Grand Warden': return '그랜드 워든';
+    case 'Royal Champion': return '로얄 챔피언';
+    case 'Minion Prince': return '미니언 프린스';
+  }
+
+  // not mapping hero english name.
+  return enName;
+}
 /**
  * 클랜 권한 한글명 반환
  * @param role
@@ -202,9 +223,18 @@ function sortByHeroTotalLevel(players) {
   return players.sort((a, b) => b.heroTotalLevel - a.heroTotalLevel || a.name.localeCompare(b.name));
 }
 
+function sortedByCode(arrays) {
+  // order 필드에 따른 정렬
+  return arrays.sort((a, b) => a.code - b.code);
+}
+
 function sortedByOrder(arrays) {
   // order 필드에 따른 정렬
   return arrays.sort((a, b) => a.order - b.order);
+}
+
+function formatPeriod(start, end) {
+  return `${start} ~ ${end}`;
 }
 
 function formatYYMMDate(date) {
@@ -216,8 +246,20 @@ function formatYYMMDD(date) {
   return dayjs(date).format('YY-MM-DD');
 }
 
+function formatYYM(date) {
+  return dayjs(date).format('YY년 M월');
+}
+
+function formatYYYYMM(date) {
+  return dayjs(date).format('YYYY년 MM월');
+}
+
 function formatYYYYMMDD(date) {
   return dayjs(date).format('YYYY-MM-DD');
+}
+
+function formatMMDD(date) {
+  return dayjs(date).format('MM-DD');
 }
 
 function formatDD(date) {
@@ -226,6 +268,34 @@ function formatDD(date) {
 
 function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
+}
+
+function formatYYMMDDHHMM(date) {
+  return dayjs(date).format('YY-MM-DD HH:mm');
+}
+
+// 주어진 시간으로부터 현재 시간까지의 차이를 분 단위로 계산
+function getMinutesDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+   // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'minute'));
+}
+
+// 주어진 시간으로부터 현재 시간까지의 차이를 시간 단위로 계산
+function getHoursDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+  // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'hour'));
+}
+
+// 주어진 시간으로부터 현재 시간까지의 차이를 일 단위로 계산
+function getDaysDifferenceFromNow(dateStr) {
+  const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
+  const now = dayjs(); // 현재 시간
+  // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  return Number(now.diff(givenDate, 'day'));
 }
 
 function toastMessage(message){
@@ -377,7 +447,52 @@ function convWarTypeName(type) {
 }
 
 
-function makeMonthPickerOption(firstDayOfMonth, customOption = {
+function makeDatePickerOption(defaultDate, customOption = {
+}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    type: 'default',
+    format: 'YYYY-MM-DD', // default
+    controls: false,
+    readonly: true,
+    value: defaultDate, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+  };
+
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
+  }
+  return option
+}
+
+function makeDateTimePickerOption(defaultDate, customOption = {}) {
+  // <!-- JavaScript Year and Month Picker -->
+  //   <script src="https://jsuites.net/v4/jsuites.js"></script>
+  //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+  const option = {
+    format: 'YYYY-MM-DD HH:MM',
+    time: true,
+    readonly: true,
+    value: defaultDate, // default
+    months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
+    resetButton: false,
+    textDone: "",
+    textUpdate: "적용"
+  };
+
+  // update callback mappings
+  if (customOption.onchange) {
+    option.onchange = customOption.onchange;
+  }
+  return option
+}
+
+function makeMonthPickerOption(defaultDate, customOption = {
   validRange: true
 }) {
   // <!-- JavaScript Year and Month Picker -->
@@ -385,17 +500,16 @@ function makeMonthPickerOption(firstDayOfMonth, customOption = {
   //   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
   const option = {
     type: 'year-month-picker',
-    format: 'YYYY-MM',
+    format: 'YYYY-MM', // default
     controls: false,
     readonly: true,
-    value: firstDayOfMonth, // default
+    value: defaultDate, // default
     months: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
     monthsFull: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
   };
 
-  // setting validRange
   if (customOption.validRange) {
-    option.validRange = [ firstDayOfMonth ];
+    option.validRange = [defaultDate];
   }
 
   // update callback mappings
@@ -404,6 +518,7 @@ function makeMonthPickerOption(firstDayOfMonth, customOption = {
   }
   return option
 }
+
 
 function isMissingAttack(attacks) {
   const ESSENTIAL_ATTACK_COUNT = 6;
@@ -426,4 +541,90 @@ function isWarPreferenceIn(warPreference) {
 
 function convWarPreferenceName(warPreference) {
   return isWarPreferenceIn(warPreference) ? '참가' : '불참';
+}
+
+function toggleDisplay(element) {
+  const { classList } = element
+
+  // visible
+  if (classList.contains('display-none')) {
+    classList.remove('display-none');
+
+    return true;
+  }
+
+  // invisible
+  classList.add('display-none');
+  return false;
+}
+
+function loadRequestBodyFromForm(formElement) {
+  const formData = new FormData(formElement);
+
+  const requestBody = {}
+  for (let pair of formData.entries()) {
+    const key = pair[0];
+    const value = pair[1];
+    requestBody[key] = value;
+  }
+
+  return requestBody;
+}
+
+function convertCheckbox(requestBody, key) {
+  // checkbox 체크된 경우 'on' 값이며, 체크되지 않은 경우 값이 없음
+  // 따라서 true | false 로 치환
+  requestBody[key] = !!requestBody[key];
+}
+
+function convertTimestamp(requestBody, key) {
+  // 날짜 값을 타임스탬프로 치환
+  if (requestBody[key]) {
+    requestBody[key] = dayjs(requestBody[key]).valueOf();
+  }
+}
+
+function convertContainTextToLink(text) {
+  if (!text) return text;
+
+  const targetWord = text;
+  const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+
+  return targetWord.replace(urlPattern, convertTag);
+
+  function convertTag(url) {
+    return '<a class="link" href="' + url + '">'+ url +'</a>';
+  }
+}
+
+function convertFormatDayHourMinuteSecond(time) {
+  let displayTime = formatTime(time, "D일 H시간 m분 s초");
+
+  if (time.days() > 0) {
+    // 0일 이상이면
+    return displayTime;
+  }
+
+  displayTime = formatTime(time, "H시간 m분 s초");
+
+  if (time.hours() > 0) {
+    // 0시간 이상이면
+    return displayTime;
+  }
+
+  displayTime = formatTime(time, "m분 s초");
+
+  return displayTime;
+}
+
+function isCapitalHighTier(clan) {
+  if (!clan) {
+    console.warn("clan is defined");
+    return false;
+  }
+
+  const { clanCapital } = clan;
+  const { tier } = clanCapital;
+
+  return tier === 1
 }

@@ -1,0 +1,83 @@
+:root {
+  --bg-color: #2b2d31;
+  --font-color: #d8d8d8;
+}
+
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color);
+  color: var(--font-color);
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  color: var(--font-color);
+  padding: 5px 10px;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  .label {
+    margin-left: 3px;
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+
+  .description {
+    font-size: 14px;
+  }
+}
+
+.register-form {
+  margin-top: 5px;
+}
+
+.input {
+  width: 50px;
+  height: 100%;
+  border: 0 transparent;
+  font-size: 12px;
+  padding: 5px;
+  color: var(--bg-color);
+  background: var(--font-color);
+  border-radius: 5px;
+  outline: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .cell {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+}
+
+.season-wrapper {
+  margin-top: 5px;
+}
+
+.season {
+  margin: 10px 0;
+
+  .row {
+    height: 34px;
+    padding: 5px;
+    border: 1px solid var(--font-color);
+    border-radius: 5px;
+    justify-content: space-between;
+
+    i:hover {
+      color: red;
+    }
+  }
+}

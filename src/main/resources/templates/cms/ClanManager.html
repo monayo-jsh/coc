@@ -6,21 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/townhall.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/warLeague.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/cms/manager.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/townhall.css" />
+  <link rel="stylesheet" type="text/css" href="/css/warLeague.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/manager.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/league.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/player.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/player.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
@@ -213,24 +213,18 @@
     async function addClan(element) {
       const cardElement = element.closest('.card');
       const { dataset } = cardElement;
-      const { clanTag, clanName, badgeUrls } = dataset;
+      const { clanTag, clanName } = dataset;
 
       if (!confirm(`${clanName}(${clanTag})를 등록하시겠습니까?\n`)) {
         return;
       }
 
-      const requestBody = {
-        tag: clanTag,
-        name: clanName,
-        badge_url: JSON.parse(badgeUrls)
-      }
-
-      const registeredClan = await registerClan(requestBody)
+      const registeredClan = await registerClan(clanTag)
       if (!registeredClan) {
         return;
       }
 
-      const [clanDetail] = await fetchClansFromExternal([registeredClan]);
+      const [clanDetail] = await fetchClanDetailsFromExternal([registeredClan]);
       clanDetail.order = registeredClan.order;
       clanDetail.clanContent = registeredClan.clanContent;
       const clansListElement = document.querySelector('.clan-list');
@@ -263,7 +257,7 @@
           return;
         }
 
-        fetchClan(searchInput.value)
+        fetchClanDetailFromExternal(searchInput.value)
         .then((clan) => {
           clearSearchResult();
 
@@ -316,10 +310,9 @@
 
       const changeYn = yn === 'Y' ? 'N' : 'Y';
       const requestBody = {}
-      requestBody.tag = clanTag;
       requestBody[menuName] = changeYn;
 
-      const result = await updateClanContent(requestBody);
+      const result = await updateClanContent(clanTag, requestBody);
       if (result) {
         // 성공 처리
         element.dataset.yn = changeYn;
@@ -343,10 +336,10 @@
       }, {});
     }
 
-    function renderClanBadge(badgeUrls, card) {
-      if (!badgeUrls) return;
+    function renderClanBadge(badgeUrl, card) {
+      if (!badgeUrl) return;
 
-      const { small } = badgeUrls;
+      const { small } = badgeUrl;
       if (small) {
         const clanBadge = card.querySelector('.clan-badge');
         clanBadge.src = small;
@@ -432,8 +425,8 @@
       const clanLabel = document.importNode(clanLabelTemplate.content, true);
       const labelIcon = clanLabel.querySelector('.label-icon');
 
-      const { iconUrls } = label;
-      const { small } = iconUrls;
+      const { iconUrl } = label;
+      const { small } = iconUrl;
 
       labelIcon.src = small;
 
@@ -446,29 +439,27 @@
     }
 
     function renderClan(clan, targetElement) {
-      const clanCardTemplate = document.querySelector("#clan-card");
-      const clanCard = document.importNode(clanCardTemplate.content, true);
+      const clanCard = copyTemplateById('clan-card');
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanCapitalPoints, labels, clanContent } = clan;
-      const [leader] = findLeader(memberList);
+      const { name, tag, joinType, badgeUrl, warLeague, capitalLeague, members, points, clanCapitalPoints, labels, clanContent } = clan;
+      const [leader] = findLeader(members);
 
       // dataset
       card.dataset.clanTag = tag;
       card.dataset.clanName = name;
-      card.dataset.badgeUrls = JSON.stringify(badgeUrls);
       card.dataset.clanContent = JSON.stringify(clanContent);
 
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
                            .replace(/{CLAN_TAG}/g, tag)
-                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
+                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(joinType))
                            .replace(/{CLAN_LEADER}/, leader.name)
-                           .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
-                           .replace(/{CLAN_MEMBERS}/, members)
+                           .replace(/{CLAN_TROPHIES}/, Number(points).toLocaleString())
+                           .replace(/{CLAN_MEMBERS}/, members.length)
                            .replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
 
-      renderClanBadge(badgeUrls, card);
+      renderClanBadge(badgeUrl, card);
       renderWarLeagueBadge(warLeague, card);
       renderCapitalLeagueBadge(capitalLeague, card);
 
@@ -515,18 +506,20 @@
     async function getClans() {
       showWifiLoading('.clan-manager');
       let clans = await fetchClans();
-      let clanDetailMap = makeClanMapByTag(await fetchClansFromExternal(clans));
+      let clanDetailMap = makeClanMapByTag(await fetchClanDetailsFromExternal(clans));
 
       let resultClans = [];
       clans.forEach(clan => {
         // 객체 병합
         const clanDetail = clanDetailMap[clan.tag];
-        clanDetail.order = clan.order;
-        clanDetail.clanContent = clan.clanContent;
-        resultClans.push(clanDetail);
+        if (clanDetail) {
+          clanDetail.order = clan.order;
+          clanDetail.clanContent = clan.clanContent;
+          resultClans.push(clanDetail);
+        }
       });
 
-      renderClans(resultClans)
+      renderClans(resultClans);
 
       hideWifiLoading('.clan-manager');
     }
@@ -669,7 +662,7 @@
       const cardCurrentPlayerWrapper = cardElement.querySelector('.card-current-player-wrapper');
       cardCurrentPlayerWrapper.classList.remove('display-none');
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
 
       //전체 클랜원 태그 조회
       const allPlayerTags = await fetchAllPlayerTags();
@@ -802,7 +795,7 @@
       // 배정 클랜원 목록
       const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
@@ -942,7 +935,7 @@
       const searchResultElement = assignedPlayerForm.querySelector('.player-search-result');
       searchResultElement.innerHTML = ""; //clear
 
-      findPlayer(searchInput.value)
+      findPlayerFromExternal(searchInput.value)
       .then(player => {
         const playerInfoTemplate = document.querySelector('#clan-player-info-template');
         const playerInfoElement = document.importNode(playerInfoTemplate.content, true);
@@ -1002,7 +995,7 @@
 
       const clanAssignedPlayers = await fetchClanLeagueAssignedMembers(clanTag);
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardLeagueAssignedPlayerWrapper.querySelector('.season-date');
@@ -1316,19 +1309,19 @@
       </div>
 
       <div class="card-footer">
-        <div class="card-button btn-clan-war" data-btn-name="클랜전 현황" data-menu-name="clan_war_yn" onclick="changeContentYn(this); return false;">
+        <div class="card-button btn-clan-war" data-btn-name="클랜전 현황" data-menu-name="clanWarYn" onclick="changeContentYn(this); return false;">
           <i class="icon-clan-war"></i>
           <span class="chip">클랜전</span>
         </div>
-        <div class="card-button btn-clan-war-league" data-btn-name="리그전 현황" data-menu-name="clan_war_league_yn" onclick="changeContentYn(this); return false;">
+        <div class="card-button btn-clan-war-league" data-btn-name="리그전 현황" data-menu-name="clanWarLeagueYn" onclick="changeContentYn(this); return false;">
           <i class="icon-clan-war-league"></i>
           <span class="chip">리그전</span>
         </div>
-        <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clan_capital_yn" onclick="changeContentYn(this); return false;">
+        <div class="card-button btn-clan-capital" data-btn-name="습격전 현황" data-menu-name="clanCapitalYn" onclick="changeContentYn(this); return false;">
           <i class="icon-clan-capital"></i>
           <span class="chip">습격전</span>
         </div>
-        <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clan_war_parallel_yn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
+        <div class="card-button btn-clan-war-parallel" data-btn-name="병행클랜전 현황" data-menu-name="clanWarParallelYn" onclick="changeContentYn(this); return false;" style="filter: hue-rotate(45deg);">
           <i class="icon-clan-war"></i>
           <span class="chip">병행클랜전</span>
         </div>

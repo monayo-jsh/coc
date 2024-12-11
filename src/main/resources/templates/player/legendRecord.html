@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/player/legendRecord.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/player.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chartjs -->
+
+  <script type="text/javascript">
+
+    dayjs.locale('ko')
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+
+    function makeChartDataset(rows) {
+      const sortedRows = rows.sort((a, b) => new Date(a.x) - new Date(b.x));
+      return {
+        datasets: [{
+          data: sortedRows,
+          fill: false,
+          backgroundColor: 'rgb(255,107,0)',
+          borderColor: 'rgb(255,107,0)',
+          tension: 0.1
+        }]
+      }
+    }
+    function renderRecordChart(canvas, rows) {
+      const data = makeChartDataset(rows);
+
+      new Chart(canvas, {
+        type: 'line',
+        data: data,
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: "일자별 순위 그래프"
+            },
+            legend: {
+              display: false,
+              position: 'top'
+            }
+          }
+        }
+      });
+    }
+
+    function makeRecord(record) {
+      const { diffTrophies, recordedAt } = record;
+      const recordRowTemplate = copyTemplateById('record-row-template');
+      const recordRow = recordRowTemplate.querySelector('.record-row');
+
+      let timeAgo = getMinutesDifferenceFromNow(recordedAt);
+      if (timeAgo < 60) {
+        timeAgo += "분";
+      } else {
+        timeAgo = getHoursDifferenceFromNow(recordedAt);
+        if (timeAgo < 24) {
+          timeAgo = timeAgo + "시간";
+        } else {
+          timeAgo = getDaysDifferenceFromNow(recordedAt) + "일";
+        }
+      }
+
+      let formatTrophies = diffTrophies;
+      if (formatTrophies >= 0) {
+        formatTrophies = `+${formatTrophies}`;
+      }
+
+      recordRow.innerHTML = recordRow.innerHTML
+                                     .replace(/{TROPHIES}/, formatTrophies)
+                                     .replace(/{RECORDED_TIME}/, timeAgo);
+
+      return recordRow;
+    }
+
+    function renderRecords(recordElement, records) {
+      const attackRecordTable = recordElement.querySelector('.table.attack');
+      const defenceRecordTable = recordElement.querySelector('.table.defence');
+
+      let attackTotalTrophies = 0;
+      let defenceTotalTrophies = 0;
+
+      for (const record of records) {
+        if (record.diffTrophies > 0) {
+          // 공격 처리
+          attackTotalTrophies = addRecordToTable(record, attackRecordTable, attackTotalTrophies, 1);
+        } else if (record.diffTrophies < 0) {
+          // 방어 처리
+          defenceTotalTrophies = addRecordToTable(record, defenceRecordTable, defenceTotalTrophies, -1);
+        } else {
+          // 트로피 0점 또는 추적 실패 케이스
+          const { updatedAttackTotalTrophies, updatedDefenceTotalTrophies } = addZeroRecordToTable(record, attackRecordTable, defenceRecordTable, attackTotalTrophies, defenceTotalTrophies);
+
+          attackTotalTrophies = updatedAttackTotalTrophies;
+          defenceTotalTrophies = updatedDefenceTotalTrophies;
+        }
+      }
+
+      attackRecordTable.innerHTML = attackRecordTable.innerHTML.replace(/{ATTACK_TOTAL_TROPHIES}/, `+${attackTotalTrophies}`);
+      defenceRecordTable.innerHTML = defenceRecordTable.innerHTML.replace(/{DEFENCE_TOTAL_TROPHIES}/, defenceTotalTrophies);
+
+      function addRecordToTable(record, targetTable, totalTrophies, diffValue) {
+        const targetTbody = targetTable.querySelector('.table-tbody');
+
+        while (record.diffTrophies * diffValue >= 40) {
+          const newRecord = { ...record, diffTrophies: diffValue * 40 }; // 40 또는 -40으로 분할
+          const newRecordRow = makeRecord(newRecord);
+          targetTbody.appendChild(newRecordRow);
+          totalTrophies += newRecord.diffTrophies;
+          record.diffTrophies -= diffValue * 40;
+        }
+
+        if (record.diffTrophies !== 0) {
+          const remainingRecordRow = makeRecord(record); // 남은 트로피 처리
+          targetTbody.appendChild(remainingRecordRow);
+          totalTrophies += record.diffTrophies;
+        }
+
+        return totalTrophies;
+      }
+
+      function addZeroRecordToTable(record, attackRecordTable, defenceRecordTable, attackTotalTrophies, defenceTotalTrophies) {
+        // 0점으로 수집된 기록을 처리한다.
+        const { oldAttackWins, newAttackWins, oldDefenceWins, newDefenceWins } = record;
+        const recordRow = makeRecord(record);
+
+        const attackRecordTbody = attackRecordTable.querySelector('.table-tbody');
+        const defenceRecordTbody = defenceRecordTable.querySelector('.table-tbody');
+
+        if (newAttackWins > oldAttackWins) {
+          // 공격 성공 횟수가 있는 경우 공격과 방어가 동시에 반영된 데이터로 양쪽에 40점씩 보정
+          const attackCalibrationRecord = { ...record, diffTrophies: 40 };
+          const attackCalibrationRecordRow = makeRecord(attackCalibrationRecord);
+          attackRecordTbody.appendChild(attackCalibrationRecordRow);
+          attackTotalTrophies += 40;
+
+          const defenceCalibrationRecord = { ...record, diffTrophies: -40 };
+          const defenceCalibrationRecordRow = makeRecord(defenceCalibrationRecord);
+          defenceRecordTbody.appendChild(defenceCalibrationRecordRow);
+          defenceTotalTrophies -= 40;
+
+          return { updatedAttackTotalTrophies: attackTotalTrophies, updatedDefenceTotalTrophies: defenceTotalTrophies };
+        }
+
+        if (newDefenceWins > oldDefenceWins) {
+          recordRow.querySelector('.table-td').classList.add('bg-green');
+
+          // 방어 성공한 경우
+          defenceRecordTbody.appendChild(recordRow);
+
+          return { updatedAttackTotalTrophies: attackTotalTrophies, updatedDefenceTotalTrophies: defenceTotalTrophies };
+        }
+
+        // 전설 8공이 채워지지 않은 경우
+        if (attackRecordTbody.children.length < 8) {
+          attackRecordTbody.appendChild(recordRow);
+        } else {
+          defenceRecordTbody.appendChild(recordRow);
+        }
+
+        return { updatedAttackTotalTrophies: attackTotalTrophies, updatedDefenceTotalTrophies: defenceTotalTrophies };
+      }
+    }
+
+    function renderLegendRecord(playerLegendElement, baseDate, records) {
+      const targetElement = playerLegendElement.querySelector('.player-records');
+      const playerLegendRecordTemplate = copyTemplateById('player-legend-record-template');
+      const playerLegendRecordElement = playerLegendRecordTemplate.querySelector('.player-record');
+
+      renderRecords(playerLegendRecordElement, records);
+
+      let startTrophies = records[records.length-1].oldTrophies;
+      let endTrophies = records[0].newTrophies;
+
+      let resultTrophies = endTrophies - startTrophies;
+
+      let displayResultTrophies = resultTrophies;
+      if (resultTrophies >= 0) {
+        displayResultTrophies = `+${resultTrophies}`
+      }
+
+      playerLegendRecordElement.innerHTML = playerLegendRecordElement.innerHTML
+                                                                     .replace(/{RECORD_DATE}/, baseDate)
+                                                                     .replace(/{START_TROPHIES}/, Number(startTrophies).toLocaleString())
+                                                                     .replace(/{END_TROPHIES}/, Number(endTrophies).toLocaleString())
+                                                                     .replace(/{RECORD_RESULT_TROPHIES}/, String(displayResultTrophies));
+
+      const summaryElement = playerLegendRecordElement.querySelector('.result.summary');
+      if (resultTrophies > 0) {
+        summaryElement.classList.add('bg-green');
+      } else if (resultTrophies < 0) {
+        summaryElement.classList.add('bg-crimson');
+      }
+
+
+      targetElement.appendChild(playerLegendRecordElement);
+    }
+
+    function renderLegendRecordChart(playerLegend, playerTag, chartDataset) {
+
+      const recordChartTemplate = copyTemplateById('record-chart-template');
+      const recordChart = recordChartTemplate.querySelector('.record-history-chart');
+      const canvas = recordChart.querySelector('canvas');
+
+      canvas.id = removeHashTag(playerTag);
+
+      renderRecordChart(canvas, chartDataset);
+
+      const targetElement = playerLegend.querySelector('.record-chart');
+      targetElement.appendChild(canvas);
+    }
+
+    function displayPlayerRecord(tag) {
+      const playerRecordElement = document.querySelector(`.player-${tag}`);
+
+      // 첫번째로 위치 조정
+      const root = document.querySelector('.legend-record-wrapper');
+      if (root.children.length > 1) {
+        root.insertBefore(playerRecordElement, root.firstElementChild);
+      }
+
+      toggleDisplay(playerRecordElement);
+    }
+
+    function renderDisplayButton(player) {
+      const { tag, name } = player;
+
+      const radioItemTemplate = copyTemplateById('radio-item-template');
+      const radioItem = radioItemTemplate.querySelector('.radio.item');
+
+      radioItem.innerHTML = radioItem.innerHTML
+                                     .replace(/{TAG}/g, removeHashTag(tag))
+                                     .replace(/{NAME}/, name);
+
+      const radioInputs = document.querySelector('.radio-inputs');
+      radioInputs.appendChild(radioItem);
+    }
+
+    async function drawLegendRecord(player) {
+      const { tag, name } = player
+      const legendRecords = await fetchPlayerLegendRecord(tag);
+
+      if (!legendRecords.length) {
+        drawEmptyResult(`${name}(${tag}) 계정의 전설 기록 수집 데이터가 없습니다.`, tag);
+        return;
+      }
+
+      // chart dataset initial
+      const chartDataset = [];
+
+      const playerLegendTemplate = copyTemplateById('player-legend-template');
+      const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
+      playerLegend.innerHTML = playerLegend.innerHTML
+                                           .replace(/{PLAYER_NAME}/, name)
+                                           .replace(/{PLAYER_TAG}/, tag);
+
+      playerLegend.classList.add(`player-${removeHashTag(tag)}`);
+
+      const recordMap = convertArrayToMapByKey(legendRecords, 'baseDate', true);
+      for(const [baseDate, records] of recordMap) {
+        renderLegendRecord(playerLegend, baseDate, records);
+        addChartDataset(chartDataset, baseDate, records);
+      }
+
+      renderLegendRecordChart(playerLegend, tag, chartDataset);
+
+      const targetElement = document.querySelector('.legend-record-wrapper');
+      targetElement.appendChild(playerLegend);
+
+      function addChartDataset(chartDataset, baseDate, records) {
+        const [latest] = records;
+        const { newTrophies } = latest;
+        chartDataset.push({
+          x: baseDate,
+          y: newTrophies
+        })
+      }
+    }
+
+    function displayRegisterForm() {
+      const form = document.querySelector('.register-form');
+      if (!toggleDisplay(form)) {
+        const playerTagInput = document.querySelector('.player-register');
+        playerTagInput.value = ''; //입력값 clear
+      }
+    }
+
+    async function registerPlayer() {
+      const playerTagInput = document.querySelector('.player-register');
+      const playerTag = playerTagInput.value.trim();
+
+      if (!playerTag) {
+        alert('계정 태그를 입력해주세요.');
+        return;
+      }
+
+      registerLegendRecordTarget(playerTag)
+      .then((isResult) => {
+        displayRegisterForm();
+      });
+    }
+
+    function drawEmptyResult(msg, tag) {
+      const legendRecordWrapper = document.querySelector('.legend-record-wrapper');
+      const emptyGuideTemplate = copyTemplateById('empty-guide-template');
+      const emptyGuide = emptyGuideTemplate.querySelector('.description');
+      emptyGuide.innerHTML = msg;
+
+      if (tag)
+        emptyGuide.classList.add(`player-${removeHashTag(tag)}`, 'display-none');
+
+      legendRecordWrapper.appendChild(emptyGuide);
+    }
+
+    async function findAllLegendRecordTarget(playerName) {
+      const players = await fetchAllLegendRecordTarget(playerName);
+
+      if (!players.length) {
+        drawEmptyResult(`등록된 계정을 찾지 못했습니다.<br/>기록 확인을 위해서는 계정을 등록하세요.`);
+        return;
+      }
+
+      for (const player of players) {
+        renderDisplayButton(player);
+        await drawLegendRecord(player);
+      }
+
+      const [first] = players;
+      clickFirstRecord(first.tag);
+    }
+
+    function clickFirstRecord(playerTag) {
+      const target = document.querySelector(`input[name=checkbox-${removeHashTag(playerTag)}]`);
+      if (target)
+        target.click();
+    }
+
+    function clearLegendRecord() {
+      const playerRadioInputs = document.querySelector('.players .radio-inputs');
+      playerRadioInputs.innerHTML = ""; // 라디오버튼 clear
+      const legendRecordWrapper = document.querySelector('.legend-record-wrapper');
+      legendRecordWrapper.innerHTML = ""; // 기록 화면 clear
+    }
+
+    function findSearch() {
+
+      clearLegendRecord();
+
+      const input = document.querySelector('.player-search');
+      const playerName = input.value.trim();
+
+      if (!playerName && !playerName.length) {
+        alert('이름 또는 닉네임 입력을 입력해주세요.');
+        return;
+      }
+
+      findAllLegendRecordTarget(playerName);
+    }
+  </script>
+
+  <title>전설 기록</title>
+</head>
+<body>
+
+<div class="title">
+  <div class="icon trophies"></div>
+  <span class="label">전설 기록</span>
+</div>
+
+<div class="support-area">
+  <div class="buttons display-flex justify-content-center">
+    <div class="button-chip" onclick="displayRegisterForm()">수집 등록</div>
+  </div>
+  <div class="register-form display-none">
+
+    <div class="search">
+      <div class="search-box">
+        <div class="search-field">
+          <input placeholder="플레이어 태그를 입력 후 등록" class="input player-register" type="text">
+          <div class="search-box-icon">
+            <button class="btn-icon-content" onclick="registerPlayer(); return false;">
+              <i class="search-icon">
+                <i class="fa-regular fa-square-plus"></i>
+              </i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div class="description">
+  <div class="color-red">전설 기록 수집 계정 등록 후 확인 가능<br/>전설 리그 계정만 등록 가능하며, 전설 리그 탈출 시 수집 대상 제외됨</div>
+</div>
+
+<div class="support-area">
+
+  <div class="search-form">
+
+    <div class="search">
+      <div class="search-box">
+        <div class="search-field">
+          <input placeholder="이름 또는 닉네임 입력" class="input player-search" type="text">
+          <div class="search-box-icon">
+            <button class="btn-icon-content" onclick="findSearch(); return false;">
+              <i class="search-icon">
+                <svg class="icon-search" aria-hidden="true" viewBox="0 0 24 24"><g><path d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"></path></g></svg>
+              </i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+<div class="description">데이터 수집 결과에 따라 차이가 있을 수 있습니다</div>
+
+<div class="players">
+  <div class="radio-inputs filter">
+
+  </div>
+</div>
+<div class="legend-record-wrapper"></div>
+
+</body>
+<template id="radio-item-template">
+  <label class="radio item">
+    <input type="checkbox" name="checkbox-{TAG}" onchange="displayPlayerRecord('{TAG}'); return false;">
+    <span class="name">{NAME}</span>
+  </label>
+</template>
+<template id="record-row-template">
+  <tr class="table-tr record-row">
+    <td class="table-td">
+      <div class="td-wrap justify-content-space-between">
+        <div class="record-info">
+          <span class="count">{TROPHIES}</span><div class="icon trophies"></div>
+        </div>
+        <div class="recorded-time font-weight-bold">{RECORDED_TIME} 전</div>
+      </div>
+    </td>
+  </tr>
+</template>
+<template id="player-legend-record-template">
+  <div class="player-record">
+
+    <div class="result summary">
+      <span class="label">{RECORD_DATE}</span>
+      <div class="count">{RECORD_RESULT_TROPHIES}<div class="icon trophies"></div></div>
+    </div>
+
+    <div class="wrap display-flex justify-content-space-between">
+      <div class="summary bg-black">
+        <div class="label">시작</div>
+        <div class="count">{START_TROPHIES}<div class="icon trophies"></div></div>
+      </div>
+      <div class="summary bg-black">
+        <div class="label">종료</div>
+        <div class="count">{END_TROPHIES}<div class="icon trophies"></div></div>
+      </div>
+    </div>
+
+    <div class="detail">
+
+      <table class="table attack">
+        <caption class="table-caption summary bg-black">
+          <span class="label">공격</span>
+          <div class="attack-total count">{ATTACK_TOTAL_TROPHIES} <div class="icon trophies"></div></div>
+        </caption>
+        <tbody class="table-tbody"></tbody>
+      </table>
+
+      <table class="table defence">
+        <caption class="table-caption summary bg-black">
+          <span class="label">방어</span>
+          <div class="defence-total count">{DEFENCE_TOTAL_TROPHIES}<div class="icon trophies"></div></div>
+        </caption>
+        <tbody class="table-tbody"></tbody>
+      </table>
+
+    </div>
+
+  </div>
+</template>
+<template id="player-legend-template">
+  <div class="player-legend-wrapper display-none">
+    <div class="player-name">{PLAYER_NAME} <div class="chip">{PLAYER_TAG}</div></div>
+    <div class="information">
+      <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기되므로 차이가 있을 수 있습니다.</span></div>
+    </div>
+    <div class="player-records"></div>
+    <div class="information">
+      <div class="description"><span class="color-red">* 가로스크롤을 통해 이전 기록을 확인할 수 있습니다</span></div>
+    </div>
+    <div class="record-chart"></div>
+  </div>
+</template>
+<template id="record-chart-template">
+  <div class="record-history-chart">
+    <canvas></canvas>
+  </div>
+</template>
+<template id="empty-guide-template">
+  <div class="description"></div>
+</template>
+</html>

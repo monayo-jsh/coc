@@ -6,20 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/hallOfFame.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/townhall.css" />
+  <link rel="stylesheet" type="text/css" href="/css/hallOfFame.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/raid.js"></script>
-  <script src="/static/js/api/player.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/clanWar.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/raid.js"></script>
+  <script src="/js/api/player.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/clanWar.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -29,6 +30,18 @@
     dayjs.locale('ko')
     //dayjs duration 확장
     dayjs.extend(dayjs_plugin_duration)
+
+    function showLoading(targetClassName) {
+      const targetElement = getTargetElement(`leaderboard-wrapper.${targetClassName}`);
+      const loader = targetElement.querySelector('.loader-circle');
+      toggleDisplay(loader);
+    }
+
+    function hideLoading(targetClassName) {
+      const targetElement = getTargetElement(`leaderboard-wrapper.${targetClassName}`);
+      const loader = targetElement.querySelector('.loader-circle');
+      toggleDisplay(loader);
+    }
 
     function getMedalIcon(rank) {
       let templateId = "";
@@ -40,284 +53,468 @@
       return document.importNode(medalTemplate.content, true);
     }
 
-    function makeRankRow(rowData) {
-      const rankingRowTemplate = document.querySelector('#ranking-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      const row = rankingRow.querySelector('.table-tr');
+    function makeTopPlayerEmptyRow() {
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+      topPlayer.innerHTML = "";
+      return topPlayer;
+    }
 
-      const { rank, name, score, icon_class_name } = rowData;
+    function makeTopPlayerRow(rank, player) {
+      const { name, score, townHallLevel, iconClassName } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
 
-      row.innerHTML = row.innerHTML
-                         .replace(/{RANK}/, rank)
-                         .replace(/{NAME}/, name)
-                         .replace(/{ICON_CLASS_NAME}/, icon_class_name)
-                         .replace(/{SCORE}/, score);
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                     .replace(/{SCORE}/, Number(score).toLocaleString())
+                                     .replace(/{ICON_CLASS_NAME}/, iconClassName);
 
-      row.classList.add(`rank-${rank}`);
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
 
-      if (rank < 4) {
-        //순위권 메달 표기
-        const medalIcon = getMedalIcon(rank);
-        const rankTd = row.querySelector('.table-td.rank');
-        rankTd.innerHTML = "";
-        rankTd.appendChild(medalIcon);
+      topPlayer.classList.add(`top-player-${rank}`);
+
+      return topPlayer;
+    }
+
+    function makePlayerRow(rank, player) {
+      const { name, score, iconClassName } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{SCORE}/, Number(score).toLocaleString())
+                                     .replace(/{ICON_CLASS_NAME}/, iconClassName);
+
+      return topPlayer;
+    }
+
+    function drawLeaderBoardTopPlayer(leaderboard, topPlayers, functionMakePlayerRow) {
+      const target = leaderboard.querySelector('.top-3');
+
+      const recordRows = [];
+      let rank = 1;
+      for (const topPlayer of topPlayers) {
+        const topPlayerRow = functionMakePlayerRow(rank, topPlayer);
+
+        switch (rank) {
+          case 1: recordRows.push(topPlayerRow); break; // 배열의 가운데 위치해야함
+          case 2: recordRows.unshift(topPlayerRow); break; // 배열의 첫번째 위치해야함
+          case 3: recordRows.push(topPlayerRow); break; // 배열의 마지막에 위치해야함
+        }
+
+        rank++;
       }
 
-      return row;
+      // 빈 순위 채워주기
+      for (let rowCount = recordRows.length; rowCount < 3; rowCount++) {
+        const emptyRow = makeTopPlayerEmptyRow();
+        if (recordRows.length === 1) {
+          recordRows.unshift(emptyRow);
+        } else {
+          recordRows.push(emptyRow);
+        }
+      }
+
+      recordRows.forEach(record => target.appendChild(record));
     }
 
-    function convHallOfFameRankingItem(rank, name, score, iconClassName) {
-      return {
-        rank: rank,
-        name: name,
-        score: score,
-        icon_class_name: iconClassName
-      };
-    }
+    function drawLeaderBoardOtherPlayer(leaderboard, players, functionMakePlayerRow) {
+      const target = leaderboard.querySelector('.other-players');
 
-    function renderRankings(sectionClassName, players, iconClassName) {
-      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
-      // clear
-      rankingTbody.innerHTML = '';
+      let rank = 4;
+      for (const player of players) {
+        const playerRow = functionMakePlayerRow(rank, player);
+        target.appendChild(playerRow);
 
-      let rank = 1;
-      for(const player of players) {
-        const rowData = convHallOfFameRankingItem(rank, player.name, Number(player.score).toLocaleString(), iconClassName);
-        const row = makeRankRow(rowData);
-        rankingTbody.appendChild(row);
         rank++;
       }
     }
 
-    function makeRankClanWarRow(rowData) {
-      const rankingRowTemplate = document.querySelector('#ranking-clan-war-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      const row = rankingRow.querySelector('.table-tr');
+    function makeTopPlayerDonationRow(rank, player) {
+      const { name, townHallLevel, troopCount, spellCount, siegeCount } = player;
 
-      const { rank, name, clan_name, score, destruction_percentage, duration } = rowData;
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-donation-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
 
-      row.innerHTML = row.innerHTML
-                         .replace(/{RANK}/, rank)
-                         .replace(/{NAME}/, name)
-                         .replace(/{CLAN_NAME}/, clan_name)
-                         .replace(/{SCORE}/, score)
-                         .replace(/{DESTRUCTION_PERCENTAGE}/, destruction_percentage)
-                         .replace(/{DURATION}/, duration);
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                     .replace(/{TROOP_COUNT}/, Number(troopCount).toLocaleString())
+                                     .replace(/{SPELL_COUNT}/, Number(spellCount).toLocaleString())
+                                     .replace(/{SIEGE_COUNT}/, Number(siegeCount).toLocaleString());
 
-      row.classList.add(`rank-${rank}`);
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
 
-      if (rank < 4) {
-        //순위권 메달 표기
-        const medalIcon = getMedalIcon(rank);
-        const rankTd = row.querySelector('.table-td.rank');
-        rankTd.innerHTML = "";
-        rankTd.appendChild(medalIcon);
-      }
+      topPlayer.classList.add(`top-player-${rank}`);
 
-      return row;
+      return topPlayer;
     }
 
-    function convHallOfFameRankingClanWarItem(rank, name, clanName, score, destructionPercentage, duration) {
-      return {
-        rank: rank,
-        name: name,
-        clan_name: clanName,
-        score: score,
-        destruction_percentage: destructionPercentage,
-        duration: duration
-      };
+    function makePlayerDonationRow(rank, player) {
+      const { name, troopCount, spellCount, siegeCount } = player;
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-donation-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{TROOP_COUNT}/, Number(troopCount).toLocaleString())
+                                     .replace(/{SPELL_COUNT}/, Number(spellCount).toLocaleString())
+                                     .replace(/{SIEGE_COUNT}/, Number(siegeCount).toLocaleString());
+
+      return topPlayer;
     }
 
-    function emptyRankClanWarRow() {
-      const rankingRowTemplate = document.querySelector('#ranking-clan-war-empty-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      return rankingRow.querySelector('.table-tr');
+    function drawLeaderboardRecord(leaderboard, rankingRecords, functionMakeTopPlayerRow, functionMakePlayerRow) {
+      drawLeaderBoardTopPlayer(leaderboard, rankingRecords.splice(0, 3), functionMakeTopPlayerRow);
+      drawLeaderBoardOtherPlayer(leaderboard, rankingRecords, functionMakePlayerRow);
     }
 
-    function renderRankingsClanWar(sectionClassName, players) {
-      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
+    function makeTopPlayerClanWarRow(rank, player) {
+      const { name, townHallLevel, clan_name, totalStars, totalDestructionPercentage, avgDuration } = player;
 
-      // clear
-      rankingTbody.innerHTML = '';
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-clan-war-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
 
-      if (!players.length) {
-        rankingTbody.appendChild(emptyRankClanWarRow());
-        return;
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                     .replace(/{STARS}/, totalStars)
+                                     .replace(/{PERCENTAGES}/, totalDestructionPercentage)
+                                     .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
+
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
+
+      topPlayer.classList.add(`top-player-${rank}`);
+
+      return topPlayer;
+    }
+
+    function makePlayerClanWarRow(rank, player) {
+      const { name, clan_name, totalStars, totalDestructionPercentage, avgDuration } = player;
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-clan-war-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{STARS}/, totalStars)
+                                     .replace(/{PERCENTAGES}/, totalDestructionPercentage)
+                                     .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
+
+      return topPlayer;
+    }
+
+
+    function makeTopPlayerLeagueRow(rank, player) {
+      const { name, townHallLevel, avgDuration } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-league-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townHallLevel)
+                                     .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
+
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
+
+      topPlayer.classList.add(`top-player-${rank}`);
+
+      return topPlayer;
+    }
+
+    function makePlayerLeagueRow(rank, player) {
+      const { name, avgDuration } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-league-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{DURATION}/, formatMinuteSecond(Number(avgDuration)));
+
+      return topPlayer;
+    }
+
+    function renderLeaderboard(sectionClassName, leaderboardTitle, rankingRecords, iconClassName) {
+      const leaderboard = makeLeaderboard(leaderboardTitle);
+
+      const drawRecords = rankingRecords.map(rankingRecord => makeDrawRecord(rankingRecord, iconClassName));
+
+      if (drawRecords.length) {
+        drawLeaderboardRecord(leaderboard, drawRecords, makeTopPlayerRow, makePlayerRow);
+      } else {
+        // 데이터가 없을 경우
+        // 데이터 없을 경우
+        leaderboard.querySelector('.top-3').innerHTML = `
+          <div class="empty" style="width: 100%;">데이터 집계중</div>
+        `;
       }
 
-      let rank = 1;
-      for(const player of players) {
-        const rowData = convHallOfFameRankingClanWarItem(
-            rank, player.name, player.clanName,
-            Number(player.totalStars).toLocaleString(),
-            Number(player.totalDestructionPercentage),
-            formatMinuteSecond(Number(player.avgDuration))
-        );
-        const row = makeRankClanWarRow(rowData);
-        rankingTbody.appendChild(row);
-        rank++;
+      rendering(sectionClassName, leaderboard);
+
+      function makeDrawRecord(rankingRecord, iconClassName) {
+        return {
+          ...rankingRecord,
+          iconClassName: iconClassName
+        }
       }
+    }
+
+    function makeLeaderboard(title) {
+      const leaderboardTemplate = copyTemplateById('leaderboard-template');
+      const leaderboard = leaderboardTemplate.querySelector('.leaderboard');
+      leaderboard.innerHTML = leaderboard.innerHTML.replace(/{LEADERBOARD_TITLE}/, title);
+      return leaderboard;
+    }
+
+    function rendering(sectionClassName, leaderboard) {
+      const targetSection = document.querySelector(`.leaderboard-wrapper.${sectionClassName}`);
+      targetSection.appendChild(leaderboard);
+    }
+
+    function clearLeaderboard(sectionClassName) {
+      const targetLeaderboard = document.querySelector(`.leaderboard-wrapper.${sectionClassName} .leaderboard`);
+      if (targetLeaderboard)
+        targetLeaderboard.remove();
+    }
+
+    function renderLeaderboardForDonation(sectionClassName, leaderboardTitle, rankingRecords) {
+      const leaderboard = makeLeaderboard(leaderboardTitle);
+
+      if (rankingRecords.length) {
+        drawLeaderboardRecord(leaderboard, rankingRecords, makeTopPlayerDonationRow, makePlayerDonationRow);
+      } else {
+        // 데이터가 없을 경우
+        // 데이터 없을 경우
+        leaderboard.querySelector('.top-3').innerHTML = `
+          <div class="empty" style="width: 100%;">데이터 집계중</div>
+        `;
+      }
+
+      rendering(sectionClassName, leaderboard);
+    }
+
+    function renderLeaderboardForLeague(sectionClassName, leaderboardTitle, rankingRecords) {
+      clearLeaderboard(sectionClassName);
+
+      const leaderboard = makeLeaderboard(leaderboardTitle);
+
+      if (rankingRecords.length) {
+        drawLeaderboardRecord(leaderboard, rankingRecords, makeTopPlayerLeagueRow, makePlayerLeagueRow);
+      } else {
+        // 데이터 없을 경우
+        leaderboard.querySelector('.top-3').innerHTML = `
+          <div class="empty" style="width: 100%;">아쉽게도 없습니다.</div>
+        `;
+      }
+
+      rendering(sectionClassName, leaderboard);
+    }
+
+    function renderLeaderboardForClanWar(sectionClassName, leaderboardTitle, rankingRecords) {
+      clearLeaderboard(sectionClassName);
+
+      const leaderboard = makeLeaderboard(leaderboardTitle);
+
+      if (rankingRecords.length) {
+        drawLeaderboardRecord(leaderboard, rankingRecords, makeTopPlayerClanWarRow, makePlayerClanWarRow);
+      } else {
+        // 데이터 없을 경우
+        // 데이터 없을 경우
+        leaderboard.querySelector('.top-3').innerHTML = `
+          <div class="empty" style="width: 100%;">클랜전 기록이 없습니다.</div>
+        `;
+      }
+
+      rendering(sectionClassName, leaderboard);
     }
 
     async function fetchRaidCurrentSeason() {
       const targetClassName = 'raid-current-season';
-      showLoaderCircle(targetClassName);
+      const leaderboardTitle = "현재 시즌 순위";
+      const displayIcon = "icon icon-clan-capital";
+      showLoading(targetClassName);
       const rankings = await fetchRankingRaidCurrentSeason();
-      renderRankings(targetClassName, rankings, 'icon-clan-capital');
-      hideLoaderCircle(targetClassName);
+      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      hideLoading(targetClassName);
     }
 
     async function fetchRaidAverageSeason() {
       const targetClassName = 'raid-average-season';
-      showLoaderCircle(targetClassName);
+      const leaderboardTitle = "지난 3주 평균 순위";
+      const displayIcon = "icon icon-clan-capital";
+      showLoading(targetClassName);
       const rankings = await fetchRankingRaidAverageSeason();
-      renderRankings(targetClassName, rankings, 'icon-clan-capital');
-      hideLoaderCircle(targetClassName);
+      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      hideLoading(targetClassName);
     }
 
     async function fetchCurrentTrophies() {
-      const targetClassName = 'current-trophies';
-      showLoaderCircle(targetClassName);
+      const targetClassName = 'trophies';
+      const leaderboardTitle = "현재 트로피 순위";
+      const displayIcon = "icon trophies";
+      showLoading(targetClassName);
       const rankings = await fetchRankingPlayerTrophies();
-      renderRankings(targetClassName, rankings, 'icon trophies');
-      hideLoaderCircle(targetClassName);
+      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      hideLoading(targetClassName);
     }
 
     async function fetchCurrentAttackWins() {
-      const targetClassName = 'current-attack-wins';
-      showLoaderCircle(targetClassName);
+      const targetClassName = 'attack-wins';
+      const leaderboardTitle = "현재 공성 순위";
+      const displayIcon = "icon icon-sword";
+      showLoading(targetClassName);
       const rankings = await fetchRankingPlayerAttackWins();
-      renderRankings(targetClassName, rankings, 'icon-sword');
-      hideLoaderCircle(targetClassName);
+      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      hideLoading(targetClassName);
+    }
+
+    async function fetchCurrentDonations() {
+      const targetClassName = 'donations';
+      const leaderboardTitle = "현재 지원왕";
+      showLoading(targetClassName);
+      const rankings = await fetchRankingPlayerDonations();
+      renderLeaderboardForDonation(targetClassName, leaderboardTitle, rankings);
+      hideLoading(targetClassName);
+    }
+
+    async function fetchCurrentDonationsReceived() {
+      const targetClassName = 'donations-received';
+      const leaderboardTitle = "현재 수혜왕";
+      const displayIcon = "icon icon-caret-up color-blue";
+      showLoading(targetClassName);
+      const rankings = await fetchRankingPlayerDonationsReceived();
+      renderLeaderboard(targetClassName, leaderboardTitle, rankings, displayIcon);
+      hideLoading(targetClassName);
     }
 
     async function fetchThisMonthClanWarStars(clanTag) {
       const baseMonth = dayjs();
       const targetClassName = 'this-month-clan-war-stars';
-      showLoaderCircle(targetClassName);
-      const rankings = await fetchRankingClanWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
-      renderRankingsClanWar(targetClassName, rankings);
-      replaceSeasonDate(targetClassName, baseMonth);
-      hideLoaderCircle(targetClassName);
+      showLoading(targetClassName);
+      const rankings = await fetchRankingClanWarStars(baseMonth.valueOf(), clanTag);
+
+      const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 순위`;
+      renderLeaderboardForClanWar(targetClassName, leaderboardTitle, rankings);
+      hideLoading(targetClassName);
     }
 
     async function fetchLastMonthClanWarStars(clanTag) {
       const baseMonth = dayjs().add(-1, 'month');
       const targetClassName = 'last-month-clan-war-stars';
-      showLoaderCircle(targetClassName);
-      const rankings = await fetchRankingClanWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
-      renderRankingsClanWar(targetClassName, rankings);
-      replaceSeasonDate(targetClassName, baseMonth);
-      hideLoaderCircle(targetClassName)
-    }
+      showLoading(targetClassName);
+      const rankings = await fetchRankingClanWarStars(baseMonth.valueOf(), clanTag);
 
-
-    function makeRankClanLeagueWarRow(rowData) {
-      const rankingRowTemplate = document.querySelector('#ranking-clan-league-war-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      const row = rankingRow.querySelector('.table-tr');
-
-      const { rank, name, clan_name, duration } = rowData;
-
-      row.innerHTML = row.innerHTML
-                         .replace(/{RANK}/, rank)
-                         .replace(/{NAME}/, name)
-                         .replace(/{CLAN_NAME}/, clan_name)
-                         .replace(/{DURATION}/, duration);
-
-      return row;
-    }
-
-    function emptyRankClanLeagueWarRow() {
-      const rankingRowTemplate = document.querySelector('#ranking-clan-league-war-empty-row-template');
-      const rankingRow = document.importNode(rankingRowTemplate.content, true);
-      return rankingRow.querySelector('.table-tr');
-    }
-    function renderRankingsClanLeagueWar(sectionClassName, players) {
-      const rankingTbody = document.querySelector(`.${sectionClassName} .table-tbody`);
-
-      // clear
-      rankingTbody.innerHTML = '';
-
-      if (!players.length) {
-        rankingTbody.appendChild(emptyRankClanLeagueWarRow());
-        return;
-      }
-
-      let rank = 1;
-      for(const player of players) {
-        const rowData = convHallOfFameRankingClanWarItem(
-            rank, player.name, player.clanName,
-            Number(player.totalStars).toLocaleString(),
-            Number(player.totalDestructionPercentage),
-            formatMinuteSecond(Number(player.avgDuration))
-        );
-        const row = makeRankClanLeagueWarRow(rowData);
-        rankingTbody.appendChild(row);
-        rank++;
-      }
+      const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 순위`;
+      renderLeaderboardForClanWar(targetClassName, leaderboardTitle, rankings);
+      hideLoading(targetClassName);
     }
 
     function getTargetElement(targetClassName) {
       return document.querySelector(`.${targetClassName}`);
     }
 
-    function showLoaderCircle(targetClassName) {
-      const targetElement = getTargetElement(targetClassName);
-      const loader = targetElement.querySelector('.loader-circle');
-      loader.classList.remove('display-none');
-      const table = targetElement.querySelector('.table');
-      table.classList.add('opacity-01');
-    }
-    function hideLoaderCircle(targetClassName) {
-      const targetElement = getTargetElement(targetClassName);
-      const loader = targetElement.querySelector('.loader-circle');
-      loader.classList.add('display-none');
-      const table = targetElement.querySelector('.table');
-      table.classList.remove('opacity-01');
+    function renderLeagueWarClans(targetClassName, rankings) {
+      // 리그전 완파클랜원이 존재하는 클랜 Set 획득
+      const clans = rankings.map(data => convertClanInfo(data)).sort((a, b) => a.order - b.order);
+      const clanMap = new Map();
+      clans.forEach(clan => clanMap.set(clan.tag, clan));
+
+      renderClans(Array.from(clanMap.values()), 'league', targetClassName);
+
+      function convertClanInfo(data) {
+        return {
+          tag:data.clanTag,
+          name:data.clanName,
+          order:data.clanOrder
+        }
+      }
     }
 
-    async function fetchThisMonthClanLeagueWar(clanTag) {
+    async function fetchThisMonthClanLeagueWar(tag) {
+      let clanTag = tag;
+      if (clanTag === 'all') clanTag = '';
+
       const baseMonth = dayjs();
       const targetClassName = 'this-month-league-war';
-      showLoaderCircle(targetClassName);
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
-      renderRankingsClanLeagueWar(targetClassName, rankings);
-      replaceSeasonDate(targetClassName, baseMonth);
-      hideLoaderCircle(targetClassName);
+      showLoading(targetClassName);
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag, 'ALL', true);
+
+      if (clanTag === '') {
+        // 리그전 완파 클랜원이 존재하는 클랜 목록 표기
+        renderLeagueWarClans(targetClassName, rankings);
+      }
+
+      const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
+      renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);
+      hideLoading(targetClassName);
     }
 
-    function replaceSeasonDate(sectionClassName, searchMonth) {
-      const seasonDateElement = document.querySelector(`.${sectionClassName} .season-date`);
-      seasonDateElement.innerHTML = searchMonth.format("YY년 M월");
-    }
+    async function fetchLastMonthClanLeagueWar(tag) {
+      let clanTag = tag;
+      if (clanTag === 'all') clanTag = '';
 
-    async function fetchLastMonthClanLeagueWar(clanTag) {
       const baseMonth = dayjs().add(-1, 'month');
       const targetClassName = 'last-month-league-war';
-      showLoaderCircle(targetClassName);
-      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.format('YYYY-MM-DD'), clanTag);
-      renderRankingsClanLeagueWar(targetClassName, rankings);
-      replaceSeasonDate(targetClassName, baseMonth);
-      hideLoaderCircle(targetClassName);
+      showLoading(targetClassName);
+
+      const rankings = await fetchRankingClanLeagueWarStars(baseMonth.valueOf(), clanTag, 'ALL', true);
+
+      if (clanTag === '') {
+        // 리그전 완파 클랜원이 존재하는 클랜 목록 표기
+        renderLeagueWarClans(targetClassName, rankings);
+      }
+
+      const leaderboardTitle = `[${formatYYM(baseMonth)}] 완파 클랜원 (총: ${rankings.length} 명)`;
+      renderLeaderboardForLeague(targetClassName, leaderboardTitle, rankings);
+      hideLoading(targetClassName);
     }
 
-    function renderClan(clan) {
+    function renderClan(clan, type = 'clan', targetClassRootName) {
       const { tag, name } = clan;
-      const radioItemTemplate = document.querySelector('#radio-item-template');
-      const radioItem = document.importNode(radioItemTemplate.content, true);
+      const radioItem = getRadioItemTemplateByType();
       const radio = radioItem.querySelector('.radio.item');
 
       radio.innerHTML = radio.innerHTML
+                             .replace(/{TYPE}/, targetClassRootName)
                              .replace(/{CLAN_TAG}/, tag)
                              .replace(/{CLAN_NAME}/, name);
 
-      const radioInputs = document.querySelector('.radio-inputs');
+      if (type === 'league') {
+        // add click event
+        const radioButton = radio.querySelector('input[type="radio"]');
+        radioButton.onclick = () => targetClassRootName.startsWith('this') ? fetchThisMonthClanLeagueWar(tag) : fetchLastMonthClanLeagueWar(tag);
+      }
+
+      const radioInputs = getRadioInputsByType(targetClassRootName);
       radioInputs.appendChild(radio);
+
+      function getRadioItemTemplateByType() {
+        if (type === 'clan')
+          return copyTemplateById('clan-war-radio-item-template');
+
+        return copyTemplateById('league-war-radio-item-template');
+      }
     }
-    function renderClans(clans) {
+
+    function getRadioInputsByType(targetClassRootName) {
+      return document.querySelector(`.${targetClassRootName} .radio-inputs`);
+    }
+
+    function renderClans(clans, type, targetClassRootName) {
+      const target = getRadioInputsByType(targetClassRootName);
+      if (target.children.length > 1) return; // 초기 구성 완료된 경우 더이상 그리지 않음
       for(const clan of clans) {
-        renderClan(clan);
+        renderClan(clan, type, targetClassRootName);
       }
     }
 
@@ -328,11 +525,20 @@
       fetchLastMonthClanWarStars(clanTag);
     }
 
-    async function fetchClanLeagueWar(type) {
-      let clanTag = type;
-      if (clanTag === 'all') clanTag = '';
-      fetchThisMonthClanLeagueWar(clanTag);
-      fetchLastMonthClanLeagueWar(clanTag);
+    function displaySections(targetClassName) {
+      const flipCards = document.querySelector('.flip-cards');
+      const sections = flipCards.querySelectorAll('.section-wrapper.sections');
+      sections.forEach(section => section.classList.add('display-none'));
+
+      if (targetClassName === 'all') {
+        sections.forEach(section => section.classList.remove('display-none'));
+        return;
+      }
+
+      const targetSection = flipCards.querySelector(`.${targetClassName}`);
+      if (targetSection) {
+        targetSection.classList.remove('display-none');
+      }
     }
 
     function swipeSection() {
@@ -340,6 +546,7 @@
       const swipeSection = document.querySelector('.section-wrapper.swipe:last-child');
       flipCards.prepend(swipeSection);
     }
+
 
     function intervalSwipeSection() {
       setInterval(() => {
@@ -351,14 +558,17 @@
       //개인 기록 부문
       fetchCurrentTrophies();
       fetchCurrentAttackWins();
+      fetchCurrentDonations();
+      fetchCurrentDonationsReceived();
 
       //클랜전 부문
-      const warClans = await fetchWarClans();
-      await renderClans(warClans);
+      const warClans = await fetchWarClans('none');
+      await renderClans(warClans, 'clan', 'clan-war');
       fetchClanWarStars('all');
 
       //리그전 부문
-      fetchClanLeagueWar('all');
+      fetchThisMonthClanLeagueWar('all');
+      fetchLastMonthClanLeagueWar('all');
 
       //습격전 부문
       fetchRaidCurrentSeason();
@@ -378,100 +588,167 @@
       <i class="fa-solid fa-medal"></i>
     </div>
 
+    <div class="support-area">
+      <div class="section-filter radio-inputs">
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('all'); return false;" checked>
+          <span class="name">전체</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('player'); return false;">
+          <span class="name">개인</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('capital'); return false;">
+          <span class="name">습격전</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('clan-war'); return false;">
+          <span class="name">클랜전</span>
+        </label>
+        <label class="radio item">
+          <input type="radio" name="radio-league" onchange="displaySections('league-war'); return false;">
+          <span class="name">리그전</span>
+        </label>
+      </div>
+    </div>
+
     <div class="flip-cards">
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections player swipe">
 
-        <div class="section-wrapper">
-          <div class="section-title">개인 기록 부문</div>
+        <div class="section-title">개인 부문</div>
 
-          <div class="section-contents">
+        <div class="section-contents">
 
-            <div class="section current-trophies">
-              <div class="sub-title">현재 트로피 순위</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">순위</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">점수</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="3">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
+          <div class="section leaderboard-wrapper trophies">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
             </div>
-
-            <div class="section current-attack-wins">
-              <div class="sub-title">현재 공성 순위</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">순위</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">점수</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="3">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
           </div>
+
+          <div class="section leaderboard-wrapper attack-wins">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="section-contents">
+
+          <div class="section leaderboard-wrapper donations">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
+            </div>
+          </div>
+
+          <div class="section leaderboard-wrapper donations-received">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections capital swipe">
+
+        <div class="section-title">습격전 부문</div>
+
+        <div class="section-contents">
+
+          <div class="section leaderboard-wrapper raid-current-season">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
+            </div>
+          </div>
+
+          <div class="section leaderboard-wrapper raid-average-season">
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="section-wrapper sections clan-war swipe">
 
         <div class="section-wrapper">
           <div class="section-title">클랜전 부문</div>
           <div class="support-area">
-            <div class="radio-inputs">
+            <div class="clan-list radio-inputs">
               <label class="radio item">
-                <input type="radio" name="radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
+                <input type="radio" name="clan-war-radio-clan" onchange="fetchClanWarStars('all'); return false;" checked>
                 <span class="name">전체</span>
               </label>
             </div>
@@ -479,77 +756,37 @@
 
           <div class="section-contents">
 
-            <div class="section this-month-clan-war-stars">
-              <div class="sub-title">[<span class="season-date">이번달</span>] 완파 순위</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">순위</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">총 획득별</th>
-                    <th class="table-th">총 파괴율<br/>평균 완파시간</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="4">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
+            <div class="section leaderboard-wrapper this-month-clan-war-stars">
+              <div class="loader-circle display-none">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+                <div class="bar4"></div>
+                <div class="bar5"></div>
+                <div class="bar6"></div>
+                <div class="bar7"></div>
+                <div class="bar8"></div>
+                <div class="bar9"></div>
+                <div class="bar10"></div>
+                <div class="bar11"></div>
+                <div class="bar12"></div>
               </div>
             </div>
 
-            <div class="section last-month-clan-war-stars">
-              <div class="sub-title">[<span class="season-date">지난달</span>] 완파 순위</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">순위</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">총 획득별</th>
-                    <th class="table-th">총 파괴율<br/>평균 완파시간</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="4">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
+            <div class="section leaderboard-wrapper last-month-clan-war-stars">
+              <div class="loader-circle display-none">
+                <div class="bar1"></div>
+                <div class="bar2"></div>
+                <div class="bar3"></div>
+                <div class="bar4"></div>
+                <div class="bar5"></div>
+                <div class="bar6"></div>
+                <div class="bar7"></div>
+                <div class="bar8"></div>
+                <div class="bar9"></div>
+                <div class="bar10"></div>
+                <div class="bar11"></div>
+                <div class="bar12"></div>
               </div>
             </div>
 
@@ -558,171 +795,66 @@
 
       </div>
 
-      <div class="section-wrapper swipe">
+      <div class="section-wrapper sections league-war swipe">
 
-        <div class="section-wrapper">
-          <div class="section-title">리그전 부문</div>
-
-          <div class="section-contents">
-
-            <div class="section this-month-league-war">
-              <div class="sub-title">[<span class="season-date">현재 시즌</span>] 완파 클랜원</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">No</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">클랜</th>
-                    <th class="table-th">평균 완파시간</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="4">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div class="section last-month-league-war">
-              <div class="sub-title">[<span class="season-date">지난 시즌</span>] 완파 클랜원</div>
-              <div class="rankings">
-                <table class="table">
-                  <caption>
-                    <div class="loader-circle display-none">
-                      <div class="bar1"></div>
-                      <div class="bar2"></div>
-                      <div class="bar3"></div>
-                      <div class="bar4"></div>
-                      <div class="bar5"></div>
-                      <div class="bar6"></div>
-                      <div class="bar7"></div>
-                      <div class="bar8"></div>
-                      <div class="bar9"></div>
-                      <div class="bar10"></div>
-                      <div class="bar11"></div>
-                      <div class="bar12"></div>
-                    </div>
-                  </caption>
-                  <thead>
-                  <tr class="table-tr">
-                    <th class="table-th">No</th>
-                    <th class="table-th">이름</th>
-                    <th class="table-th">클랜</th>
-                    <th class="table-th">평균 완파시간</th>
-                  </tr>
-                  </thead>
-                  <tbody class="table-tbody">
-                  <tr class="table-tr">
-                    <td class="table-td empty" colspan="4">데이터 수집중</td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <div class="section-wrapper swipe">
-        <div class="section-title">습격전 부문</div>
+        <div class="section-title">리그전 부문</div>
 
         <div class="section-contents">
 
-          <div class="section raid-current-season">
-            <div class="sub-title">현재 시즌 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">점수</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="3">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
+          <div class="section leaderboard-wrapper this-month-league-war">
+            <div class="support-area">
+              <div class="league-clan-list radio-inputs">
+                <label class="radio item">
+                  <input type="radio" name="this-month-league-war-radio-clan" onchange="fetchThisMonthClanLeagueWar('all'); return false;" checked>
+                  <span class="name">전체</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
             </div>
           </div>
 
+          <div class="section leaderboard-wrapper last-month-league-war">
+            <div class="support-area">
+              <div class="league-clan-list radio-inputs">
+                <label class="radio item">
+                  <input type="radio" name="last-month-league-war-radio-clan" onchange="fetchLastMonthClanLeagueWar('all'); return false;" checked>
+                  <span class="name">전체</span>
+                </label>
+              </div>
+            </div>
 
-          <div class="section raid-average-season">
-            <div class="sub-title">최근 3주 평균 순위</div>
-            <div class="rankings">
-              <table class="table">
-                <caption>
-                  <div class="loader-circle display-none">
-                    <div class="bar1"></div>
-                    <div class="bar2"></div>
-                    <div class="bar3"></div>
-                    <div class="bar4"></div>
-                    <div class="bar5"></div>
-                    <div class="bar6"></div>
-                    <div class="bar7"></div>
-                    <div class="bar8"></div>
-                    <div class="bar9"></div>
-                    <div class="bar10"></div>
-                    <div class="bar11"></div>
-                    <div class="bar12"></div>
-                  </div>
-                </caption>
-                <thead>
-                <tr class="table-tr">
-                  <th class="table-th">순위</th>
-                  <th class="table-th">이름</th>
-                  <th class="table-th">점수</th>
-                </tr>
-                </thead>
-                <tbody class="table-tbody">
-                <tr class="table-tr">
-                  <td class="table-td empty" colspan="3">데이터 수집중</td>
-                </tr>
-                </tbody>
-              </table>
+            <div class="loader-circle display-none">
+              <div class="bar1"></div>
+              <div class="bar2"></div>
+              <div class="bar3"></div>
+              <div class="bar4"></div>
+              <div class="bar5"></div>
+              <div class="bar6"></div>
+              <div class="bar7"></div>
+              <div class="bar8"></div>
+              <div class="bar9"></div>
+              <div class="bar10"></div>
+              <div class="bar11"></div>
+              <div class="bar12"></div>
             </div>
           </div>
 
         </div>
+
       </div>
 
     </div>
@@ -757,23 +889,131 @@
 <template id="ranking-third-place-template">
   <i class="fa-solid fa-medal third-place"></i>
 </template>
-<template id="ranking-clan-league-war-empty-row-template">
-  <tr class="table-tr">
-    <td class="table-td empty" colspan="4">데이터 수집중</td>
-  </tr>
-</template>
-<template id="ranking-clan-league-war-row-template">
-  <tr class="table-tr">
-    <td class="table-td rank"><div class="td-wrap">{RANK}</div></td>
-    <td class="table-td name"><div class="td-wrap">{NAME}</div></td>
-    <td class="table-td"><div class="chip bg-crimson">{CLAN_NAME}</div></td>
-    <td class="table-td"><div class="td-wrap"><div class="icon-clock"></div>{DURATION}</div></td>
-  </tr>
-</template>
-<template id="radio-item-template">
+<template id="clan-war-radio-item-template">
   <label class="radio item">
-    <input type="radio" name="radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
+    <input type="radio" name="{TYPE}-radio-clan" onchange="fetchClanWarStars('{CLAN_TAG}'); return false;">
     <span class="name">{CLAN_NAME}</span>
   </label>
+</template>
+<template id="league-war-radio-item-template">
+  <label class="radio item">
+    <input type="radio" name="{TYPE}-radio-clan">
+    <span class="name">{CLAN_NAME}</span>
+  </label>
+</template>
+
+
+<template id="leaderboard-template">
+
+  <div class="leaderboard">
+    <h2 class="leaderboard-title">{LEADERBOARD_TITLE}</h2>
+    <div class="top-3"></div>
+    <ul class="other-players"></ul>
+  </div>
+
+</template>
+<template id="leaderboard-top-player-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="score"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div>
+  </div>
+</template>
+<template id="leaderboard-player-template">
+  <li class="player">
+    <span class="rank">{RANK}th</span>
+    <span class="name">{NAME}</span>
+    <div class="score"><div class="{ICON_CLASS_NAME}"></div>{SCORE}</div>
+  </li>
+</template>
+<template id="leaderboard-top-player-donation-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="info">
+      <div class="score"><div class="icon Barbarian"></div>{TROOP_COUNT}</div>
+      <div class="score column">
+        <div class="percentages">
+          <div class="score"><div class="icon LightningSpell"></div>{SPELL_COUNT}</div>
+        </div>
+        <div class="durations">
+          <div class="score"><div class="icon WallWrecker"></div>{SIEGE_COUNT}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="leaderboard-player-donation-template">
+  <li class="player with-row">
+    <div class="row">
+      <span class="rank">{RANK}th</span>
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="row">
+      <div class="score"><div class="icon Barbarian"></div>{TROOP_COUNT}</div>
+      <div class="score"><div class="score icon LightningSpell"></div>{SPELL_COUNT}</div>
+      <div class="score"><div class="score icon WallWrecker"></div>{SIEGE_COUNT}</div>
+    </div>
+  </li>
+</template>
+<template id="leaderboard-top-player-clan-war-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="info">
+      <div class="score"><i class="icon fa-solid fa-star"></i>{STARS}</div>
+      <div class="score column">
+        <div class="percentages">
+          <div class="score"><div class="icon icon-damage"></div>{PERCENTAGES} %</div>
+        </div>
+        <div class="durations">
+          <div class="score"><div class="icon icon-clock"></div>{DURATION}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="leaderboard-player-clan-war-template">
+  <li class="player with-row">
+    <div class="row">
+      <span class="rank">{RANK}th</span>
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="row">
+      <div class="score"><i class="icon fa-solid fa-star"></i>{STARS}</div>
+      <div class="score"><div class="score icon icon-damage"></div>{PERCENTAGES} %</div>
+      <div class="score"><div class="score icon icon-clock"></div>{DURATION}</div>
+    </div>
+  </li>
+</template>
+<template id="leaderboard-top-player-league-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="score"><div class="icon icon-clock"></div>{DURATION}</div>
+  </div>
+</template>
+<template id="leaderboard-player-league-template">
+  <li class="player">
+    <span class="rank">{RANK}th</span>
+    <span class="name">{NAME}</span>
+    <div class="score"><div class="icon icon-clock"></div>{DURATION}</div>
+  </li>
 </template>
 </html>

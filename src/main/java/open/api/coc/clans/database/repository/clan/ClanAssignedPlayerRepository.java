@@ -2,14 +2,14 @@ package open.api.coc.clans.database.repository.clan;
 
 import java.util.List;
 import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerEntity;
-import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPKEntity;
+import open.api.coc.clans.database.entity.clan.ClanAssignedPlayerPK;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClanAssignedPlayerRepository extends JpaRepository<ClanAssignedPlayerEntity, ClanAssignedPlayerPKEntity> {
+public interface ClanAssignedPlayerRepository extends JpaRepository<ClanAssignedPlayerEntity, ClanAssignedPlayerPK> {
 
     @Query("select max(cap.id.seasonDate) from ClanAssignedPlayerEntity cap")
     String findLatestSeasonDate();

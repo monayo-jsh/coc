@@ -1,7 +1,9 @@
 package open.api.coc.external.coc.clan.domain.common;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.common.ExceptionCode;
@@ -10,7 +12,8 @@ import org.springframework.util.StringUtils;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class IconUrl {
 
     @Schema(description = "아주 작은 아이콘 경로")

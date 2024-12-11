@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="stylesheet" href="/static/css/common.css" />
-  <link rel="stylesheet" href="/static/css/button.css" />
-  <link rel="stylesheet" href="/static/css/townhall.css" />
-  <link rel="stylesheet" href="/static/css/card.css" />
-  <link rel="stylesheet" href="/static/css/loader.css" />
-  <link rel="stylesheet" href="/static/css/clan/war.css" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/button.css" />
+  <link rel="stylesheet" href="/css/townhall.css" />
+  <link rel="stylesheet" href="/css/card.css" />
+  <link rel="stylesheet" href="/css/loader.css" />
+  <link rel="stylesheet" href="/css/clan/war.css" />
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -22,13 +22,14 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="/static/js/common.js"></script>
+  <script src="/js/common.js"></script>
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
-  <script src="/static/js/api/clanWar.js"></script>
-  <script src="/static/js/util.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/clanWar.js"></script>
+  <script src="/js/util.js"></script>
   <script type="text/javascript">
 
     function refreshWarStatus(element) {
@@ -42,18 +43,32 @@
 
       const clanWarContent = cardContentsElement.querySelector('.clan-war');
 
+      const { clanTag, clanName } = clanWarContent.dataset
       const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
       const clanWarContents = templateClanWar.querySelector('.card-contents');
 
       clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                 .replace(/{CLAN_TAG}/, clanWarContent.dataset.clanTag)
-                                                 .replace(/{CLAN_NAME}/g, clanWarContent.dataset.clanName);
+                                                 .replace(/{CLAN_TAG}/, clanTag)
+                                                 .replace(/{CLAN_NAME}/g, clanName);
 
-      settingClanWar(clanWarContents, clanWarContent.dataset.clanTag)
+      const missingAttackTable = document.querySelector('.section.missing-attack .table');
+      // 갱신 대상 클랜 미공 현황 제거
+      for (const tbody of missingAttackTable.tBodies) {
+        const { tag } = tbody.dataset;
+        if (tag === clanTag) {
+          missingAttackTable.removeChild(tbody);
+          break;
+        }
+      }
+
+      settingClanWar(clanWarContents, clanTag)
       .then(() => {
         cardContentsElement.innerHTML = clanWarContents.innerHTML;
         loader.classList.add('display-none');
         cardContentsElement.classList.remove('opacity-01');
+
+        // 미공 현황 재정렬
+        sortedMissingAttackTableTbody();
       });
 
     }
@@ -271,24 +286,25 @@
       if (!drawState.has(state)) return;
 
       let formattedRemainTime = getLeftUntilByTime(endTime);
-      if (!formattedRemainTime) {
+      if (formattedRemainTime.seconds() === 0) {
         formattedRemainTime = '전쟁 종료';
       } else {
         formattedRemainTime = formatTime(formattedRemainTime, "H시 mm분");
       }
 
       const clanData = ClanWarMap.get(clan.tag);
-      const forcedParticipatePlayers = await fetchClanWarMembers(clan.tag, startTime, 'N');
+      const forcedParticipatePlayers = await fetchClanWarParticipants(clan.tag, startTime, 'N');
       const forcedParticipatePlayersSet = new Set(forcedParticipatePlayers.map(player => player.tag))
 
       const tableTbodyTemplate = copyTemplateById('table-tbody-template');
       const tableTbody = tableTbodyTemplate.querySelector('.table-tbody');
 
+      tableTbody.dataset.tag = clanData.tag;
       tableTbody.dataset.name = clanData.name;
       tableTbody.dataset.order = clanData.order;
 
       for (const member of clan.members) {
-        const { tag, name, attacks } = member;
+        const { tag, name, townHallLevel, attacks } = member;
         const isForcedParticipatePlayer = forcedParticipatePlayersSet.has(tag);
 
         if (attacks.length < attacksPerMember) {
@@ -296,7 +312,8 @@
             clan_name: clan.name,
             player_tag: tag,
             player_name: name,
-            remain_time: formattedRemainTime
+            remain_time: formattedRemainTime,
+            town_hall_level: townHallLevel,
           });
 
           if (!isForcedParticipatePlayer) {
@@ -343,9 +360,10 @@
       const memberNotAttackRowTemplate = copyTemplateById('member-not-attack-row-template');
       const memberNotAttackRow = memberNotAttackRowTemplate.querySelector('.row');
 
-      const { clan_name, player_tag, player_name, remain_time } = row;
+      const { clan_name, player_tag, player_name, remain_time, town_hall_level } = row;
 
       memberNotAttackRow.innerHTML = memberNotAttackRow.innerHTML
+                                                       .replace(/{TOWN_HALL_LEVEL}/, town_hall_level)
                                                        .replace(/{NAME}/, player_name)
                                                        .replace(/{TAG}/, player_tag)
                                                        .replace(/{CLAN_NAME}/, clan_name)
@@ -358,12 +376,15 @@
       const uri = `/clans/${encodeURIComponent(clanTag)}/current/war`
 
       await axios.get(uri)
-                 .then((response) => {
+                 .then(async (response) => {
                    const { data } = response;
                    const { clan, opponent, startTime, endTime, state, battleModifier, teamSize, attacksPerMember } = data
 
                    const totalTownhallCount = teamSize * 1;
                    const totalStarCount = teamSize * 3;
+
+                   // 준비중일땐 시작시간까지, 전쟁중일땐 종료시간까지
+                   const warRemainHourMinutes = formatWarRemainHourMinute(state === 'preparation' ? startTime : endTime);
 
                    clanWarContentsElement.innerHTML = clanWarContentsElement.innerHTML
                                                                             .replace(/{BATTLE_TYPE_COLOR}/g, getBgColorByBattleType(battleModifier))
@@ -377,7 +398,7 @@
                                                                             .replace(/{CLAN_AVERAGE_DURATION}/, calcAverageDuration(clan))
                                                                             .replace(/{CLAN_REMAIN_HALL}/, getRemainHall(opponent, teamSize))
                                                                             .replace(/{CLAN_TOTAL_HALL}/, totalTownhallCount)
-                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, formatWarRemainHourMinute(endTime))
+                                                                            .replace(/{WAR_REMAIN_HOUR_MINUTE}/, warRemainHourMinutes)
                                                                             .replace(/{WAR_STATE}/, convWarState(state))
                                                                             .replace(/{OPPONENT_NAME}/, opponent.name ? opponent.name : "정보 없음")
                                                                             .replace(/{OPPONENT_STAR_COUNT}/, opponent.stars)
@@ -405,7 +426,7 @@
 
                    settingTooltips(clanWarContentsElement);
 
-                   drawReportClanWarMissingAttack(data);
+                   await drawReportClanWarMissingAttack(data);
                  })
                  .catch((error) => {
                    console.error(error);
@@ -436,8 +457,7 @@
 
     function getUriForClanWarViewType() {
       const urlSearchParams = new URLSearchParams(location.search);
-      const viewType = urlSearchParams.get('type');
-      return `/clans/war?view=${viewType}`;
+      return urlSearchParams.get('type');
     }
 
     let clanWarSize = -1;
@@ -448,51 +468,49 @@
     function getClans() {
       showWifiLoading('.card-container');
 
-      const uri = getUriForClanWarViewType();
-      axios.get(uri)
-           .then((response) => {
-             const { data } = response;
+      const warType = getUriForClanWarViewType();
+      fetchWarClans(warType)
+      .then((clans) => {
+        if (!clans || !clans.length) {
+          hideWifiLoading('.card-container');
+          const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
+          clanWarCard.classList.add('display-none');
+          const clanWarEmptyCard = document.querySelector('.empty-clan');
+          clanWarEmptyCard.classList.remove('display-none');
+          return;
+        }
 
-             if (!data || !data.length) {
-               hideWifiLoading('.card-container');
-               const clanWarCard = document.querySelector('.card-wrapper:not(.empty-clan)');
-               clanWarCard.classList.add('display-none');
-               const clanWarEmptyCard = document.querySelector('.empty-clan');
-               clanWarEmptyCard.classList.remove('display-none');
-               return;
-             }
+        clanWarSize = clans.length;
 
-             clanWarSize = data.length;
+        clans.forEach(clan => ClanWarMap.set(clan.tag, clan));
 
-             data.forEach(clan => ClanWarMap.set(clan.tag, clan));
+        const carousel = document.querySelector(".carousel");
+        for (const clan of clans) {
+          const { tag, name } = clan;
 
-             const carousel = document.querySelector(".carousel");
-             for (let index = 0; index<data.length; index++) {
-               const { tag, name } = data[index];
+          const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
+          const clanWarContents = templateClanWar.querySelector('.card-contents');
 
-               const templateClanWar = document.importNode(document.getElementById('section-clan-war').content, true);
-               const clanWarContents = templateClanWar.querySelector('.card-contents');
+          clanWarContents.classList.add('display-none');
+          clanWarContents.innerHTML = clanWarContents.innerHTML
+                                                     .replace(/{CLAN_TAG}/, tag)
+                                                     .replace(/{CLAN_NAME}/g, name);
 
-               clanWarContents.classList.add('display-none');
-               clanWarContents.innerHTML = clanWarContents.innerHTML
-                                                          .replace(/{CLAN_TAG}/, tag)
-                                                          .replace(/{CLAN_NAME}/g, name);
+          settingClanWar(clanWarContents, tag)
+          .then(() => {
+            clanWarContents.classList.remove('display-none');
+            complatedDrawClanWarSet.add(tag);
+          });
 
-               settingClanWar(clanWarContents, tag)
-               .then(() => {
-                 clanWarContents.classList.remove('display-none');
-                 complatedDrawClanWarSet.add(tag);
-               });
+          carousel.appendChild(templateClanWar);
+        }
 
-               carousel.appendChild(templateClanWar);
-             }
-
-             //initCardSlide();
-             hideWifiLoading('.card-container');
-           })
-           .catch((error) => {
-             console.error(error);
-           });
+        //initCardSlide();
+        hideWifiLoading('.card-container');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     }
 
     function switchAttacks(element) {
@@ -814,9 +832,11 @@
 <template id="member-not-attack-row-template">
   <tr class="table-tr row">
     <td class="table-td name" rowspan=1>
-      {NAME}
-      <br/>
-      <div class="chips">
+      <div class="td-wrap display-flex align-items-center justify-content-center">
+        <div class="town-hall th{TOWN_HALL_LEVEL} w-25 h-25"></div>
+        {NAME}
+      </div>
+      <div class="chips mt-5">
         <span class="chip border-none">{TAG}</span>
         <span class="forced-participate chip border-none bg-orange">강참</span>
       </div>

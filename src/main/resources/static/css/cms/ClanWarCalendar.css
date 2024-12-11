@@ -103,6 +103,13 @@
 .clan-war-detail-wrap {
   width: 100%;
   max-width: 530px;
+
+  .clan-list.radio-inputs {
+    max-width: 530px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
 }
 
 .icon-damage {

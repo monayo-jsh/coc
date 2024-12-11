@@ -1,27 +1,30 @@
-const URI_WAR_CLANS = "/clans/war"; //클랜전 진행 클랜 목록 조회
-const URI_CAPITAL_CLANS = "/clans/capital"; //습격전 클랜 목록 조회
+const PREFIX_CLAN_API = '/api/clans'; // 클랜 API
 
-const URL_WAR_LEAGUE_CLANS = "/clans/war/league"; //리그전 진행 클랜 목록 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE = "/clans/{clanTag}/current/war/league"; //클랜 진행중인 리그전 조회
 const URL_CLAN_CURRENT_WAR_LEAGUE_ROUND = "/clans/war/league/{warTag}"; //클랜 리그전 전쟁 정보 조회
 
-const URI_CLANS = '/clans'; //전체 클랜 목록 조회
-const URI_CLANS_ONE = '/clans/{clanTag}'; //클랜 조회,생성
+const URI_CLAN = `${PREFIX_CLAN_API}`; //클랜 목록 조회
+const URI_CLAN_REGISTER = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 등록
+const URI_CLAN_DELETE = `${PREFIX_CLAN_API}/{clanTag}`; //클랜 삭제
 
-const URI_CLAN_DETAIL = '/clans/detail'; //클랜 상세 조회
-const URI_CLAN_MEMBERS = '/clans/members' //클랜 멤버 조회
+const URI_CLAN_CONTENT_ACTIVATION = `${PREFIX_CLAN_API}/{clanTag}/content` // 클랜 컨텐츠 활성화 수정
 
+const URI_CLAN_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/external`; //클랜 상세 조회 (OPEN API)
+const URI_CLAN_MEMBERS_EXTERNAL = `${PREFIX_CLAN_API}/{clanTag}/members/external` //클랜 멤버 조회 (OPEN API)
+
+const URI_LATEST_CLAN_ASSIGNED_DATE = `/api/clan/assign/latest-month` //최신 클랜 배정 날짜 조회
 const URI_LATEST_CLAN_ASSIGNED_MEMBERS = `/clans/assigned/members/latest` //최신 클랜 배정 멤버 목록 조회
 const URI_CLAN_ASSIGNED_MEMBERS = `/clans/{clanTag}/assigned/members` //클랜 배정 멤버 조회
 const URI_CLAN_ASSIGNED_MEMBER = `/clans/{clanTag}/assigned/{seasonDate}/{playerTag}` //클랜 배정 멤버 삭제
 const URI_CLAN_ASSIGNED_MEMBER_BULK = `/clans/assigned/members` //클랜 일괄 배정
 
+const URI_LATEST_LEAGUE_ASSIGNED_DATE = `/clans/league/assigned/latest` //최신 리그 배정 날짜 조회
 const URI_LATEST_LEAGUE_ASSIGNED_MEMBERS = `/clans/league/assigned/members/latest` //최신 리그 배정 멤버 목록 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBERS = `/clans/{clanTag}/league/assigned/members` //리그 배정 멤버 조회
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER = `/clans/{clanTag}/league/assigned/{seasonDate}/{playerTag}` //리그 배정 멤버 삭제
 const URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK = `/clans/league/assigned/members` //리그 일괄 배정
 
-const URI_CLAN_CONTENT = '/clans/content' //클랜 컨텐츠 업데이트
+const URL_CLAN_GAME_LATEST = `/api/clan/game/latest`; // 최근 클랜 게임 목록 조회
 
 function divideClanArray(array, size) {
   if (array.length === 1) return [array];
@@ -33,10 +36,10 @@ function divideClanArray(array, size) {
   return result;
 }
 
-async function registerClan(requestBody) {
-  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(requestBody.tag));
+async function registerClan(clanTag) {
+  const uri = URI_CLAN_REGISTER.replace(/{clanTag}/, encodeURIComponent(clanTag));
 
-  return await axios.post(uri, requestBody)
+  return await axios.post(uri)
                     .then((response) => {
                       alert('등록 되었습니다.');
 
@@ -57,8 +60,12 @@ async function registerClan(requestBody) {
                     });
 }
 
-async function fetchClan(clanTag) {
-  const uri = URI_CLANS_ONE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+function makeClanDetailURI(clanTag) {
+  return URI_CLAN_EXTERNAL.replace(/{clanTag}/, encodeURIComponent(clanTag));
+}
+
+async function fetchClanDetailFromExternal(clanTag) {
+  const uri = makeClanDetailURI(clanTag)
 
   return await axios.get(uri)
                     .then((response) => {
@@ -72,7 +79,8 @@ async function fetchClan(clanTag) {
 }
 
 async function deleteClan(clanTag) {
-  const uri = `${URI_CLANS}/${encodeURIComponent(clanTag)}`
+  const uri = URI_CLAN_DELETE.replace(/{clanTag}/, encodeURIComponent(clanTag));
+
   return await axios.delete(uri)
                     .then((response) => {
                       alert('삭제 되었습니다.');
@@ -92,8 +100,10 @@ async function deleteClan(clanTag) {
                     });
 }
 
-async function updateClanContent(requestBody) {
-  return await axios.put(URI_CLAN_CONTENT, requestBody)
+async function updateClanContent(clanTag, requestBody) {
+  const uri = URI_CLAN_CONTENT_ACTIVATION.replace(/{clanTag}/, encodeURIComponent(clanTag))
+
+  return await axios.put(uri, requestBody)
                     .then((response) => {
                       alert('처리 되었습니다.');
                       return true;
@@ -114,7 +124,7 @@ async function updateClanContent(requestBody) {
 
 async function fetchClans() {
   // 전체 클랜 조회
-  return axios.get(URI_CLANS)
+  return axios.get(URI_CLAN)
               .then((response) => {
                 const { data } = response
                 if (!data) {
@@ -129,63 +139,43 @@ async function fetchClans() {
               });
 }
 
-function makeClanDetailRequest(clans) {
-  const uri = `${URI_CLAN_DETAIL}?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
+function makeClanDetailRequest(clan) {
+  const uri = makeClanDetailURI(clan.tag);
   return axios.get(uri);
 }
 
-async function fetchClansFromExternal(clans) {
-  const requests = divideClanArray(clans, clans.length/3).map(makeClanDetailRequest);
+async function fetchClanDetailsFromExternal(clans) {
+  const requests = clans.map(makeClanDetailRequest);
 
   let results = [];
+
   // 클랜 상세 조회
-  return axios.all(requests)
-              .then((responses) => {
-                responses.forEach((response) => {
-
-                  const { data } = response;
-                  data.forEach((response) => {
-                    results = results.concat(response);
-                  })
-                });
-
-                return results;
-              })
-              .catch((error) => {
-                console.error(error);
-                return clans;
-              });
-}
-
-function makeClanMemberRequest(clans) {
-  const uri = `${URI_CLAN_MEMBERS}?clanTags=${encodeURIComponent(clans.map(clan => clan.tag))}`;
-  return axios.get(uri);
-}
-
-async function fetchClanMembers(clans) {
-  const requests = divideClanArray(clans, clans.length/2).map(makeClanMemberRequest);
-
-  let allClanMembers = [];
   await axios.all(requests)
              .then((responses) => {
                responses.forEach((response) => {
-
                  const { data } = response;
-                 data.forEach((response) => {
-                   const { clanTag, members } = response
-                   if (members) {
-                     // concat member
-                     allClanMembers = allClanMembers.concat(members);
-                   }
-                 })
-
+                 results.push(data);
                });
              })
              .catch((error) => {
                console.error(error);
-             })
+             });
 
-  return allClanMembers;
+  return results
+}
+
+async function fetchClanMembers(clanTag) {
+  const uri = URI_CLAN_MEMBERS_EXTERNAL.replace(/{clanTag}/, encodeURIComponent(clanTag));
+
+  return await axios.get(uri)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    })
 }
 
 async function fetchClanAssignedMembers(clanTag) {
@@ -266,6 +256,18 @@ async function deleteAssignedMember(clanTag, seasonDate, playerTag) {
                     });
 }
 
+async function latestClanAssignedDate() {
+  return await axios.get(URI_LATEST_CLAN_ASSIGNED_DATE)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return null;
+                    });
+}
+
 async function latestClanAssignedMembers() {
   return await axios.get(URI_LATEST_CLAN_ASSIGNED_MEMBERS)
                     .then((response) => {
@@ -274,10 +276,9 @@ async function latestClanAssignedMembers() {
                     })
                     .catch((error) => {
                       console.error(error);
-                      return [];
+                      return {};
                     });
 }
-
 
 async function fetchClanLeagueAssignedMembers(clanTag) {
   const URI = URI_CLAN_LEAGUE_ASSIGNED_MEMBERS.replace(/{clanTag}/, encodeURIComponent(clanTag));
@@ -289,6 +290,18 @@ async function fetchClanLeagueAssignedMembers(clanTag) {
                     .catch((error) => {
                       console.error(error);
                       return [];
+                    });
+}
+
+async function latestLeagueAssignedDate() {
+  return await axios.get(URI_LATEST_LEAGUE_ASSIGNED_DATE)
+                    .then((response) => {
+                      const { data } = response;
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return null;
                     });
 }
 
@@ -369,8 +382,32 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
                     });
 }
 
-async function fetchWarClans() {
-  return await axios.get(URI_WAR_CLANS)
+async function fetchWarClans(warType = "none") {
+  const option = {
+    params: {
+      type: warType
+    }
+  }
+
+  return await axios.get(URI_CLAN, option)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error)
+                      return [];
+                    });
+}
+
+async function fetchCompetitionClans() {
+  const option = {
+    params: {
+      type: 'competition'
+    }
+  }
+
+  return await axios.get(URI_CLAN, option)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -382,7 +419,13 @@ async function fetchWarClans() {
 }
 
 async function fetchCapitalClans() {
-  return await axios.get(URI_CAPITAL_CLANS)
+  const option = {
+    params: {
+      type: 'capital'
+    }
+  }
+
+  return await axios.get(URI_CLAN, option)
                     .then((response) => {
                       const { data } = response
                       return data;
@@ -391,18 +434,6 @@ async function fetchCapitalClans() {
                       console.error(error)
                       return [];
                     });
-}
-
-async function fetchWarLeagueClans() {
-  return axios.get(URL_WAR_LEAGUE_CLANS)
-              .then((response) => {
-                const { data } = response
-                return data;
-              })
-              .catch((error) => {
-                console.error(error)
-                return [];
-              });
 }
 
 async function fetchClanWarLeague(clanTag) {
@@ -441,5 +472,19 @@ async function fetchCurrentWarLeagueRound(warTags, clanTag, season) {
               .catch((error) => {
                 console.error(error)
                 return [];
+              });
+}
+
+
+async function fetchLatestClanGame() {
+  // 전체 클랜 조회
+  return axios.get(URL_CLAN_GAME_LATEST)
+              .then((response) => {
+                const { data } = response
+                return data;
+              })
+              .catch((error) => {
+                console.error(error);
+                return {};
               });
 }

@@ -6,23 +6,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
-  <link rel="stylesheet" href="/static/css/common.css" />
-  <link rel="stylesheet" href="/static/css/button.css" />
-  <link rel="stylesheet" href="/static/css/loader.css" />
-  <link rel="stylesheet" href="/static/css/clan/member.css" />
-  <link rel="stylesheet" href="/static/css/townhall.css" />
-  <link rel="stylesheet" href="/static/css/hero.css" />
-  <link rel="stylesheet" href="/static/css/heroEquipment.css" />
-  <link rel="stylesheet" href="/static/css/pet.css" />
-  <link rel="stylesheet" href="/static/css/siegemachine.css" />
-  <link rel="stylesheet" href="/static/css/spell.css" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/button.css" />
+  <link rel="stylesheet" href="/css/loader.css" />
+  <link rel="stylesheet" href="/css/clan/member.css" />
+  <link rel="stylesheet" href="/css/townhall.css" />
+  <link rel="stylesheet" href="/css/hero.css" />
+  <link rel="stylesheet" href="/css/heroEquipment.css" />
+  <link rel="stylesheet" href="/css/pet.css" />
+  <link rel="stylesheet" href="/css/siegemachine.css" />
+  <link rel="stylesheet" href="/css/spell.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/league.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/player.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -206,7 +206,7 @@
     }
 
     function renderHero(memberHtml, hero) {
-      const { name, level, maxLevel, village, equipments } = hero;
+      const { name, koreanName, level, maxLevel, village, equipments } = hero;
 
       // 본 마을 영웅만 표기
       if (village !== 'home') return;
@@ -224,6 +224,9 @@
                                          .replace(/{LEVEL}/, level)
                                          .replace(/{IS_MAX}/, level === maxLevel ? 'is-max' : '');
 
+      // hero name set
+      heroElement.dataset.name = koreanName ? koreanName : name;
+
       heroesElement.appendChild(heroElement);
 
       if (equipments) {
@@ -235,7 +238,7 @@
       const { heroes } = player
       if (!heroes) return;
 
-      for (const hero of heroes) {
+      for (const hero of sortedByCode(heroes)) {
         renderHero(memberHtml, hero);
       }
     }
@@ -245,7 +248,9 @@
       const { heroEquipments } = player
       if (!heroEquipments || !heroEquipments.length) return;
 
-      const heroEquipmentMap = convertArrayToMapByKey(heroEquipments, 'heroName', true);
+      const sortedByHeroCode = heroEquipments.sort((a, b) => a.heroCode - b.heroCode)
+
+      const heroEquipmentMap = convertArrayToMapByKey(sortedByHeroCode, 'heroName', true);
 
       const innerSectionGroupTemplate = document.querySelector('#inner-section-group');
 
@@ -254,7 +259,7 @@
 
       for (const [key, value] of heroEquipmentMap) {
         const sortedEquipments = value.sort((a, b) => b.code - a.code);
-        renderHeroEquipment(innerSectionGroupElement, key, sortedEquipments);
+        renderHeroEquipment(innerSectionGroupElement, convertHeroKoreanName(key), sortedEquipments);
       }
 
       const cardBackElement = memberHtml.querySelector('.card-back .inner-content');
@@ -500,7 +505,7 @@
       const templateMember = document.importNode(memberTemplate.content, true);
       const memberHtml = templateMember.querySelector('.member');
 
-      const { displayName, name, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
+      const { displayName, name, nickname, tag, role, townHallLevel, expLevel, heroTotalLevel, heroTotalMaxLevel, league, trophies, donations, donationsReceived } = player
 
       memberHtml.dataset.tag = tag;
       memberHtml.dataset.name = name;
@@ -510,8 +515,14 @@
       if (displayName) writeName += displayName;
       else writeName += name;
 
+      let displayNickname = nickname;
+      if (!displayNickname) {
+        displayNickname = "닉네임 설정";
+      }
+
       memberHtml.innerHTML = memberHtml.innerHTML
                                        .replace(/{NAME}/g, writeName)
+                                       .replace(/{NICKNAME}/g, displayNickname)
                                        .replace(/{TROPHIES}/g, trophies)
                                        .replace(/{TOWN_HALL_LEVEL}/g, townHallLevel)
                                        .replace(/{EXP_LEVEL}/g, expLevel)
@@ -643,6 +654,23 @@
       });
     }
 
+    function changeNickname(element) {
+      const nickname = prompt('설정할 닉네임을 입력해주세요.\n(설정한 닉네임은 사용자 조회 기능으로 제공 예정)', '');
+
+      if (!nickname) return;
+
+      const memberCard = element.closest('.member.row');
+      const { tag } = memberCard.dataset;
+
+      updatePlayerNickname(tag, nickname)
+      .then((isResult) => {
+        if (isResult) {
+          // 변경 성공한 닉네임으로 재설정
+          element.innerHTML = nickname;
+        }
+      });
+    }
+
     let latestClanAssignedPlayerObj = {}
     let latestLeagueAssignedPlayerObj = {}
     window.onload = async () => {
@@ -740,7 +768,10 @@
 
       <div class="layout-title">
         <div class="cell">
-          <div class="user chip">{NAME}</div>
+          <div class="user">
+            <div class="name chip">{NAME}</div>
+            <div class="nickname chip cursor-pointer" onclick="changeNickname(this);">{NICKNAME}</div>
+          </div>
           <div class="player-labels">
           </div>
         </div>

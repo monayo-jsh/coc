@@ -7,7 +7,7 @@
 .contents {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 5px;
 }
 
 .card.blue-1 {
@@ -79,7 +79,13 @@
 
 .title {
   text-align: center;
+  font-weight: 700;
+}
+
+.sub-title {
+  text-align: center;
   font-weight: bold;
+  font-size: 0.8em;
 }
 
 .card-inner-group {
@@ -118,9 +124,6 @@
   .card {
     width: 140px !important;
   }
-  .card.w90 {
-    width: 90px !important;
-  }
 }
 
 .card.with-icon {
@@ -145,6 +148,10 @@
   transition: 400ms;
 }
 
+.card.w100p {
+  width: 100% !important;
+}
+
 .card p.tip {
   font-size: 1em;
   font-weight: 700;
@@ -159,6 +166,99 @@
 }
 
 .card-group:hover > .card:not(:hover) {
-  /*filter: blur(10px);*/
   transform: scale(0.9, 0.9);
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(-100%);
+  }
+  10% {
+    transform: translateY(0);
+  }
+  90% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+.notices {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  height: 45px;
+  border: 3px double darkorange;
+  border-radius: 5px;
+
+  .notice {
+    width: 365px;
+    text-align: center;
+    position: absolute;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 13px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    height: 22px;
+    overflow: hidden;
+
+    .slide-animation {
+      overflow: hidden;
+
+      .label {
+        font-weight: bold;
+        margin-right: 5px;
+        border-radius: 5px;
+        width: 40px;
+      }
+
+      .text {
+        display: flex;
+        align-content: center;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+      .label.NOTICE {
+        border: 1px solid black;
+      }
+
+      .label.EVENT {
+        border: 1px solid purple;
+        color: purple;
+      }
+
+      .label.COUPON {
+        border: 1px solid gold;
+        color: gold;
+      }
+
+      .timer {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .notice.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    .slide-animation.deactivate {
+      animation: none !important;
+    }
+    .slide-animation {
+      display: flex;
+      align-items: center;
+      animation-name: slideUp;
+      animation-duration: 5s;
+      animation-fill-mode: forwards;
+    }
+  }
 }

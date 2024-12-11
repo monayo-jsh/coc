@@ -17,7 +17,7 @@
 
 .card {
   position: relative;
-  width: 270px;
+  width: 320px;
   min-height: 130px;
   border-radius: 15px;
   background: #1b233d;
@@ -156,7 +156,7 @@
 
 .footer-section {
   margin-top: 0;
-  padding: 0;
+  padding: 5px;
 
   .members {
     display: none;

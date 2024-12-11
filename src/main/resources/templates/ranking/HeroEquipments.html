@@ -6,17 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/ranking/heroEquipments.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/hero.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/heroEquipment.css" />
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/ranking/heroEquipments.css" />
+  <link rel="stylesheet" type="text/css" href="/css/hero.css" />
+  <link rel="stylesheet" type="text/css" href="/css/heroEquipment.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/player.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/player.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
@@ -107,7 +107,7 @@
     }
 
     window.onload = async () => {
-      const warClans = await fetchWarClans();
+      const warClans = await fetchWarClans('none');
       await renderClans(warClans);
 
       const radioInputs = document.querySelector('.radio-inputs');
@@ -129,6 +129,7 @@
         </label>
       </div>
     </div>
+
     <div class="heroes-wrapper">
       <div class="hero-wrapper barbarian_king">
         <div class="hero barbarian_king"></div>
@@ -139,6 +140,7 @@
         <div class="rankings"></div>
       </div>
     </div>
+
     <div class="heroes-wrapper">
       <div class="hero-wrapper grand_warden">
         <div class="hero grand_warden"></div>
@@ -146,6 +148,17 @@
       </div>
       <div class="hero-wrapper royal_champion">
         <div class="hero royal_champion"></div>
+        <div class="rankings"></div>
+      </div>
+    </div>
+
+    <div class="heroes-wrapper">
+      <div class="hero-wrapper minion_prince">
+        <div class="hero minion_prince"></div>
+        <div class="rankings"></div>
+      </div>
+      <div class="hero-wrapper empty" style="opacity: 0">
+        <div class="hero empty"></div>
         <div class="rankings"></div>
       </div>
     </div>

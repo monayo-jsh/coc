@@ -5,16 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="stylesheet" href="/static/css/common.css" />
-  <link rel="stylesheet" href="/static/css/button.css" />
-  <link rel="stylesheet" href="/static/css/townhall.css" />
-  <link rel="stylesheet" href="/static/css/card.css" />
-  <link rel="stylesheet" href="/static/css/loader.css" />
-  <link rel="stylesheet" href="/static/css/warLeague.css" />
-  <link rel="stylesheet" href="/static/css/clan/war.css" />
-  <link rel="stylesheet" href="/static/css/clan/leagueWar.css" />
+  <link rel="stylesheet" href="/css/common.css" />
+  <link rel="stylesheet" href="/css/button.css" />
+  <link rel="stylesheet" href="/css/townhall.css" />
+  <link rel="stylesheet" href="/css/card.css" />
+  <link rel="stylesheet" href="/css/loader.css" />
+  <link rel="stylesheet" href="/css/warLeague.css" />
+  <link rel="stylesheet" href="/css/clan/war.css" />
+  <link rel="stylesheet" href="/css/clan/leagueWar.css" />
 
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -25,10 +25,10 @@
     dayjs.extend(dayjs_plugin_duration)
   </script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/api/league.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/util.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/util.js"></script>
 
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
@@ -335,6 +335,10 @@
 
     function initLeagueClan(leagueClanMap, warLeague, clans, roundSize) {
       for(const clan of clans) {
+        if (leagueClanMap.get(clan.tag)) {
+          // 이미 초기화된 클랜은 중복 처리 방지
+          continue;
+        }
         // 라운드 별 dataset
         clan.rounds = [];
         clan.roundSize = roundSize;
@@ -364,15 +368,28 @@
           const { clan, opponent } = currentWarLeagueRound;
           const targetClan = leagueClanMap.get(clan.tag);
           const clanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
-          targetClan.rounds.push(clanRoundWarInfo);
+
+          if (isRoundNotExists(targetClan.rounds, clanRoundWarInfo)) {
+            // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
+            targetClan.rounds.push(clanRoundWarInfo);
+          }
 
           const opponentClanRoundWarInfo = _.cloneDeep(currentWarLeagueRound);
           swipeClanAndOpponent(opponentClanRoundWarInfo);
           const opponentClan = leagueClanMap.get(opponent.tag);
-          opponentClan.rounds.push(opponentClanRoundWarInfo);
+
+          if (isRoundNotExists(opponentClan.rounds, opponentClanRoundWarInfo)) {
+            // 한 조에 동일한 클랜이 존재할 경우 데이터 중복 방지
+            opponentClan.rounds.push(opponentClanRoundWarInfo);
+          }
         }
       }
 
+      function isRoundNotExists(rounds, roundWarInfo) {
+        // 라운드 전쟁 정보에 전쟁 시작/종료일시가 동일한 데이터로 중복 판단
+        const { startTime, endTime } = roundWarInfo
+        return !rounds.some(round => round.startTime === startTime && round.endTime === endTime)
+      }
     }
 
     function drawLeagueWarRound(clanWarContentsElement, drawClan) {
@@ -571,12 +588,13 @@
       const leagueClanRecordCell = document.importNode(leagueClanRecordCellTemplate.content, true);
       const cell = leagueClanRecordCell.querySelector('.cell');
 
-      const { name, badge, stars, attacks, members } = clan;
+      const { name, badge, stars, attacks, destructionPercentage, members } = clan;
 
       cell.innerHTML = cell.innerHTML
                          .replace(/{NAME}/, name)
                          .replace(/{STARS}/,stars)
-                         .replace(/{ATTACKS}/, attacks);
+                         .replace(/{ATTACKS}/, attacks)
+                         .replace(/{DESTRUCTION_PERCENTAGE}/, Number(destructionPercentage).toFixed(2));
 
       const summaryStar = calcStars(members);
       const summaryStarElement = makeSummaryStar(summaryStar)
@@ -899,7 +917,6 @@
     }
 
     function drawMedalBonusQuantity(leagueWarClanContents, clanWarLeagueInfo) {
-      console.log(clanWarLeagueInfo);
       const medalBonusQuantity = leagueWarClanContents.querySelector('.additional-info .bonus-medal .count');
       medalBonusQuantity.innerHTML = clanWarLeagueInfo.medalBonusQuantity;
     }
@@ -999,7 +1016,11 @@
           }
 
           // 강등 기준
-          const demotedCriteria = 2;
+          let demotedCriteria = 2;
+          if (leagueClanCount === 6) {
+            // 리그 클랜이 6팀인 경우 하위 1개팀 강등
+            demotedCriteria = 1;
+          }
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기
@@ -1023,7 +1044,11 @@
             return 'promoted';
           }
           // 강등 기준
-          const demotedCriteria = 2;
+          let demotedCriteria = 2;
+          if (leagueClanCount === 6) {
+            // 리그 클랜이 6팀인 경우 하위 1개팀 강등
+            demotedCriteria = 1;
+          }
           const demotedRank = leagueClanCount - demotedCriteria;
           if (demotedRank < rank) {
             // 강등권 순위 표기
@@ -1356,7 +1381,7 @@
     async function getClansForLeague() {
       showWifiLoading('.card-container');
       await loadLeagues();
-      const warLeagueClans = await fetchWarLeagueClans();
+      const warLeagueClans = await fetchWarClans('league');
       hideWifiLoading('.card-container');
 
       const sortedLeagueClans = sortByLeague(warLeagueClans);
@@ -1449,15 +1474,15 @@
   <div class="clan-rank display-none">
     <div class="promotion-demotion"></div>
     <div class="rank">{RANK}</div>
-    <div class="stars">
-      <i class="fa-solid fa-star color-gold"></i>
-      <span class="count">{TOTAL_STAR_COUNT}</span>
-    </div>
     <div class="clan-info">
       <div class="clan-icon">
         <img class="clan" alt="">
       </div>
       <div class="name">{CLAN_NAME}</div>
+    </div>
+    <div class="stars">
+      <i class="fa-solid fa-star color-gold"></i>
+      <span class="count">{TOTAL_STAR_COUNT}</span>
     </div>
     <div class="round-record-summary">
       <span class="chip bg-green win-count">{WIN_COUNT}</span>
@@ -1751,16 +1776,31 @@
 <template id="league-clan-record-cell">
   <div class="cell">
     <div class="basic">
-      <div class="name">{NAME}</div>
-      <div class="badge clan">
-        <img class="clan" alt=""/>
+      <div class="clan-info">
+        <div class="badge clan">
+          <img class="clan" alt=""/>
+        </div>
+        <div class="clan-name">{NAME}</div>
       </div>
-      <div class="icon-sword"></div>
-      <div class="attacks">{ATTACKS}</div>
-      <div class="stars">
-        <span class="count">{STARS}</span>
-        <i class="fa-solid fa-star"></i>
-        <img>
+      <div class="war-info">
+        <div class="attacks">
+          <div class="label chip">
+            <div class="icon-sword"></div>
+          </div>
+          <div class="count">{ATTACKS}</div>
+        </div>
+        <div class="stars">
+          <div class="label chip">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <span class="count">{STARS}</span>
+        </div>
+        <div class="destruction-percentage">
+          <div class="label chip">
+            <i class="fa-solid fa-percent"></i>
+          </div>
+          <div class="count">{DESTRUCTION_PERCENTAGE}</div>
+        </div>
       </div>
     </div>
     <div class="summary"></div>

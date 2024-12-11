@@ -3,6 +3,7 @@ package open.api.coc.external.coc.config;
 import static open.api.coc.external.coc.config.HeroConfig.ARCHER_QUEEN;
 import static open.api.coc.external.coc.config.HeroConfig.BARBARIAN_KING;
 import static open.api.coc.external.coc.config.HeroConfig.GRAND_WARDEN;
+import static open.api.coc.external.coc.config.HeroConfig.MINION_PRINCE;
 import static open.api.coc.external.coc.config.HeroConfig.ROYAL_CHAMPION;
 
 import java.util.Arrays;
@@ -36,6 +37,8 @@ public enum HeroEquipmentConfig {
     ETERNAL_TOME(GRAND_WARDEN, 302, "normal", "Eternal Tome", "영원의 책"),
     HEALING_TOME(GRAND_WARDEN, 303, "normal", "Healing Tome", "치유의 책"),
 
+    LAVALOON_PUPPET(GRAND_WARDEN, 320, "epic", "Lavaloon Puppet", "라벌 인형"),
+
     FIREBALL(GRAND_WARDEN, 320, "epic", "Fireball", "파이어 볼"),
 
     // 로얄 챔피언
@@ -45,6 +48,11 @@ public enum HeroEquipmentConfig {
     HOG_RIDER_PUPPET(ROYAL_CHAMPION, 403, "normal", "Hog Rider Puppet", "호그 라이더 인형"),
 
     ROCKET_SPEAR(ROYAL_CHAMPION, 420, "epic", "Rocket Spear", "로켓창"),
+    ELECTRO_BOOTS(ROYAL_CHAMPION, 421, "epic", "Electro Boots", "일렉트로 부츠"),
+
+    // 미니언 프린스
+    HENCHMEN_PUPPET(MINION_PRINCE, 500, "normal", "Henchmen Puppet", "보디가드 인형"),
+    DARK_ORB(MINION_PRINCE, 501, "normal", "Dark Orb", "다크 구슬"),
 
     UNKNOWN(HeroConfig.UNKNOWN, Integer.MAX_VALUE, "unknown", "unknown", "unknown");
 

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/event/teamLegend.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/event.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- chartjs -->
+
+  <script type="text/javascript">
+    dayjs.locale('ko')
+    //dayjs duration 확장
+    dayjs.extend(dayjs_plugin_duration)
+
+    function getMedalIcon(rank) {
+      let templateId = "";
+      if (rank === 1) templateId = "ranking-first-place-template";
+      if (rank === 2) templateId = "ranking-second-place-template";
+      if (rank === 3) templateId = "ranking-third-place-template";
+
+      const medalTemplate = document.querySelector(`#${templateId}`);
+      return document.importNode(medalTemplate.content, true);
+    }
+
+    function drawDifferenceChip(teamRow, rank) {
+      const diffElement = teamRow.querySelector('.chip.difference');
+
+      let icon = copyTemplateById('icon-arrow-down');
+      if (rank === 1) {
+        icon = copyTemplateById('icon-arrow-up');
+      } else {
+        diffElement.classList.add('bg-lightcoral');
+      }
+
+      diffElement.prepend(icon);
+    }
+
+    function makeTeamElement(rank, team, differenceTrophies) {
+      const { name, trophies } = team;
+
+      const teamTbodyTemplate = copyTemplateById('legend-team-tbody-template');
+      const teamTbody = teamTbodyTemplate.querySelector('.team');
+
+      const teamRow = teamTbody.querySelector('.table-tr');
+      teamRow.innerHTML = teamRow.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{TEAM_NAME}/, name)
+                                     .replace(/{TOTAL_TROPHIES}/, Number(trophies).toLocaleString())
+                                     .replace(/{DIFFERENCE_TROPHIES}/, Number(differenceTrophies).toLocaleString())
+
+      teamRow.classList.add(`rank-${rank}`);
+
+      if (rank < 4) {
+        //순위권 메달 표기
+        const medalIcon = getMedalIcon(rank);
+        const rankTd = teamRow.querySelector('.table-td.rank');
+        rankTd.innerHTML = "";
+        rankTd.appendChild(medalIcon);
+      }
+
+      // 격차 아이콘 및 색상 설정
+      drawDifferenceChip(teamRow, rank);
+
+      return teamTbody;
+    }
+
+    function makeMemberRow(member) {
+      const { tag, name, trophies, updatedAt } = member;
+
+      const memberRowTemplate = copyTemplateById('team-member-row-template');
+      const memberRow = memberRowTemplate.querySelector('.table-tr');
+
+      memberRow.innerHTML = memberRow.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{TROPHIES}/, trophies)
+                                     .replace(/{RECORD_TIME}/, formatTime(updatedAt, 'MM/DD HH:mm'));
+
+      return memberRow;
+    }
+
+    function drawTeamDetail(teamsElement, team) {
+      const teamDetailTemplate = copyTemplateById('legend-team-detail-template');
+      const teamDetail = teamDetailTemplate.querySelector('.table');
+
+      const { name, trophies, members } = team
+      teamDetail.innerHTML = teamDetail.innerHTML
+                                       .replace(/{TEAM_NAME}/, name)
+                                       .replace(/{TOTAL_TROPHIES}/, Number(trophies).toLocaleString());
+
+      const tableTbody = teamDetail.querySelector('.table-tbody');
+      for(const member of members) {
+        const memberRow = makeMemberRow(member);
+        tableTbody.appendChild(memberRow);
+      }
+
+      teamsElement.appendChild(teamDetail);
+    }
+
+    function getDifferenceTrophies(rank, teams) {
+      if (rank === 1) {
+        // 1등은 2등과의 차이로 표현
+        if (teams.length > 2) {
+          // 2등이 존재할 경우
+          return teams[0].trophies - teams[1].trophies;
+        }
+
+        return 0; // 2등이 없는 경우
+      }
+
+      // 2등부터는 앞 팀과의 격차 표현
+      return teams[rank-2].trophies - teams[rank-1].trophies;
+    }
+
+    let SORTED_TEAMS;
+    function drawTeamLegendTeams(eventTeamLegendSection, teams) {
+      if (!teams || !teams.length) return;
+
+      const teamLegend = eventTeamLegendSection.querySelector('.team-legend');
+      const rankingTable = teamLegend.querySelector('.rankings .table');
+      const teamsElement = teamLegend.querySelector('.teams');
+      const sortedTeams = sortByTrophies(teams);
+
+      SORTED_TEAMS = sortedTeams; // 참조용 데이터셋
+
+      let rank = 1;
+      for (const team of sortedTeams) {
+        const differenceTrophies = getDifferenceTrophies(rank, sortedTeams);
+        const teamElement = makeTeamElement(rank, team, differenceTrophies);
+        rankingTable.appendChild(teamElement);
+        rank++;
+
+        drawTeamDetail(teamsElement, team);
+      }
+    }
+
+    function makeTeamLegendEventElement(teamLegend) {
+      const { name, startDate, endDate, teams } = teamLegend;
+
+      const eventTeamLegendTemplate = copyTemplateById('event-team-legend-template');
+      const eventTeamLegendSection = eventTeamLegendTemplate.querySelector('.section-contents');
+
+      const startDateTime = formatYYYYMMDDHHMM(startDate);
+      const endDateTime = formatYYYYMMDDHHMM(endDate);
+      const period = formatPeriod(startDateTime, endDateTime);
+      eventTeamLegendSection.innerHTML = eventTeamLegendSection.innerHTML
+                                                               .replace(/{EVENT_NAME}/, name)
+                                                               .replace(/{EVENT_PERIOD}/, period);
+
+      drawTeamLegendTeams(eventTeamLegendSection, teams);
+
+      return eventTeamLegendSection;
+    }
+
+    function renderTeamLegend(targetClassName, teamLegend) {
+      const drawTargetElement = document.querySelector(`.${targetClassName}`);
+      const teamLegendEventElement = makeTeamLegendEventElement(teamLegend);
+      drawTargetElement.appendChild(teamLegendEventElement);
+
+      drawEventTeamLegendDailyRanking(teamLegend);
+    }
+
+    async function drawEventTeamLegend() {
+      const targetClassName = 'event-team-legend';
+      const latestTeamLegend = await fetchLatestTeamLegendEvent();
+
+      renderTeamLegend(targetClassName, latestTeamLegend);
+    }
+
+    async function drawEventTeamLegendDailyRanking(teamLegend) {
+      const dailyRankings = await fetchTeamLegendDailyRanking(teamLegend.id);
+
+      if (!dailyRankings || !dailyRankings.length) return;
+
+      // 실시간 순위 추가
+      if (teamLegend.status === "ING") {
+        let currentRank = 0;
+        for (const team of SORTED_TEAMS) {
+          const now = dayjs()
+          const currentHour = now.hour();
+          const displayRank = currentHour < 14 ? now : now.add(+1, 'day'); // 현재 랭크 표기
+          const { id, name, trophies } = team;
+          const dailyRank = {
+            rankingDate: formatYYYYMMDD(displayRank),
+            teamId: id,
+            teamName: name,
+            trophies: trophies,
+            dailyRank: ++currentRank
+          };
+          dailyRankings.push(dailyRank);
+        }
+      }
+
+      renderRankingChart('daily-ranking', dailyRankings);
+    }
+
+    function renderRankingChart(canvasId, rankings) {
+      const context = document.getElementById(canvasId);
+
+      const data = makeChartDataset(rankings);
+      new Chart(context, {
+        type: 'line',
+        data: data,
+        options: {
+          plugins: {
+            title: {
+                display: true,
+                text: "일자별 순위 그래프"
+            },
+            subtitle: {
+              display: true,
+              text: "아래의 팀명을 선택해서 팀별 그래프를 확인할 수 있습니다"
+            },
+            legend: {
+              display: true,
+              position: 'top'
+            },
+            tooltip: {
+              callbacks: {
+                // 툴팁 라벨 사용자화
+                label: function(tooltipItem) {
+                  const { dataset, dataIndex } = tooltipItem;
+                  const { label, data } = dataset;
+                  const { record } = data[dataIndex];
+                  const { dailyRank, trophies } = record;
+                  return `${dailyRank}. ${label} (${trophies.toLocaleString()})`;
+                }
+              },
+              // 툴팁 정렬
+              itemSort: function(a, b) {
+                return a.raw.y - b.raw.y;
+              }
+            },
+          },
+          interaction: {
+            mode: 'index' // 동일 인덱스의 여러 데이터셋을 보여줌
+          },
+          scales: {
+            y: {
+              reverse: true,
+              ticks: {
+                stepSize: 1
+              }
+            },
+          }
+        }
+      });
+
+      toggleDisplay(context);
+    }
+    function makeChartDataset(rows) {
+      const teamMap = convertArrayToMapByKey(rows, 'teamName', true);
+
+      const dataset = [];
+
+      for(const team of SORTED_TEAMS) {
+        const dailyRecords = teamMap.get(team.name);
+        const sortedRecords = dailyRecords.sort((a, b) => a.rankingDate - b.rankingDate);
+        const teamDataset = {
+          label: team.name,
+          data: sortedRecords.map(convertRecord),
+          fill: false,
+          borderColor: getColor(team.id),
+          backgroundColor: getColor(team.id),
+          tension: 0.1
+        }
+
+        dataset.push(teamDataset);
+      }
+
+      return {
+        datasets: dataset
+      }
+
+      function convertRecord(record) {
+        const { rankingDate, dailyRank } = record;
+        const displayDate = dayjs(rankingDate).add(-1, 'day');
+        return {
+          x: formatMMDD(displayDate),
+          y: dailyRank,
+          record: record
+        }
+      }
+
+      function getColor(teamId) {
+        switch (teamId) {
+          case 1: return 'rgb(255,0,0)';
+          case 2: return 'rgb(255,221,0)';
+          case 3: return 'rgb(0,81,255)';
+          case 4: return 'rgb(72,157,0)';
+        }
+        return "";
+      }
+    }
+
+    window.onload = async () => {
+      // 이벤트 : 팀 전설내기
+      await drawEventTeamLegend();
+    }
+  </script>
+
+  <title>아카데미 이벤트</title>
+</head>
+<body>
+
+    <div class="title event" onclick="renderPage('/event'); return false;">
+      <i class="fa-solid fa-star"></i>
+      이벤트
+      <i class="fa-solid fa-star"></i>
+    </div>
+
+    <div class="flip-cards">
+
+      <div class="section-wrapper sections">
+
+        <div class="section-wrapper event-team-legend"></div>
+
+      </div>
+
+    </div>
+
+</body>
+<template id="event-team-legend-template">
+  <div class="section-contents">
+
+    <div class="section team-legend">
+      <div class="sub-title"><span class="decorate-title">{EVENT_NAME}</span></div>
+      <div class="rankings">
+        <table class="table">
+          <caption class="table-caption text-align-center">{EVENT_PERIOD}</caption>
+          <thead>
+          <tr class="table-tr">
+            <th class="table-th">순위</th>
+            <th class="table-th">팀 이름</th>
+            <th class="table-th">팀 트로피</th>
+            <th class="table-th">격차</th>
+          </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="teams"></div>
+      <div class="ranking-chart">
+        <canvas id="daily-ranking" class="display-none"></canvas>
+      </div>
+    </div>
+  </div>
+</template>
+<template id="legend-team-tbody-template">
+  <tbody class="table-tbody team">
+  <tr class="table-tr">
+    <td class="table-td rank">{RANK}</td>
+    <td class="table-td name">{TEAM_NAME}</td>
+    <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TOTAL_TROPHIES}</div></td>
+    <td class="table-td">
+      <div class="td-wrap">
+        <div class="chip difference">{DIFFERENCE_TROPHIES}</div>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</template>
+<template id="legend-team-detail-template">
+  <table class="table team-detail">
+    <caption class="table-caption font-weight-bold text-align-center">{TEAM_NAME}</caption>
+    <tbody class="table-tbody"></tbody>
+    <tfoot class="table-tfoot text-align-center">
+      <tr class="table-tr bg-lightgoldenrodyellow">
+        <td class="table-td font-weight-bold" colspan="3">
+          <div class="td-wrap">
+            <div class="icon trophies"></div>{TOTAL_TROPHIES}
+          </div>
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</template>
+<template id="team-member-row-template">
+  <tr class="table-tr">
+    <td class="table-td name">{NAME}</td>
+    <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TROPHIES}</div></td>
+    <td class="table-td"><div class="td-wrap">{RECORD_TIME}</div></td>
+  </tr>
+</template>
+<template id="ranking-first-place-template">
+  <i class="fa-solid fa-medal first-place"></i>
+</template>
+<template id="ranking-second-place-template">
+  <i class="fa-solid fa-medal second-place"></i>
+</template>
+<template id="ranking-third-place-template">
+  <i class="fa-solid fa-medal third-place"></i>
+</template>
+<template id="icon-arrow-up">
+  <i class="fa-solid fa-sort-up"></i>
+</template>
+<template id="icon-arrow-down">
+  <i class="fa-solid fa-sort-down"></i>
+</template>
+</html>

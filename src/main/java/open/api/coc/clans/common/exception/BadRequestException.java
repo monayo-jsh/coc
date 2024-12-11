@@ -7,11 +7,18 @@ import org.springframework.util.StringUtils;
 @Getter
 public class BadRequestException extends RuntimeException {
 
-    private final String code;
+    private final String code = ExceptionCode.INVALID_REQUEST.getCode();
     private String message;
 
+    protected BadRequestException(ExceptionCode exceptionCode) {
+        this.message = exceptionCode.getMessage();
+    }
+
     public BadRequestException(String code, String message) {
-        this.code = code;
+        this.message = message;
+    }
+
+    public BadRequestException(String message) {
         this.message = message;
     }
 

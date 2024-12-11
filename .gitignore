@@ -10,6 +10,7 @@ docs
 war-league
 clan-war
 spy.log
+!**/src/main/generated
 
 ### STS ###
 .apt_generated

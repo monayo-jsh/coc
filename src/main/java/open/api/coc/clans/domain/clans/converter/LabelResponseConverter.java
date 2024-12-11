@@ -2,8 +2,8 @@ package open.api.coc.clans.domain.clans.converter;
 
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.common.IconUrlEntity;
-import open.api.coc.clans.database.entity.league.LeagueEntity;
+import open.api.coc.clans.clean.infrastructure.common.persistence.entity.IconUrlEntity;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.domain.clans.IconUrlResponse;
 import open.api.coc.clans.domain.clans.LabelResponse;
 import open.api.coc.external.coc.clan.domain.common.IconUrl;

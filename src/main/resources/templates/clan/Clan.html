@@ -5,20 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
-  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/common.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/loader.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/button.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/townhall.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/warLeague.css" />
-  <link rel="stylesheet" type="text/css" href="/static/css/cms/manager.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/townhall.css" />
+  <link rel="stylesheet" type="text/css" href="/css/warLeague.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/manager.css" />
 
-  <script src="/static/js/common.js"></script>
-  <script src="/static/js/util.js"></script>
-  <script src="/static/js/api/league.js"></script>
-  <script src="/static/js/api/clan.js"></script>
-  <script src="/static/js/api/player.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/clan.js"></script>
+  <script src="/js/api/player.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
@@ -176,7 +176,7 @@
       const cardCurrentPlayerWrapper = cardElement.querySelector('.card-current-player-wrapper');
       cardCurrentPlayerWrapper.classList.remove('display-none');
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
 
       //전체 클랜원 태그 조회
       const allPlayerTags = await fetchAllPlayerTags();
@@ -315,7 +315,7 @@
       // 배정 클랜원 목록
       const clanAssignedPlayers = await fetchClanAssignedMembers(clanTag);
 
-      const clanMembers = await fetchClanMembers([{tag: clanTag}]);
+      const clanMembers = await fetchClanMembers(clanTag);
       const clanMembersMap = makeMapByTag(clanMembers);
 
       const seasonDate = cardAssignedPlayerWrapper.querySelector('.season-date');
@@ -368,10 +368,10 @@
       });
     }
 
-    function renderClanBadge(badgeUrls, card) {
-      if (!badgeUrls) return;
+    function renderClanBadge(badgeUrl, card) {
+      if (!badgeUrl) return;
 
-      const { small } = badgeUrls;
+      const { small } = badgeUrl;
       if (small) {
         const clanBadge = card.querySelector('.clan-badge');
         clanBadge.src = small;
@@ -495,8 +495,8 @@
       const clanLabel = document.importNode(clanLabelTemplate.content, true);
       const labelIcon = clanLabel.querySelector('.label-icon');
 
-      const { iconUrls } = label;
-      const { small } = iconUrls;
+      const { iconUrl } = label;
+      const { small } = iconUrl;
 
       labelIcon.src = small;
 
@@ -513,8 +513,8 @@
       const clanCard = document.importNode(clanCardTemplate.content, true);
       const card = clanCard.querySelector('.card');
 
-      const { name, tag, type, badgeUrls, warLeague, capitalLeague, memberList, members, clanPoints, clanCapitalPoints, labels, clanContent } = clan;
-      const [leader] = findLeader(memberList);
+      const { name, tag, joinType, badgeUrl, warLeague, capitalLeague, members, points, clanCapitalPoints, labels, clanContent } = clan;
+      const [leader] = findLeader(members);
 
       // dataset
       card.dataset.clanTag = tag;
@@ -523,13 +523,13 @@
       card.innerHTML = card.innerHTML
                            .replace(/{CLAN_NAME}/, name)
                            .replace(/{CLAN_TAG}/g, tag)
-                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(type))
+                           .replace(/{CLAN_TYPE}/, convClanJoinTypeName(joinType))
                            .replace(/{CLAN_LEADER}/, leader ? leader.name : '알 수 없음')
-                           .replace(/{CLAN_TROPHIES}/, Number(clanPoints).toLocaleString())
-                           .replace(/{CLAN_MEMBERS}/, members)
+                           .replace(/{CLAN_TROPHIES}/, Number(points).toLocaleString())
+                           .replace(/{CLAN_MEMBERS}/, members.length)
                            .replace(/{CLAN_CAPITAL_POINTS}/, Number(clanCapitalPoints).toLocaleString());
 
-      renderClanBadge(badgeUrls, card);
+      renderClanBadge(badgeUrl, card);
       renderWarLeagueBadge(warLeague, card);
       renderCapitalLeagueBadge(capitalLeague, card);
 
@@ -562,13 +562,15 @@
     async function getClans() {
       showWifiLoading('.clan-manager');
       let clans = await fetchClans();
-      let clanDetailMap = makeMapByTag(await fetchClansFromExternal(clans));
+      let clanDetailMap = makeMapByTag(await fetchClanDetailsFromExternal(clans));
 
       clans.forEach(clan => {
         // 객체 병합
         const clanDetail = clanDetailMap[clan.tag];
-        clanDetail.order = clan.order;
-        clanDetail.clanContent = clan.clanContent;
+        if (clanDetail) {
+          clanDetail.order = clan.order;
+          clanDetail.clanContent = clan.clanContent;
+        }
         clanList.push(clanDetail);
       });
 

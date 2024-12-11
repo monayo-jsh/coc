@@ -185,9 +185,6 @@
     font-weight: bold;
   }
 
-  .user.chip {
-    background-color: aliceblue;
-  }
   .user {
     font-size: 1em;
     font-weight: bold;
@@ -195,6 +192,22 @@
     display: flex;
     align-items: center;
     line-height: 1.5;
+
+    .chip {
+      font-size: 1em;
+      font-weight: bold;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+      line-height: 1.5;
+      background-color: #9ccffc;
+    }
+
+    .nickname {
+      margin-left: 5px;
+      font-size: 0.8em;
+      background-color: aliceblue;
+    }
   }
 
   .league-icon {
@@ -207,7 +220,7 @@
   .xp {
     position: relative;
     padding: 16px;
-    background-image: url("/static/images/etc/xp.png");
+    background-image: url("/images/etc/xp.png");
     background-size: contain;
     background-repeat: no-repeat;
 
@@ -279,7 +292,7 @@
         position: absolute;
         width: 36px;
         height: 36px;
-        background-image: url(/static/images/etc/trophies.png);
+        background-image: url(/images/etc/trophies.png);
         background-repeat: no-repeat;
         background-size: contain;
         top: 0;
@@ -371,7 +384,7 @@
   transform: rotateY(180deg);
 
   .inner-content {
-    height: 160px;
+    height: 225px;
     overflow-y: scroll;
     scrollbar-width: none;
   }

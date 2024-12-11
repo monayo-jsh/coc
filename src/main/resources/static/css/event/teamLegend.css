@@ -1,0 +1,240 @@
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-tbody {
+
+  .table-tr:nth-child(odd) {
+    background-color: unset !important;
+  }
+
+}
+
+.event {
+  margin-top: 10px;
+  color: black;
+  padding: 5px 10px;
+  background-color: #ffffff;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  i {
+    color: gold;
+  }
+}
+
+.table-td:nth-child(1) {
+}
+.table-td:nth-child(2) {
+  white-space: nowrap;
+}
+.table-td:nth-child(3) {
+  white-space: nowrap;
+}
+.table-td:nth-child(4) {
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+ .support-area {
+   width: 300px;
+
+   .radio-inputs {
+     width: 300px;
+     overflow-x: auto;
+   }
+ }
+}
+.support-area {
+  margin-top: 5px;
+  white-space: nowrap;
+  overflow-x: auto;
+
+  .radio-inputs {
+    flex-wrap: nowrap;
+    max-width: 610px;
+
+    .name {
+      color: black;
+    }
+
+    input:checked + .name {
+      color: white;
+      background-color: #808080;
+    }
+  }
+}
+
+.section-wrapper {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+
+  .section-title {
+    font-weight: bold;
+    border-radius: 10px;
+    background-color: cornsilk;
+    padding: 5px 60px;
+    font-size: 16px;
+  }
+
+  .section-contents {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+
+    .section {
+      margin: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      .sub-title {
+        font-size: 16px;
+        font-weight: bold;
+
+        .decorate-title {
+          padding: 5px 20px;
+          background-color: #eb8600;
+          border-radius: 5px;
+          color: white;
+        }
+      }
+
+      .rankings {
+        margin-top: 10px;
+        width: 385px;
+
+        .table {
+          .table-caption {
+            background-color: #119d11;
+          }
+        }
+
+        .table-tr.rank-1 .table-td {
+          font-size: 15px;
+          font-weight: 700;
+        }
+        .table-tr.rank-2 .table-td {
+          font-size: 14px;
+          font-weight: 600;
+        }
+        .table-tr.rank-3 .table-td {
+          font-size: 13px;
+          font-weight: 500;
+        }
+
+        .table-th {
+          font-size: 16px;
+          font-weight: 800;
+          background-color: #0c770c;
+          color: white;
+        }
+
+        .table-td {
+          font-size: 12px;
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .td-wrap:not(:first-child) {
+            margin-top: 3px;
+          }
+        }
+      }
+
+      .teams {
+        margin-top: 10px;
+        width: 800px;
+        display: flex;
+        flex-wrap: wrap;
+
+        @media (max-width: 800px) {
+          width: 385px;
+        }
+
+        .team-detail {
+          width: 385px;
+          margin: 3px;
+
+          .table-caption {
+            background-color: #6c8e45;
+          }
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
+      }
+
+      .ranking-chart {
+        padding: 5px;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+}
+
+i.fa-star {
+  margin-right: 5px;
+  color: gold;
+}
+
+div.icon.trophies,
+div.icon-sword,
+div.icon-damage,
+div.icon-clock,
+div.icon-clan-capital {
+  margin-right: 5px;
+  width: 18px;
+  height: 16px;
+}
+
+div.icon-caret-up {
+  filter: invert(19%) sepia(70%) saturate(5244%) hue-rotate(113deg) brightness(96%) contrast(104%);
+}
+
+div.icon-caret-up.color-blue {
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(175deg);
+}
+
+i.first-place {
+  color: #ffd700;
+}
+i.second-place {
+  color: #c0c0c0;
+}
+i.third-place {
+  color: #CD7F32;
+}
+
+i.fa-sort-up {
+  margin-right: 4px;
+  margin-top: 3px;
+}
+
+i.fa-sort-down {
+  margin-right: 4px;
+  margin-bottom: 3px;
+}
+
+.chip.difference {
+  display: flex;
+  align-items: center;
+  background-color: #48b448;
+  color: white;
+  font-size: 11px;
+  padding: 3px 10px;
+}

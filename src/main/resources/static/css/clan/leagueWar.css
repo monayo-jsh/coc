@@ -1,21 +1,25 @@
+.card-title {
+  border: none;
+}
+
 .icon {
   width: 15px;
   height: 15px;
 }
 .icon.promoted {
-  background-image: url("/static/images/etc/wl_icon_promoted.png");
+  background-image: url("/images/etc/wl_icon_promoted.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 .icon.demoted {
-  background-image: url("/static/images/etc/wl_icon_demoted.png");
+  background-image: url("/images/etc/wl_icon_demoted.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 .icon.stay {
-  background-image: url("/static/images/etc/wl_icon_stay.png");
+  background-image: url("/images/etc/wl_icon_stay.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -39,7 +43,7 @@
 }
 
 .clan-icon {
-  margin-top: 3px;
+  margin-top: 4px;
   width: 35px;
 }
 
@@ -157,6 +161,7 @@
 
     .name {
       flex: 100%;
+      margin-left: 5px;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
@@ -173,7 +178,6 @@
 
       i {
         color: yellow;
-        margin-top: -3px;
         margin-left: 3px;
       }
     }
@@ -239,74 +243,157 @@
 
       .basic {
         display: flex;
-        flex-direction: row-reverse;
 
-        .attacks {
-          text-align: right;
+        .clan-info {
+          flex-direction: row-reverse;
+
+          .clan-name {
+            text-align: right;
+          }
+
         }
+
+        .war-info {
+          flex-direction: row-reverse;
+
+          .attacks {
+            flex-direction: row-reverse;
+          }
+
+          .stars {
+            flex-direction: row-reverse;
+          }
+
+          .destruction-percentage {
+            flex-direction: row-reverse;
+          }
+
+        }
+
       }
 
     }
     .cell {
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
 
       .basic {
         display: flex;
-        align-items: center;
+        flex-direction: column;
+        width: 100%;
         padding: 5px;
 
-        .badge {
+        .clan-info {
           display: flex;
-          margin: 0 3px;
-
-          .clan {
-            width: 25px;
-          }
-        }
-
-        .name {
-          width: 100px;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          overflow: hidden;
-        }
-
-        .icon-sword {
-          width: 25px;
-        }
-
-        .attacks {
-          width: 25px;
-          margin: 0 5px;
-          white-space: nowrap;
-        }
-
-        .stars {
-          width: 65px;
-          display: flex;
-          justify-content: flex-end;
           align-items: center;
-          border: 1px solid black;
-          background-color: black;
-          padding: 3px;
 
-          i {
-            color: gold;
-            margin-left: 3px;
+          .badge {
+            display: flex;
+            margin: 0 3px;
+
+            .clan {
+              width: 25px;
+            }
           }
-          .count {
-            margin-top: 2px;
+
+          .clan-name {
+            width: 100px;
+            text-overflow: ellipsis;
             white-space: nowrap;
+            overflow: hidden;
           }
+
         }
 
-        .destruction-percentage {
-          background-color: black;
-          margin-left: 5px;
-          padding: 4px 8px;
-          width: 60px;
+        .war-info {
+          margin-top: 3px;
+          display: flex;
+          align-items: center;
+
+          .attacks {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+
+            .label {
+              background-color: black;
+              border: none;
+
+              .icon-sword {
+                width: 10px;
+                height: 10px;
+                padding: 10px;
+              }
+            }
+
+            .count {
+              margin: 0 3px;
+              white-space: nowrap;
+              border-radius: 10px;
+              padding: 5px 10px;
+              background: black;
+              color: white;
+            }
+          }
+
+          .stars {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            padding: unset;
+            margin: 0 3px;
+            background-color: unset !important;
+            border: none !important;
+
+            .label {
+              font-size: 12px;
+              background-color: black;
+              border: none;
+
+              i {
+                color: gold;
+                margin-left: unset !important;
+              }
+            }
+            .count {
+              margin: 0 3px;
+              white-space: nowrap;
+              border-radius: 10px;
+              padding: 5px 10px;
+              background: black;
+              color: white;
+            }
+          }
+
+          .destruction-percentage {
+            margin: 0 3px;
+            padding: unset;
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            background-color: unset !important;
+            border: none !important;
+
+            .label {
+              font-size: 12px;
+              background-color: black;
+              border: none;
+
+              i {
+                padding: 0 5px;
+              }
+            }
+            .count {
+              margin: 0 3px;
+              white-space: nowrap;
+              border-radius: 10px;
+              padding: 5px 10px;
+              background: black;
+              color: white;
+            }
+          }
         }
 
       }
@@ -476,13 +563,19 @@
   }
 
   .round.total {
+    color: coral;
     justify-content: center;
+
+    .label {
+      width: 40px;
+    }
   }
 
   .round {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding: 3px;
     color: #ffc251;
 
     .label {
@@ -525,7 +618,7 @@
     }
 
     .clan-rank {
-      margin-left: 3px;
+      margin-left: 15px;
       margin-top: 10px;
       width: 100%;
       display: flex;
@@ -539,7 +632,7 @@
       }
 
       .stars {
-        margin-left: 10px;
+        margin-left: 5px;
         white-space: nowrap;
       }
 
@@ -560,7 +653,6 @@
     }
 
     .clan-info {
-      margin-top: 2px;
       margin-left: 5px;
       display: flex;
       align-items: center;

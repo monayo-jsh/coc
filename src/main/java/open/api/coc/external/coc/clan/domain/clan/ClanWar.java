@@ -12,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ClanWar {
 
+    private boolean isWarCollected = false; // 수집 완료 처리 여부
+
     @Setter
     private String warTag; // 현재는 리그전의 경우 라운드 별 전쟁태그를 획득할 수 있음
 
@@ -62,5 +64,10 @@ public class ClanWar {
         if (Objects.equals(clanTag, this.clan.getTag())) return true;
         if (Objects.equals(clanTag, this.opponent.getTag())) return true;
         return false;
+    }
+
+    @JsonIgnore
+    public void changeWarCollected() {
+        this.isWarCollected = true;
     }
 }

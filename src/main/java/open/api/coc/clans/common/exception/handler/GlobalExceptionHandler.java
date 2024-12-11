@@ -1,7 +1,9 @@
 package open.api.coc.clans.common.exception.handler;
 
+import jakarta.validation.ConstraintViolationException;
 import open.api.coc.clans.common.ExceptionCode;
 import open.api.coc.clans.common.exception.BadRequestException;
+import open.api.coc.clans.common.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -30,6 +32,13 @@ public class GlobalExceptionHandler {
                              .body(responseBody);
     }
 
+    @ExceptionHandler(value = NotFoundException.class)
+    public ResponseEntity<String> notFoundException(NotFoundException e) {
+        String responseBody = formatMessage(e.getCode(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(responseBody);
+    }
+
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<String> httpMessageNotReadableException(HttpMessageNotReadableException e) {
         BadRequestException badRequestException = BadRequestException.create(ExceptionCode.INVALID_PARAMETER)
@@ -42,6 +51,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> missingServletRequestParameterException(MissingServletRequestParameterException e) {
         BadRequestException badRequestException = BadRequestException.create(ExceptionCode.INVALID_PARAMETER)
                                                                      .addExtraMessage(formatMessage(e.getParameterName(), " must not be null"));
+
+        return badRequestException(badRequestException);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    public ResponseEntity<String> constraintViolationException(ConstraintViolationException e) {
+        BadRequestException badRequestException = BadRequestException.create(ExceptionCode.INVALID_PARAMETER);
+        e.getConstraintViolations().forEach(constraintViolation -> {
+            badRequestException.addExtraMessage(constraintViolation.getMessage());
+        });
 
         return badRequestException(badRequestException);
     }
@@ -72,8 +91,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = HttpClientErrorException.class)
     public ResponseEntity<String> httpClientErrorException(HttpClientErrorException e) {
-        return ResponseEntity.status(e.getStatusCode())
-                             .body(e.getResponseBodyAsString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("[code]: %s, [error]: %s".formatted(e.getStatusCode(), e.getResponseBodyAsString()));
+    }
+
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<String> exception(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                             .body("[error]: %s".formatted(e.getMessage()));
     }
 
     private String formatMessage(String name, String message) {

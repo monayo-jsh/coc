@@ -4,9 +4,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import open.api.coc.clans.database.entity.raid.RaiderEntity;
+import open.api.coc.clans.clean.infrastructure.capital.persistence.entity.RaiderEntity;
 import open.api.coc.clans.domain.clans.ClanResponse;
-import open.api.coc.external.coc.clan.domain.clan.ClanCapital;
 
 import java.util.List;
 import java.util.stream.Collectors;

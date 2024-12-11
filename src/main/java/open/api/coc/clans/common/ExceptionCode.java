@@ -7,9 +7,11 @@ public enum ExceptionCode {
 
     INVALID_PARAMETER("I400", "잘못된 파라미터 요청"),
     ALREADY_DATA("I401", "이미 등록된 데이터"),
+    INVALID_REQUEST("I499", "잘못된 요청"),
 
     ERROR_NOT_FOUND("I4040", "정보 없음"),
 
+    INTERNAL_ERROR("I5000", "내부 처리 오류"),
     EXTERNAL_ERROR("E5000", "외부 연동 오류");
 
     private final String code;

@@ -38,107 +38,113 @@ body::before {
 
   /* load images */
   content:
-      url(/static/images/hero/Barbarian_King.png);
-      url(/static/images/hero/Archer_Queen.png);
-      url(/static/images/hero/Grand_Warden.png);
-      url(/static/images/hero/Royal_Champion.png);
+      url(/images/hero/Barbarian_King.png);
+      url(/images/hero/Archer_Queen.png);
+      url(/images/hero/Grand_Warden.png);
+      url(/images/hero/Royal_Champion.png);
+      url(/images/hero/Minion_Prince.png);
 
-      url(/static/images/hero/equipment/Archer_Puppet.png);
-      url(/static/images/hero/equipment/Barbarian_Puppet.png);
-      url(/static/images/hero/equipment/Earthquake_Boots.png);
-      url(/static/images/hero/equipment/Eternal_Tome.png);
-      url(/static/images/hero/equipment/Fireball.png);
-      url(/static/images/hero/equipment/Frozen_Arrow.png);
-      url(/static/images/hero/equipment/Giant_Arrow.png);
-      url(/static/images/hero/equipment/Giant_Gauntlet.png);
-      url(/static/images/hero/equipment/Haste_Vial.png);
-      url(/static/images/hero/equipment/Healer_Puppet.png);
-      url(/static/images/hero/equipment/Healing_Tome.png);
-      url(/static/images/hero/equipment/Hog_Rider_Puppet.png);
-      url(/static/images/hero/equipment/Invisibility_Vial.png);
-      url(/static/images/hero/equipment/Life_Gem.png);
-      url(/static/images/hero/equipment/Rage_Gem.png);
-      url(/static/images/hero/equipment/Rage_Vial.png);
-      url(/static/images/hero/equipment/Royal_Gem.png);
-      url(/static/images/hero/equipment/Seeking_Shield.png);
-      url(/static/images/hero/equipment/Vampstache.png);
-      url(/static/images/hero/equipment/Spiky_Ball.png);
-      url(/static/images/hero/equipment/Rocket_Spear.png);
-      url("/static/images/hero/equipment/Magic_Mirror.png");
+      url(/images/hero/equipment/Archer_Puppet.png);
+      url(/images/hero/equipment/Barbarian_Puppet.png);
+      url(/images/hero/equipment/Earthquake_Boots.png);
+      url(/images/hero/equipment/Eternal_Tome.png);
+      url(/images/hero/equipment/Fireball.png);
+      url(/images/hero/equipment/Frozen_Arrow.png);
+      url(/images/hero/equipment/Giant_Arrow.png);
+      url(/images/hero/equipment/Giant_Gauntlet.png);
+      url(/images/hero/equipment/Haste_Vial.png);
+      url(/images/hero/equipment/Healer_Puppet.png);
+      url(/images/hero/equipment/Healing_Tome.png);
+      url(/images/hero/equipment/Hog_Rider_Puppet.png);
+      url(/images/hero/equipment/Invisibility_Vial.png);
+      url(/images/hero/equipment/Lavaloon_Puppet.png);
+      url(/images/hero/equipment/Life_Gem.png);
+      url(/images/hero/equipment/Rage_Gem.png);
+      url(/images/hero/equipment/Rage_Vial.png);
+      url(/images/hero/equipment/Royal_Gem.png);
+      url(/images/hero/equipment/Seeking_Shield.png);
+      url(/images/hero/equipment/Vampstache.png);
+      url(/images/hero/equipment/Spiky_Ball.png);
+      url(/images/hero/equipment/Rocket_Spear.png);
+      url("/images/hero/equipment/Magic_Mirror.png");
+      url("/images/hero/equipment/Henchmen_Puppet.png");
+      url("/images/hero/equipment/Dark_Orb.png");
+      url("/images/hero/equipment/Electro_Boots.png");
 
-      url(/static/images/etc/trophies.png);
-      url(/static/images/etc/max_level.png);
-      url(/static/images/etc/xp.png);
+      url(/images/etc/trophies.png);
+      url(/images/etc/max_level.png);
+      url(/images/etc/xp.png);
 
-      url(/static/images/pets/Lassi.png);
-      url(/static/images/pets/Mighty_Yak.png);
-      url(/static/images/pets/Electro_Owl.png);
-      url(/static/images/pets/Phoenix.png);
-      url(/static/images/pets/Unicorn.png);
-      url(/static/images/pets/Frosty.png);
-      url(/static/images/pets/Poison_Lizard.png);
-      url(/static/images/pets/Diggy.png);
-      url(/static/images/pets/Spirit_Fox.png);
-      url(/static/images/pets/Angry_Jelly.png);
+      url(/images/pets/Lassi.png);
+      url(/images/pets/Mighty_Yak.png);
+      url(/images/pets/Electro_Owl.png);
+      url(/images/pets/Phoenix.png);
+      url(/images/pets/Unicorn.png);
+      url(/images/pets/Frosty.png);
+      url(/images/pets/Poison_Lizard.png);
+      url(/images/pets/Diggy.png);
+      url(/images/pets/Spirit_Fox.png);
+      url(/images/pets/Angry_Jelly.png);
 
-      url(/static/images/townhall/16.png);
-      url(/static/images/townhall/15.png);
-      url(/static/images/townhall/14.png);
-      url(/static/images/townhall/13.png);
-      url(/static/images/townhall/12.png);
-      url(/static/images/townhall/11.png);
-      url(/static/images/townhall/10.png);
-      url(/static/images/townhall/9.png);
-      url(/static/images/townhall/8.png);
-      url(/static/images/townhall/7.png);
-      url(/static/images/townhall/6.png);
-      url(/static/images/townhall/5.png);
-      url(/static/images/townhall/4.png);
-      url(/static/images/townhall/3.png);
-      url(/static/images/townhall/2.png);
-      url(/static/images/townhall/1.png);
+      url(/images/townhall/17.png);
+      url(/images/townhall/16.png);
+      url(/images/townhall/15.png);
+      url(/images/townhall/14.png);
+      url(/images/townhall/13.png);
+      url(/images/townhall/12.png);
+      url(/images/townhall/11.png);
+      url(/images/townhall/10.png);
+      url(/images/townhall/9.png);
+      url(/images/townhall/8.png);
+      url(/images/townhall/7.png);
+      url(/images/townhall/6.png);
+      url(/images/townhall/5.png);
+      url(/images/townhall/4.png);
+      url(/images/townhall/3.png);
+      url(/images/townhall/2.png);
+      url(/images/townhall/1.png);
 
-      url(/static/images/siegemachine/Wall_Wrecker.png);
-      url(/static/images/siegemachine/Battle_Blimp.png);
-      url(/static/images/siegemachine/Stone_Slammer.png);
-      url(/static/images/siegemachine/Siege_Barracks.png);
-      url(/static/images/siegemachine/Log_Launcher.png);
-      url(/static/images/siegemachine/Flame_Flinger.png);
-      url(/static/images/siegemachine/Battle_Drill.png);
+      url(/images/siegemachine/Wall_Wrecker.png);
+      url(/images/siegemachine/Battle_Blimp.png);
+      url(/images/siegemachine/Stone_Slammer.png);
+      url(/images/siegemachine/Siege_Barracks.png);
+      url(/images/siegemachine/Log_Launcher.png);
+      url(/images/siegemachine/Flame_Flinger.png);
+      url(/images/siegemachine/Battle_Drill.png);
 
-      url(/static/images/spell/Bat_Spell.png);
-      url(/static/images/spell/Clone_Spell.png);
-      url(/static/images/spell/Earthquake_Spell.png);
-      url(/static/images/spell/Freeze_Spell.png);
-      url(/static/images/spell/Haste_Spell.png);
-      url(/static/images/spell/Healing_Spell.png);
-      url(/static/images/spell/Invisibility_Spell.png);
-      url(/static/images/spell/Jump_Spell.png);
-      url(/static/images/spell/Lightning_Spell.png);
-      url(/static/images/spell/Overgrowth_Spell.png);
-      url(/static/images/spell/Poison_Spell.png);
-      url(/static/images/spell/Rage_Spell.png);
-      url(/static/images/spell/Recall_Spell.png);
-      url(/static/images/spell/Skeleton_Spell.png);
+      url(/images/spell/Bat_Spell.png);
+      url(/images/spell/Clone_Spell.png);
+      url(/images/spell/Earthquake_Spell.png);
+      url(/images/spell/Freeze_Spell.png);
+      url(/images/spell/Haste_Spell.png);
+      url(/images/spell/Healing_Spell.png);
+      url(/images/spell/Invisibility_Spell.png);
+      url(/images/spell/Jump_Spell.png);
+      url(/images/spell/Lightning_Spell.png);
+      url(/images/spell/Overgrowth_Spell.png);
+      url(/images/spell/Poison_Spell.png);
+      url(/images/spell/Rage_Spell.png);
+      url(/images/spell/Recall_Spell.png);
+      url(/images/spell/Skeleton_Spell.png);
 }
 
 .logo {
   width: 150px;
   height: 150px;
-  background-image: url("/static/images/logo.png");
+  background-image: url("/images/logo.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
 }
 
 .m-1 {
-  margin: 1px;
+  margin: 1px !important;
 }
 .mt-5 {
-  margin-top: 5px;
+  margin-top: 5px !important;
 }
 .ml-5 {
-  margin-left: 5px;
+  margin-left: 5px !important;
 }
 
 .font-nowrap {
@@ -146,21 +152,21 @@ body::before {
 }
 
 .text-align-center {
-  text-align: center;
+  text-align: center !important;
 }
 
 .level-icon {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 15px;
+  width: 20px;
   height: 15px;
   font-weight: bold;
-  font-size: 11px;
+  font-size: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url(/static/images/etc/max_level.png);
+  background-image: url(/images/etc/max_level.png);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -216,6 +222,15 @@ body::before {
 .color-red {
   color: red !important;
 }
+.color-blue {
+  color: #0080ff !important;
+}
+.color-orange {
+  color: orange; !important;
+}
+.color-deeppink {
+  color: deeppink !important;
+}
 
 .cursor-pointer {
   cursor: pointer !important;
@@ -242,6 +257,10 @@ body::before {
 
 .align-items-center {
   align-items: center !important;
+}
+
+.justify-content-space-between {
+  justify-content: space-between !important;
 }
 
 .justify-content-center {
@@ -286,63 +305,77 @@ body::before {
   padding: 0 2px;
 }
 
+.bg-lightcoral {
+  background-color: lightcoral !important;
+  color: white !important;
+}
+
 .bg-gray {
-  background-color: gray;
-  color: white;
+  background-color: gray !important;
+  color: white !important;
+}
+
+.bg-yellowgreen {
+  background-color: yellowgreen !important;
+  color: white !important;
+}
+
+.bg-lightgoldenrodyellow {
+  background-color: lightgoldenrodyellow !important;
 }
 
 .bg-lightgray {
-  background-color: lightgray;
-  color: white;
+  background-color: lightgray !important;
+  color: white !important;
 }
 
 .bg-black {
-  background-color: black;
-  color: white;
+  background-color: black !important;
+  color: white !important;
 }
 
 .bg-black-2 {
-  background-color: #232323;
+  background-color: #232323 !important;
 }
 
 .bg-pink {
-  background-color: #e87186;
-  color: white;
+  background-color: #e87186 !important;
+  color: white !important;
 }
 
 .bg-gold {
-  background-color: #a18700;
-  color: #ffef9c;
+  background-color: #a18700 !important;
+  color: #ffef9c !important;
 }
 
 .bg-forestgreen {
-  background-color: forestgreen;
-  color: white;
+  background-color: forestgreen !important;
+  color: white !important;
 }
 
 .bg-red {
-  background-color: red;
-  color: white;
+  background-color: red !important;
+  color: white !important;
 }
 
 .bg-crimson {
-  background-color: crimson;
-  color: white;
+  background-color: crimson !important;
+  color: white !important;
 }
 
 .bg-orange {
-  background-color: #ff9800;
-  color: white;
+  background-color: #ff9800 !important;
+  color: white !important;
 }
 
 .bg-blue {
-  background-color: #4687f0;
-  color: white;
+  background-color: #4687f0 !important;
+  color: white !important;
 }
 
 .bg-green {
-  background-color: green;
-  color: white;
+  background-color: green !important;
+  color: white !important;
 }
 
 .search {
@@ -484,7 +517,7 @@ body::before {
 .icon-clock {
   width: 36px;
   height: 36px;
-  background-image: url("/static/images/etc/clock.png");
+  background-image: url("/images/etc/clock.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -493,7 +526,7 @@ body::before {
 .icon-sword {
   width: 36px;
   height: 36px;
-  background-image: url("/static/images/etc/sword.png");
+  background-image: url("/images/etc/sword.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -502,7 +535,7 @@ body::before {
 .icon-damage {
   width: 36px;
   height: 36px;
-  background-image: url("/static/images/etc/damage.png");
+  background-image: url("/images/etc/damage.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -511,7 +544,7 @@ body::before {
 .icon-clan-war {
   width: 35px;
   height: 35px;
-  background-image: url("/static/images/etc/ClanWars.png");
+  background-image: url("/images/etc/ClanWars.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -520,7 +553,7 @@ body::before {
 .icon-clan-war-league {
   width: 35px;
   height: 35px;
-  background-image: url("/static/images/etc/WarLeagues.png");
+  background-image: url("/images/etc/WarLeagues.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -529,7 +562,7 @@ body::before {
 .icon-clan-capital {
   width: 35px;
   height: 35px;
-  background-image: url("/static/images/etc/CapitalGold.png");
+  background-image: url("/images/etc/CapitalGold.png");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -538,13 +571,56 @@ body::before {
 .icon.trophies {
   width: 35px;
   height: 35px;
-  background-image: url(/static/images/etc/trophies.png);
+  background-image: url(/images/etc/trophies.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+.icon.Barbarian {
+  width: 35px;
+  height: 35px;
+  background-image: url(/images/etc/Icon_Barbarian.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon.LightningSpell {
+  width: 35px;
+  height: 35px;
+  background-image: url(/images/etc/Icon_Lightning_Spell.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+}
+
+.icon.WallWrecker {
+  width: 35px;
+  height: 35px;
+  background-image: url(/images/etc/Icon_Wall_Wrecker.png);
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
 }
 
 
+.icon-caret-up {
+  width: 15px;
+  height: 15px;
+  background-image: url("/images/etc/caret-up-solid.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.icon-caret-down {
+  width: 15px;
+  height: 15px;
+  background-image: url("/images/etc/caret-down-solid.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
 
 .file-upload-form {
   width: 185px;
@@ -599,8 +675,8 @@ body::before {
   font-size: 14px;
 
   .table-caption {
-    border: 1px solid green;
-    border-left: 3px solid green;
+    border: 1px solid transparent;
+    border-left: 3px solid transparent;
     background-color: green;
     border-radius: 5px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
@@ -609,15 +685,6 @@ body::before {
     color: white;
     padding: 5px 5px 5px 10px;
   }
-
-  .table-tbody {
-
-    .table-tr:nth-child(odd) {
-      background-color: #f9f9f9;
-    }
-
-  }
-
 
   .table-tr {
 
@@ -664,6 +731,15 @@ body::before {
   padding: 10px 20px;
 }
 
+/** date-picker */
+.input-date {
+  border: 1px solid #b7b7b7;
+  border-radius: 5px;
+  width: 115px;
+  padding: 5px;
+  font-size: 12px;
+  background-position: top 45% right 5px;
+}
 
 /** month-picker */
 .input-month {
@@ -677,4 +753,25 @@ body::before {
 
 .border-none {
   border: none;
+}
+
+.w-25 {
+  width: 25px !important;
+}
+
+.h-25 {
+  height: 25px !important;
+}
+
+.font-small {
+  font-size: 12px;
+}
+
+.font-weight-bold {
+  font-weight: bold;
+}
+
+a.link {
+  color: white;
+  text-decoration: none;
 }

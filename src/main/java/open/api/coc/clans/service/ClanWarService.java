@@ -1,8 +1,7 @@
 
 package open.api.coc.clans.service;
 
-import static open.api.coc.clans.common.exception.handler.ExceptionHandler.createNotFoundException;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,75 +9,60 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import open.api.coc.clans.common.config.HallOfFameConfig;
+import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanWarMemberRepository;
 import open.api.coc.clans.database.entity.clan.ClanEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberAttackPKEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberEntity;
 import open.api.coc.clans.database.entity.clan.ClanWarMemberPKEntity;
-import open.api.coc.clans.database.entity.clan.ClanWarRecordDTO;
 import open.api.coc.clans.database.entity.clan.ClanWarType;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberQueryRepository;
-import open.api.coc.clans.database.repository.clan.ClanWarMemberRepository;
 import open.api.coc.clans.database.repository.clan.ClanWarQueryRepository;
-import open.api.coc.clans.domain.clans.ClanWarMemberQuery;
-import open.api.coc.clans.domain.clans.ClanWarMemberResponse;
-import open.api.coc.clans.domain.clans.ClanWarMissingAttackPlayerDTO;
-import open.api.coc.clans.domain.clans.ClanWarResponse;
-import open.api.coc.clans.domain.clans.converter.EntityClanWarMemberResponseConverter;
-import open.api.coc.clans.domain.clans.converter.EntityClanWarResponseConverter;
+import open.api.coc.clans.database.repository.clan.condition.ClanWarWhitelistQueryRepository;
 import open.api.coc.clans.domain.clans.converter.TimeConverter;
-import open.api.coc.clans.domain.clans.converter.TimeUtils;
 import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.clan.ClanCurrentWarLeagueGroup;
 import open.api.coc.external.coc.clan.domain.clan.ClanWar;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarAttack;
 import open.api.coc.external.coc.clan.domain.clan.ClanWarMember;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.thymeleaf.util.StringUtils;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ClanWarService {
 
-    private final HallOfFameConfig hallOfFameConfig;
-
     private final ClanApiService clanApiService;
     private final ClanRepository clanRepository;
 
-    private final ClanWarMemberRepository clanWarMemberRepository;
+    private final ClanWarWhitelistQueryRepository clanWarWhitelistQueryRepository;
+
+    private final JpaClanWarMemberRepository clanWarMemberRepository;
 
     private final ClanWarQueryRepository clanWarQueryRepository;
-    private final ClanWarMemberQueryRepository clanWarMemberQueryRepository;
 
     private final TimeConverter timeConverter;
-    private final EntityClanWarResponseConverter entityClanWarResponseConverter;
-    private final EntityClanWarMemberResponseConverter entityClanWarMemberResponseConverter;
 
     private final String CLAN_WAR_ROOT_DIR = "./clan-war";
     private final String CLAN_WAR_GROUP_DIR = CLAN_WAR_ROOT_DIR + "/{clanTag}";
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     /**
      * 클랜전 현황 메타 정보를 생성
@@ -94,25 +78,37 @@ public class ClanWarService {
         ClanEntity clanEntity = findClan.get();
         if (clanEntity.isNotUsed()) { return ClanWarEntity.empty(); }
 
-        LocalDateTime startTime = getLocalDateTime(clanWar.getStartTime());
+        LocalDateTime preparationStartTime = getLocalDateTime(clanWar.getPreparationStartTime());
 
-        Optional<ClanWarEntity> findClanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanTag, startTime);
-
-        if (findClanWar.isPresent()) {
-            ClanWarEntity clanWarEntity = findClanWar.get();
-
-            // 이미 수집된 경우
-            if (clanWarEntity.isCollected()) { return ClanWarEntity.empty(); }
-
-            clanWarEntity.setState(clanWar.getState());
-            LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
-            clanWarEntity.setEndTime(endTime);
-
-            return clanWarEntity;
+        Optional<ClanWarEntity> findClanWar;
+        if (ClanWarType.LEAGUE.equals(clanWarType)) {
+            // 리그전의 경우 리그 전쟁 태그로 유일 데이터 판단
+            findClanWar = clanWarQueryRepository.findByClanTagAndWarTag(clanWar.getClan().getTag(), clanWar.getWarTag());
+        } else {
+            // 일반 클랜전의 경우 클랜태그와 준비 시간으로 유일 데이터 판단
+            findClanWar = clanWarQueryRepository.findByClanTagAndPreparationStartTime(clanTag, preparationStartTime);
         }
 
-        // 클랜전 기록 생성
-        return saveClanWar(clanWar, clanWarType);
+        // 클랜전 신규 기록 생성
+        if (findClanWar.isEmpty()) {
+            return saveClanWar(clanWar, clanWarType);
+        }
+
+        // 기존에 기록된 클랜전 정보 현행화
+        ClanWarEntity clanWarEntity = findClanWar.get();
+
+        LocalDateTime endTime = getLocalDateTime(clanWar.getEndTime());
+        // 점검 등으로 종료일시가 변경된 경우 갱신
+        if (!getLocalDateTime(clanWar.getEndTime()).isEqual(clanWarEntity.getEndTime())) {
+            clanWarEntity.setEndTime(endTime);
+        } else if (clanWarEntity.isCollected()) {
+            // 이미 수집된 경우
+            return ClanWarEntity.empty();
+        }
+
+        clanWarEntity.setState(clanWar.getState());
+
+        return clanWarEntity;
     }
 
     @Transactional
@@ -168,6 +164,7 @@ public class ClanWarService {
                                                                                .collect(Collectors.toMap(clanWarMemberEntity -> clanWarMemberEntity.getId().getTag(),
                                                                                                          clanWarMemberEntity -> clanWarMemberEntity));
 
+        Set<String> clanWarWhitelist = clanWarWhitelistQueryRepository.findAll();
         for (ClanWarMember clanWarMember : clanWar.getClan().getMembers()) {
             ClanWarMemberEntity clanWarMemberEntity = clanWarMemberEntityMap.get(clanWarMember.getTag());
             if (ObjectUtils.isEmpty(clanWarMemberEntity)) {
@@ -181,6 +178,13 @@ public class ClanWarService {
                                                          .build();
 
                 clanWarEntity.addMember(clanWarMemberEntity);
+            }
+
+            if (!clanWarEntity.isLeagueWar()) {
+                // 리그전이 아닌 경우 화이트리스트에 등록된 계정은 강참 설정으로 전환을 기본 정책으로 설정
+                if (clanWarWhitelist.contains(clanWarMemberEntity.getId().getTag())) {
+                    clanWarMemberEntity.changeNecessaryAttack(YnType.N);
+                }
             }
 
             mergeClanWarMemberAttacks(clanWarMemberEntity, clanWarMember);
@@ -278,7 +282,10 @@ public class ClanWarService {
         if (Objects.isNull(clanWar)) return;
 
         mergeClanWarMember(clanWarEntity, clanWar);
-        clanWarEntity.changeStateWarCollected();
+
+        if (clanWar.isWarCollected()) {
+            clanWarEntity.changeStateWarCollected();
+        }
     }
 
     private ClanWar getClanWar(ClanWarEntity clanWarEntity) {
@@ -298,14 +305,24 @@ public class ClanWarService {
             Optional<ClanWar> findClanWar = clanApiService.findClanCurrentWarByClanTag(clanWarEntity.getClanTag());
             if (findClanWar.isEmpty()) {
                 log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanWarEntity.getClanTag());
+
+                clanWar.changeWarCollected(); // 수집 완료 설정
             } else {
                 // 수집하기 직전 최신 데이터로 수집 진행
                 ClanWar currentClanWar = findClanWar.get();
-                if (currentClanWar.isWarEnded() || currentClanWar.isInWar()) {
-                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                if (currentClanWar.isInWar()) {
+                    // 최신 데이터가 진행중인 경우 해당 데이터로 수집 진행 및 재수집하도록 수집 완료 설정하지 않음
                     clanWar = currentClanWar;
+                }
+                else if (currentClanWar.isWarEnded()) {
+                    // 최신 데이터가 전쟁 종료된 경우 해당 데이터로 수집 진행
+                    clanWar = currentClanWar;
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 } else {
                     log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanWarEntity.getClanTag());
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 }
 
                 // 최신 데이터 기록
@@ -329,14 +346,24 @@ public class ClanWarService {
             Optional<ClanWar> findClanWarLeague = clanApiService.findWarLeagueByWarTag(warTag);
             if (findClanWarLeague.isEmpty()) {
                 log.info("클랜전이 종료되었으나 클랜 종료 데이터는 수집하지 못함. {}", clanTag);
+
+                clanWar.changeWarCollected(); // 수집 완료 설정
             } else {
                 // 수집하기 직전 최신 데이터로 수집 진행
                 ClanWar clanWarLeague = findClanWarLeague.get();
-                if (clanWarLeague.isWarEnded() || clanWarLeague.isInWar()) {
-                    // 최신 데이터가 전쟁 종료되었거나 진행중이면 해당 데이터로 수집 진행
+                if (clanWarLeague.isInWar()) {
+                    // 최신 데이터가 진행중이면 해당 데이터로 수집 진행 및 재수집하도록 수집 완료 설정하지 않음
                     clanWar = clanWarLeague;
+                }
+                else if (clanWarLeague.isWarEnded()) {
+                    // 최신 데이터가 전쟁 종료된 경우 해당 데이터로 수집 진행
+                    clanWar = clanWarLeague;
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 } else {
                     log.info("클랜전 데이터 수집했으나 전쟁 종료 또는 진행중 데이터가 아니기에 서버에 작성된 클랜전 파일 기준으로 수집 진행. {}", clanTag);
+
+                    clanWar.changeWarCollected(); // 수집 완료 설정
                 }
 
                 // 최신 데이터 기록
@@ -476,141 +503,4 @@ public class ClanWarService {
         }
     }
 
-    public List<ClanWarRecordDTO> getRankingClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
-        LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
-        LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
-
-        Pageable pageable = makePageable(searchType);
-
-        if (StringUtils.isEmpty(clanTag)) {
-            return clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.NONE, fromStartTime, toStartTime, pageable);
-        }
-
-        return clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(clanTag, ClanWarType.NONE, fromStartTime, toStartTime, pageable);
-    }
-
-    private Pageable makePageable(String searchType) {
-        // 임시 전체 조회 코드 설정
-        if ("ALL".equals(searchType)) {
-            return Pageable.unpaged();
-        }
-
-        return Pageable.ofSize(hallOfFameConfig.getRanking());
-    }
-
-    private LocalDateTime getStartTime(LocalDate searchMonth) {
-        LocalDate startDate = searchMonth.with(TemporalAdjusters.firstDayOfMonth());
-        return LocalDateTime.of(startDate, LocalDateTime.MIN.toLocalTime());
-    }
-
-    private LocalDateTime getEndTime(LocalDate endTime) {
-        LocalDate endDate = endTime.with(TemporalAdjusters.lastDayOfMonth());
-        return LocalDateTime.of(endDate, LocalTime.MAX.withNano(999_999_000));
-    }
-
-    public List<ClanWarResponse> getClanWars(LocalDate startDate, LocalDate endDate) {
-
-        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
-        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
-
-        List<ClanWarEntity> clanWarEntities = clanWarQueryRepository.findAllByStartTimePeriod(fromStartTime, toStartTime);
-
-        return clanWarEntities.stream()
-                              .map(entityClanWarResponseConverter::convertWithoutMember)
-                              .collect(Collectors.toList());
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayers(LocalDate startDate, LocalDate endDate) {
-        LocalDateTime fromStartTime = TimeUtils.withMinTime(startDate);
-        LocalDateTime toStartTime = TimeUtils.withMaxTime(endDate);
-
-        return clanWarQueryRepository.findAllMissingAttackPlayerByStartTimePeriod(fromStartTime, toStartTime);
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithName(String playerName, Integer queryDate) {
-        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
-        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
-
-        return clanWarQueryRepository.findMissingAttackByNameAndStartTimePeriod(playerName, fromStartTime, toStartTime);
-    }
-
-    public List<ClanWarMissingAttackPlayerDTO> getClanWarMissingAttackPlayersWithTag(String playerTag, Integer queryDate) {
-        LocalDateTime fromStartTime = TimeUtils.getDateMinTimeDaysAgo(queryDate);
-        LocalDateTime toStartTime = TimeUtils.getDateMaxTimeDaysAgo(0);
-
-        return clanWarQueryRepository.findMissingAttackByTagAndStartTimePeriod(playerTag, fromStartTime, toStartTime);
-    }
-
-    public ClanWarResponse getClanWarDetail(Long warId) {
-        ClanWarEntity clanWarEntity = clanWarQueryRepository.findByWarId(warId).orElseThrow(() -> createNotFoundException("클랜전(%s) 조회 실패".formatted(warId)));
-
-        List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWarEntity.getWarId());
-        clanWarEntity.changeMembers(clanWarMemberEntities);
-
-        return entityClanWarResponseConverter.convertWithMember(clanWarEntity);
-    }
-
-    public List<ClanWarRecordDTO> getRankingLeagueClanWarStars(LocalDate searchMonth, String clanTag, String searchType) {
-        LocalDateTime fromStartTime = TimeUtils.toFirstDayOfMonthDateTime(searchMonth);
-        LocalDateTime toStartTime = TimeUtils.toLastDayOfMonthDateTime(searchMonth);
-
-        List<ClanWarRecordDTO> rankingHallOfFames;
-        if (StringUtils.isEmpty(clanTag)) {
-            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
-        } else {
-            rankingHallOfFames = clanWarQueryRepository.findClanWarRecordsByClanTagAndClanWarTypeAndPreparationStartTimePeriod(clanTag, ClanWarType.LEAGUE, fromStartTime, toStartTime, Pageable.unpaged());
-        }
-
-        Map<String, Long> leagueClanWarRoundsMap = clanWarQueryRepository.findClanWarCountByClanWarTypeAndPreparationStartTimePeriod(ClanWarType.LEAGUE, fromStartTime, toStartTime);;
-
-        if ("ALL".equalsIgnoreCase(searchType)) {
-            return rankingHallOfFames;
-        }
-
-        // 완파한 클랜원만 제공
-        return rankingHallOfFames.stream()
-                                 .filter(ranking -> isCompleteStars(ranking, leagueClanWarRoundsMap))
-                                 .toList();
-    }
-
-    private boolean isCompleteStars(ClanWarRecordDTO ranking, Map<String, Long> clanWarCountMap) {
-        Long clanWarCount = clanWarCountMap.get(ranking.clanTag());
-        Long completedStarCount = clanWarCount * 3;
-        return Objects.equals(ranking.totalStars(), completedStarCount.intValue());
-    }
-
-    @Transactional
-    public ClanWarMemberResponse updateClanWarMemberAttackNecessaryAttack(Long warId, String playerTag) {
-
-        ClanWarMemberEntity clanWarMemberEntity = clanWarMemberRepository.findById(ClanWarMemberPKEntity.builder()
-                                                                                                        .warId(warId)
-                                                                                                        .tag(playerTag)
-                                                                                                        .build())
-                                                                         .orElseThrow(() -> createNotFoundException("클랜전(%s) 계정(%s) 정보 없음".formatted(warId, playerTag)));
-
-        YnType currentNecessaryAttackYn = clanWarMemberEntity.getNecessaryAttackYn();
-        YnType toNecessaryAttackYn = Objects.equals(currentNecessaryAttackYn, YnType.Y) ? YnType.N : YnType.Y;
-        clanWarMemberEntity.changeNecessaryAttack(toNecessaryAttackYn);
-
-        return entityClanWarMemberResponseConverter.convert(clanWarMemberEntity);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ClanWarMemberResponse> getClanWarMembers(ClanWarMemberQuery clanWarMemberQuery) {
-
-        ClanWarEntity clanWar = clanWarQueryRepository.findByClanTagAndStartTime(clanWarMemberQuery.getClanTag(), clanWarMemberQuery.getStartTime())
-                                                      .orElseThrow(() -> createNotFoundException("클랜전(%s) 시작시간(%s) 정보 없음".formatted(clanWarMemberQuery.getClanTag(), clanWarMemberQuery.getStartTime())));
-
-        List<ClanWarMemberEntity> clanWarMemberEntities = clanWarMemberQueryRepository.findAllByWarId(clanWar.getWarId());
-
-        if (clanWarMemberQuery.isConditionWithNecessaryAttackYn()) {
-            clanWarMemberEntities = clanWarMemberEntities.stream()
-                                                         .filter(clanWarMember -> Objects.equals(clanWarMember.getNecessaryAttackYn(), clanWarMemberQuery.getNecessaryAttackYn()))
-                                                         .toList();
-        }
-
-        return clanWarMemberEntities.stream()
-                                    .map(entityClanWarMemberResponseConverter::convert)
-                                    .toList();
-    }
 }

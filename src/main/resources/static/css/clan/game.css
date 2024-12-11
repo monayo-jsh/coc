@@ -1,0 +1,100 @@
+.content {
+  width: 865px;
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-wrapper {
+  border-radius: 5px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  @media (max-width: 800px) {
+    display: flex;
+    justify-content: center;
+  }
+
+  .clan-game-logo {
+    width: 870px;
+    height: 515px;
+    background-image: url(/images/etc/clan-game-logo.png);
+    background-size: cover;
+    object-fit: cover;
+
+    @media (max-width: 800px) {
+      width: 400px;
+      height: 250px;
+    }
+  }
+}
+
+.description-label {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  font-weight: bold;
+  border: 1px solid darkgray;
+  background-color: lightgreen;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.clan-game-wrapper {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+
+  @media (max-width: 800px) {
+    justify-content: center;
+  }
+
+  .clan-game {
+    display: flex;
+    align-items: center;
+    width: 285px;
+    gap: 3px;
+    border: 1px solid darkgray;
+    border-radius: 5px;
+    padding: 5px 0;
+    font-weight: bold;
+    font-size: 14px;
+
+    @media (max-width: 800px) {
+      width: 400px;
+    }
+
+    .no {
+      width: 15%;
+      display: flex;
+      justify-content: center;
+      border-right: 1px solid darkgray;
+    }
+    .name {
+      width: 70%;
+      border-right: 1px solid darkgray;
+    }
+    .point {
+      width: 30%;
+      display: flex;
+      justify-content: right;
+      align-items: center;
+      padding-right: 5px;
+    }
+  }
+
+  .completed {
+    background-color: #ddfea1;
+  }
+}
+
+.icon-clan-game-point {
+    width: 20px;
+    height: 20px;
+    background-image: url("/images/etc/clan-game-points.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}

@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import open.api.coc.clans.database.entity.player.PlayerHeroEntity;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerHeroEntity;
 import open.api.coc.clans.domain.common.HeroEquipmentResponse;
 import open.api.coc.clans.domain.common.HeroResponse;
 import open.api.coc.external.coc.clan.domain.common.Hero;

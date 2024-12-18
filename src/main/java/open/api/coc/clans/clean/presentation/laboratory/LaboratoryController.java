@@ -7,13 +7,21 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.laboratory.persistence.entity.LaboratoryEntity;
+import open.api.coc.clans.clean.infrastructure.laboratory.persistence.entity.LaboratoryMetaEntity;
+import open.api.coc.clans.clean.infrastructure.laboratory.persistence.repository.JpaLaboratoryMetaRepository;
 import open.api.coc.clans.clean.infrastructure.laboratory.persistence.repository.JpaLaboratoryRepository;
+import open.api.coc.clans.clean.presentation.laboratory.dto.LaboratoryCreateRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/lab")
 public class LaboratoryController {
 
+    private final JpaLaboratoryMetaRepository jpaLaboratoryMetaRepository;
     private final JpaLaboratoryRepository jpaLaboratoryRepository;
 
     @Operation(
@@ -37,6 +46,65 @@ public class LaboratoryController {
     public ResponseEntity<List<LaboratoryEntity>> getLinks() {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(jpaLaboratoryRepository.findAll());
+    }
+
+    @Operation(
+        summary = "연구소를 등록합니다., version: 1.00, Last Update: 25.12.18",
+        description = "이 API는 연구소 등록 기능을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = LaboratoryEntity.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("")
+    public ResponseEntity<LaboratoryEntity> postLaboratory(@Valid @RequestBody LaboratoryCreateRequest request) {
+        LaboratoryEntity newLaboratory = LaboratoryEntity.createNew(request.name(), request.linkUrl());
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(jpaLaboratoryRepository.save(newLaboratory));
+    }
+
+    @Operation(
+        summary = "연구소를 삭제합니다., version: 1.00, Last Update: 25.12.18",
+        description = "이 API는 연구소 삭제 기능을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "성공 응답 없음"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteLaboratory(@PathVariable("id") Long id) {
+        jpaLaboratoryRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+    @Operation(
+        summary = "연구소 최신 입장코드 문구를 조회합니다., version: 1.00, Last Update: 25.12.18",
+        description = "이 API는 연구소 최신 입장코드 문구를 조회합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = LaboratoryMetaEntity.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/enter-code/latest")
+    public ResponseEntity<LaboratoryMetaEntity> getLatestLaboratoryEnterCode() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(jpaLaboratoryMetaRepository.findLatestOne());
+    }
+
+    @Operation(
+        summary = "연구소 입장코드 문구를 설정합니다., version: 1.00, Last Update: 25.12.18",
+        description = "이 API는 연구소 입장코드 문구 설정 기능을 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "성공 응답 없음"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/enter-code/{code}")
+    public ResponseEntity<Void> postLaboratoryEnterCode(@PathVariable("code") String code) {
+        jpaLaboratoryMetaRepository.save(LaboratoryMetaEntity.createNew(code));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
     }
 
 }

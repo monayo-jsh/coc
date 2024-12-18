@@ -14,13 +14,30 @@
   <script src="/js/api/lab.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script>
+    async function drawEnterCode() {
+      const meta = await fetchLatestLaboratoryEnterCode();
+      if (meta) {
+        const { code } = meta;
+        const target = document.querySelector('.enter-code');
+        target.innerHTML = code;
+      }
+    }
     async function getLabLinks() {
-      const links = await fetchLabLinkAll();
+      const links = await fetchLaboratories();
       renderLinks(links);
     }
 
     function renderLinks(links) {
-      for(const link of links) {
+      const sortedLinks = links.map(link => {
+                                  if (!link.order) {
+                                    // 정렬값이 설정되지 않은 경우 id 채번으로 설정
+                                    link.order = link.id;
+                                  }
+                                  return link;
+                                })
+                               .sort((a, b) => a.order - b.order);
+
+      for(const link of sortedLinks) {
         renderLink(link);
       }
     }
@@ -40,6 +57,7 @@
     }
 
     window.onload = async () => {
+      await drawEnterCode();
       await getLabLinks();
     }
   </script>
@@ -53,7 +71,7 @@
     <div class="description">
       새로운 연구소 개설 희망시 운영진DM 주세요
       <br><br>
-      <span class="small-text">입장코드: 0070</span>
+      <span class="small-text">입장코드: <span class="enter-code"></span></span>
     </div>
 
     <div class="contents">

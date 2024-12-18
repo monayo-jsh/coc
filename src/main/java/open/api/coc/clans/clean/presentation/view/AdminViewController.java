@@ -32,6 +32,12 @@ public class AdminViewController {
         return "cms/SeasonManager";
     }
 
+    /** 연구소 관리 */
+    @GetMapping("/laboratory/manager")
+    public String laboratoryManager() {
+        return "cms/LaboratoryManager";
+    }
+
     /** 클랜원 관리 */
     @GetMapping("/member/manager")
     public String memberManager() {

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/laboratoryManager.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/lab.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <title>연구소 관리</title>
+  <script>
+    async function setupEnterCode() {
+        const input = document.querySelector('.input.code');
+        const enterCode = input.value.trim();
+
+        if (!enterCode) {
+          alert("입장코드 문구를 입력해주세요.");
+          return;
+        }
+
+        const isResult = await updateLaboratoryEnterCode(enterCode);
+        if (isResult) {
+          location.reload();
+        }
+    }
+
+    async function drawLatestEnterCode() {
+        const meta = await fetchLatestLaboratoryEnterCode();
+        if (meta) {
+          const { code } = meta;
+          const target = document.querySelector('.enter-code');
+          target.innerHTML = code;
+        }
+    }
+
+    async function removeLaboratory(element) {
+      const laboratory = element.closest('.laboratory');
+      const { id, name } = laboratory.dataset;
+
+      if (!confirm(`"${name}" 연구소를 삭제하시겠습니까?`)) {
+        return;
+      }
+
+      const isResult = await deleteLaboratory(id);
+      if (isResult) {
+        location.reload();
+      }
+    }
+
+    async function drawLaboratories() {
+      const links = await fetchLaboratories();
+      renderLinks(links);
+    }
+
+    function renderLinks(links) {
+      const target = document.querySelector('.laboratory-wrapper');
+      target.innerHTML = ""; // clear
+
+      const sortedLinks = links.map(link => {
+                                  if (!link.order) {
+                                    // 정렬값이 설정되지 않은 경우 id 채번으로 설정
+                                    link.order = link.id;
+                                  }
+                                  return link;
+                                })
+                               .sort((a, b) => a.order - b.order);
+
+      for(const link of sortedLinks) {
+        const row = drawLaboratoryRow(link);
+        target.appendChild(row);
+      }
+    }
+
+    function drawLaboratoryRow(laboratory) {
+      const laboratoryTemplate = copyTemplateById('laboratory-template');
+      const laboratoryRow = laboratoryTemplate.querySelector('.laboratory');
+
+      const { id, name, link } = laboratory;
+
+      laboratoryRow.innerHTML = laboratoryRow.innerHTML
+                                             .replace(/{LINK}/g, link)
+                                             .replace(/{NAME}/, name);
+
+      //dataset
+      laboratoryRow.dataset.id = id;
+      laboratoryRow.dataset.name = name;
+
+      return laboratoryRow;
+    }
+
+    function displayRegisterForm() {
+      const noticeRegistrationWrapper = document.querySelector('.registration-wrapper');
+      toggleDisplay(noticeRegistrationWrapper);
+    }
+
+    async function registerLaboratory() {
+      const registerForm = document.querySelector('form.registration-form');
+      const requestBody = loadRequestBodyFromForm(registerForm);
+
+      // API 호출
+      createLaboratory(requestBody)
+      .then((isResult) => {
+        if (isResult) {
+          location.reload();
+        }
+      });
+    }
+
+    window.onload = async () => {
+      await drawLatestEnterCode();
+      await drawLaboratories();
+    }
+  </script>
+</head>
+<body>
+
+<div class="title">
+  <span class="label">연구소 관리</span>
+</div>
+<div class="support-area">
+  <form class="enter-code-form">
+    <div class="row">
+      <div class="cell">
+        <span class="description">* 연구소 입장코드 문구 설정</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <span class="description">현재 입장코드 : <span class="enter-code"></span></span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <input type="text" class="input code" name="code">
+      </div>
+      <div class="cell">
+        <div class="button-chip" onclick="setupEnterCode();">설정</div>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="support-area">
+  <div class="buttons">
+    <div class="button-chip" onclick="displayRegisterForm();">연구소 등록</div>
+  </div>
+  <div class="registration-wrapper display-none">
+    <form class="registration-form">
+      <table class="table mt-5">
+        <caption class="table-caption">연구소 등록</caption>
+        <colgroup>
+          <col width="20%">
+          <col width="*">
+        </colgroup>
+        <tbody class="table-tbody">
+        <tr class="table-tr">
+          <th class="table-th">이름</th>
+          <td class="table-td">
+            <input class="input" name="name" type="text" maxlength="100">
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">링크</th>
+          <td class="table-td">
+            <input class="input" name="link_url" type="text" maxlength="500">
+          </td>
+        </tr>
+        </tbody>
+        <tfoot class="table-foot">
+        <tr class="table-tr">
+          <td colspan="2" class="table-td">
+            <div class="td-wrap display-flex justify-content-center">
+              <div class="button-chip" onclick="registerLaboratory();">추가</div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </form>
+  </div>
+</div>
+<div class="laboratory-wrapper"></div>
+
+</body>
+<template id="laboratory-template">
+  <div class="laboratory">
+    <div class="row">
+      <div class="cell">
+        <div class="name">{NAME}</div>
+      </div>
+      <div class="cell">
+        <i class="fa-solid fa-trash cursor-pointer" onclick="removeLaboratory(this);"></i>
+      </div>
+    </div>
+    <div class="row">
+      <div class="cell">
+        <div class="link"><a href="{LINK}" class="link">{LINK}</a></div>
+      </div>
+    </div>
+  </div>
+</template>
+</html>

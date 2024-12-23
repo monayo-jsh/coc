@@ -39,6 +39,7 @@ public class EventTeamLegendService {
     public void saveCurrentTeamLegendRecord() {
         EventTeamLegend eventTeamLegend = findLatestTeamLegend();
 
+        if (eventTeamLegend.isNotStarted()) return; // 시작하지 않은 경우
         if (eventTeamLegend.isFinish()) return; // 종료된 경우
 
         List<EventTeamMember> allMembers = eventTeamLegend.getTeams()

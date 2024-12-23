@@ -44,12 +44,20 @@ public class EventUseCase {
         // 이미 종료된 이벤트인 경우 종료
         if (teamLegend.isFinish()) return;
 
+        // 이벤트 시작일이 되지 않은 경우
+        if (teamLegend.isNotStartDate()) return;
+
+        // 이벤트 시작일시가 지났으나 진행중 상태가 아닌 경우
+        if (teamLegend.isNotStarted()) {
+            teamLegend.start();
+        }
+
         // 이벤트 데이터를 현행화한다.
         processSyncAllTeamMembers(teamLegend);
 
         // 종료일시가 지난경우 이벤트 상태 종료 처리.
         if (teamLegend.isPassedEndDate()) {
-            teamLegend.finishEvent();
+            teamLegend.finish();
         }
 
         // 이벤트 저장

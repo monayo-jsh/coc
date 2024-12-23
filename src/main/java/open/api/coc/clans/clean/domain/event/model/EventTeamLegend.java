@@ -25,18 +25,36 @@ public class EventTeamLegend {
 
     private List<EventTeam> teams; // 팀 목록
 
+    public boolean isIng() {
+        return EventStatus.ING.equals(this.status);
+    }
     public boolean isFinish() {
         return EventStatus.FINISH.equals(this.status);
     }
 
-    public boolean isPassedEndDate() {
-        // 종료 시간을 기준으로 1분 전까지만 갱신
-        LocalDateTime conditionEndDate = this.endDate.minusMinutes(1);
-        return LocalDateTime.now().isAfter(conditionEndDate);
+    public void start() {
+        this.status = EventStatus.ING;
     }
 
-    public void finishEvent() {
+    public void finish() {
         this.status = EventStatus.FINISH;
+    }
+
+    public boolean isNotStarted() {
+        if (isIng()) return false;
+        return LocalDateTime.now().isAfter(this.startDate);
+    }
+
+    public boolean isNotStartDate() {
+        // 시작 시간을 기준으로 1분전을 기준으로 판단
+        LocalDateTime conditionStartDateTime = LocalDateTime.now().minusMinutes(1);
+        return conditionStartDateTime.isBefore(this.startDate);
+    }
+
+    public boolean isPassedEndDate() {
+        // 종료 시간을 기준으로 1분 전까지만 갱신
+        LocalDateTime conditionEndDateTime = this.endDate.minusMinutes(1);
+        return LocalDateTime.now().isAfter(conditionEndDateTime);
     }
 
     public static class EventTeamLegendBuilder {

@@ -26,10 +26,11 @@ public class JpaEventCustomRepository {
     public LocalDateTime findLatestStartDate() {
         BooleanBuilder condition = createBaseCondition();
 
-        return queryFactory.select(eventEntity.startDate.max())
+        return queryFactory.select(eventEntity.startDate)
                            .from(eventEntity)
                            .where(condition)
-                           .groupBy(eventEntity.startDate)
+                           .orderBy(eventEntity.startDate.desc())
+                           .limit(1)
                            .fetchOne();
     }
 

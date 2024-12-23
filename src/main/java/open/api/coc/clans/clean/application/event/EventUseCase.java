@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.application.event;
 
+import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,6 +85,9 @@ public class EventUseCase {
 
         // 참여 팀 아이디 목록을 구한다.
         List<Long> teamIds = eventTeamLegend.getTeams().stream().map(EventTeam::getId).toList();
+
+        // 배정된 팀이 없는 경우
+        if (teamIds.isEmpty()) { return Collections.emptyList(); }
 
         // 참여팀의 일별 결과를 조회한다.
         return eventTeamLegendService.findAllTeamLegendDailyRankingsByIds(teamIds);

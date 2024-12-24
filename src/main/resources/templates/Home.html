@@ -25,6 +25,7 @@
   <script src="/js/util.js"></script>
   <script src="/js/api/clan.js"></script>
   <script src="/js/api/notice.js"></script>
+  <script src="/js/api/event.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -227,7 +228,7 @@
     
     function initSwipeEvent() {
       const notices = document.querySelectorAll('.notices .notice');
-      if (!notices) return;
+      if (!notices.length) return;
       if (notices.length === 1) return;
 
       setInterval(() => showNextNotice(notices), 5000);
@@ -243,10 +244,35 @@
       notices[currentNoticeIndex].classList.add('active');
     }
 
-    window.onload = async () => {
+  async function renderTeamEventPage() {
+    const latestTeamEvent = await fetchLatestTeamLegendEvent();
+
+    if (isNotStarted()) {
+      alert('Coming Soon!');
+      return;
+    }
+
+    renderPage('/event/team/legend');
+
+    function isNotStarted() {
+      if (latestTeamEvent.status === 'READY') return true;
+      if (latestTeamEvent.status === 'ING') return false;
+
+      // 종료된 케이스
+      const eventEndDate = dayjs(latestTeamEvent.endDate);
+
+      // 이벤트 종료된 후 2일이 지난 경우
+      if (dayjs().diff(eventEndDate, 'day') > 2) { return true; }
+
+      // 그 전까지는 진입
+      return false;
+    }
+  }
+
+  window.onload = async () => {
       await initAssignedDate();
       await drawNotice();
-    }
+  }
   </script>
 </head>
 <body>
@@ -271,8 +297,7 @@
           <i class="fa-brands fa-youtube fa-lg" style="color: gold;"></i>
           <p class="tip">뱃튜브</p>
         </div>
-<!--        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('/event/team/legend'); return false;">-->
-        <div class="card bg-black-2 with-icon color-gold w90" onclick="alert('Coming Soon !'); return false;">
+        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderTeamEventPage(); return false;">
           <i class="fa-solid fa-star" style="color: gold;"></i>
           <p class="tip">이벤트</p>
           <i class="fa-solid fa-star" style="color: gold;"></i>

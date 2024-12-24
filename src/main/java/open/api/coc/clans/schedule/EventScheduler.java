@@ -11,7 +11,7 @@ public class EventScheduler {
 
     private final EventUseCase eventUseCase;
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 1000 * 60)
     public void processForTeamLegendRecord() {
         // 팀 전설내기 분 단위 기록 갱신용
         eventUseCase.processForTeamLegendRecord();

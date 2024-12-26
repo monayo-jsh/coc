@@ -17,6 +17,7 @@ import org.mapstruct.ReportingPolicy;
 )
 public interface EventTeamLegendEntityMapper {
 
+    @Mapping(target = "eventId", source = "event.id")
     EventTeam toEventTeamLegend(EventTeamLegendEntity teamLegendEntity);
 
     @Mapping(target = "members", ignore = true)

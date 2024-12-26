@@ -11,6 +11,9 @@ public record EventTeamResponse(
     @Schema(description = "팀 이름")
     String name,
 
+    @Schema(description = "팀 색상")
+    String color,
+
     @Schema(description = "팀 트로피")
     Integer trophies,
 

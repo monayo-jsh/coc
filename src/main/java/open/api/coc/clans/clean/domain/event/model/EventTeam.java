@@ -18,6 +18,7 @@ public class EventTeam {
 
     private Long id; // 팀 고유키
     private String name; // 팀 이름
+    private String color; // 팀 색상
 
     private int trophies; // 팀 트로피
 

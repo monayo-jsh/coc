@@ -188,8 +188,6 @@
     async function drawEventTeamLegendDailyRanking(teamLegend) {
       const dailyRankings = await fetchTeamLegendDailyRanking(teamLegend.id);
 
-      if (!dailyRankings || !dailyRankings.length) return;
-
       // 실시간 순위 추가
       if (teamLegend.status === "ING") {
         let currentRank = 0;
@@ -208,6 +206,8 @@
           dailyRankings.push(dailyRank);
         }
       }
+
+      if (!dailyRankings || !dailyRankings.length) return;
 
       renderRankingChart('daily-ranking', dailyRankings);
     }
@@ -264,7 +264,8 @@
         }
       });
 
-      toggleDisplay(context);
+      const target = context.closest('.ranking-chart');
+      toggleDisplay(target);
     }
 
     function makeChartDataset(rows) {
@@ -272,15 +273,18 @@
 
       const dataset = [];
 
+      let rank = 0;
       for(const team of SORTED_TEAMS) {
+        rank++; // 순위
+
         const dailyRecords = teamMap.get(team.name);
         const sortedRecords = dailyRecords.sort((a, b) => a.rankingDate - b.rankingDate);
         const teamDataset = {
           label: team.name,
           data: sortedRecords.map(convertRecord),
           fill: false,
-          borderColor: getColor(team.id),
-          backgroundColor: getColor(team.id),
+          borderColor: getColor(team.color),
+          backgroundColor: getColor(team.color),
           tension: 0.1
         }
 
@@ -301,12 +305,16 @@
         }
       }
 
-      function getColor(teamId) {
-        switch (teamId) {
+      function getColor(color) {
+        if (color) return color;
+
+        // 정의된 팀 색상이 없으면 현재 순위를 기반으로 그래프 색 설정
+        switch (rank) {
           case 1: return 'rgb(255,0,0)';
           case 2: return 'rgb(255,221,0)';
-          case 3: return 'rgb(0,81,255)';
-          case 4: return 'rgb(72,157,0)';
+          case 3: return 'rgb(72,157,0)';
+          case 4: return 'rgb(0,81,255)';
+          case 5: return 'rgb(220,0,255)';
         }
         return "";
       }
@@ -455,8 +463,8 @@
         </table>
       </div>
       <div class="teams"></div>
-      <div class="ranking-chart">
-        <canvas id="daily-ranking" class="display-none"></canvas>
+      <div class="ranking-chart display-none">
+        <canvas id="daily-ranking"></canvas>
       </div>
       <div class="personal-ranking leaderboard-wrapper">
         <div class="leaderboard">

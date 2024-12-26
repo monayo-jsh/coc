@@ -40,6 +40,10 @@ public class EventTeamLegendEntity {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Comment("팀 색상")
+    @Column(name = "color", nullable = true, length = 50)
+    private String color;
+
     @Comment("이벤트 정보")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "event_id", nullable = false, updatable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -50,10 +54,11 @@ public class EventTeamLegendEntity {
     private List<EventTeamLegendMemberEntity> members;
 
     @Builder
-    private EventTeamLegendEntity(Long id, String name, EventEntity event,
+    private EventTeamLegendEntity(Long id, String name, String color, EventEntity event,
                                  List<EventTeamLegendMemberEntity> members) {
         this.id = id;
         this.name = name;
+        this.color = color;
         this.event = event;
         this.members = members;
     }

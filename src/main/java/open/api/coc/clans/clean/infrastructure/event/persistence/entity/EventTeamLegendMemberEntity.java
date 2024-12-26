@@ -49,6 +49,11 @@ public class EventTeamLegendMemberEntity implements Persistable<String> {
     @ColumnDefault("0")
     private Integer trophies;
 
+    @Comment("타운홀 레벨")
+    @Column(name = "townhall_level", nullable = false)
+    @ColumnDefault("0")
+    private Integer townhallLevel;
+
     @Comment("팀 정보")
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "team_legend_id", nullable = false, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -65,12 +70,13 @@ public class EventTeamLegendMemberEntity implements Persistable<String> {
     private LocalDateTime updatedAt;
 
     @Builder
-    private EventTeamLegendMemberEntity(String tag, String name, Integer trophies,
+    private EventTeamLegendMemberEntity(String tag, String name, Integer trophies, Integer townhallLevel,
                                        EventTeamLegendEntity team, LocalDateTime createdAt,
                                        LocalDateTime updatedAt, boolean isNew) {
         this.tag = tag;
         this.name = name;
         this.trophies = trophies;
+        this.townhallLevel = townhallLevel;
         this.team = team;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;

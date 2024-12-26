@@ -17,6 +17,9 @@ public record EventTeamMemberResponse(
     @Schema(description = "현재 트로피")
     Integer trophies,
 
+    @Schema(description = "현재 타운홀 레벨")
+    Integer townhallLevel,
+
     @Schema(description = "최종 수정일시")
     LocalDateTime updatedAt
 

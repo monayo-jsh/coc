@@ -2,6 +2,7 @@ body {
   padding: 0;
   display: flex;
   flex-direction: column;
+  background: black;
 }
 
 .table-tbody {
@@ -14,9 +15,8 @@ body {
 
 .event {
   margin-top: 10px;
-  color: black;
+  color: gold;
   padding: 5px 10px;
-  background-color: #ffffff;
   border-bottom: 2px double;
   font-weight: bold;
   font-size: 24px;
@@ -155,6 +155,7 @@ body {
         margin-top: 10px;
         width: 800px;
         display: flex;
+        justify-content: center;
         flex-wrap: wrap;
 
         @media (max-width: 800px) {
@@ -180,7 +181,31 @@ body {
       .ranking-chart {
         padding: 5px;
         width: 100%;
-        height: 100%;
+      }
+
+      .personal-ranking {
+        margin-top: 10px;
+        width: 800px;
+        display: flex;
+        flex-wrap: wrap;
+
+        @media (max-width: 800px) {
+          width: 385px;
+        }
+
+        .team-detail {
+          margin: 3px;
+
+          .table-caption {
+            background-color: #47458e;
+          }
+
+          .td-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+        }
       }
     }
   }
@@ -237,4 +262,220 @@ i.fa-sort-down {
   color: white;
   font-size: 11px;
   padding: 3px 10px;
+}
+
+.table {
+  color: white;
+
+  .table-tfoot {
+    color: black;
+  }
+}
+
+.ranking-chart {
+  margin-top: 10px;
+  background: white;
+  border-radius: 5px;
+}
+
+
+
+
+
+.leaderboard-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  font-size: 12px;
+  max-width: 600px;
+  min-height: 100px;
+
+  .leaderboard {
+    background: linear-gradient(135deg, #000000, #000000);
+    border: 1px solid white;
+    border-radius: 10px;
+    width: 600px;
+    padding: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    color: white;
+    text-align: center;
+
+    @media (max-width: 500px) {
+      width: 380px;
+    }
+  }
+
+  .leaderboard-title {
+    font-size: 1.5em;
+    border-bottom: 1px solid darkgray;
+    padding-bottom: 10px;
+  }
+
+  .top-3 {
+    display: flex;
+    justify-content: space-around;
+    gap: 5px;
+    margin-top: 30px;
+    font-weight: bold;
+    font-size: 13px;
+
+    i.fa-medal {
+      font-size: 1.5em;
+    }
+
+    i.fa-star {
+      height: 17px;
+    }
+
+    .player {
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 5px 0;
+      border-radius: 10px;
+      padding: 10px;
+
+      @media (max-width: 500px) {
+        width: 110px !important;
+      }
+    }
+
+    .name {
+      font-size: 15px;
+    }
+    .score {
+      font-size: 13px;
+    }
+
+    .info {
+      margin-top: 5px;
+
+      .score {
+        display: flex;
+        gap: 5px;
+
+        .icon {
+          margin-right: unset;
+        }
+      }
+
+      .score.column {
+        @media (max-width: 500px) {
+          flex-direction: column;
+        }
+      }
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .player.top-player-1 {
+    margin-top: -18px;
+    height: fit-content;
+    border: 1px solid gold;
+
+    .name {
+      white-space: nowrap;
+    }
+  }
+
+  .player.top-player-2 {
+    border: 1px solid #c0c0c0;
+  }
+  .player.top-player-3 {
+    border: 1px solid #CD7F32;
+  }
+
+  .player {
+    position: relative;
+    width: 280px;
+    margin-top: 0;
+
+    @media (max-width: 500px) {
+      width: 100% !important;
+    }
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+    background-color: #000000;
+    border-radius: 50%;
+    margin: 10px auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .details {
+    margin-top: 5px;
+  }
+
+  .info {
+    margin-top: 5px;
+  }
+
+  .name {
+    display: block;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .score {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #f5d742;
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  .other-players {
+    margin-top: 10px;
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    @media (max-width: 500px) {
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: initial;
+    }
+  }
+
+  .other-players .player {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 3px 0;
+    border-radius: 10px;
+    font-size: 12px;
+    width: 285px;
+
+    .score {
+      margin-top: 0;
+      text-align: right;
+      color: #f5d742;
+    }
+
+    i, div.icon {
+      margin-right: 5px;
+    }
+  }
+
+  .rank {
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
 }

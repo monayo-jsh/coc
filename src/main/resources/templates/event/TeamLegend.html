@@ -12,6 +12,7 @@
   <link rel="stylesheet" type="text/css" href="/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/css/loader.css" />
   <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/townhall.css" />
   <link rel="stylesheet" type="text/css" href="/css/event/teamLegend.css" />
 
   <script src="/js/common.js"></script>
@@ -174,6 +175,7 @@
       drawTargetElement.appendChild(teamLegendEventElement);
 
       drawEventTeamLegendDailyRanking(teamLegend);
+      drawRanking(teamLegend);
     }
 
     async function drawEventTeamLegend() {
@@ -264,6 +266,7 @@
 
       toggleDisplay(context);
     }
+
     function makeChartDataset(rows) {
       const teamMap = convertArrayToMapByKey(rows, 'teamName', true);
 
@@ -307,6 +310,96 @@
         }
         return "";
       }
+    }
+
+    function drawRanking(teamLegend) {
+      const { teams } = teamLegend;
+      // 팀 정보가 없을 경우
+      if (!teams || !teams.length) return;
+
+      const members = teams.reduce((allMembers, team) => allMembers.concat(team.members), []);
+
+      // 팀원 목록이 없을 경우
+      if (!members || !members.length) return;
+
+      const target = document.querySelector('.personal-ranking');
+      const sortedMembers = sortByTrophies(members);
+
+      drawLeaderBoardTopPlayer(target, sortedMembers.splice(0, 3));
+      drawLeaderBoardOtherPlayer(target, sortedMembers);
+    }
+
+    function drawLeaderBoardTopPlayer(leaderboard, topPlayers) {
+      const target = leaderboard.querySelector('.top-3');
+
+      const recordRows = [];
+      let rank = 1;
+      for (const topPlayer of topPlayers) {
+        const topPlayerRow = makeTopPlayerRow(rank, topPlayer);
+
+        switch (rank) {
+          case 1: recordRows.push(topPlayerRow); break; // 배열의 가운데 위치해야함
+          case 2: recordRows.unshift(topPlayerRow); break; // 배열의 첫번째 위치해야함
+          case 3: recordRows.push(topPlayerRow); break; // 배열의 마지막에 위치해야함
+        }
+
+        rank++;
+      }
+
+      // 빈 순위 채워주기
+      for (let rowCount = recordRows.length; rowCount < 3; rowCount++) {
+        const emptyRow = makeTopPlayerEmptyRow();
+        if (recordRows.length === 1) {
+          recordRows.unshift(emptyRow);
+        } else {
+          recordRows.push(emptyRow);
+        }
+      }
+
+      recordRows.forEach(record => target.appendChild(record));
+    }
+
+    function drawLeaderBoardOtherPlayer(leaderboard, players) {
+      const target = leaderboard.querySelector('.other-players');
+
+      let rank = 4;
+      for (const player of players) {
+        const playerRow = makePlayerRow(rank, player);
+        target.appendChild(playerRow);
+
+        rank++;
+      }
+    }
+
+    function makeTopPlayerRow(rank, player) {
+      const { name, trophies, townhallLevel } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{USER_HALL_LEVEL}/, townhallLevel)
+                                     .replace(/{SCORE}/, Number(trophies).toLocaleString());
+
+      const medalIcon = getMedalIcon(rank);
+      topPlayer.prepend(medalIcon);
+
+      topPlayer.classList.add(`top-player-${rank}`);
+
+      return topPlayer;
+    }
+
+    function makePlayerRow(rank, player) {
+      const { name, trophies } = player
+      const topPlayerTemplate = copyTemplateById('leaderboard-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+
+      topPlayer.innerHTML = topPlayer.innerHTML
+                                     .replace(/{RANK}/, rank)
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{SCORE}/, Number(trophies).toLocaleString());
+
+      return topPlayer;
     }
 
     window.onload = async () => {
@@ -358,6 +451,13 @@
       <div class="ranking-chart">
         <canvas id="daily-ranking" class="display-none"></canvas>
       </div>
+      <div class="personal-ranking leaderboard-wrapper">
+        <div class="leaderboard">
+          <h2 class="leaderboard-title">개인 순위</h2>
+          <div class="top-3"></div>
+          <ul class="other-players"></ul>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -392,6 +492,7 @@
 </template>
 <template id="team-member-row-template">
   <tr class="table-tr">
+    <td class="table-td no display-none">{NO}</td>
     <td class="table-td name">{NAME}</td>
     <td class="table-td"><div class="td-wrap"><div class="icon trophies"></div>{TROPHIES}</div></td>
     <td class="table-td"><div class="td-wrap">{RECORD_TIME}</div></td>
@@ -411,5 +512,24 @@
 </template>
 <template id="icon-arrow-down">
   <i class="fa-solid fa-sort-down"></i>
+</template>
+
+<template id="leaderboard-top-player-template">
+  <div class="player">
+    <div class="avatar">
+      <div class="town-hall th{USER_HALL_LEVEL}"></div>
+    </div>
+    <div class="details">
+      <span class="name">{NAME}</span>
+    </div>
+    <div class="score"><div class="icon trophies"></div>{SCORE}</div>
+  </div>
+</template>
+<template id="leaderboard-player-template">
+  <li class="player">
+    <span class="rank">{RANK}th</span>
+    <span class="name">{NAME}</span>
+    <div class="score"><div class="icon trophies"></div>{SCORE}</div>
+  </li>
 </template>
 </html>

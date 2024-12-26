@@ -19,11 +19,13 @@ public class EventTeamMember {
     private String name; // 플레이어 이름
 
     private int trophies; // 트로피 점수
+    private int townhallLevel; // 타운홀 레벨
 
     private LocalDateTime updatedAt; // 최종 수정일시
 
-    public void refreshInfo(String name, Integer trophies) {
+    public void refreshInfo(String name, Integer trophies, Integer townhallLevel) {
         this.name = name;
         this.trophies = trophies;
+        this.townhallLevel = townhallLevel;
     }
 }

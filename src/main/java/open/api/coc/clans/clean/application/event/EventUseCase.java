@@ -74,7 +74,7 @@ public class EventUseCase {
         for (EventTeamMember member : allTeamMembers) {
             try {
                 PlayerResponse playerResponse = playersService.findPlayerBy(member.getTag());
-                member.refreshInfo(playerResponse.getName(), playerResponse.getTrophies());
+                member.refreshInfo(playerResponse.getName(), playerResponse.getTrophies(), playerResponse.getTownHallLevel());
             } catch (Exception e) {
                 log.error("%s (%s) 정보 동기화 실패".formatted(member.getName(), member.getTag()), e);
             }

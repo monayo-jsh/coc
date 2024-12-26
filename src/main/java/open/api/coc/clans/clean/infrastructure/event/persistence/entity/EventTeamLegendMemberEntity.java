@@ -7,13 +7,12 @@ import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +21,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -33,10 +31,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
     name = "tb_event_team_legend_member"
 )
 @Comment("이벤트 팀 전설내기 멤버 테이블")
-public class EventTeamLegendMemberEntity implements Persistable<String> {
+public class EventTeamLegendMemberEntity {
+
+    @Comment("팀 전설내기 멤버 고유키")
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @Comment("플레이어 태그")
-    @Id
     @Column(name = "tag", nullable = false, length = 100)
     private String tag;
 
@@ -70,9 +72,9 @@ public class EventTeamLegendMemberEntity implements Persistable<String> {
     private LocalDateTime updatedAt;
 
     @Builder
-    private EventTeamLegendMemberEntity(String tag, String name, Integer trophies, Integer townhallLevel,
+    private EventTeamLegendMemberEntity(Long id, String tag, String name, Integer trophies, Integer townhallLevel,
                                        EventTeamLegendEntity team, LocalDateTime createdAt,
-                                       LocalDateTime updatedAt, boolean isNew) {
+                                       LocalDateTime updatedAt) {
         this.tag = tag;
         this.name = name;
         this.trophies = trophies;
@@ -80,34 +82,10 @@ public class EventTeamLegendMemberEntity implements Persistable<String> {
         this.team = team;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        this.isNew = isNew;
-    }
-
-    @Transient
-    private boolean isNew;
-
-    @PrePersist
-    @PostLoad
-    void markNotNew() {
-        this.isNew = false;
-    }
-
-    @Override
-    public String getId() {
-        return this.tag;
-    }
-
-    @Override
-    public boolean isNew() {
-        return isNew;
     }
 
     public void changeTeam(EventTeamLegendEntity team) {
         this.team = team;
     }
 
-    // 기본값 설정을 위한 빌더 객체
-    public static class EventTeamLegendMemberEntityBuilder {
-        private boolean isNew = false;
-    }
 }

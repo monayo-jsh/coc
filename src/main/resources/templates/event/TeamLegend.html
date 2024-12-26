@@ -359,6 +359,13 @@
       recordRows.forEach(record => target.appendChild(record));
     }
 
+    function makeTopPlayerEmptyRow() {
+      const topPlayerTemplate = copyTemplateById('leaderboard-top-player-template');
+      const topPlayer = topPlayerTemplate.querySelector('.player');
+      topPlayer.innerHTML = "";
+      return topPlayer;
+    }
+
     function drawLeaderBoardOtherPlayer(leaderboard, players) {
       const target = leaderboard.querySelector('.other-players');
 

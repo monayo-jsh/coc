@@ -22,6 +22,8 @@ public interface JpaEventTeamLegendMemberHistoryRepository extends JpaRepository
               + "        SUM(trophies) AS total_trophies "
               + "    FROM  "
               + "        TB_EVENT_TEAM_LEGEND_MEMBER_HISTORY "
+              + "    WHERE "
+              + "          team_legend_Id in (:teamIds)"
               + "    GROUP BY  "
               + "        TO_CHAR(created_at, 'yyyy-MM-dd'), team_legend_id "
               + ") AS daily_summary "

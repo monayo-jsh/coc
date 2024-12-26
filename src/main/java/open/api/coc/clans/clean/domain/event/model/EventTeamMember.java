@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class EventTeamMember {
 
+    private Long id; // 팀 멤버 고유키
     private Long teamId; // 팀 고유키
 
     private String tag; //플레이어 태그

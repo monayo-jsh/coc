@@ -54,7 +54,7 @@
       const timer = noticeRow.querySelector('.timer');
       const leftUntilTime = getLeftUntilByTime(dayjs(postingEndDate));
 
-      const isFinishTimer = leftUntilTime.seconds() <= 0;
+      const isFinishTimer = leftUntilTime.valueOf() <= 0;
 
       if (isFinishTimer) {
         timer.innerHTML = "";

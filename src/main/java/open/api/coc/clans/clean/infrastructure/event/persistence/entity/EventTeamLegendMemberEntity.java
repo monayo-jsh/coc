@@ -75,6 +75,7 @@ public class EventTeamLegendMemberEntity {
     private EventTeamLegendMemberEntity(Long id, String tag, String name, Integer trophies, Integer townhallLevel,
                                        EventTeamLegendEntity team, LocalDateTime createdAt,
                                        LocalDateTime updatedAt) {
+        this.id = id;
         this.tag = tag;
         this.name = name;
         this.trophies = trophies;

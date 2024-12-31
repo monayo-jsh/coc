@@ -19,9 +19,11 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
   <title>공지사항</title>
   <script>
+    dayjs.locale('ko');
     dayjs.extend(dayjs_plugin_duration);
 
     function showDetail(noticeElement) {
@@ -132,7 +134,159 @@
       }
     }
 
+    function fetchBeginningMonthPlans() {
+      return [
+        {
+          date: 1735525780602,
+          leagueWar: "",
+          clanWar: "매칭(정식)",
+          capital: ""
+        },
+        {
+          date: 1735612260070,
+          leagueWar: "",
+          clanWar: "전투",
+          capital: ""
+        },
+        {
+          date: 1735700840672,
+          leagueWar: "매칭",
+          clanWar: "",
+          capital: ""
+        },
+        {
+          date: 1735785127129,
+          leagueWar: "1Round 전투",
+          clanWar: "",
+          capital: ""
+        },
+        {
+          date: 1735871557622,
+          leagueWar: "2Round 전투",
+          clanWar: "매칭(병행)",
+          capital: "오픈"
+        },
+        {
+          date: 1735957966491,
+          leagueWar: "3Round 전투",
+          clanWar: "전투",
+          capital: ""
+        },
+        {
+          date: 1736044413442,
+          leagueWar: "4Round 전투",
+          clanWar: "매칭(병행)",
+          capital: ""
+        },
+        {
+          date: 1736130820457,
+          leagueWar: "5Round 전투",
+          clanWar: "전투",
+          capital: "종료"
+        },
+        {
+          date: 1736217226776,
+          leagueWar: "6Round 전투",
+          clanWar: "매칭(병행)",
+          capital: ""
+        },
+        {
+          date: 1736303680617,
+          leagueWar: "7Round 전투",
+          clanWar: "전투",
+          capital: ""
+        },
+        {
+          date: 1736390091703,
+          leagueWar: "종료",
+          clanWar: "",
+          capital: ""
+        },
+        {
+          date: 1736476501623,
+          leagueWar: "",
+          clanWar: "",
+          capital: "오픈"
+        },
+        {
+          date: 1736562908365,
+          leagueWar: "",
+          clanWar: "매칭(정식)",
+          capital: ""
+        },
+        {
+          date: 1736649314227,
+          leagueWar: "",
+          clanWar: "전투",
+          capital: ""
+        }
+        ,
+        {
+          date: 1736735786946,
+          leagueWar: "",
+          clanWar: "",
+          capital: "종료"
+        }
+      ]
+    }
+
+    function makePlanRow(plan) {
+      const { date, leagueWar, clanWar, capital } = plan;
+
+      const planDate = dayjs(date);
+
+      const planRowTemplate = copyTemplateById('beginning-month-template');
+      const planRow = planRowTemplate.querySelector('.table-tr');
+
+      const displayDate = formatDDddd(date);
+      planRow.innerHTML = planRow.innerHTML
+                                 .replace(/{DATE}/, displayDate)
+                                 .replace(/{LEAGUE_WAR}/, leagueWar)
+                                 .replace(/{CLAN_WAR}/, clanWar)
+                                 .replace(/{CAPITAL}/, capital);
+
+      const dateCell = planRow.querySelector('.date');
+      const planRowDay = planDate.get('day');
+      if (planRowDay === 0) { // 일요일
+        dateCell.classList.add('color-red');
+      }
+      if (planRowDay === 6) { // 토요일
+        dateCell.classList.add('color-green');
+      }
+
+      const todayDate = dayjs().get('date');
+      const planRowDate = planDate.get('date');
+      if (todayDate === planRowDate) {
+        planRow.classList.add('today');
+      }
+
+      return planRow;
+    }
+
+    function drawBeginningMonthPlan() {
+      const beginningMonthPlans = fetchBeginningMonthPlans();
+
+      const today = dayjs();
+      const lastPlan = beginningMonthPlans[beginningMonthPlans.length-1];
+      const lastPlanDate = dayjs(lastPlan.date);
+      if (today > lastPlanDate) {
+        // 마지막 일정 지난 경우 표기하지 않음
+        return;
+      }
+
+      const beginningMonthPlanElement = document.querySelector('.beginning-month-plan');
+
+      const target = beginningMonthPlanElement.querySelector('.table-tbody');
+      for(const plan of beginningMonthPlans) {
+        const planRow = makePlanRow(plan);
+        target.appendChild(planRow);
+      }
+
+      toggleDisplay(beginningMonthPlanElement);
+    }
+
     window.onload = async () => {
+      drawBeginningMonthPlan();
       await drawNotice();
 
       showDetailPage();
@@ -145,9 +299,40 @@
   <span class="label">공지사항</span>
 </div>
 
+<div class="beginning-month-plan display-none">
+  <table class="table">
+    <caption class="table-caption">월초 일정</caption>
+    <thead class="table-thead">
+      <tr class="table-tr bg-black">
+        <th class="table-th">날짜</th>
+        <th class="table-th">리그전</th>
+        <th class="table-th">클랜전</th>
+        <th class="table-th">습격전</th>
+      </tr>
+    </thead>
+    <tbody class="table-tbody">
+    </tbody>
+    <tfoot class="table-tfoot">
+      <tr class="table-tr bg-black">
+        <th class="table-td">매칭/오픈시간</th>
+        <th class="table-td">오후 9시</th>
+        <th class="table-td">오후 9시</th>
+        <th class="table-td">오후 4시</th>
+      </tr>
+    </tfoot>
+  </table>
+</div>
 <div class="notice-wrapper"></div>
 
 </body>
+<template id="beginning-month-template">
+  <tr class="table-tr">
+    <td class="table-td date">{DATE}</td>
+    <td class="table-td">{LEAGUE_WAR}</td>
+    <td class="table-td">{CLAN_WAR}</td>
+    <td class="table-td">{CAPITAL}</td>
+  </tr>
+</template>
 <template id="notice-template">
   <div class="notice">
     <div class="row">

@@ -43,6 +43,35 @@ body {
   }
 }
 
+.beginning-month-plan {
+  margin-top: 10px;
+  width: 500px;
+
+  @media (max-width: 500px) {
+    width: 400px;
+  }
+
+  .table-caption {
+    text-align: center;
+    background-color: #000000;
+    border: 1px solid;
+    font-weight: bold;
+  }
+
+  .table-tbody, .table-tfoot {
+    border-top: 1px solid white;
+  }
+
+  .table-th:not(:first-child), .table-td:not(:first-child) {
+    border-left: 1px solid white;
+  }
+
+  .table-tr.today {
+    font-weight: bold;
+    border: 2px solid white;
+    background-color: black;
+  }
+}
 
 .notice-wrapper {
   display: flex;
@@ -146,10 +175,6 @@ body {
 
 .table {
   border-radius: 5px;
-
-  .table-tr:nth-child(odd) {
-    background-color: unset !important;
-  }
 
   .table-th {
     color: var(--notice-font-color) !important;

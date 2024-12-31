@@ -266,6 +266,10 @@ function formatDD(date) {
   return dayjs(date).format('DD');
 }
 
+function formatDDddd(date) {
+  return dayjs(date).format('DD (ddd)');
+}
+
 function formatYYYYMMDDHHMM(date) {
   return dayjs(date).format('YYYY-MM-DD HH:mm');
 }

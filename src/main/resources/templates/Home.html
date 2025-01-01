@@ -34,7 +34,6 @@
   <title>아카데미 클랜 편의기능</title>
 
   <script>
-
   dayjs.extend(dayjs_plugin_duration);
 
   function renderNoticeDetail(noticeElement) {
@@ -105,11 +104,11 @@
       if (isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate)) {
         isNotLeagueAssigned = true;
 
-        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const latestSeasonDate = dayjs(String(latestLeagueAssignedSeasonDate));
         const now = dayjs();
 
         let displayDate = dayjs();
-        if (latestSeasonMonth >= now.month()) {
+        if (latestSeasonDate > now || latestSeasonDate.month() === now.month()) {
           // 최근 배정월이 이번달과 같거나 미래인 경우 다음달로 표기
           displayDate = displayDate.add(1, 'month');
         }
@@ -119,23 +118,28 @@
       leagueAssignedDateDisplay.innerHTML = displayText;
 
       function isNotLeagueAssignedMonth(latestLeagueAssignedSeasonDate) {
-        const latestSeasonMonth = dayjs(String(latestLeagueAssignedSeasonDate)).month();
+        const latestSeason = dayjs(String(latestLeagueAssignedSeasonDate));
         const now = dayjs();
 
-        // 매달 15일 이후인 경우
-        if (now.date() >= 13) {
-          // 이번달 배정인 경우
-          if (latestSeasonMonth === now.month()) {
-            return true;
+        // 최신 리그 배정표와 같은 달인 경우
+        if (now.month() === latestSeason.month()) {
+
+          // 당월 리그 배정표는 13일 이전까지만 표기
+          if (now.date() <= 13) {
+            return false;
           }
-        } else {
-          // 매달 14일까지 기준 지난달 리그전 배정인 경우
-          if (latestSeasonMonth < now.month()) {
-            return true;
-          }
+
+          // 14일 이후는 표기하지 않음
+          return true;
         }
 
-        return false;
+        // 최신 리그 배정표가 다음달인 경우
+        if (now < latestSeason) {
+          return false;
+        }
+
+        // 지난달 리그배정표인 경우 표기하지 않음
+        return true;
       }
     }
 

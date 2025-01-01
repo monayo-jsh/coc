@@ -105,7 +105,6 @@
 
   .table-caption {
     border: 1px solid crimson;
-    border-left: 3px solid crimson;
     background-color: crimson;
   }
 
@@ -119,7 +118,6 @@
 
   .table-caption {
     border: 1px solid goldenrod;
-    border-left: 3px solid goldenrod;
     background-color: goldenrod;
   }
 

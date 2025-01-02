@@ -565,11 +565,26 @@ function toggleDisplay(element) {
 function loadRequestBodyFromForm(formElement) {
   const formData = new FormData(formElement);
 
-  const requestBody = {}
+  const requestBody = new Map();
   for (let pair of formData.entries()) {
     const key = pair[0];
     const value = pair[1];
-    requestBody[key] = value;
+
+    if (requestBody.get(key) !== undefined) {
+      // 기존값 존재하는 경우
+      const existValue = requestBody.get(key);
+      if (Array.isArray(existValue)) {
+        existValue.push(value)
+        continue;
+      }
+
+      // 이미 존재하는 값으로 배열로 자료형 변경
+      requestBody.set(key, [existValue, value]);
+      continue;
+    }
+
+    // 신규 값 처리
+    requestBody.set(key, value);
   }
 
   return requestBody;

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/cms/beginningMonthPlanManager.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/notice.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- JavaScript Year and Month Picker -->
+  <script src="https://jsuites.net/v4/jsuites.js"></script>
+  <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <title>월초 일정 관리</title>
+  <script>
+    dayjs.locale('ko');
+
+    function changeClanWar(element) {
+      const selectedValue = element.value;
+
+      if (!selectedValue) return;
+      if (selectedValue === "전투") return;
+
+      const planRow = element.closest('tr.table-tr');
+      const nextPlanRow = planRow.nextElementSibling;
+
+      if (nextPlanRow) {
+        // 전투 자동 설정
+        const selectElement = nextPlanRow.querySelector('select[name=planClanWar]');
+        selectElement.value = "전투";
+      }
+    }
+
+    function initMonthPicker() {
+      const monthPicker = document.querySelector('input.input-month');
+
+      function getDefaultLeagueFirstDayOfMonth() {
+        let defaultFirstDayOfMonth = dayjs().date(1);
+
+        const now = dayjs();
+
+        // 매달 4일 이전까지는 이번달 기본값
+        if (now.date() < 5) {
+          return formatYYYYMMDD(defaultFirstDayOfMonth);
+        }
+
+        // 이 후는 다음달 기본값
+        defaultFirstDayOfMonth = defaultFirstDayOfMonth.add(1, 'month');
+        return formatYYYYMMDD(defaultFirstDayOfMonth);
+      }
+
+      const defaultFirstDayOfMonth = getDefaultLeagueFirstDayOfMonth();
+      jSuites.calendar(monthPicker, makeMonthPickerOption(defaultFirstDayOfMonth));
+    }
+
+    function initDatePicker() {
+      const inputBaseMonth = document.querySelector('.input-month');
+      const baseMonth = dayjs(inputBaseMonth.value);
+
+      // 일정 시작 기본값 설정
+      const inputStartDate = document.querySelector('.input-date.start');
+      let defaultStartDate = baseMonth.add(-1, 'month');
+      defaultStartDate = defaultStartDate.date(defaultStartDate.daysInMonth());
+      jSuites.calendar(inputStartDate, makeDatePickerOption(formatYYYYMMDD(defaultStartDate)));
+
+      // 일정 종료 기본값 설정
+      const inputEndDate = document.querySelector('.input-date.end');
+      const defaultEndDate = baseMonth.add(1, 'day');
+      jSuites.calendar(inputEndDate, makeDatePickerOption(formatYYYYMMDD(defaultEndDate)));
+    }
+
+    function displayRegisterForm() {
+      // 월초 일정 등록폼
+      const registerFormWrapper = document.querySelector('.registration-form-wrapper');
+
+      // 월초 일정 세부 등록폼
+      const planTemplate = copyTemplateById('form-beginning-month-plan-template');
+      const planTableElement = registerFormWrapper.querySelector('.table.plan');
+      planTableElement.querySelectorAll('.table-tbody, .table-tfoot')
+                      .forEach(item => item.remove());
+
+      planTableElement.appendChild(planTemplate);
+
+      toggleDisplay(registerFormWrapper);
+
+    }
+
+    function matchingLeagueDate(element) {
+      const selectedTableRow = element.closest('tr.table-tr');
+
+      // 매칭일 설정 버튼 제거
+      const plan = element.closest('.table.plan');
+      plan.querySelectorAll('.table-tbody .plan-league').forEach(ele => ele.innerHTML = "");
+
+      // 리그전 매칭일 자동 배정
+      let drawIndex = 0;
+      let drawRoundSize = 7;
+      for (const tr of plan.querySelector('.table-tbody').children) {
+        // 선택한 매칭일 표기 수정
+        if (tr === selectedTableRow) {
+          convertPlanLeague(tr, "매칭");
+          drawIndex++;
+          continue;
+        }
+        // 이 후 라운드 표기
+        if (drawIndex > 0 && drawRoundSize >= drawIndex) {
+          convertPlanLeague(tr, `${drawIndex}Round 전투`);
+          drawIndex++;
+          continue;
+        }
+
+        // 7일차까지 표기하면 종료
+        if (drawIndex > drawRoundSize) {
+          convertPlanLeague(tr, "종료");
+          break;
+        }
+      }
+
+      function convertPlanLeague(tr, value) {
+        // 표기
+        const target = tr.querySelector('.plan-league');
+        target.innerHTML = value;
+
+        // 데이터 설정
+        const targetInput = tr.querySelector('input[name=planLeague]');
+        targetInput.value = value;
+      }
+    }
+
+    function makePlanRowTemplate(date) {
+      const planRowTemplate = copyTemplateById('form-beginning-month-plan-row-template');
+      const planRow = planRowTemplate.querySelector('.table-tr');
+
+      const displayDate = formatDDddd(date);
+      planRow.innerHTML = planRow.innerHTML
+                                 .replace(/{DATE}/, displayDate)
+                                 .replace(/{DATE_VALUE}/, String(date.valueOf()))
+
+      const planRowDayOfWeek = date.get('day');
+      switch (planRowDayOfWeek) {
+        case 0: // 일요일
+          appendCellDateColorClass(planRow, 'color-red');
+          break;
+        case 1: // 월요일
+          // 습격전 기본값 설정
+          convertCapitalValue(planRow, "종료");
+          break;
+        case 5: // 금요일
+          // 습격전 기본값 설정
+          convertCapitalValue(planRow, "오픈");
+          break;
+        case 6: // 토요일
+          appendCellDateColorClass(planRow, 'color-green');
+          break;
+      }
+
+      const planRowDate = date.date();
+      if (planRowDate === 1 || planRowDate === 2) {
+        appendCellLeagueMatchingButton(planRow);
+      }
+
+      return planRow;
+
+      function appendCellLeagueMatchingButton(planRow) {
+        const btnMatchingLeagueTemplate = copyTemplateById('form-beginning-month-plan-row-matching-league-template');
+        const btnMatchingLeague = btnMatchingLeagueTemplate.querySelector('.button-chip');
+
+        const target = planRow.querySelector('.plan-league');
+        target.appendChild(btnMatchingLeague);
+      }
+
+      function appendCellDateColorClass(planRow, colorClassName) {
+        // 날짜 컬러 지정 함수
+        const dateCell = planRow.querySelector('.date');
+        dateCell.classList.add(colorClassName);
+      }
+      function convertCapitalValue(planRow, value) {
+        // 습격전 기본값 설정 함수
+        planRow.querySelector('.plan-capital-text').innerHTML = value;
+        planRow.querySelector('input[name=planCapital]').value = value;
+      }
+    }
+
+    function drawPlanRowTemplate(form, planStartDate, planEndDate) {
+      const planTable = form.querySelector('.table.plan');
+
+      const target = planTable.querySelector('.table-tbody');
+      target.innerHTML = ""; // clear
+
+      let drawDate = planStartDate;
+      while(drawDate <= planEndDate) {
+        const planRow = makePlanRowTemplate(drawDate);
+        target.appendChild(planRow);
+
+        drawDate = drawDate.add(1, 'day');
+      }
+    }
+
+    function makeRegisterPlanTemplate(element) {
+      const form = element.closest('form.registration-form');
+
+      // 월초 일정 시작/종료일 획득
+      const inputPlanStartDate = form.querySelector('.input-date.start');
+      const inputPlanEndDate = form.querySelector('.input-date.end');
+
+      const planStartDate = dayjs(inputPlanStartDate.value);
+      const planEndDate = dayjs(inputPlanEndDate.value);
+
+      // 월초 일정 등록 템플릿 구성
+      drawPlanRowTemplate(form, planStartDate, planEndDate);
+
+      // 매칭/오픈시간 폼 표시
+      // const tfoot = form.querySelector('.table-tfoot');
+      // tfoot.classList.remove('display-none');
+    }
+
+    async function register() {
+      // 일정 등록 처리
+      const form = document.querySelector('form.registration-form');
+      const formData = loadRequestBodyFromForm(form);
+
+      // 등록 데이터 설정
+      const requestBody = new Map();
+      // 등록월
+      requestBody.set("month", formData.get("baseMonth"));
+
+      const plans = [];
+      const length = formData.get("planDate").length;
+      for(let i=0; i<length; i++) {
+        const plan = {
+          date: formData.get("planDate")[i],
+          league: formData.get('planLeague')[i],
+          clanWar: formData.get('planClanWar')[i],
+          capital: formData.get('planCapital')[i]
+        };
+
+        plans.push(plan);
+      }
+
+      requestBody.set("plans", plans);
+
+      console.log(requestBody);
+    }
+
+    window.onload = async () => {
+      initMonthPicker();
+      initDatePicker();
+    }
+  </script>
+</head>
+<body>
+
+<div class="title">
+  <span class="label">월초 일정 관리</span>
+</div>
+
+<div class="support-area">
+  <div class="buttons">
+    <div class="button-chip" onclick="displayRegisterForm();">월초 일정 등록</div>
+  </div>
+  <div class="registration-form-wrapper display-none">
+    <form class="registration-form">
+      <table class="table mt-5">
+        <caption class="table-caption">월초 일정 등록</caption>
+        <colgroup>
+          <col width="20%">
+          <col width="*">
+        </colgroup>
+        <tbody class="table-tbody">
+        <tr class="table-tr">
+          <th class="table-th">등록 월</th>
+          <td class="table-td">
+            <div class="td-wrap">
+              <div class="picker">
+                <input type="text" class="input-month" name="baseMonth">
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <th class="table-th">월초 일정 시작/종료</th>
+          <td class="table-td">
+            <div class="td-wrap display-flex justify-content-left align-items-center flex-gap">
+              <div class="picker">
+                <input type="text" class="input-date start">
+              </div>
+              ~
+              <div class="picker">
+                <input type="text" class="input-date end">
+              </div>
+              <div class="button-chip ml-5" onclick="makeRegisterPlanTemplate(this);">월초 일정 생성</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="table-tr">
+          <td colspan="2" class="table-td">
+            <table class="table plan">
+              <colgroup>
+                <col width="21%">
+                <col width="23%">
+                <col width="23%">
+                <col width="23%">
+              </colgroup>
+              <thead class="table-thead">
+                <tr class="table-tr">
+                  <th class="table-th">날짜</th>
+                  <th class="table-th">리그전</th>
+                  <th class="table-th">클랜전</th>
+                  <th class="table-th">습격전</th>
+                </tr>
+              </thead>
+            </table>
+          </td>
+        </tr>
+        </tbody>
+        <tfoot class="table-tfoot">
+        <tr class="table-tr">
+          <td class="table-td" colspan="2">
+            <div class="td-wrap justify-content-center">
+              <div class="button-chip" onclick="register();">등록</div>
+            </div>
+          </td>
+        </tr>
+        </tfoot>
+      </table>
+    </form>
+  </div>
+</div>
+<div class="beginning-month-plan-wrapper"></div>
+
+</body>
+<template id="form-beginning-month-plan-template">
+  <tbody class="table-tbody plan-template">
+    <tr class="table-tr">
+      <td colspan="4" class="td">
+        <div class="td-wrap p-5 justify-content-center">월초 일정을 생성해주세요.</div>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot class="table-tfoot time-template display-none">
+    <tr class="table-tr">
+      <th class="table-th">매칭/오픈시간</th>
+      <td class="table-td">
+        <div class="picker">
+          <input class="input-time" name="timeLeague">
+        </div>
+      </td>
+      <td class="table-td">
+        <div class="picker">
+          <input class="input-time" name="timeClanWar">
+        </div>
+      </td>
+      <td class="table-td">
+        <div class="picker">
+          <input class="input-time" name="timeCapital">
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</template>
+<template id="form-beginning-month-plan-row-template">
+  <tr class="table-tr">
+    <th class="table-th">
+      <div class="date">{DATE}</div>
+      <input type="hidden" name="planDate" value="{DATE_VALUE}">
+    </th>
+    <td class="table-td">
+      <div class="plan-league display-flex justify-content-center"></div>
+      <input type="hidden" class="input" name="planLeague" value="">
+    </td>
+    <td class="table-td">
+      <div class="plan-clanWar">
+        <label>
+          <select name="planClanWar" onchange="changeClanWar(this);">
+            <option value="">선택</option>
+            <option value="매칭(정식)">매칭(정식)</option>
+            <option value="매칭(병행)">매칭(병행)</option>
+            <option value="전투">전투</option>
+          </select>
+        </label>
+      </div>
+    </td>
+    <td class="table-td">
+      <div class="plan-capital-text"></div>
+      <input type="hidden" class="input" name="planCapital" value="">
+    </td>
+  </tr>
+</template>
+<template id="form-beginning-month-plan-row-matching-league-template">
+  <div class="button-chip" onclick="matchingLeagueDate(this);">매칭일</div>
+</template>
+<template id="beginning-month-plan-template">
+
+</template>
+</html>

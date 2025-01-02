@@ -149,6 +149,10 @@ body::before {
   margin-left: 5px !important;
 }
 
+.p-5 {
+  padding: 5px;
+}
+
 .font-nowrap {
   white-space: nowrap !important;
 }
@@ -791,4 +795,9 @@ body::before {
 
 a.link {
   color: white;
+}
+
+select {
+  padding: 5px;
+  border-radius: 5px;
 }

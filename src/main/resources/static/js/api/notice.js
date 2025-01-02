@@ -30,7 +30,13 @@ async function fetchNotices() {
 }
 
 async function createNotice(requestBody) {
-  return await axios.post(URI_NOTICES, requestBody)
+  const jsonData = JSON.stringify(Object.fromEntries(requestBody));
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+  return await axios.post(URI_NOTICES, jsonData, options)
                     .then((response) => {
                       alert('등록 되었습니다.');
                       return true;

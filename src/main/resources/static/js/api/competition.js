@@ -38,7 +38,14 @@ async function fetchCompetitions() {
 }
 
 async function createCompetition(requestBody) {
-  return axios.post(URI_COMPETITIONS, requestBody)
+  const jsonData = JSON.stringify(Object.fromEntries(requestBody));
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return axios.post(URI_COMPETITIONS, jsonData, options)
               .then(response => {
                 const { data } = response
                 let message = `대회 정보를 등록했습니다.`
@@ -59,7 +66,14 @@ async function createCompetition(requestBody) {
 async function updateCompetition(competitionId, requestBody) {
   const uri = URI_COMPETITION_UPDATE.replace(/{COMPETITION_ID}/, competitionId)
 
-  return axios.put(uri, requestBody)
+  const jsonData = JSON.stringify(Object.fromEntries(requestBody));
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return axios.put(uri, jsonData, options)
               .then(response => {
                 const { data } = response
                 let message = `대회 정보를 수정했습니다.`
@@ -96,7 +110,14 @@ async function createCompetitionClanSchedule(competitionId, clanTag, requestBody
   const uri = URI_COMPETITION_CLAN_SCHEDULE.replace(/{COMPETITION_ID}/, competitionId)
                                            .replace(/{CLAN_TAG}/, encodeURIComponent(clanTag));
 
-  return await axios.post(uri, requestBody)
+  const jsonData = JSON.stringify(Object.fromEntries(requestBody));
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.post(uri, jsonData, options)
                     .then((response) => {
                       return true;
                     })

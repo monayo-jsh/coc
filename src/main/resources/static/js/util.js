@@ -570,7 +570,7 @@ function loadRequestBodyFromForm(formElement) {
     const key = pair[0];
     const value = pair[1];
 
-    if (requestBody.get(key) !== undefined) {
+    if (requestBody.get(key) !== undefined && requestBody.get(key) != null) {
       // 기존값 존재하는 경우
       const existValue = requestBody.get(key);
       if (Array.isArray(existValue)) {
@@ -590,17 +590,23 @@ function loadRequestBodyFromForm(formElement) {
   return requestBody;
 }
 
-function convertCheckbox(requestBody, key) {
+function convertBodyOfCheckbox(requestBody, key) {
   // checkbox 체크된 경우 'on' 값이며, 체크되지 않은 경우 값이 없음
   // 따라서 true | false 로 치환
-  requestBody[key] = !!requestBody[key];
+  requestBody.set(key, !!requestBody.get(key));
 }
 
-function convertTimestamp(requestBody, key) {
+function convertBodyOfTimestamp(requestBody, key) {
   // 날짜 값을 타임스탬프로 치환
-  if (requestBody[key]) {
-    requestBody[key] = dayjs(requestBody[key]).valueOf();
+  const value = requestBody.get(key);
+  if (value) {
+    requestBody.set(key, convertTimestamp(value));
   }
+}
+
+function convertTimestamp(value) {
+  if (!value) return value;
+  return dayjs(value).valueOf();
 }
 
 function convertContainTextToLink(text) {

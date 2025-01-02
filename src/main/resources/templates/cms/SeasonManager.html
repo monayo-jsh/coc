@@ -46,7 +46,8 @@
       const form = document.querySelector('form.register-form');
       const formData = loadRequestBodyFromForm(form);
 
-      const { date, hour } = formData;
+      const date = formData.get('date');
+      const hour = formData.get('hour');
 
       if (!date) { alert("종료일까지 남은 일수를 입력해주세요."); return; }
       if (!hour) { alert("종료일까지 남은 시간를 입력해주세요."); return; }

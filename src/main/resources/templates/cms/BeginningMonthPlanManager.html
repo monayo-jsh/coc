@@ -14,7 +14,7 @@
 
   <script src="/js/common.js"></script>
   <script src="/js/util.js"></script>
-  <script src="/js/api/notice.js"></script>
+  <script src="/js/api/beginningMonthPlan.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -237,7 +237,7 @@
       // 등록 데이터 설정
       const requestBody = new Map();
       // 등록월
-      requestBody.set("month", formData.get("baseMonth"));
+      requestBody.set("month", convertTimestamp(formData.get("baseMonth")));
 
       const plans = [];
       const length = formData.get("planDate").length;
@@ -254,7 +254,12 @@
 
       requestBody.set("plans", plans);
 
-      console.log(requestBody);
+      createBeginningMonthPlan(requestBody)
+      .then((isResult) => {
+        if (isResult) {
+          location.reload();
+        }
+      })
     }
 
     window.onload = async () => {

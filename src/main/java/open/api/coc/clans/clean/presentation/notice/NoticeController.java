@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.notice.NoticeService;
 import open.api.coc.clans.clean.domain.notice.dto.NoticeCreateCommand;
 import open.api.coc.clans.clean.domain.notice.mapper.NoticeMapper;
-import open.api.coc.clans.clean.presentation.notice.dto.NoticeCreateReqeust;
+import open.api.coc.clans.clean.presentation.notice.dto.NoticeCreateRequest;
 import open.api.coc.clans.clean.presentation.notice.dto.NoticeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +72,7 @@ public class NoticeController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PostMapping("")
-    public ResponseEntity<Void> postNotice(@Valid @RequestBody NoticeCreateReqeust request) {
+    public ResponseEntity<Void> postNotice(@Valid @RequestBody NoticeCreateRequest request) {
         NoticeCreateCommand command = noticeMapper.toCreateCommand(request);
         noticeService.registerNotice(command);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

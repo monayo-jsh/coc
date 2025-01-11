@@ -503,3 +503,7 @@
     color: white;
   }
 }
+
+.label.sample {
+  font-size: 12px;
+}

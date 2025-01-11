@@ -1097,6 +1097,20 @@
       }
     }
 
+    function downloadUploadFileSample(fileName) {
+      const workSheetJsonData = [
+        {
+          "클랜원태그": "#memberTag1",
+          "배정클랜태그": "#clanTag1"
+        },
+        {
+          "클랜원태그": "#memberTag2",
+          "배정클랜태그": "#clanTag2"
+        }
+      ];
+      writeExcelFile(`${fileName}샘플.xlsx`, workSheetJsonData, fileName);
+    }
+
     window.onload = async () => {
       initMonthPicker();
       await loadLeagues();
@@ -1189,6 +1203,19 @@
             </td>
           </tr>
           <tr class="table-tr">
+            <th class="table-th">
+              양식
+            </th>
+            <td class="table-td">
+              <div class="td-wrap">
+                <span class="label sample">클랜배정 샘플파일</span>
+                <label class="upload-file-sample" for="assigned-clan-upload-file-sample">
+                  <i id="assigned-clan-upload-file-sample" class="fa-regular fa-file-excel cursor-pointer fa-xl" onclick="downloadUploadFileSample('클랜배정');"></i>
+                </label>
+              </div>
+            </td>
+          </tr>
+          <tr class="table-tr">
             <td colspan="2" class="table-td">
               <div class="button-wrapper">
                 <div class="button-chip bg-green" onclick="readExcelFile(this); return false;">클랜 배정</div>
@@ -1230,6 +1257,19 @@
                 </div>
                 <input type="file" id="league-assigned-player-excel" class="assigned-player-excel" accept=".xlsx" onchange="changeFile(this); return false;">
               </label>
+            </td>
+          </tr>
+          <tr class="table-tr">
+            <th class="table-th">
+              양식
+            </th>
+            <td class="table-td">
+              <div class="td-wrap">
+                <span class="label sample">리그배정 샘플파일</span>
+                <label class="upload-file-sample" for="assigned-league-upload-file-sample">
+                  <i id="assigned-league-upload-file-sample" class="fa-regular fa-file-excel cursor-pointer fa-xl" onclick="downloadUploadFileSample('리그배정');"></i>
+                </label>
+              </div>
             </td>
           </tr>
           <tr class="table-tr">

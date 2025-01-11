@@ -97,10 +97,10 @@ function exportExcel(members) {
   writeExcelFile(fileName, players)
 }
 
-function writeExcelFile(fileName, jsonData) {
+function writeExcelFile(fileName, jsonData, sheetName = "Dates") {
   const workbook = XLSX.utils.book_new();
   const worksheet = XLSX.utils.json_to_sheet(jsonData);
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Dates");
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
   XLSX.writeFile(workbook, fileName);
 }
 

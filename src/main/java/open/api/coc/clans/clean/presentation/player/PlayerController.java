@@ -360,7 +360,7 @@ public class PlayerController {
         @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
-    @PostMapping("/{playerTag}/legend/record/{order}")
+    @PutMapping("/{playerTag}/legend/record/{order}")
     public ResponseEntity<Void> postPlayerLegendRecord(@PathVariable String playerTag, @PathVariable Integer order) {
         playerUseCase.updatePlayerLegendRecordOrder(playerTag, order);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)

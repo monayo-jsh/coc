@@ -292,7 +292,7 @@ async function registerLegendRecordTarget(playerTag) {
 async function updateLegendRecordOrder(playerTag, order) {
   const uri = `${URI_PLAYERS_LEGEND_RECORD_ORDER.replace(/{playerTag}/, encodeURIComponent(playerTag)).replace(/{order}/, order)}`;
 
-  return await axios.post(uri)
+  return await axios.put(uri)
                     .then((response) => {
                       alert('조회 순서가 수정되었습니다.\n- 조회 시 적용된 결과를 확인할 수 있습니다.');
 

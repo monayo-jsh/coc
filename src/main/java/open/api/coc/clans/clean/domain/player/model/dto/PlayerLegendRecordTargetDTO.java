@@ -14,7 +14,10 @@ public record PlayerLegendRecordTargetDTO(
     String name,
 
     @Schema(description = "플레이어 레벨")
-    Integer expLevel
+    Integer expLevel,
+
+    @Schema(description = "플레이어 현재트로피")
+    Integer trophies
 
 ) {
 }

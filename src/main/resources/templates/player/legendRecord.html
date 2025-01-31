@@ -242,21 +242,22 @@
     }
 
     function renderDisplayButton(player) {
-      const { tag, name } = player;
+      const { tag, name, trophies } = player;
 
       const radioItemTemplate = copyTemplateById('radio-item-template');
       const radioItem = radioItemTemplate.querySelector('.radio.item');
 
       radioItem.innerHTML = radioItem.innerHTML
                                      .replace(/{TAG}/g, removeHashTag(tag))
-                                     .replace(/{NAME}/, name);
+                                     .replace(/{NAME}/, name)
+                                     .replace(/{TROPHIES}/, trophies);
 
       const radioInputs = document.querySelector('.radio-inputs');
       radioInputs.appendChild(radioItem);
     }
 
     async function drawLegendRecord(player) {
-      const { tag, name } = player
+      const { tag, name, trophies, expLevel, order, isTempOrder } = player
       const legendRecords = await fetchPlayerLegendRecord(tag);
 
       if (!legendRecords.length) {
@@ -271,7 +272,14 @@
       const playerLegend = playerLegendTemplate.querySelector('.player-legend-wrapper');
       playerLegend.innerHTML = playerLegend.innerHTML
                                            .replace(/{PLAYER_NAME}/, name)
-                                           .replace(/{PLAYER_TAG}/, tag);
+                                           .replace(/{PLAYER_TAG}/, tag)
+                                           .replace(/{TROPHIES}/, trophies)
+                                           .replace(/{EXP_LEVEL}/, expLevel)
+                                           // 임시 지정 순서의 경우 노출하지 않도록 조정
+                                           .replace(/{ORDER}/, isTempOrder ? "미설정" : order);
+
+      // dataset
+      playerLegend.dataset.tag = tag;
 
       playerLegend.classList.add(`player-${removeHashTag(tag)}`);
 
@@ -294,6 +302,23 @@
           y: newTrophies
         })
       }
+    }
+
+    function changeOrder(element) {
+      const order = prompt('설정할 조회 순서를 입력해주세요.', '');
+
+      if (!order) return;
+
+      const playerLegendCard = element.closest('.player-legend-wrapper');
+      const { tag } = playerLegendCard.dataset;
+
+      updateLegendRecordOrder(tag, order)
+      .then((isResult) => {
+        if (isResult) {
+          // 변경 성공한 순서로 노출 수정
+          element.innerHTML = order;
+        }
+      });
     }
 
     function displayRegisterForm() {
@@ -341,7 +366,9 @@
 
       const sortedPlayers = players.map(player => {
         if (!player.order) {
-          player.order = 999999 // 정렬 순서가 정의되지 않은 경우
+          // 정렬 순서가 정의되지 않은 경우 임시 순서 지정
+          player.isTempOrder = true
+          player.order = 9876543210
         }
         return player
       }).sort((a, b) => a.order - b.order)
@@ -456,7 +483,7 @@
 <template id="radio-item-template">
   <label class="radio item">
     <input type="checkbox" name="checkbox-{TAG}" onchange="displayPlayerRecord('{TAG}'); return false;">
-    <span class="name">{NAME}</span>
+    <span class="name">{NAME}<br/>({TROPHIES})</span>
   </label>
 </template>
 <template id="record-row-template">
@@ -514,8 +541,14 @@
 </template>
 <template id="player-legend-template">
   <div class="player-legend-wrapper display-none">
-    <div class="player-name">{PLAYER_NAME} <div class="chip">{PLAYER_TAG}</div></div>
+    <div class="player-name">
+      <div class="icon xp"><div class="level">{EXP_LEVEL}</div></div>
+      <div class="name">{PLAYER_NAME}</div>
+      <div class="chip">{PLAYER_TAG}</div>
+      <div class="chip current-trophies"><div class="icon trophies"></div><div class="count">{TROPHIES}</div></div>
+    </div>
     <div class="information">
+      <div class="description orders">조회 순서는 <div class="chip cursor-pointer order bg-blue" onclick="changeOrder(this);">{ORDER}</div>클릭해서 수정할 수 있습니다.</div>
       <div class="description"><span class="color-red">* 40점 이상/이하로 수집된 데이터는 분할하여 표기되므로 차이가 있을 수 있습니다.</span></div>
     </div>
     <div class="player-records"></div>

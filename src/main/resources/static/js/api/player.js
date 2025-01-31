@@ -13,6 +13,7 @@ const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원�
 
 const URI_PLAYERS_LEGEND_RECORD_TARGET = `${PREFIX_PLAYER_API}/legend/record/target`; //전설 기록 수집 등록 계정 태그 조회
 const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/record`; //전설 기록 수집 등록/조회
+const URI_PLAYERS_LEGEND_RECORD_ORDER = `${PREFIX_PLAYER_API}/{playerTag}/legend/record/{order}`; //전설 기록 수집 등록 계정 조회 순서 설정
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = `${PREFIX_PLAYER_API}/ranking/hero/equipments`; //영웅 장비 랭킹
 
@@ -271,6 +272,29 @@ async function registerLegendRecordTarget(playerTag) {
   return await axios.post(uri)
                     .then((response) => {
                       alert('전설 기록 수집 계정으로 등록되었습니다.\n데이터 수집된 이후에 확인 가능합니다.');
+
+                      return true;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+                      return false;
+                    });
+}
+
+async function updateLegendRecordOrder(playerTag, order) {
+  const uri = `${URI_PLAYERS_LEGEND_RECORD_ORDER.replace(/{playerTag}/, encodeURIComponent(playerTag)).replace(/{order}/, order)}`;
+
+  return await axios.post(uri)
+                    .then((response) => {
+                      alert('조회 순서가 수정되었습니다.\n- 조회 시 적용된 결과를 확인할 수 있습니다.');
 
                       return true;
                     })

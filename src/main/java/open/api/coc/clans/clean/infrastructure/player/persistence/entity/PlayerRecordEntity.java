@@ -50,6 +50,10 @@ public class PlayerRecordEntity implements Persistable<String> {
         return isNew;
     }
 
+    public void changeOrder(Integer order) {
+        this.order = order;
+    }
+
     @Builder
     private PlayerRecordEntity(String tag, boolean isNew) {
         this.tag = tag;

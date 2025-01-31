@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.repository.LeagueRepository;
 import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
+import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotLeagueException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotLegendLeagueException;
 import open.api.coc.clans.clean.domain.player.model.Player;
@@ -18,6 +19,7 @@ import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTarget
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordHistoryRepository;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRecordRepository;
 import open.api.coc.clans.clean.domain.season.repository.SeasonRepository;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -103,7 +105,8 @@ public class PlayerLegendRecordService {
             throw new PlayerAlreadyExistsException(player.getTag());
         }
 
-        recordRepository.save(player.getTag());
+        PlayerRecordEntity playerRecordEntity = PlayerRecordEntity.builder().tag(player.getTag()).build();
+        recordRepository.save(playerRecordEntity);
     }
 
     @Transactional
@@ -115,5 +118,14 @@ public class PlayerLegendRecordService {
         if (!StringUtils.hasText(name)) return Collections.emptyList();
 
         return recordRepository.findAllByNameOrNickname(name);
+    }
+
+    public PlayerRecordEntity findByTagOrThrow(String tag) {
+        return recordRepository.findById(tag)
+                               .orElseThrow(() -> new PlayerNotFoundException(tag));
+    }
+
+    public void save(PlayerRecordEntity playerRecord) {
+        recordRepository.save(playerRecord);
     }
 }

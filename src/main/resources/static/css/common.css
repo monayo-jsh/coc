@@ -576,6 +576,22 @@ body::before {
   background-size: contain;
   background-position: center;
 }
+.icon.xp {
+  position: relative;
+  padding: 16px;
+  background-image: url("/images/etc/xp.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+
+  .level {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    font-size: .9em;
+    word-break: keep-all;
+  }
+}
 .icon.Barbarian {
   width: 35px;
   height: 35px;

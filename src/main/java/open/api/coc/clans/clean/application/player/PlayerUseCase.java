@@ -31,6 +31,7 @@ import open.api.coc.clans.clean.domain.player.service.PlayerLegendRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRankingService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
+import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
@@ -347,6 +348,20 @@ public class PlayerUseCase {
 
         // 전설 기록 수집 계정으로 등록
         legendRecordService.registerCollectionTarget(player);
+    }
+
+    @Transactional
+    public void updatePlayerLegendRecordOrder(String playerTag, Integer order) {
+        // 서버에 등록된 계정 조회 & 검증
+        Player player = playerService.findByIdOrThrow(playerTag);
+
+        // 전설 기록 수집 계정 조회
+        PlayerRecordEntity playerRecord = legendRecordService.findByTagOrThrow(player.getTag());
+
+        // 조회 순서 업데이트
+        playerRecord.changeOrder(order);
+
+        legendRecordService.save(playerRecord);
     }
 
     @Transactional(readOnly = true)

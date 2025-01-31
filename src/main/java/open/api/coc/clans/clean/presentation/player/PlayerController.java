@@ -351,4 +351,20 @@ public class PlayerController {
                              .build();
     }
 
+    @Operation(
+        summary = "전설 기록 수집 대상 플레이어의 조회 순서를 설정합니다. version: 1.00, Last Update: 25.01.31",
+        description = "이 API는 전설 기록 수집 대상 플레이어의 조회 순서를 설정합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PostMapping("/{playerTag}/legend/record/{order}")
+    public ResponseEntity<Void> postPlayerLegendRecord(@PathVariable String playerTag, @PathVariable Integer order) {
+        playerUseCase.updatePlayerLegendRecordOrder(playerTag, order);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
 }

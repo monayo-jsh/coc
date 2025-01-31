@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface JpaPlayerRecordRepository extends JpaRepository<PlayerRecordEntity, String> {
 
     @Query(
-        value = "select new open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO(pr.tag, pr.order, p.name, p.expLevel) "
+        value = "select new open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO(pr.tag, pr.order, p.name, p.expLevel, p.trophies) "
             + "from PlayerRecordEntity pr "
             + "join PlayerEntity p on p.playerTag = pr.tag "
             + "where p.name like concat(:name, '%') "

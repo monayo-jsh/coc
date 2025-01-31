@@ -46,7 +46,17 @@ body {
 
 .information {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+
+  .orders {
+    display: flex;
+
+    .order {
+      margin: 0 3px;
+      padding: 3px 15px;
+    }
+  }
 }
 
 .description {
@@ -80,9 +90,36 @@ body {
   justify-content: center;
   align-items: center;
 
+  .name {
+    margin-left: 3px;
+  }
+
   .chip {
     margin-left: 5px;
     font-size: .8em;
+  }
+
+  .current-trophies {
+    display: flex;
+    align-items: center;
+
+    .icon.trophies {
+      width: 24px;
+      height: 24px;
+    }
+
+    .count {
+      margin-left: 3px;
+    }
+  }
+
+}
+
+.xp {
+  padding: 20px !important;
+
+  .level {
+    font-size: 12px !important;
   }
 }
 

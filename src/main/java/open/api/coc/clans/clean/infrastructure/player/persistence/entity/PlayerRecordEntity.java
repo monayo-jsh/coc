@@ -27,6 +27,10 @@ public class PlayerRecordEntity implements Persistable<String> {
     @Column(name = "tag", nullable = false, length = 100)
     private String tag;
 
+    @Comment("플레이어 정렬순서")
+    @Column(name = "orders", nullable = true)
+    private Integer order;
+
     @Transient
     private boolean isNew;
 

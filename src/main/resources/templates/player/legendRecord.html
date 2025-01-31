@@ -339,12 +339,19 @@
         return;
       }
 
-      for (const player of players) {
+      const sortedPlayers = players.map(player => {
+        if (!player.order) {
+          player.order = 999999 // 정렬 순서가 정의되지 않은 경우
+        }
+        return player
+      }).sort((a, b) => a.order - b.order)
+
+      for (const player of sortedPlayers) {
         renderDisplayButton(player);
         await drawLegendRecord(player);
       }
 
-      const [first] = players;
+      const [first] = sortedPlayers;
       clickFirstRecord(first.tag);
     }
 

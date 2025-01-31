@@ -7,8 +7,14 @@ public record PlayerLegendRecordTargetDTO(
     @Schema(description = "플레이어 태그")
     String tag,
 
+    @Schema(description = "플레이어 정렬순서")
+    Integer order,
+
     @Schema(description = "플레이어 이름")
-    String name
+    String name,
+
+    @Schema(description = "플레이어 레벨")
+    Integer expLevel
 
 ) {
 }

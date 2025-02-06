@@ -183,14 +183,32 @@
       }
     }
 
+    function getUriForViewType() {
+      const urlSearchParams = new URLSearchParams(location.search);
+      return urlSearchParams.get('view');
+    }
 
-    async function getClanMembers() {
-      showWifiLoading('.clan-members');
-      let players = await fetchAllPlayersSummary();
+    async function fetchPlayers() {
+      const view = getUriForViewType();
+      if (view === 'support') {
+        // 지원계정 목록 처리
+        return await fetchSupportPlayers();
+      }
+
+      // 일반 목록 처리
+      const players = await fetchAllPlayersSummary();
       let latestClanAssignedPlayerObj = await latestClanAssignedMembers();
       settingAssignClan(players, latestClanAssignedPlayerObj);
       let latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
       settingAssignLeague(players, latestLeagueAssignedPlayerObj);
+
+      return players;
+    }
+
+    async function getClanMembers() {
+      showWifiLoading('.clan-members');
+      let view = getUriForViewType();
+      let players = await fetchPlayers();
       members.push(...players);
 
       const sortedMembers = sortByTrophies(members);

@@ -44,7 +44,7 @@ public class NormalViewController {
         return "clan/Member";
     }
 
-    /** 클랜원 목록 */
+    /** 클랜원 목록 - 검색 */
     @GetMapping("/find/member")
     public String findClanMember() {
         return "clan/FindMember";

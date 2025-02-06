@@ -192,6 +192,7 @@
     display: flex;
     align-items: center;
     line-height: 1.5;
+    background-color: #9ccffc;
 
     .chip {
       font-size: 1em;

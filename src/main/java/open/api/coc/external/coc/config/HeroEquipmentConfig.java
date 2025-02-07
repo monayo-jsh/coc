@@ -21,6 +21,7 @@ public enum HeroEquipmentConfig {
 
     GIANT_GAUNTLET(BARBARIAN_KING, 120, "epic", "Giant Gauntlet", "자이언트 건틀릿"),
     SPIKY_BALL(BARBARIAN_KING, 121, "epic", "Spiky Ball", "스파이키 볼"),
+    SNAKE_BRACELET(BARBARIAN_KING, 122, "epic", "Snake Bracelet", "스네이크 팔찌"),
 
     // 아처 퀸
     ARCHER_PUPPET(ARCHER_QUEEN, 200, "normal", "Archer Puppet", "아처 인형"),

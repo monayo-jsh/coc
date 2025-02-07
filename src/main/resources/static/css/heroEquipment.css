@@ -49,6 +49,10 @@
   background-image: url("/images/hero/equipment/Spiky_Ball.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.snake_bracelet {
+  background-image: url("/images/hero/equipment/Snake_Bracelet.png");
+  color: rgba(0, 0, 0, 0);
+}
 
 
 .img-icon.archer_puppet {

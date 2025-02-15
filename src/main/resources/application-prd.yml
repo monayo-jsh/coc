@@ -19,7 +19,10 @@ spring:
         web-allow-others: true
   datasource:
     hikari:
-      connection-timeout: 1000
+      minimum-idle: 3       # 최소 유지 커넥션 개수
+      maximum-pool-size: 10  # 최대 커넥션 개수
+      idle-timeout: 60000    # 60초 동안 사용되지 않으면 해제
+      connection-timeout: 3000 # 커넥션 요청이 3초를 초과하면 예외 발생
   jpa:
     show-sql: false
     properties:

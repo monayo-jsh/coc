@@ -140,3 +140,7 @@
   background-image: url("/images/hero/equipment/Dark_Orb.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.metal_pants {
+  background-image: url("/images/hero/equipment/Metal_Pants.png");
+  color: rgba(0, 0, 0, 0);
+}

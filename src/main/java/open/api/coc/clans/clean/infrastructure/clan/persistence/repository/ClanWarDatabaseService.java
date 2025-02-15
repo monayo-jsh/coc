@@ -38,8 +38,8 @@ public class ClanWarDatabaseService implements ClanWarRepository {
     }
 
     @Override
-    public Optional<ClanWarDTO> findDTOWithAllByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
-        return queryRepository.findDTOByClanTagAndStartTime(clanTag, startTime).map(this::fetchMemberDTOs);
+    public Optional<ClanWarDTO> findDTOWithAllByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime) {
+        return queryRepository.findDTOByClanTagAndPreparationStartTime(clanTag, preparationStartTime).map(this::fetchMemberDTOs);
     }
 
     private ClanWarDTO fetchMemberDTOs(ClanWarDTO clanWar) {

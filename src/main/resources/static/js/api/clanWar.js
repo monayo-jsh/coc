@@ -142,8 +142,8 @@ async function putClanWarNecessaryAttack(warId, playerTag) {
                     })
 }
 
-async function fetchClanWarParticipants(clanTag, startTime, necessaryAttackYn) {
-  let URI = URI_CLAN_WAR_PARTICIPANTS + `?clanTag=${encodeURIComponent(clanTag)}&startTime=${startTime}`
+async function fetchClanWarParticipants(clanTag, preparationStartTime, necessaryAttackYn) {
+  let URI = URI_CLAN_WAR_PARTICIPANTS + `?clanTag=${encodeURIComponent(clanTag)}&preparationStartTime=${preparationStartTime}`
   if (necessaryAttackYn) {
     URI += `&necessaryAttackYn=${necessaryAttackYn}`
   }

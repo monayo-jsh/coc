@@ -6,13 +6,13 @@ import open.api.coc.clans.database.entity.common.YnType;
 public record ClanWarMemberQuery(
 
     String clanTag,
-    LocalDateTime startTime,
+    LocalDateTime preparationStartTime,
     YnType necessaryAttackYn
 
 ) {
 
-    public static ClanWarMemberQuery create(String clanTag, LocalDateTime startTime, YnType necessaryAttackYn) {
-        return new ClanWarMemberQuery(clanTag, startTime, necessaryAttackYn);
+    public static ClanWarMemberQuery create(String clanTag, LocalDateTime preparationStartTime, YnType necessaryAttackYn) {
+        return new ClanWarMemberQuery(clanTag, preparationStartTime, necessaryAttackYn);
     }
 
 }

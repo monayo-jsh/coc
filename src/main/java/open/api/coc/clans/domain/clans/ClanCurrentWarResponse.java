@@ -15,6 +15,7 @@ public class ClanCurrentWarResponse {
     private Integer teamSize;
     private Integer attacksPerMember;
 
+    private long preparationStartTime;
     private long startTime;
     private long endTime;
 

@@ -53,10 +53,10 @@ public class JpaClanWarQueryRepository {
                                       .fetch();
     }
 
-    public Optional<ClanWarDTO> findDTOByClanTagAndStartTime(String clanTag, LocalDateTime startTime) {
+    public Optional<ClanWarDTO> findDTOByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(clanWarEntity.clanTag.eq(clanTag))
-                 .and(clanWarEntity.startTime.eq(startTime));
+                 .and(clanWarEntity.preparationStartTime.eq(preparationStartTime));
 
         ClanWarDTO clanWar = createClanWarDTOQuery().where(condition).fetchOne();
 

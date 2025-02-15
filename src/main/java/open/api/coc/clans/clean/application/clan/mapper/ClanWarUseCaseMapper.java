@@ -37,8 +37,8 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarQuery.create(mapToLocalDate(startDate), mapToLocalDate(endDate));
     }
 
-    public ClanWarMemberQuery toClanWarMemberQuery(String clanTag, Long startTime, String necessaryAttackYn) {
-        return ClanWarMemberQuery.create(clanTag, mapToLocalDateTime(startTime), mapToYnType(necessaryAttackYn));
+    public ClanWarMemberQuery toClanWarMemberQuery(String clanTag, Long preparationStartTime, String necessaryAttackYn) {
+        return ClanWarMemberQuery.create(clanTag, mapToLocalDateTime(preparationStartTime), mapToYnType(necessaryAttackYn));
     }
 
     public abstract ClanWarResponse toClanWarResponse(ClanWarDTO clanWar);

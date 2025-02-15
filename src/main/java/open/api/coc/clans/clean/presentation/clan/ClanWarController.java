@@ -92,9 +92,9 @@ public class ClanWarController {
     })
     @GetMapping("/participants")
     public ResponseEntity<List<ClanWarParticipantResponse>> getClanWarParticipants(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
-                                                                                   @RequestParam Long startTime,
+                                                                                   @RequestParam Long preparationStartTime,
                                                                                    @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
-        ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, startTime, necessaryAttackYn);
+        ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, preparationStartTime, necessaryAttackYn);
         return ResponseEntity.status(HttpStatus.OK)
                              .body(clanWarUseCase.getClanWarParticipants(query));
     }

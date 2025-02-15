@@ -13,7 +13,7 @@ public interface ClanWarRepository {
     List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to);
 
     Optional<ClanWarDTO> findDTOWithAllById(Long warId);
-    Optional<ClanWarDTO> findDTOWithAllByClanTagAndStartTime(String clanTag, LocalDateTime startTime);
+    Optional<ClanWarDTO> findDTOWithAllByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime);
 
     ClanWarEntity save(ClanWarEntity clanWar);
 

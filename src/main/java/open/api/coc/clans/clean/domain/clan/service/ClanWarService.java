@@ -36,8 +36,8 @@ public class ClanWarService {
     }
 
     @Transactional(readOnly = true)
-    public ClanWarDTO findDTOWithAllByClanTagAndStartTimeOrThrow(String clanTag, LocalDateTime startTime) {
-        return clanWarRepository.findDTOWithAllByClanTagAndStartTime(clanTag, startTime).orElseThrow(() -> new ClanWarNotExistsException(clanTag, startTime));
+    public ClanWarDTO findDTOWithAllByClanTagAndPreparationStartTimeOrThrow(String clanTag, LocalDateTime preparationStartTime) {
+        return clanWarRepository.findDTOWithAllByClanTagAndPreparationStartTime(clanTag, preparationStartTime).orElseThrow(() -> new ClanWarNotExistsException(clanTag, preparationStartTime));
     }
 
     @Transactional

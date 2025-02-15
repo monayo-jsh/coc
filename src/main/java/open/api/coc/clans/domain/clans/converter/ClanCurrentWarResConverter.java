@@ -20,6 +20,7 @@ public class ClanCurrentWarResConverter implements Converter<ClanWar, ClanCurren
                                      .battleModifier(source.getBattleModifier())
                                      .teamSize(source.getTeamSize())
                                      .attacksPerMember(source.getAttacksPerMember())
+                                     .preparationStartTime(timeConverter.toEpochMilliSecond(source.getPreparationStartTime()))
                                      .startTime(timeConverter.toEpochMilliSecond(source.getStartTime()))
                                      .endTime(timeConverter.toEpochMilliSecond(source.getEndTime()))
                                      .clan(clanWarResConverter.convert(source.getClan()))

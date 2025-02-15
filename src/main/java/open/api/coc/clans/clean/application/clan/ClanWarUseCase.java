@@ -62,7 +62,7 @@ public class ClanWarUseCase {
     @Transactional(readOnly = true)
     public List<ClanWarParticipantResponse> getClanWarParticipants(ClanWarMemberQuery query) {
         // 클랜 전쟁 정보를 조회한다.
-        ClanWarDTO clanWar = clanWarService.findDTOWithAllByClanTagAndStartTimeOrThrow(query.clanTag(), query.startTime());
+        ClanWarDTO clanWar = clanWarService.findDTOWithAllByClanTagAndPreparationStartTimeOrThrow(query.clanTag(), query.preparationStartTime());
 
         // 필수 참석 여부 조건에 따른 참여자 목록을 조회한다.
         List<ClanWarParticipantDTO> members = clanWar.getNecessaryAttackParticipants(query.necessaryAttackYn());

@@ -35,8 +35,18 @@ public class BeginningMonthDatabaseService implements BeginningMonthRepository {
     }
 
     @Override
+    public Optional<BeginningMonth> findById(Long id) {
+        return repository.findById(id);
+    }
+
+    @Override
     public BeginningMonth save(BeginningMonth beginningMonth) {
         return repository.save(beginningMonth);
+    }
+
+    @Override
+    public void delete(BeginningMonth beginningMonth) {
+        repository.delete(beginningMonth);
     }
 
 }

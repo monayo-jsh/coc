@@ -91,86 +91,17 @@ body {
     padding: 15px;
     text-align: center;
     display: flex;
-    flex-direction: column;
-    border-bottom: 1px solid white;
-    font-size: 13px;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
 
-    .row {
-      display: flex;
-      align-items: center;
-
-      @media (max-width: 500px) {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-      }
-
-      .dynamic {
-        display: flex;
-        align-items: center;
-
-        @media (max-width: 500px) {
-          justify-content: flex-start;
-          align-items: center;
-        }
-      }
-    }
-
-    .detail {
-      margin-top: 5px;
-      border-top: 1px solid;
-      padding-top: 10px;
-      white-space: pre-line;
-      text-align: left;
-    }
-
-    .label {
-      font-weight: bold;
-      margin-right: 5px;
-      border-radius: 5px;
-      width: 40px;
-    }
-
-    .label.NOTICE {
-      border: 1px solid red;
+    i:hover {
       color: red;
     }
-
-    .label.EVENT {
-      border: 1px solid green;
-      color: green;
-    }
-
-    .label.COUPON {
-      border: 1px solid gold;
-      color: gold;
-    }
-
-    .text {
-      width: 365px;
-      text-align: left;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      margin-right: 5px;
-
-      @media (max-width: 500px) {
-        width: 255px;
-      }
-    }
-
-    .posting-date {
-      margin-right: 5px;
-      white-space: nowrap;
-    }
-    .timer {
-      white-space: nowrap;
-    }
   }
 
-  .notice.active {
-    opacity: 1;
-  }
 }
 
 .table {

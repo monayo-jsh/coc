@@ -50,4 +50,9 @@ public class BeginningMonthPlanService {
         beginningMonthRepository.save(beginningMonth);
     }
 
+    @Transactional
+    public void delete(Long id) {
+        beginningMonthRepository.findById(id)
+                                .ifPresent(beginningMonthRepository::delete);
+    }
 }

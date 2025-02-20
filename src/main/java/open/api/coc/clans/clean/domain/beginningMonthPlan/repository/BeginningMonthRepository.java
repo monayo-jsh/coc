@@ -11,7 +11,8 @@ public interface BeginningMonthRepository {
     BeginningMonth findLatest();
 
     Optional<BeginningMonth> findByMonth(LocalDate month);
+    Optional<BeginningMonth> findById(Long id);
 
     BeginningMonth save(BeginningMonth beginningMonth);
-
+    void delete(BeginningMonth beginningMonth);
 }

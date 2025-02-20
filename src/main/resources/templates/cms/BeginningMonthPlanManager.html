@@ -262,9 +262,53 @@
       })
     }
 
+    async function drawBeginningMonths() {
+      const beginningMonths = await fetchBeginningMonths();
+      if (!beginningMonths.length) return;
+
+      const target = document.querySelector('.beginning-month-plan-wrapper');
+      target.innerHTML = ""; //clear
+      for(const beginningMonth of beginningMonths) {
+        const beginningMonthRow = drawBeginningMonth(beginningMonth);
+        target.appendChild(beginningMonthRow);
+      }
+    }
+
+    function drawBeginningMonth(beginningMonth) {
+      const { id, month } = beginningMonth;
+
+      const beginningMonthPlanTemplate = copyTemplateById('beginning-month-plan-template');
+      const row = beginningMonthPlanTemplate.querySelector('.beginning-month-plan.row');
+
+      const displayMonth = formatYYM(month);
+
+      row.dataset.id = id;
+      row.dataset.displayMonth = displayMonth;
+
+      row.innerHTML = row.innerHTML.replace(/{MONTH}/, displayMonth);
+
+      return row;
+    }
+
+    function removeBeginningMonth(element) {
+      const row = element.closest('.beginning-month-plan.row');
+      const { id, displayMonth } = row.dataset;
+
+      if (!confirm(`[${displayMonth}] 월초 일정을 삭제하시겠습니까?`)) return;
+
+      deleteBeginningMonth(id)
+      .then((isResult) => {
+        if (isResult) {
+          location.reload();
+        }
+      })
+    }
+
     window.onload = async () => {
       initMonthPicker();
       initDatePicker();
+
+      await drawBeginningMonths();
     }
   </script>
 </head>
@@ -275,9 +319,11 @@
 </div>
 
 <div class="support-area">
+
   <div class="buttons">
     <div class="button-chip" onclick="displayRegisterForm();">월초 일정 등록</div>
   </div>
+
   <div class="registration-form-wrapper display-none">
     <form class="registration-form">
       <table class="table mt-5">
@@ -346,6 +392,7 @@
     </form>
   </div>
 </div>
+
 <div class="beginning-month-plan-wrapper"></div>
 
 </body>
@@ -410,6 +457,9 @@
   <div class="button-chip" onclick="matchingLeagueDate(this);">매칭일</div>
 </template>
 <template id="beginning-month-plan-template">
-
+  <div class="beginning-month-plan row">
+    <div class="month">{MONTH}</div>
+    <i class="fa-solid fa-trash cursor-pointer" onclick="removeBeginningMonth(this);"></i>
+  </div>
 </template>
 </html>

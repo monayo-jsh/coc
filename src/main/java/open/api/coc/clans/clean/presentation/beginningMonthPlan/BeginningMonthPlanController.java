@@ -17,7 +17,9 @@ import open.api.coc.clans.clean.presentation.beginningMonthPlan.dto.BeginningMon
 import open.api.coc.clans.clean.presentation.beginningMonthPlan.dto.BeginningMonthResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,11 +73,26 @@ public class BeginningMonthPlanController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @PostMapping("")
-    public ResponseEntity<Void> postBeginningMonthPlan(@Valid @RequestBody BeginningMonthCreateRequest request) {
+    public ResponseEntity<Void> postBeginningMonth(@Valid @RequestBody BeginningMonthCreateRequest request) {
 
         BeginningMonthCreateCommand command = beginningMonthMapper.toBeginningMonthCommand(request);
         beginningMonthPlanService.create(command);
 
+        return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                             .build();
+    }
+
+    @Operation(
+        summary = "월초 일정을 삭제합니다. version: 1.00, Last Update: 25.02.20",
+        description = "이 API는 월초 일정을 삭제합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteBeginningMonth(@PathVariable Long id) {
+        beginningMonthPlanService.delete(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
                              .build();
     }

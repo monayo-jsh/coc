@@ -82,7 +82,7 @@ public class ClanWarController {
     @Parameters(
         value = {
             @Parameter(name = "clanTag", description = "클랜 태그"),
-            @Parameter(name = "startTime", description = "전쟁 시작일시"),
+            @Parameter(name = "preparationStartTime", description = "전쟁 준비 시작일시"),
             @Parameter(name = "necessaryAttackYn", description = "필수 참여 여부: YN", required = false),
         }
     )

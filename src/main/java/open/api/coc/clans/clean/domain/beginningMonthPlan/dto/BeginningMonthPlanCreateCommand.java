@@ -8,7 +8,7 @@ public record BeginningMonthPlanCreateCommand(
     LocalDate date,
 
     // 리그전 설명
-    String leagueDesc,
+    String leagueWarDesc,
 
     // 클랜전 설명
     String clanWarDesc,

@@ -11,7 +11,7 @@ public record BeginningMonthPlanCreateRequest(
     Long date,
 
     @Schema(description = "리그전")
-    String league,
+    String leagueWar,
 
     @Schema(description = "클랜전")
     String clanWar,

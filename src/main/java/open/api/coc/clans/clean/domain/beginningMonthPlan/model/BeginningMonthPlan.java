@@ -37,8 +37,8 @@ public class BeginningMonthPlan {
     private LocalDate date;
 
     @Comment("리그전 일정 설명")
-    @Column(name = "leagueDesc", nullable = true, length = 50)
-    private String leagueDesc;
+    @Column(name = "leagueWarDesc", nullable = true, length = 50)
+    private String leagueWarDesc;
 
     @Comment("클랜전 일정 설명")
     @Column(name = "clanWarDesc", nullable = true, length = 50)
@@ -54,11 +54,11 @@ public class BeginningMonthPlan {
     private BeginningMonth beginningMonth;
 
     @Builder
-    public BeginningMonthPlan(Long id, LocalDate date, String leagueDesc, String clanWarDesc,
+    public BeginningMonthPlan(Long id, LocalDate date, String leagueWarDesc, String clanWarDesc,
                               String capitalDesc, BeginningMonth beginningMonth) {
         this.id = id;
         this.date = date;
-        this.leagueDesc = leagueDesc;
+        this.leagueWarDesc = leagueWarDesc;
         this.clanWarDesc = clanWarDesc;
         this.capitalDesc = capitalDesc;
         this.beginningMonth = beginningMonth;

@@ -105,7 +105,7 @@
 
       // 매칭일 설정 버튼 제거
       const plan = element.closest('.table.plan');
-      plan.querySelectorAll('.table-tbody .plan-league').forEach(ele => ele.innerHTML = "");
+      plan.querySelectorAll('.table-tbody .plan-league-war').forEach(ele => ele.innerHTML = "");
 
       // 리그전 매칭일 자동 배정
       let drawIndex = 0;
@@ -113,31 +113,31 @@
       for (const tr of plan.querySelector('.table-tbody').children) {
         // 선택한 매칭일 표기 수정
         if (tr === selectedTableRow) {
-          convertPlanLeague(tr, "매칭");
+          convertPlanLeagueWar(tr, "매칭");
           drawIndex++;
           continue;
         }
         // 이 후 라운드 표기
         if (drawIndex > 0 && drawRoundSize >= drawIndex) {
-          convertPlanLeague(tr, `${drawIndex}Round 전투`);
+          convertPlanLeagueWar(tr, `${drawIndex}Round 전투`);
           drawIndex++;
           continue;
         }
 
         // 7일차까지 표기하면 종료
         if (drawIndex > drawRoundSize) {
-          convertPlanLeague(tr, "종료");
+          convertPlanLeagueWar(tr, "종료");
           break;
         }
       }
 
-      function convertPlanLeague(tr, value) {
+      function convertPlanLeagueWar(tr, value) {
         // 표기
-        const target = tr.querySelector('.plan-league');
+        const target = tr.querySelector('.plan-league-war');
         target.innerHTML = value;
 
         // 데이터 설정
-        const targetInput = tr.querySelector('input[name=planLeague]');
+        const targetInput = tr.querySelector('input[name=planLeagueWar]');
         targetInput.value = value;
       }
     }
@@ -180,7 +180,7 @@
         const btnMatchingLeagueTemplate = copyTemplateById('form-beginning-month-plan-row-matching-league-template');
         const btnMatchingLeague = btnMatchingLeagueTemplate.querySelector('.button-chip');
 
-        const target = planRow.querySelector('.plan-league');
+        const target = planRow.querySelector('.plan-league-war');
         target.appendChild(btnMatchingLeague);
       }
 
@@ -244,7 +244,7 @@
       for(let i=0; i<length; i++) {
         const plan = {
           date: formData.get("planDate")[i],
-          league: formData.get('planLeague')[i],
+          leagueWar: formData.get('planLeagueWar')[i],
           clanWar: formData.get('planClanWar')[i],
           capital: formData.get('planCapital')[i]
         };
@@ -385,8 +385,8 @@
       <input type="hidden" name="planDate" value="{DATE_VALUE}">
     </th>
     <td class="table-td">
-      <div class="plan-league display-flex justify-content-center"></div>
-      <input type="hidden" class="input" name="planLeague" value="">
+      <div class="plan-league-war display-flex justify-content-center"></div>
+      <input type="hidden" class="input" name="planLeagueWar" value="">
     </td>
     <td class="table-td">
       <div class="plan-clanWar">

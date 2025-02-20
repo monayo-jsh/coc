@@ -15,6 +15,8 @@
   <script src="/js/common.js"></script>
   <script src="/js/util.js"></script>
   <script src="/js/api/notice.js"></script>
+  <script src="/js/api/beginningMonthPlan.js"></script>
+
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -134,101 +136,6 @@
       }
     }
 
-    function fetchBeginningMonthPlans() {
-      return [
-        {
-          date: 1738108800000,  // 2025년 1월 29일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "매칭(정식)",
-          capital: ""
-        },
-        {
-          date: 1738195200000,  // 2025년 1월 30일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "전투",
-          capital: ""
-        },
-        {
-          date: 1738281600000,  // 2025년 1월 31일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "",
-          capital: "오픈"
-        },
-        {
-          date: 1738368000000,  // 2025년 2월 1일 00시 00분 00초
-          leagueWar: "매칭",
-          clanWar: "",
-          capital: ""
-        },
-        {
-          date: 1738454400000,  // 2025년 2월 2일 00시 00분 00초
-          leagueWar: "1R 전투",
-          clanWar: "",
-          capital: ""
-        },
-        {
-          date: 1738540800000,  // 2025년 2월 3일 00시 00분 00초
-          leagueWar: "2R 전투",
-          clanWar: "매칭(병행)",
-          capital: "종료"
-        },
-        {
-          date: 1738627200000,  // 2025년 2월 4일 00시 00분 00초
-          leagueWar: "3R 전투",
-          clanWar: "전투",
-          capital: ""
-        },
-        {
-          date: 1738713600000,  // 2025년 2월 5일 00시 00분 00초
-          leagueWar: "4R 전투",
-          clanWar: "매칭(병행)",
-          capital: ""
-        },
-        {
-          date: 1738800000000,  // 2025년 2월 6일 00시 00분 00초
-          leagueWar: "5R 전투",
-          clanWar: "전투",
-          capital: ""
-        },
-        {
-          date: 1738886400000,  // 2025년 2월 7일 00시 00분 00초
-          leagueWar: "6R 전투",
-          clanWar: "매칭(병행)",
-          capital: "오픈"
-        },
-        {
-          date: 1738972800000,  // 2025년 2월 8일 00시 00분 00초
-          leagueWar: "7R 전투",
-          clanWar: "전투",
-          capital: ""
-        },
-        {
-          date: 1739059200000,  // 2025년 2월 9일 00시 00분 00초
-          leagueWar: "종료",
-          clanWar: "",
-          capital: ""
-        },
-        {
-          date: 1739145600000,  // 2025년 2월 10일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "매칭(정식)",
-          capital: "종료"
-        },
-        {
-          date: 1739232000000,  // 2025년 2월 11일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "전투",
-          capital: ""
-        },
-        {
-          date: 1739318400000,  // 2025년 2월 12일 00시 00분 00초
-          leagueWar: "",
-          clanWar: "매칭(정식)",
-          capital: ""
-        }
-      ];
-    }
-
     function makePlanRow(plan) {
       const { date, leagueWar, clanWar, capital } = plan;
 
@@ -262,11 +169,14 @@
       return planRow;
     }
 
-    function drawBeginningMonthPlan() {
-      const beginningMonthPlans = fetchBeginningMonthPlans();
+    async function drawBeginningMonthPlans() {
+      const beginningMonth = await fetchBeginningMonthLatest();
+      if (!beginningMonth) return;
+
+      const { plans } = beginningMonth;
 
       const today = dayjs();
-      const lastPlan = beginningMonthPlans[beginningMonthPlans.length-1];
+      const lastPlan = plans[plans.length-1];
       const lastPlanDate = dayjs(lastPlan.date);
       if (today > lastPlanDate) {
         // 마지막 일정 지난 경우 표기하지 않음
@@ -276,7 +186,7 @@
       const beginningMonthPlanElement = document.querySelector('.beginning-month-plan');
 
       const target = beginningMonthPlanElement.querySelector('.table-tbody');
-      for(const plan of beginningMonthPlans) {
+      for(const plan of plans) {
         const planRow = makePlanRow(plan);
         target.appendChild(planRow);
       }
@@ -285,7 +195,7 @@
     }
 
     window.onload = async () => {
-      drawBeginningMonthPlan();
+      await drawBeginningMonthPlans();
       await drawNotice();
 
       showDetailPage();

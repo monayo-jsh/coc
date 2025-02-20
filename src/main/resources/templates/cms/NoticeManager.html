@@ -71,10 +71,10 @@
       const registerForm = document.querySelector('form.notice-registration-form');
       const requestBody = loadRequestBodyFromForm(registerForm);
 
-      convertCheckbox(requestBody, 'shutdownTimer');
-      convertCheckbox(requestBody, 'isVisible');
-      convertTimestamp(requestBody, 'startDateTime');
-      convertTimestamp(requestBody, 'endDateTime');
+      convertBodyOfCheckbox(requestBody, 'shutdownTimer');
+      convertBodyOfCheckbox(requestBody, 'isVisible');
+      convertBodyOfTimestamp(requestBody, 'startDateTime');
+      convertBodyOfTimestamp(requestBody, 'endDateTime');
 
       // API 호출
       createNotice(requestBody)

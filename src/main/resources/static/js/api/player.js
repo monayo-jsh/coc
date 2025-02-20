@@ -160,8 +160,15 @@ async function updatePlayerSupportYn(playerTag, supportYn) {
     support_yn: supportYn
   }
 
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
   const uri = `${URI_PLAYERS_SUPPORT.replace(/{playerTag}/, encodeURIComponent(playerTag))}`
-  return axios.put(uri, requestBody)
+  return axios.put(uri, jsonData, options)
               .then(response => {
                 const { data } = response
                 let message = `지원계정 ${supportYn === 'Y' ? '등록' : '해제'} 되었습니다.`
@@ -179,7 +186,14 @@ async function insertSupportPlayerBulk(playerTags) {
     player_tags: playerTags
   }
 
-  return axios.post(URI_PLAYERS_SUPPORT_BULK, requestBody)
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return axios.post(URI_PLAYERS_SUPPORT_BULK, jsonData, options)
               .then(response => {
                 const { data } = response
                 let message = `지원계정 일괄 등록 되었습니다.`
@@ -317,8 +331,15 @@ async function updatePlayerNickname(playerTag, nickname) {
     nickname: nickname
   }
 
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
   const uri = `${URI_PLAYERS_NICKNAME.replace(/{playerTag}/, encodeURIComponent(playerTag))}`
-  return axios.put(uri, requestBody)
+  return axios.put(uri, jsonData, options)
               .then(response => {
                 alert("닉네임을 변경했습니다.");
                 return true;

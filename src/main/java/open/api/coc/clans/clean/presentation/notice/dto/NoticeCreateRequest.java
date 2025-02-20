@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public record NoticeCreateReqeust(
+public record NoticeCreateRequest(
 
     @Schema(description = "공지 유형")
     @Pattern(regexp = "NOTICE|EVENT|COUPON")

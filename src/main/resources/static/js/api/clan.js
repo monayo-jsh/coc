@@ -103,7 +103,14 @@ async function deleteClan(clanTag) {
 async function updateClanContent(clanTag, requestBody) {
   const uri = URI_CLAN_CONTENT_ACTIVATION.replace(/{clanTag}/, encodeURIComponent(clanTag))
 
-  return await axios.put(uri, requestBody)
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.put(uri, jsonData, options)
                     .then((response) => {
                       alert('처리 되었습니다.');
                       return true;
@@ -221,7 +228,14 @@ async function registerClanAssignedPlayers(seasonDate, players) {
     players: players
   }
 
-  return await axios.post(URI_CLAN_ASSIGNED_MEMBER_BULK, requestBody)
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.post(URI_CLAN_ASSIGNED_MEMBER_BULK, jsonData, options)
                     .then((response) => {
                       alert('클랜 배정 되었습니다.');
                       return true;
@@ -363,7 +377,14 @@ async function registerClanLeagueAssignedPlayers(seasonDate, players) {
     players: players
   }
 
-  return await axios.post(URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK, requestBody)
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.post(URI_CLAN_LEAGUE_ASSIGNED_MEMBER_BULK, jsonData, options)
                     .then((response) => {
                       alert('리그 배정 되었습니다.');
                       return true;

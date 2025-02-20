@@ -18,7 +18,14 @@ async function fetchLaboratories() {
 }
 
 async function createLaboratory(requestBody) {
-  return await axios.post(PREFIX_LAB_API, requestBody)
+  const jsonData = JSON.stringify(Object.fromEntries(requestBody));
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.post(PREFIX_LAB_API, jsonData, options)
                     .then((response) => {
                       const { data } = response
                       alert('등록 되었습니다.');

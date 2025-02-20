@@ -20,12 +20,6 @@ public class AdminViewController {
         return "cms/Admin";
     }
 
-    /** 공지 관리 */
-    @GetMapping("/notice/manager")
-    public String noticeManager() {
-        return "cms/NoticeManager";
-    }
-
     /** 시즌종료일 관리 */
     @GetMapping("/season/manager")
     public String seasonManager() {
@@ -36,6 +30,18 @@ public class AdminViewController {
     @GetMapping("/laboratory/manager")
     public String laboratoryManager() {
         return "cms/LaboratoryManager";
+    }
+
+    /** 공지 관리 */
+    @GetMapping("/notice/manager")
+    public String noticeManager() {
+        return "cms/NoticeManager";
+    }
+
+    /** 월초 일정 관리 */
+    @GetMapping("/beginning-month-plan/manager")
+    public String beginningMonthPlanManager() {
+        return "cms/BeginningMonthPlanManager";
     }
 
     /** 클랜원 관리 */

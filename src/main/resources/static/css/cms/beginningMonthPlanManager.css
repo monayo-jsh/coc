@@ -1,0 +1,183 @@
+:root {
+  --notice-bg-color: #2b2d31;
+  --notice-font-color: #d8d8d8;
+}
+
+body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--notice-bg-color);
+  color: var(--notice-font-color);
+}
+
+.title {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  color: var(--notice-font-color);
+  padding: 5px 10px;
+  border-bottom: 2px double;
+  font-weight: bold;
+  font-size: 24px;
+
+  .label {
+    margin-left: 3px;
+  }
+}
+
+.support-area {
+  margin-top: 5px;
+  width: 720px;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 500px) {
+    width: 400px;
+  }
+
+  .buttons {
+    width: 100%;
+    display: flex;
+    justify-content: right;
+  }
+}
+
+.beginning-month-plan {
+  margin-top: 10px;
+  width: 500px;
+
+  @media (max-width: 500px) {
+    width: 400px;
+  }
+
+  .table-caption {
+    text-align: center;
+    background-color: #000000;
+    border: 1px solid;
+    font-weight: bold;
+  }
+
+  .table-tbody, .table-tfoot {
+    border-top: 1px solid white;
+  }
+
+  .table-th:not(:first-child), .table-td:not(:first-child) {
+    border-left: 1px solid white;
+  }
+
+  .table-tr.today {
+    font-weight: bold;
+    border: 2px solid white;
+    background-color: black;
+  }
+}
+
+.beginning-month-plan-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 5px;
+  border-radius: 10px;
+  padding: 10px 0;
+
+  @media (max-width: 500px) {
+    width: 400px;
+  }
+
+  .beginning-month-plan {
+    width: 100%;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+
+    i:hover {
+      color: red;
+    }
+  }
+
+}
+
+.table {
+  border-radius: 5px;
+
+  .table-th {
+    color: var(--notice-font-color) !important;
+  }
+
+}
+
+.is-visible .toggle-switch-button {
+  width: 53px;
+}
+
+.td-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.td-wrap.shutdown-timer, .td-wrap.is-visible {
+  @media (max-width: 500px) {
+    flex-direction: column;
+  }
+}
+
+.input {
+  width: 100%;
+  height: 100%;
+  border: 0 transparent;
+  font-size: 12px;
+  padding: 5px;
+  color: var(--notice-bg-color);
+  background: var(--notice-font-color);
+  border-radius: 5px;
+  outline: none;
+}
+
+.jcalendar {
+  color: black;
+}
+
+.input-date {
+  width: 130px;
+}
+
+.radio-inputs {
+
+  .radio {
+
+    .name {
+      color: var(--notice-font-color);
+    }
+
+    input:checked + .name.NOTICE {
+      color: white;
+      background-color: red;
+    }
+
+    input:checked + .name.EVENT {
+      color: white;
+      background-color: green;
+    }
+
+    input:checked + .name.COUPON {
+      color: black;
+      background-color: gold;
+    }
+
+  }
+}
+
+.table.plan {
+
+  .table-tbody {
+    border-top: 1px solid white;
+  }
+
+}

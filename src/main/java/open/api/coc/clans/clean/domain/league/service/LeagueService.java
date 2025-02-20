@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.domain.league.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,7 +31,7 @@ public class LeagueService {
     @Transactional(readOnly = true)
     public Map<Integer, League> findAllMapByIds(List<Integer> leagueIds) {
         if (leagueIds == null || leagueIds.isEmpty()) {
-            throw new IllegalArgumentException("leagueIds can not be null or empty");
+            return Collections.emptyMap();
         }
 
         return leagueRepository.findAllByIds(leagueIds)

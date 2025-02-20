@@ -1,5 +1,6 @@
 package open.api.coc.clans.clean.domain.clan.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class ClanRegistrationService {
     @Transactional(readOnly = true)
     public List<Clan> findAllByIds(List<String> clanTags) {
         if (clanTags == null || clanTags.isEmpty()) {
-            throw new IllegalArgumentException("clanTags is empty");
+            return Collections.emptyList();
         }
 
         return clanRepository.findByIds(clanTags);

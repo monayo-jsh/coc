@@ -93,19 +93,26 @@
       const image = await fetchFile("clan-game", fileName);
       if (!image) return;
 
+      // 로고 래퍼
+      const logoWrapper = document.querySelector('.logo-wrapper');
+
       // 기본 이미지 숨김
-      toggleDisplay(document.querySelector('.clan-game-image.logo'));
+      const logoImage = document.querySelector('.clan-game-image.logo');
 
       // 보상 이미지 표시
       const url = URL.createObjectURL(image);
-      const target = document.querySelector('.clan-game-image.reward');
-      target.src = url;
-      toggleDisplay(target);
+      const rewardImage = document.querySelector('.clan-game-image.reward');
+      rewardImage.src = url;
+      rewardImage.onload = () => {
+        logoImage.classList.add('hidden');
+        logoWrapper.classList.add('loaded');
+        rewardImage.classList.add('loaded');
+      }
     }
 
     window.onload = async () => {
-      await fetchLatestClanGameRewardImage();
       await renderLatestClanGames();
+      await fetchLatestClanGameRewardImage();
     }
   </script>
 
@@ -114,7 +121,7 @@
 <div class="content">
   <div class="logo-wrapper">
     <div class="clan-game-image logo"></div>
-    <img class="clan-game-image reward display-none" />
+    <img class="clan-game-image reward hidden" />
   </div>
   <div class="section">
     <div id="wifi-loader" class="display-none">

@@ -19,6 +19,9 @@ spring:
     cache: false
   mvc:
     static-path-pattern: /static/**
+  servlet:
+    multipart:
+      max-file-size: 10MB
   jackson:
     default-property-inclusion: non_null
   h2:
@@ -78,3 +81,6 @@ scheduling:
 hall-of-fame:
   ranking: 11
   average: 3
+
+file:
+  upload-path: ./web

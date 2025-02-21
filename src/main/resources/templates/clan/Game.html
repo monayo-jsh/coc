@@ -15,6 +15,7 @@
   <script src="/js/common.js"></script>
   <script src="/js/util.js"></script>
   <script src="/js/api/clan.js"></script>
+  <script src="/js/api/file.js"></script>
 
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -86,8 +87,25 @@
       drawClanGameRecords(completedPoint, records);
     }
 
+    async function fetchLatestClanGameRewardImage() {
+      const fileName = `${dayjs().format('YYYYMM')}.png`;
+
+      const image = await fetchFile("clan-game", fileName);
+      if (!image) return;
+
+      // 기본 이미지 숨김
+      toggleDisplay(document.querySelector('.clan-game-image.logo'));
+
+      // 보상 이미지 표시
+      const url = URL.createObjectURL(image);
+      const target = document.querySelector('.clan-game-image.reward');
+      target.src = url;
+      toggleDisplay(target);
+    }
+
     window.onload = async () => {
-        await renderLatestClanGames();
+      await fetchLatestClanGameRewardImage();
+      await renderLatestClanGames();
     }
   </script>
 
@@ -95,7 +113,8 @@
 <body>
 <div class="content">
   <div class="logo-wrapper">
-    <div class="clan-game-logo"></div>
+    <div class="clan-game-image logo"></div>
+    <img class="clan-game-image reward display-none" />
   </div>
   <div class="section">
     <div id="wifi-loader" class="display-none">

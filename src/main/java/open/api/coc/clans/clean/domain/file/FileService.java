@@ -5,6 +5,7 @@ import open.api.coc.clans.clean.domain.file.dto.FileUploadCommand;
 import open.api.coc.clans.clean.domain.file.repository.FileRepository;
 import open.api.coc.clans.clean.presentation.file.dto.FileUploadResponse;
 import open.api.coc.clans.common.exception.CustomRuntimeException;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,4 +20,7 @@ public class FileService {
         return FileUploadResponse.of(command.uploadType(), uploadPath);
     }
 
+    public Resource download(String downloadType, String fileName) {
+        return fileRepository.download(downloadType, fileName);
+    }
 }

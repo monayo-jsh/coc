@@ -15,7 +15,7 @@
     justify-content: center;
   }
 
-  .clan-game-logo {
+  .clan-game-image {
     width: 870px;
     height: 515px;
     background-image: url(/images/etc/clan-game-logo.png);
@@ -25,6 +25,13 @@
     @media (max-width: 800px) {
       width: 400px;
       height: 250px;
+    }
+  }
+
+  .reward {
+    height: 870px;
+    @media (max-width: 800px) {
+      height: 400px;
     }
   }
 }

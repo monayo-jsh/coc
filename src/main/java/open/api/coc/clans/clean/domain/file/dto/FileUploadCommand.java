@@ -39,7 +39,7 @@ public record FileUploadCommand(
     }
 
     private void validateFileExtension() throws BadRequestException {
-        List<String> allowedExtensions = List.of("JPG", "PNG");
+        List<String> allowedExtensions = List.of("JPG", "JPEG", "PNG");
 
         String fileExtension = StringUtils.getFilenameExtension(this.uploadFile.getOriginalFilename());
         assert fileExtension != null;

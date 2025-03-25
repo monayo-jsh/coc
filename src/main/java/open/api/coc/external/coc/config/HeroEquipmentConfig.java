@@ -55,6 +55,7 @@ public enum HeroEquipmentConfig {
     HENCHMEN_PUPPET(MINION_PRINCE, 500, "normal", "Henchmen Puppet", "보디가드 인형"),
     DARK_ORB(MINION_PRINCE, 501, "normal", "Dark Orb", "다크 구슬"),
     METAL_PANTS(MINION_PRINCE, 502, "normal", "Metal Pants", "메탈 바지"),
+    NOBLE_IRON(MINION_PRINCE, 503, "normal", "Noble Iron", "노블 아이언"),
 
     UNKNOWN(HeroConfig.UNKNOWN, Integer.MAX_VALUE, "unknown", "unknown", "unknown");
 

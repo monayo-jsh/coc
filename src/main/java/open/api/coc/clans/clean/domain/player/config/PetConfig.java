@@ -18,6 +18,7 @@ public enum PetConfig {
     FROSTY(PlayerTroopType.PET, 8, "Frosty",  "프로스티"),
     SPIRIT_FOX(PlayerTroopType.PET, 9, "Spirit Fox", "스피릿 폭스"),
     ANGRY_JELLY(PlayerTroopType.PET, 10, "Angry Jelly", "앵그리 젤리"),
+    SNEEZY(PlayerTroopType.PET, 11, "Sneezy", "스니지"),
 
     UNKNOWN(PlayerTroopType.UNKNOWN, 99,"unknown", "알 수 없음");
 

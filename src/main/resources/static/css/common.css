@@ -72,6 +72,7 @@ body::before {
       url("/images/hero/equipment/Electro_Boots.png");
       url("/images/hero/equipment/Snake_Bracelet.png");
       url("/images/hero/equipment/Metal_Pants.png");
+      url("/images/hero/equipment/Noble_Iron.png");
 
       url(/images/etc/trophies.png);
       url(/images/etc/max_level.png);
@@ -128,6 +129,7 @@ body::before {
       url(/images/spell/Rage_Spell.png);
       url(/images/spell/Recall_Spell.png);
       url(/images/spell/Skeleton_Spell.png);
+      url(/images/spell/Revive_Spell.png);
 }
 
 .logo {

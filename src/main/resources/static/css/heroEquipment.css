@@ -144,3 +144,7 @@
   background-image: url("/images/hero/equipment/Metal_Pants.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.noble_iron {
+  background-image: url("/images/hero/equipment/Noble_Iron.png");
+  color: rgba(0, 0, 0, 0);
+}

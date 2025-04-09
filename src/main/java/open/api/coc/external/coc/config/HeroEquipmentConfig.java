@@ -31,6 +31,7 @@ public enum HeroEquipmentConfig {
 
     FROZEN_ARROW(ARCHER_QUEEN, 220, "epic", "Frozen Arrow", "얼음 화살"),
     MAGIC_MIRROR(ARCHER_QUEEN, 221, "epic", "Magic Mirror", "마법 반사경"),
+    ACTION_FIGURE(ARCHER_QUEEN, 222, "epic", "Action Figure", "액션 피규어"),
 
     // 그랜드 워든
     LIFE_GEM(GRAND_WARDEN, 300, "normal", "Life Gem", "생명의 보석"),

@@ -83,6 +83,10 @@
   background-image: url("/images/hero/equipment/Magic_Mirror.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.action_figure {
+  background-image: url("/images/hero/equipment/Action_Figure.png");
+  color: rgba(0, 0, 0, 0);
+}
 
 .img-icon.life_gem {
   background-image: url("/images/hero/equipment/Life_Gem.png");

@@ -264,8 +264,7 @@ public class ClanWarService {
         return JSON_FILE_NAME.formatted(warTag);
     }
 
-    @Transactional
-    public void collectCurrentClanWar() {
+    public void collectEndedClanWar() {
         final String state = ClanWarEntity.STATE_WAR_COLLECTED;
         LocalDateTime now = LocalDateTime.now();
         List<ClanWarEntity> collectClanWars = clanWarQueryRepository.findAllByEndTimeAfterAndStateNot(now, state);
@@ -275,7 +274,17 @@ public class ClanWarService {
         }
     }
 
-    private void collectClanWar(ClanWarEntity clanWarEntity) {
+    public void collectCurrentClanWar() {
+        final String state = ClanWarEntity.STATE_IN_WAR;
+        List<ClanWarEntity> collectClanWars = clanWarQueryRepository.findAllByStat(state);
+
+        for (ClanWarEntity clanWarEntity : collectClanWars) {
+            collectClanWar(clanWarEntity);
+        }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void collectClanWar(ClanWarEntity clanWarEntity) {
 
         ClanWar clanWar = getClanWar(clanWarEntity);
 

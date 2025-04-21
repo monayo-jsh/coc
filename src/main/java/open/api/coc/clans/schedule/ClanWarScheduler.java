@@ -18,7 +18,14 @@ public class ClanWarScheduler {
      * 1분마다 클랜전이 종료되었으나 수집되지 않은 기록을 수집한다.
      */
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.MINUTES)
-    public void raidScheduling() {
-        clanWarService.collectCurrentClanWar();
+    public void collectEndedClanWar() {
+        clanWarService.collectEndedClanWar();
     }
-}
+
+    /**
+     * 30분마다 진행중인 클랜전 기록을 수집한다.
+     */
+    @Scheduled(cron = "0 */30 * * * *")
+    public void collectCurrentClanWar() {
+        clanWarService.collectCurrentClanWar();
+    }}

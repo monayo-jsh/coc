@@ -34,7 +34,8 @@ import open.api.coc.clans.clean.domain.clan.exception.ClanWarMemberNotExistsExce
     name = "tb_clan_war",
     indexes = {
         @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag"),
-        @Index(name = "TCW_IDX_02", columnList = "clan_tag")
+        @Index(name = "TCW_IDX_02", columnList = "clan_tag"),
+        @Index(name = "TCW_IDX_03", columnList = "state")
     }
 )
 public class ClanWarEntity {
@@ -97,6 +98,7 @@ public class ClanWarEntity {
         this.state = STATE_WAR_COLLECTED;
     }
 
+    public static final String STATE_IN_WAR = "inWar";
     public static final String STATE_WAR_COLLECTED = "warCollected";
 
     public void changeClan(ClanEntity clan) {

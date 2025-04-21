@@ -52,4 +52,13 @@ public class ClanWarQueryRepository {
                                             .fetchOne();
         return Optional.ofNullable(clanWar);
     }
+
+    public List<ClanWarEntity> findAllByStat(String state) {
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.state.eq(state));
+
+        return queryFactory.selectFrom(clanWarEntity)
+                           .where(condition)
+                           .fetch();
+    }
 }

@@ -247,3 +247,13 @@ body {
   margin-left: 3px;
   color: orange;
 }
+
+img.clan-game-reward {
+  width: 870px;
+  height: 870px;
+
+  @media (max-width: 800px) {
+    width: 400px;
+    height: 400px;
+  }
+}

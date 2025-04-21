@@ -119,8 +119,9 @@
 
       if (content) {
         const detail = noticeRow.querySelector('.detail');
-        const noticeContent = convertContainTextToLink(content);
-        detail.innerHTML = noticeContent;
+        const contentWithLink = convertContainTextToLink(content);
+        const contentWithImage = convertMarkdownImageToTag(contentWithLink);
+        detail.innerHTML = contentWithImage;
       }
 
       return noticeRow;

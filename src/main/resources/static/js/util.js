@@ -622,6 +622,16 @@ function convertContainTextToLink(text) {
   }
 }
 
+function convertMarkdownImageToTag(text) {
+  if (!text) return text;
+  const targetWord = text;
+  const markdownImagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
+
+  return targetWord.replace(markdownImagePattern, (match, alt, url) => {
+      return `<img class="clan-game-reward" src="${url}" alt="${alt}">`;
+  });
+}
+
 function convertFormatDayHourMinuteSecond(time) {
   let displayTime = formatTime(time, "D일 H시간 m분 s초");
 

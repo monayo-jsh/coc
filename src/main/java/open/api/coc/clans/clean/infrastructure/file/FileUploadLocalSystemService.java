@@ -74,7 +74,7 @@ public class FileUploadLocalSystemService implements FileRepository {
             fileName = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
         }
 
-        return fileName + "." + fileExtension;
+        return fileName + ".png";
     }
 
     private Path generateFilePath(String uploadType, String fileName) {

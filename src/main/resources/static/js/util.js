@@ -613,22 +613,20 @@ function convertContainTextToLink(text) {
   if (!text) return text;
 
   const targetWord = text;
-  const urlPattern = /(\b(https?):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+  const urlPattern = /!\[link]\((https?:\/\/[^)]+)\)/gim;
 
-  return targetWord.replace(urlPattern, convertTag);
-
-  function convertTag(url) {
+  return targetWord.replace(urlPattern, (match, url) => {
     return '<a class="link" href="' + url + '">'+ url +'</a>';
-  }
+  });
 }
 
 function convertMarkdownImageToTag(text) {
   if (!text) return text;
   const targetWord = text;
-  const markdownImagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g
+  const markdownImagePattern = /^!\[image]\(([^)]+)\)/g
 
-  return targetWord.replace(markdownImagePattern, (match, alt, url) => {
-      return `<img class="clan-game-reward" src="${url}" alt="${alt}">`;
+  return targetWord.replace(markdownImagePattern, (match, url) => {
+      return `<img class="clan-game-reward" src="${url}" alt="">`;
   });
 }
 

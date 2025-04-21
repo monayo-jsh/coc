@@ -55,7 +55,6 @@ public class ClanClientImpl implements ClanClient {
                                .stream()
                                .map(clanResponseMapper::toClanMember)
                                .collect(Collectors.toList());
-
         } catch (Exception e) {
             throw ClanClientException.ofClanMember(clanTag);
         }

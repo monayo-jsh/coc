@@ -68,6 +68,9 @@ external:
         round-tag: /{roundTag}
         war-tag: /{warTag}
 
+# circuit-breaker 설정
+
+
 # CMS 어드민 계정 설정
 cms:
   admin-id: ${ADMIN_ID}

@@ -76,6 +76,7 @@ public class SecurityConfig {
             makeUserDetails(username+"3", password, "ADMIN"),
             makeUserDetails(username+"4", password, "ADMIN"),
             makeUserDetails(username+"5", password, "ADMIN"),
+            makeUserDetails(username+"6", password, "ADMIN"),
             makeUserDetails("coc-developer-1", password, "ADMIN"),
             makeUserDetails("coc-developer-2", password, "ADMIN")
         );

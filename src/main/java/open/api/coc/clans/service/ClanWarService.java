@@ -264,6 +264,7 @@ public class ClanWarService {
         return JSON_FILE_NAME.formatted(warTag);
     }
 
+    @Transactional
     public void collectEndedClanWar() {
         final String state = ClanWarEntity.STATE_WAR_COLLECTED;
         LocalDateTime now = LocalDateTime.now();
@@ -274,6 +275,7 @@ public class ClanWarService {
         }
     }
 
+    @Transactional
     public void collectCurrentClanWar() {
         final String state = ClanWarEntity.STATE_IN_WAR;
         List<ClanWarEntity> collectClanWars = clanWarQueryRepository.findAllByStat(state);

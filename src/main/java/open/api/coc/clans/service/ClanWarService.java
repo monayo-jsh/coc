@@ -280,9 +280,14 @@ public class ClanWarService {
         final String state = ClanWarEntity.STATE_IN_WAR;
         List<ClanWarEntity> collectClanWars = clanWarQueryRepository.findAllByStat(state);
 
+        if (collectClanWars.isEmpty()) { return; }
+
+        long startTime = System.currentTimeMillis();
         for (ClanWarEntity clanWarEntity : collectClanWars) {
             collectClanWar(clanWarEntity);
         }
+        long endTime = System.currentTimeMillis();
+        log.info("synchronized clan-war elapsed time : {}", (double) (endTime - startTime) / 1000);
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

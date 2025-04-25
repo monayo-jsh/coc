@@ -165,10 +165,10 @@
   line-height: 28px;
   align-items: center;
   position: relative;
-  max-width: 270px;
+  max-width: 300px;
 
   .search-input {
-    width: 100%;
+    width: 260px;
     height: 40px;
     line-height: 28px;
     padding: 0 1rem 0 2.5rem;

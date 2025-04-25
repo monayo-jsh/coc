@@ -160,11 +160,8 @@ async function fetchClanWarParticipants(clanTag, preparationStartTime, necessary
                     });
 }
 
-async function fetchClanWarParticipationRecord(startDate, endDate, playerTag, playerName) {
+async function fetchClanWarParticipationRecord(startDate, endDate, playerName) {
   let uri = URI_CLAN_WAR_PARTICIPATION_RECORD + `?startDate=${startDate}&endDate=${endDate}`;
-  if (playerTag) {
-    uri += `&playerTag=${removeHashTag(playerTag)}`;
-  }
   if (playerName) {
     uri += `&playerName=${removeHashTag(playerName)}`;
   }

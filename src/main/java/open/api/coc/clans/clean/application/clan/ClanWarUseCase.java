@@ -9,21 +9,25 @@ import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarParticipationRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantMissingAttackDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipationStatusRecordDTO;
 import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMemberRecordSearchCriteria;
 import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMissingAttackSearchCriteria;
+import open.api.coc.clans.clean.domain.clan.model.query.ClanWarParticipationRecordSearchCriteria;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarParticipantService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarRecordService;
 import open.api.coc.clans.clean.domain.clan.service.ClanWarService;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantRecordResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipationStatusRecordResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 import org.springframework.stereotype.Service;
@@ -60,7 +64,7 @@ public class ClanWarUseCase {
     }
 
     @Transactional(readOnly = true)
-    public List<ClanWarParticipantResponse> getClanWarParticipants(ClanWarMemberQuery query) {
+    public List<ClanWarParticipantRecordResponse> getClanWarParticipants(ClanWarMemberQuery query) {
         // 클랜 전쟁 정보를 조회한다.
         ClanWarDTO clanWar = clanWarService.findDTOWithAllByClanTagAndPreparationStartTimeOrThrow(query.clanTag(), query.preparationStartTime());
 
@@ -153,5 +157,19 @@ public class ClanWarUseCase {
                       .filter(record -> record.isAllRoundDestroy(leagueWarRoundMapByClan))
                       .map(clanWarUseCaseMapper::toClanWarMemberRecordResponse)
                       .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanWarParticipationStatusRecordResponse> getClanWarParticipationRecords(ClanWarParticipationRecordQuery query) {
+        // 조회를 위한 크리테리아 획득
+        ClanWarParticipationRecordSearchCriteria criteria = query.toSearchCriteria();
+
+        // 조회
+        List<ClanWarParticipationStatusRecordDTO> participationRecords = recordService.getParticipationRecords(criteria);
+
+        // 응답
+        return participationRecords.stream()
+                                   .map(clanWarUseCaseMapper::toClanWarParticipationStatusRecordResponse)
+                                   .toList();
     }
 }

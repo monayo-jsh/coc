@@ -7,6 +7,8 @@ import static open.api.coc.clans.database.entity.clan.QClanWarMemberAttackEntity
 import static open.api.coc.clans.database.entity.clan.QClanWarMemberEntity.clanWarMemberEntity;
 
 import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -15,6 +17,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipationStatusRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.query.ClanWarParticipationRecordSearchCriteria;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipationStatusRecordResponse;
+import open.api.coc.clans.database.entity.clan.ClanWarType;
+import open.api.coc.clans.database.repository.clan.condition.ClanWarParticipationStatusRecordConditionBuilder;
 import open.api.coc.clans.database.repository.clan.condition.ClanWarRecordConditionBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -74,4 +81,34 @@ public class JpaClanWarMemberRecordQueryRepository {
                                 .as(alias);
     }
 
+    public List<ClanWarParticipationStatusRecordDTO> findParticipationRecords(ClanWarParticipationStatusRecordConditionBuilder condition) {
+        ConstructorExpression<ClanWarParticipationStatusRecordDTO> clanWarParticipationStatusRecordDTO = Projections.constructor(
+            ClanWarParticipationStatusRecordDTO.class,
+            playerEntity.playerTag.as("playerTag"),
+            playerEntity.name.max().as("playerName"),
+            getClanWarCount(ClanWarType.NONE, "clanWarCount"),
+            getClanWarCount(ClanWarType.PARALLEL, "parallelWarCount"),
+            getClanWarCount(ClanWarType.LEAGUE, "leagueWarCount"),
+            clanWarEntity.warId.countDistinct().as("totalParticipationCount")
+        );
+
+        JPAQuery<ClanWarParticipationStatusRecordDTO> query = queryFactory.select(clanWarParticipationStatusRecordDTO)
+                                                                          .from(playerEntity)
+                                                                          .leftJoin(clanWarMemberEntity).on(clanWarMemberEntity.id.tag.eq(playerEntity.playerTag))
+                                                                          .leftJoin(clanWarEntity).on(clanWarEntity.warId.eq(clanWarMemberEntity.id.warId))
+                                                                          .where(condition.build())
+                                                                          .groupBy(playerEntity.playerTag)
+                                                                          .orderBy(clanWarEntity.warId.countDistinct().desc());
+
+        return query.fetch();
+    }
+
+    private Expression<Integer> getClanWarCount(ClanWarType clanWarType, String alias) {
+        NumberExpression<Integer> caseBuilder = new CaseBuilder()
+            .when(clanWarEntity.type.eq(clanWarType)).then(1)
+            .otherwise(0)
+            .sum();
+
+        return ExpressionUtils.as(caseBuilder, alias);
+    }
 }

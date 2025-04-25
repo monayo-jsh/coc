@@ -7,15 +7,18 @@ import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarParticipationRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarQuery;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantMissingAttackDTO;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipationStatusRecordDTO;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantRecordResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipationStatusRecordResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import open.api.coc.clans.common.config.MapStructConfig;
 import open.api.coc.clans.database.entity.common.YnType;
@@ -45,7 +48,7 @@ public abstract class ClanWarUseCaseMapper {
 
     public abstract ClanWarDetailResponse toClanWarDetailResponse(ClanWarDTO clanWar);
 
-    public abstract ClanWarParticipantResponse toClanWarParticipantResponse(ClanWarParticipantDTO clanWarMemberDTO);
+    public abstract ClanWarParticipantRecordResponse toClanWarParticipantResponse(ClanWarParticipantDTO clanWarMemberDTO);
 
     public ClanWarMissingAttackQuery toClanWarMissingAttackQuery(Long startDate, Long endDate) {
         return ClanWarMissingAttackQuery.create(mapToLocalDate(startDate), mapToLocalDate(endDate));
@@ -63,12 +66,17 @@ public abstract class ClanWarUseCaseMapper {
         return ClanWarMemberLeagueRecordQuery.create(type, month, clanTag, isPerfect);
     }
 
+    public ClanWarParticipationRecordQuery toParticipationRecordQuery(Long startDate, Long endDate, String playerTag, String playerName) {
+        return ClanWarParticipationRecordQuery.create(startDate, endDate, playerTag, playerName);
+    }
+
     public abstract ClanWarMemberMissingAttackResponse toClanWarMemberMissingAttackResponse(
         ClanWarParticipantMissingAttackDTO clanWarMemberMissingAttackDTO);
 
     @Mapping(target = "totalAttackCount", source = "attackCount")
-    public abstract ClanWarMemberRecordResponse toClanWarMemberRecordResponse(
-        ClanWarParticipantRecordDTO clanWarMemberRecordDTO);
+    public abstract ClanWarMemberRecordResponse toClanWarMemberRecordResponse(ClanWarParticipantRecordDTO clanWarMemberRecordDTO);
+
+    public abstract ClanWarParticipationStatusRecordResponse toClanWarParticipationStatusRecordResponse(ClanWarParticipationStatusRecordDTO clanWarMemberRecordDTO);
 
     protected LocalDate mapToLocalDate(Long time) {
         return timeConverter.toLocalDate(time);

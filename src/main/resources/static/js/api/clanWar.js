@@ -9,6 +9,8 @@ const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_PERIOD = `${PREFIX_CLAN_WAR_API}/missi
 
 const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = `${PREFIX_CLAN_WAR_API}/{warId}/{playerTag}/necessary` // 클랜전 참여 계정 강제 참여 여부 설정
 
+const URI_CLAN_WAR_PARTICIPATION_RECORD = `${PREFIX_CLAN_WAR_API}/participation/record` //클랜전 참여 기록 조회
+
 const URI_CLAN_WAR_MEMBER_RECORD = `${PREFIX_CLAN_WAR_API}/record` //월 클랜전 기록 순위
 const URI_LEAGUE_WAR_MEMBER_RECORD = `${PREFIX_CLAN_WAR_API}/league/record` //월 리그전 기록 순위
 
@@ -148,6 +150,25 @@ async function fetchClanWarParticipants(clanTag, preparationStartTime, necessary
     URI += `&necessaryAttackYn=${necessaryAttackYn}`
   }
   return await axios.get(URI)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchClanWarParticipationRecord(startDate, endDate, playerTag, playerName) {
+  let uri = URI_CLAN_WAR_PARTICIPATION_RECORD + `?startDate=${startDate}&endDate=${endDate}`;
+  if (playerTag) {
+    uri += `&playerTag=${removeHashTag(playerTag)}`;
+  }
+  if (playerName) {
+    uri += `&playerName=${removeHashTag(playerName)}`;
+  }
+  return await axios.get(uri)
                     .then((response) => {
                       const { data } = response
                       return data;

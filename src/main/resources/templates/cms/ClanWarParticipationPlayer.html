@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+    <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/common.css" />
+    <link rel="stylesheet" type="text/css" href="/css/loader.css" />
+    <link rel="stylesheet" type="text/css" href="/css/button.css" />
+    <link rel="stylesheet" type="text/css" href="/css/cms/ClanWarParticipationPlayer.css" />
+
+    <script src="/js/common.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/api/clanWar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- table withe pagination, filter library -->
+    <link rel="stylesheet" type="text/css" href="/lib/sortable/sortable.min.css" />
+    <script src="/lib/sortable/sortable.min.js"></script>
+
+
+    <!-- JavaScript Year and Month Picker -->
+    <script src="https://jsuites.net/v4/jsuites.js"></script>
+    <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/locale/ko.min.js" integrity="sha512-ycjm4Ytoo3TvmzHEuGNgNJYSFHgsw/TkiPrGvXXkR6KARyzuEpwDbIfrvdf6DwXm+b1Y+fx6mo25tBr1Icg7Fw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+
+    <!-- Excel Lib -->
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+    <title>전쟁 참여 기록</title>
+    <script type="text/javascript">
+        dayjs.locale('ko');
+        //dayjs duration 확장
+        dayjs.extend(dayjs_plugin_duration)
+
+        function getMonthPickers() {
+            return document.querySelectorAll('input.input-month');
+        }
+
+        function callBackMonthPicker(monthPickerElement, selectedValue) {
+            const isStartMonth = monthPickerElement.classList.contains('start');
+
+            let startMonthValue = document.querySelector('.input-month.start').value;
+            let endMonthValue = document.querySelector('.input-month.end').value;
+
+            if (isStartMonth) {
+                startMonthValue = selectedValue;
+            } else {
+                endMonthValue = selectedValue;
+            }
+
+            if (!startMonthValue || !endMonthValue) return;
+
+            let startMonth = dayjs(startMonthValue).date(1).valueOf();
+            let endMonth = dayjs(endMonthValue).endOf('month').valueOf();
+
+            fetchClanWarParticipationStatus(startMonth, endMonth);
+        }
+
+        function initMonthPicker() {
+            let defaultFirstDayOfMonth = dayjs().date(1);
+            const monthPickers = getMonthPickers();
+            const customOption = {
+                validRange: false,
+                onchange: callBackMonthPicker
+            }
+
+            for (const monthPicker of monthPickers) {
+                jSuites.calendar(monthPicker, makeMonthPickerOption(formatYYYYMMDD(defaultFirstDayOfMonth), customOption));
+            }
+        }
+
+        function formatPlayer(players) {
+            return players.map((player) => {
+                const { playerTag, playerName, clanWarCount, parallelWarCount, leagueWarCount, totalParticipationCount } = player;
+
+                return {
+                    '태그': playerTag,
+                    '이름': playerName,
+                    '총 참전수': Number(totalParticipationCount).toLocaleString(),
+                    '클랜전': Number(clanWarCount).toLocaleString(),
+                    '병행 클랜전': Number(parallelWarCount).toLocaleString(),
+                    '리그전': Number(leagueWarCount).toLocaleString()
+                }
+            });
+        }
+
+        function downloadStatisticsExcelFile() {
+            let startMonthValue = document.querySelector('.input-month.start').value;
+            let endMonthValue = document.querySelector('.input-month.end').value;
+            if (!confirm(`[${startMonthValue}~${endMonthValue}] 전쟁 참여 기록을 다운로드받으시겠습닌가?`)) {
+                return false;
+            }
+            const fileName = `${startMonthValue} ${endMonthValue} 전쟁 참여 기록.xlsx`;
+            const formattedPlayers = formatPlayer(players);
+            writeExcelFile(fileName, formattedPlayers);
+        }
+
+        function emptyRankClanWarRow() {
+            const rankingRowTemplate = document.querySelector('#clan-war-empty-row-template');
+            const rankingRow = document.importNode(rankingRowTemplate.content, true);
+            return rankingRow.querySelector('.table-tr');
+        }
+
+        function renderClanWarParticipationStatusPlayers(players) {
+            const rankingTbody = document.querySelector(`.table-tbody`);
+
+            // clear
+            rankingTbody.innerHTML = '';
+
+            if (!players.length) {
+                rankingTbody.appendChild(emptyRankClanWarRow());
+                return;
+            }
+
+            let rank = 1;
+            for(const player of players) {
+                const row = makeRankClanWarRow(player);
+                rankingTbody.appendChild(row);
+                rank++;
+            }
+        }
+
+        function makeRankClanWarRow(player) {
+            const rankingRowTemplate = document.querySelector('#clan-war-row-template');
+            const rankingRow = document.importNode(rankingRowTemplate.content, true);
+            const row = rankingRow.querySelector('.table-tr');
+
+            const { playerTag, playerName, clanWarCount, parallelWarCount, leagueWarCount, totalParticipationCount } = player;
+
+            row.innerHTML = row.innerHTML
+                               .replace(/{NAME}/, playerName)
+                               .replace(/{TAG}/, playerTag)
+                               .replace(/{CLAN_WAR_COUNT}/g, clanWarCount)
+                               .replace(/{PARALLEL_WAR_COUNT}/g, parallelWarCount)
+                               .replace(/{LEAGUE_WAR_COUNT}/g, leagueWarCount)
+                               .replace(/{TOTAL_PARTICIPATION_COUNT}/g, totalParticipationCount);
+
+            return row;
+        }
+
+        let players = [];
+        async function fetchClanWarParticipationStatus(startDate, endDate) {
+            showWifiLoading('.body');
+            players = await fetchClanWarParticipationRecord(startDate, endDate);
+            renderClanWarParticipationStatusPlayers(players);
+            hideWifiLoading('.body');
+        }
+
+        window.onload = async () => {
+            await initMonthPicker();
+        }
+    </script>
+</head>
+<body>
+<div class="section-wrapper">
+
+    <div class="section-item">
+        <div class="card caption">
+            <div class="bottom-section">
+                <span class="title">전쟁 참여 기록</span>
+            </div>
+        </div>
+
+        <div class="body">
+            <div id="wifi-loader" class="display-none">
+                <svg class="circle-outer" viewBox="0 0 86 86">
+                    <circle class="back" cx="43" cy="43" r="40"></circle>
+                    <circle class="front" cx="43" cy="43" r="40"></circle>
+                    <circle class="new" cx="43" cy="43" r="40"></circle>
+                </svg>
+                <svg class="circle-middle" viewBox="0 0 60 60">
+                    <circle class="back" cx="30" cy="30" r="27"></circle>
+                    <circle class="front" cx="30" cy="30" r="27"></circle>
+                </svg>
+                <svg class="circle-inner" viewBox="0 0 34 34">
+                    <circle class="back" cx="17" cy="17" r="14"></circle>
+                    <circle class="front" cx="17" cy="17" r="14"></circle>
+                </svg>
+                <div class="text" data-text="Searching"></div>
+            </div>
+
+            <div class="container">
+                <div class="inner-section">
+                    <div class="picker">
+                        <input type="text" class="input-month start">
+                        <div style="display: flex; justify-content: center; align-items: center;"> ~ </div>
+                        <input type="text" class="input-month end">
+                    </div>
+                    <div class="buttons">
+                        <div class="button-chip">
+                            <button class="refresh" onclick="downloadStatisticsExcelFile(); return false;">
+                                엑셀 다운
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="inner-section">
+                    <div class="radio-inputs"></div>
+                </div>
+            </div>
+
+            <div class="container contents">
+                <table class="table sortable">
+                    <thead class="table-thead">
+                    <tr class="table-tr">
+                        <th class="table-th no-sort">이름</th>
+                        <th class="table-th">총 참전수</th>
+                        <th class="table-th">클랜전</th>
+                        <th class="table-th">병행클랜전</th>
+                        <th class="table-th">리그전</th>
+                    </tr>
+                    </thead>
+                    <tbody class="table-tbody">
+                    <tr class="table-tr">
+                        <td class="table-td" colspan="5">데이터 없음</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+<template id="loader">
+    <div class="loader-circle">
+        <div class="bar1"></div>
+        <div class="bar2"></div>
+        <div class="bar3"></div>
+        <div class="bar4"></div>
+        <div class="bar5"></div>
+        <div class="bar6"></div>
+        <div class="bar7"></div>
+        <div class="bar8"></div>
+        <div class="bar9"></div>
+        <div class="bar10"></div>
+        <div class="bar11"></div>
+        <div class="bar12"></div>
+    </div>
+</template>
+<template id="clan-war-row-template">
+    <tr class="table-tr">
+        <td class="table-td name">
+            <div class="td-wrap flex-colum flex-gap">
+                <div class="player-name">{NAME}</div>
+                <div class="chip">{TAG}</div>
+            </div>
+        </td>
+        <td class="table-td" data-sort="{TOTAL_PARTICIPATION_COUNT}">
+            <div class="td-wrap">
+                <div class="icon-sword"></div>
+                <div class="record">{TOTAL_PARTICIPATION_COUNT}</div>
+            </div>
+        </td>
+        <td class="table-td" data-sort="{CLAN_WAR_COUNT}">
+            <div class="td-wrap">
+                <div class="record">{CLAN_WAR_COUNT}</div>
+            </div>
+        </td>
+        <td class="table-td" data-sort="{PARALLEL_WAR_COUNT}">
+            <div class="td-wrap">
+                <div class="record">{PARALLEL_WAR_COUNT}</div>
+            </div>
+        </td>
+        <td class="table-td" data-sort="{LEAGUE_WAR_COUNT}">
+            <div class="td-wrap">
+                <div class="record">{LEAGUE_WAR_COUNT}</div>
+            </div>
+        </td>
+    </tr>
+</template>
+<template id="clan-war-empty-row-template">
+    <tr class="table-tr">
+        <td class="table-td empty" colspan="5">데이터 없음</td>
+    </tr>
+</template>
+</html>

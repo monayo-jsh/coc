@@ -68,6 +68,12 @@ public class AdminViewController {
         return "cms/ClanWarCalendar";
     }
 
+    /** 클랜전 캘린더 */
+    @GetMapping("/clan/war/participation")
+    public String clanWarParticipation() {
+        return "cms/ClanWarParticipationPlayer";
+    }
+
     /** 클랜전 월 완파 현황 */
     @GetMapping("/clan/war/statistics/player")
     public String clanWarStatistics() {

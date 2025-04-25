@@ -3,7 +3,9 @@ package open.api.coc.clans.clean.domain.clan.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipantRecordDTO;
+import open.api.coc.clans.clean.domain.clan.model.ClanWarParticipationStatusRecordDTO;
 import open.api.coc.clans.clean.domain.clan.model.query.ClanWarMemberRecordSearchCriteria;
+import open.api.coc.clans.clean.domain.clan.model.query.ClanWarParticipationRecordSearchCriteria;
 import open.api.coc.clans.clean.domain.clan.repository.ClanWarRecordRepository;
 import open.api.coc.clans.common.config.HallOfFameConfig;
 import org.springframework.data.domain.Pageable;
@@ -25,5 +27,10 @@ public class ClanWarRecordService {
         }
 
         return clanWarRecordRepository.findAll(criteria.clanWarType(), criteria.from(), criteria.to(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClanWarParticipationStatusRecordDTO> getParticipationRecords(ClanWarParticipationRecordSearchCriteria criteria) {
+        return clanWarRecordRepository.findParticipationRecords(criteria);
     }
 }

@@ -11,7 +11,7 @@ import open.api.coc.clans.database.entity.common.YnType;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ClanWarParticipantResponse {
+public class ClanWarParticipantRecordResponse {
 
     @Schema(description = "전쟁 유니크키")
     private Long warId;

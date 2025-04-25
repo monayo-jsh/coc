@@ -18,13 +18,15 @@ import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberLeagueReco
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarParticipationRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.mapper.ClanWarUseCaseMapper;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarDetailResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberMissingAttackResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberRecordResponse;
-import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipantRecordResponse;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarParticipationStatusRecordResponse;
 import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -87,13 +89,13 @@ public class ClanWarController {
         }
     )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarParticipantResponse.class))),
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarParticipantRecordResponse.class))),
         @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
     })
     @GetMapping("/participants")
-    public ResponseEntity<List<ClanWarParticipantResponse>> getClanWarParticipants(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
-                                                                                   @RequestParam Long preparationStartTime,
-                                                                                   @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
+    public ResponseEntity<List<ClanWarParticipantRecordResponse>> getClanWarParticipants(@RequestParam @NotBlank(message = "클랜 태그를 입력해주세요.") String clanTag,
+                                                                                         @RequestParam Long preparationStartTime,
+                                                                                         @RequestParam(required = false) @Pattern(regexp = "[YN]") String necessaryAttackYn) {
         ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, preparationStartTime, necessaryAttackYn);
         return ResponseEntity.status(HttpStatus.OK)
                              .body(clanWarUseCase.getClanWarParticipants(query));
@@ -201,5 +203,31 @@ public class ClanWarController {
         ClanWarMemberLeagueRecordQuery query = clanWarUseCaseMapper.toLeagueWarRecordQuery(type, month, clanTag, isPerfect);
         return ResponseEntity.ok()
                              .body(clanWarUseCase.getLeagueWarMemberRecords(query));
+    }
+
+    @Operation(
+        summary = "전쟁 참여 기록을 제공합니다. version: 1.00, Last Update: 25.04.25",
+        description = "이 API는 서버에 수집된 전쟁 기록을 제공합니다."
+    )
+    @Parameters(
+        value = {
+            @Parameter(name = "startDate", description = "조회 기간 시작일", required = true),
+            @Parameter(name = "endDate", description = "조회 기간 종료일", required = true),
+            @Parameter(name = "playerTag", description = "플레이어 태그"),
+            @Parameter(name = "playerName", description = "플레이어 이름")
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = ClanWarParticipationStatusRecordResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/participation/record")
+    public ResponseEntity<List<ClanWarParticipationStatusRecordResponse>> getClanWarParticipationRecords(@RequestParam Long startDate,
+                                                                                                         @RequestParam Long endDate,
+                                                                                                         @RequestParam(required = false) String playerTag,
+                                                                                                         @RequestParam(required = false) String playerName) {
+        ClanWarParticipationRecordQuery query = clanWarUseCaseMapper.toParticipationRecordQuery(startDate, endDate, playerTag, playerName);
+        return ResponseEntity.ok()
+                             .body(clanWarUseCase.getClanWarParticipationRecords(query));
     }
 }

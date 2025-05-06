@@ -2,14 +2,12 @@
 package open.api.coc.clans.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.domain.clans.ClanAssignedMemberListResponse;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulk;
 import open.api.coc.clans.domain.clans.ClanAssignedPlayerBulkRequest;
 import open.api.coc.clans.domain.clans.ClanCurrentWarLeagueGroupResponse;
 import open.api.coc.clans.domain.clans.ClanCurrentWarResponse;
-import open.api.coc.clans.schedule.ClanWarLeagueScheduler;
 import open.api.coc.clans.service.ClansService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -137,10 +135,6 @@ public class ClansController {
         return ResponseEntity.ok(clansService.getLeagueWar(clanTag, roundTag));
     }
 
-    @GetMapping("/league-data-scheduling")
-    public void leagueDataScheduling() throws IOException {
-        scheduler.createWarRoundFile();
-    }
 
 
 

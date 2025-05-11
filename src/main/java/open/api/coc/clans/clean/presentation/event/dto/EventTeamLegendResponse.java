@@ -12,6 +12,9 @@ public record EventTeamLegendResponse(
     @Schema(description = "이벤트 이름")
     String name,
 
+    @Schema(description = "이벤트 설명")
+    String description,
+
     @Schema(description = "이벤트 유형 - TEAM_LEGEND: 팀 전설내기")
     String type,
 

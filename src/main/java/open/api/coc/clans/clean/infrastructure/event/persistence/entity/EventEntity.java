@@ -47,6 +47,10 @@ public class EventEntity {
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
+    @Comment("이벤트 설명")
+    @Column(name = "description", nullable = true, length = 500)
+    private String description;
+
     @Comment("이벤트 유형")
     @Column(name = "type", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
@@ -80,11 +84,13 @@ public class EventEntity {
     private List<EventTeamLegendEntity> teams;
 
     @Builder
-    private EventEntity(Long id, String name, EventType type, LocalDateTime startDate,
-                       LocalDateTime endDate, EventStatus status, LocalDateTime createdAt,
-                       LocalDateTime updatedAt, List<EventTeamLegendEntity> teams) {
+    public EventEntity(Long id, String name, String description, EventType type,
+                       LocalDateTime startDate, LocalDateTime endDate, EventStatus status,
+                       LocalDateTime createdAt, LocalDateTime updatedAt,
+                       List<EventTeamLegendEntity> teams) {
         this.id = id;
         this.name = name;
+        this.description = description;
         this.type = type;
         this.startDate = startDate;
         this.endDate = endDate;

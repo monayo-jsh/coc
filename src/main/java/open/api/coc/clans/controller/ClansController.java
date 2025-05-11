@@ -26,7 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClansController {
 
     private final ClansService clansService;
-    private final ClanWarLeagueScheduler scheduler;
 
     @GetMapping("/assigned/members/latest")
     public ResponseEntity<ClanAssignedMemberListResponse> getLatestClanAssignedMembers() {

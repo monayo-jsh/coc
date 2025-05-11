@@ -19,6 +19,7 @@ public class EventTeamLegend {
 
     private Long id; // 이벤트 고유키
     private String name; // 이벤트 이름
+    private String description; // 이벤트 설명
     private LocalDateTime startDate; // 이벤트 시작일시
     private LocalDateTime endDate; // 이벤트 종료일시
     private EventStatus status;

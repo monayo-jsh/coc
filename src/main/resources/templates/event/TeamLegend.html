@@ -149,10 +149,14 @@
 
         drawTeamDetail(teamsElement, team);
       }
+
+      if (teams.length <= 1) {
+        teamLegend.querySelector('.rankings').classList.add('display-none');
+      }
     }
 
     function makeTeamLegendEventElement(teamLegend) {
-      const { name, startDate, endDate, teams } = teamLegend;
+      const { name, description, startDate, endDate, teams } = teamLegend;
 
       const eventTeamLegendTemplate = copyTemplateById('event-team-legend-template');
       const eventTeamLegendSection = eventTeamLegendTemplate.querySelector('.section-contents');
@@ -162,6 +166,7 @@
       const period = formatPeriod(startDateTime, endDateTime);
       eventTeamLegendSection.innerHTML = eventTeamLegendSection.innerHTML
                                                                .replace(/{EVENT_NAME}/, name)
+                                                               .replace(/{EVENT_DESCRIPTION}/, description ? description : "")
                                                                .replace(/{EVENT_PERIOD}/, period);
 
       drawTeamLegendTeams(eventTeamLegendSection, teams);
@@ -186,6 +191,8 @@
     }
 
     async function drawEventTeamLegendDailyRanking(teamLegend) {
+      if (teamLegend.teams.length <= 1) return; // 1팀인 경우 차트 미표기
+
       const dailyRankings = await fetchTeamLegendDailyRanking(teamLegend.id);
 
       // 실시간 순위 추가
@@ -449,6 +456,7 @@
 
     <div class="section team-legend">
       <div class="sub-title"><span class="decorate-title">{EVENT_NAME}</span></div>
+      <div class="event-description">{EVENT_DESCRIPTION}</div>
       <div class="rankings">
         <table class="table">
           <caption class="table-caption text-align-center">{EVENT_PERIOD}</caption>

@@ -166,8 +166,12 @@
       const period = formatPeriod(startDateTime, endDateTime);
       eventTeamLegendSection.innerHTML = eventTeamLegendSection.innerHTML
                                                                .replace(/{EVENT_NAME}/, name)
-                                                               .replace(/{EVENT_DESCRIPTION}/, description ? description : "")
+                                                               .replace(/{EVENT_DESCRIPTION}/, description)
                                                                .replace(/{EVENT_PERIOD}/, period);
+
+      if (description) {
+        toggleDisplay(eventTeamLegendTemplate.querySelector('.event-description'));
+      }
 
       drawTeamLegendTeams(eventTeamLegendSection, teams);
 
@@ -456,7 +460,7 @@
 
     <div class="section team-legend">
       <div class="sub-title"><span class="decorate-title">{EVENT_NAME}</span></div>
-      <div class="event-description">{EVENT_DESCRIPTION}</div>
+      <div class="event-description display-none">{EVENT_DESCRIPTION}</div>
       <div class="rankings">
         <table class="table">
           <caption class="table-caption text-align-center">{EVENT_PERIOD}</caption>

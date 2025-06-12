@@ -152,3 +152,7 @@
   background-image: url("/images/hero/equipment/Noble_Iron.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.dark_crown {
+  background-image: url("/images/hero/equipment/Dark_Crown.png");
+  color: rgba(0, 0, 0, 0);
+}

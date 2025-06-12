@@ -58,6 +58,8 @@ public enum HeroEquipmentConfig {
     METAL_PANTS(MINION_PRINCE, 502, "normal", "Metal Pants", "메탈 바지"),
     NOBLE_IRON(MINION_PRINCE, 503, "normal", "Noble Iron", "노블 아이언"),
 
+    DARK_CROWN(MINION_PRINCE, 520, "epic", "Dark Crown", "다크 크라운"),
+
     UNKNOWN(HeroConfig.UNKNOWN, Integer.MAX_VALUE, "unknown", "unknown", "unknown");
 
     private final HeroConfig hero;

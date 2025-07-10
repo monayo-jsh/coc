@@ -7,6 +7,7 @@
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
   <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="/css/home.css" />
   <link rel="stylesheet" href="/css/common.css" />
   <link rel="stylesheet" href="/css/button.css" />
   <link rel="stylesheet" href="/css/loader.css" />
@@ -95,7 +96,7 @@
     }
 
     // 사용자 목록
-    const members = []
+    let members = []
 
     function clearClanMembers() {
       const clanMembers = document.querySelector('.clan-members');
@@ -193,6 +194,9 @@
 
       const sortedMembers = sortByTrophies(players);
       drawMember(sortedMembers);
+
+      // 참조를 위해 메타 설정
+      members = sortedMembers
 
       hideWifiLoading('.clan-members');
     }
@@ -680,6 +684,17 @@
       initSearchKeyword();
       initSwitchCard();
     }
+
+    function copySearchedPlayerTags() {
+      if (!members || !members.length) {
+        alert("검색된 플레이어 정보 없음");
+        return;
+      }
+
+      const tags = members.map(member => member.tag).join("\n");
+
+      copyClipboard(tags, "검색된 플레이어 태그 목록");
+    }
   </script>
 </head>
 <body>
@@ -739,6 +754,9 @@
           <div class="knobs" data-toggle-on="요약" data-toggle-off="장비"></div>
           <div class="layer"></div>
         </div>
+      </div>
+      <div class="card" onclick="copySearchedPlayerTags()">
+        <p class="tip">태그 복사</p>
       </div>
     </div>
   </div>

@@ -107,6 +107,10 @@
 .img-icon.fireball {
   background-image: url("/images/hero/equipment/Fireball.png");
   color: rgba(0, 0, 0, 0);
+
+.img-icon.heroic_torch {
+    background-image: url("/images/hero/equipment/Heroic_Torch.png");
+    color: rgba(0, 0, 0, 0);
 }
 
 

@@ -41,7 +41,8 @@ public enum HeroEquipmentConfig {
 
     LAVALOON_PUPPET(GRAND_WARDEN, 320, "epic", "Lavaloon Puppet", "라벌 인형"),
 
-    FIREBALL(GRAND_WARDEN, 320, "epic", "Fireball", "파이어 볼"),
+    FIREBALL(GRAND_WARDEN, 321, "epic", "Fireball", "파이어 볼"),
+    HEROIC_TORCH(GRAND_WARDEN, 322, "epic", "Heroic Torch", "투지의 횃불"),
 
     // 로얄 챔피언
     ROYAL_GEM(ROYAL_CHAMPION, 400, "normal", "Royal Gem", "로얄 보석"),

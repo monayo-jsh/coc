@@ -13,22 +13,22 @@
 }
 
 .hero.barbarian_king {
-  background-image: url(/images/hero/Barbarian_King.png);
+  background-image: url("/images/hero/Barbarian_King.png");
   color: rgba(0, 0, 0, 0);
 }
 .hero.archer_queen {
-  background-image: url(/images/hero/Archer_Queen.png);
+  background-image: url("/images/hero/Archer_Queen.png");
   color: rgba(0, 0, 0, 0);
 }
 .hero.grand_warden {
-  background-image: url(/images/hero/Grand_Warden.png);
+  background-image: url("/images/hero/Grand_Warden.png");
   color: rgba(0, 0, 0, 0);
 }
 .hero.royal_champion {
-  background-image: url(/images/hero/Royal_Champion.png);
+  background-image: url("/images/hero/Royal_Champion.png");
   color: rgba(0, 0, 0, 0);
 }
 .hero.minion_prince {
-  background-image: url(/images/hero/Minion_Prince.png);
+  background-image: url("/images/hero/Minion_Prince.png");
   color: rgba(0, 0, 0, 0);
 }

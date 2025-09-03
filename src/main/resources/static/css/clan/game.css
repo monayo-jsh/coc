@@ -38,7 +38,7 @@
   }
 
   .logo {
-    background-image: url(/images/etc/clan-game-logo.png);
+    background-image: url("/images/etc/clan-game-logo.png");
   }
 
   .hidden {

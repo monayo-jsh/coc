@@ -287,7 +287,7 @@
         position: absolute;
         width: 36px;
         height: 36px;
-        background-image: url(/images/etc/trophies.png);
+        background-image: url("/images/etc/trophies.png");
         background-repeat: no-repeat;
         background-size: contain;
         top: 0;

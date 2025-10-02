@@ -150,6 +150,13 @@
 
     async function drawNotice() {
       const notices = await fetchPostingNotices();
+      if (!notices || !notices.length) {
+        // 공지사항 없는 경우 버튼 숨김
+        let btnNotice = document.querySelector('.card.btn-notice');
+        if (btnNotice)
+          toggleDisplay(btnNotice); // hide
+        return;
+      }
 
       renderNotices(notices);
       initSwipeEvent();
@@ -210,6 +217,9 @@
     }
 
     function renderNotices(notices) {
+      // 공지사항 없는경우
+      if (!notices || !notices.length) return;
+
       const target = document.querySelector('.notices');
       for (const notice of notices) {
         const noticeRow = makeNotice(notice);
@@ -311,7 +321,7 @@
       <div class="card-group menu-rule">
         <div class="title">아카데미 규칙</div>
         <div class="cards">
-          <div class="card bg-black-2 w100p" onclick="renderPage('/notice'); return false;">
+          <div class="card bg-black-2 w100p btn-notice" onclick="renderPage('/notice'); return false;">
             <p class="tip">공지사항</p>
           </div>
         </div>

@@ -176,7 +176,7 @@
 
       const { plans } = beginningMonth;
 
-      const today = dayjs();
+      const today = dayjs().startOf('day');
       const lastPlan = plans[plans.length-1];
       const lastPlanDate = dayjs(lastPlan.date);
       if (today > lastPlanDate) {
@@ -188,6 +188,10 @@
 
       const target = beginningMonthPlanElement.querySelector('.table-tbody');
       for(const plan of plans) {
+        if (dayjs(plan.date) < today) {
+          continue; // 지난 일정은 표시하지 않음
+        }
+
         const planRow = makePlanRow(plan);
         target.appendChild(planRow);
       }

@@ -25,6 +25,7 @@ public interface JpaBeginningMonthRepository extends JpaRepository<BeginningMont
             from BeginningMonth beginning_month
             join fetch beginning_month.plans
             order by beginning_month.month desc
+            limit 1
         """
     )
     BeginningMonth findLatest();

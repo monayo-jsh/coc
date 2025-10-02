@@ -150,11 +150,11 @@
 
     async function drawNotice() {
       const notices = await fetchPostingNotices();
-      if (!notices || !notices.length) {
-        // 공지사항 없는 경우 버튼 숨김
+      if (notices && !!notices.length) {
+        // 공지사항 있는 경우 버튼 노출
         let btnNotice = document.querySelector('.card.btn-notice');
         if (btnNotice)
-          toggleDisplay(btnNotice); // hide
+          toggleDisplay(btnNotice); // show
         return;
       }
 
@@ -321,7 +321,7 @@
       <div class="card-group menu-rule">
         <div class="title">아카데미 규칙</div>
         <div class="cards">
-          <div class="card bg-black-2 w100p btn-notice" onclick="renderPage('/notice'); return false;">
+          <div class="card bg-black-2 w100p btn-notice display-none" onclick="renderPage('/notice'); return false;">
             <p class="tip">공지사항</p>
           </div>
         </div>

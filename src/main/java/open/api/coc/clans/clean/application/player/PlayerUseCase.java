@@ -38,6 +38,7 @@ import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHeroEquipmentResponse;
 import open.api.coc.clans.common.config.HallOfFameConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -323,6 +324,8 @@ public class PlayerUseCase {
     public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
         // 최근 배정일을 가져온다.
         String latestAssignedDate = clanAssignService.findLatestAssignedMonth();
+
+        if (StringUtils.isEmpty(latestAssignedDate)) return Collections.emptyList();
 
         // 클랜에 최근 배정 목록을 가져온다.
         List<ClanAssignedPlayer> clanAssignedPlayers = clanAssignService.findAll(latestAssignedDate, clanTag);

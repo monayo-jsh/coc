@@ -21,32 +21,13 @@ public class JpaClanAssignedPlayerQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    private static final DateTimeFormatter SEASON_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
-
     public String findLatestAssignedDate() {
         String maxSeasonDate = queryFactory.select(clanAssignedPlayerEntity.id.seasonDate.max())
                                            .from(clanAssignedPlayerEntity)
                                            .fetchOne();
 
         return Optional.ofNullable(maxSeasonDate)
-                       .orElseGet(() -> LocalDate.now().format(SEASON_DATE_FORMATTER));
-    }
-
-    public List<ClanAssignedPlayerEntity> findAllBySeasonDate(String seasonDate) {
-        BooleanBuilder condition = new BooleanBuilder();
-        condition.and(clanAssignedPlayerEntity.id.seasonDate.eq(seasonDate));
-
-        return createBaseQueryWithClan().where(condition)
-                                        .fetch();
-
-    }
-
-    public long deleteBySeasonDateAndPlayerTags(String seasonDate, List<String> playerTags) {
-        return queryFactory.delete(clanAssignedPlayerEntity)
-                           .where(clanAssignedPlayerEntity.id.seasonDate.eq(seasonDate)
-                                                                        .and(clanAssignedPlayerEntity.id.playerTag.in(playerTags)))
-                           .execute();
-
+                       .orElse("");
     }
 
     public List<ClanAssignedPlayerEntity> findAllByAssignedDateAndClanTag(String assignedDate, String clanTag) {

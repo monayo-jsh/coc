@@ -269,6 +269,8 @@
     renderPage('/event/team/legend');
 
     function isNotStarted() {
+      if (!latestTeamEvent || !latestTeamEvent.length) return true;
+
       if (latestTeamEvent.status === 'READY') return true;
       if (latestTeamEvent.status === 'ING') return false;
 

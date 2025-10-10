@@ -84,8 +84,23 @@
 
     function sortByTrophies(members) {
       // 트로피 순 > 이름 순
-      return members.map(member => member)
-                    .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
+      return members.map(member => {
+                      // 정렬을 위한 트로피 설정
+                      member.sortTrophies = member.trophies
+                      const { league } = member;
+
+                      if (!league) {
+                        // 리그 정보 없는 경우
+                        member.sortTrophies = -1;
+                      }
+                      if (league.name === 'Unranked') {
+                        // 언랭크
+                        member.sortTrophies = -1;
+                      }
+
+                      return member;
+                    })
+                    .sort((a, b) => b.sortTrophies - a.sortTrophies || b.name.localeCompare(a.name));
     }
 
     function sortByHeroLevelSum(members) {
@@ -549,7 +564,7 @@
 
       renderPlayerLabels(memberHtml, player)
 
-      const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+      const leagueIconImg = memberHtml.querySelector('.league-icon');
       if (league) {
         const { iconUrls } = league;
         leagueIconImg.src = iconUrls.small;
@@ -785,15 +800,14 @@
         </div>
         <div class="cell trophies">
           <div class="count">
-            {TROPHIES}
-            <div class="icon"></div>
+            <img class="icon league-icon" src="" alt="">
+            <span class="display-flex justify-content-right">{TROPHIES}</span>
           </div>
         </div>
       </div>
 
       <div class="inner-section">
         <div class="layout-badge">
-          <img class="cell league-icon" src="" alt="">
           <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
           <div class="cell icon xp"><span class="level">{EXP_LEVEL}</span></div>
           <div class="cell hero-level"><div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div></div>

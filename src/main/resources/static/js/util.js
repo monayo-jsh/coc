@@ -214,8 +214,23 @@ function calcHeroLevelSum(heroes) {
 
 function sortByTrophies(members) {
   // 트로피 순 > 이름 순
-  return members.map(member => member)
-                .sort((a, b) => b.trophies - a.trophies || b.name.localeCompare(a.name));
+  return members.map(member => {
+                  // 정렬을 위한 트로피 설정
+                  member.sortTrophies = member.trophies
+                  const { league } = member;
+
+                  if (!league) {
+                    // 리그 정보 없는 경우
+                    member.sortTrophies = -1;
+                  }
+                  if (league.name === 'Unranked') {
+                    // 언랭크
+                    member.sortTrophies = -1;
+                  }
+
+                  return member;
+                })
+                .sort((a, b) => b.sortTrophies - a.sortTrophies || b.name.localeCompare(a.name));
 }
 
 function sortByHeroTotalLevel(players) {

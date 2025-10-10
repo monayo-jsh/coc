@@ -288,11 +288,8 @@
         position: absolute;
         width: 36px;
         height: 36px;
-        background-image: url("/images/etc/trophies.png");
-        background-repeat: no-repeat;
-        background-size: contain;
         top: 0;
-        right: 0;
+        left: 0;
         transform: translateY(-7px);
       }
     }

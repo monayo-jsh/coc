@@ -537,7 +537,7 @@
 
       renderPlayerLabels(memberHtml, player)
 
-      const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+      const leagueIconImg = memberHtml.querySelector('.league-icon');
       if (league) {
         const { iconUrls } = league;
         leagueIconImg.src = iconUrls.small;
@@ -795,15 +795,14 @@
         </div>
         <div class="cell trophies">
           <div class="count">
-            {TROPHIES}
-            <div class="icon"></div>
+            <img class="icon league-icon" src="" alt="">
+            <span class="display-flex justify-content-right">{TROPHIES}</span>
           </div>
         </div>
       </div>
 
       <div class="inner-section">
         <div class="layout-badge">
-          <img class="cell league-icon" src="" alt="">
           <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
           <div class="cell icon xp"><span class="level">{EXP_LEVEL}</span></div>
           <div class="cell hero-level"><div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div></div>

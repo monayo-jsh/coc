@@ -509,7 +509,7 @@
 
   function renderPlayerLabels(memberHtml, player) {
     const playerLabels = memberHtml.querySelector('.player-labels');
-    const { tag, clan, assignedClan, assignedLeague, role, supportYn } = player;
+    const { tag, clan, assignedClan, assignedLeague, role, supportYn, league } = player;
 
     const tagLabel = createPlayerLabel(tag, '플레이어 태그');
     playerLabels.appendChild(tagLabel);
@@ -533,6 +533,9 @@
     }
     if (supportYn === 'Y') {
       memberHtml.classList.add('support-account')
+    }
+    if (!league || league.name === 'Unranked') {
+      memberHtml.classList.add('unranked')
     }
   }
 
@@ -563,7 +566,7 @@
 
       renderPlayerLabels(memberHtml, player)
 
-      const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
+      const leagueIconImg = memberHtml.querySelector('.league-icon');
       if (league) {
         const { iconUrls } = league;
         leagueIconImg.src = iconUrls.small;
@@ -857,10 +860,13 @@
               <input type="radio" name="radio-filter-member" onchange="filterMember('need-assigned'); return false;">
               <span class="name">배정필요</span>
             </label>
-
             <label class="radio">
               <input type="radio" name="radio-filter-member" onchange="filterMember('support-account'); return false;">
               <span class="name">지원계정</span>
+            </label>
+            <label class="radio">
+              <input type="radio" name="radio-filter-member" onchange="filterMember('unranked'); return false;">
+              <span class="name">Unranked</span>
             </label>
           </div>
         </div>
@@ -901,15 +907,14 @@
         </div>
         <div class="cell trophies">
           <div class="count">
-            {TROPHIES}
-            <div class="icon"></div>
+            <img class="icon league-icon" src="" alt="">
+            <span class="display-flex justify-content-right">{TROPHIES}</span>
           </div>
         </div>
       </div>
 
       <div class="inner-section">
         <div class="layout-badge">
-          <img class="cell league-icon" src="" alt="">
           <div class="cell town-hall th{TOWN_HALL_LEVEL}"></div>
           <div class="cell icon xp"><span class="level">{EXP_LEVEL}</span></div>
           <div class="cell hero-level"><div class="level-icon {IS_HERO_MAX_LEVEL}">{HERO_LEVEL}</div></div>

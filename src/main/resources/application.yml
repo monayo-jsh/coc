@@ -85,7 +85,7 @@ scheduling:
 
 # 명예의전당 랭킹 표기 설정값
 hall-of-fame:
-  ranking: 21
+  ranking: 15
   average: 3
 
 file:

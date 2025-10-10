@@ -8,10 +8,10 @@
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="아카데미"/>
+  <meta property="og:title" content="광전사"/>
   <meta property="og:description" content="클랜 편의기능 사이트"/>
-  <meta property="og:url" content="http://146.56.103.211"/>
-  <meta property="og:image" content="http://146.56.103.211/images/logo.png"/>
+  <meta property="og:url" content="http://138.2.119.97"/>
+  <meta property="og:image" content="http://138.2.119.97/images/logo.png"/>
 
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
@@ -31,7 +31,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/plugin/duration.min.js" integrity="sha512-t0b2NyBypSms8nA81pldWo0mXbfMotsdYgvs4awmbi/GU/25YBNLnXj+I9DAMV7WGZ8+z8wtRolX7zSF2LN8UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-  <title>아카데미 클랜 편의기능</title>
+  <title>클랜 편의기능</title>
 
   <script>
   dayjs.extend(dayjs_plugin_duration);
@@ -55,12 +55,6 @@
     }
 
   function renderClanAssignedPage() {
-      if (isNotClanAssigned) {
-        const message = `${formatYYYYMM(dayjs())} 클랜 배정 예정입니다.`;
-        alert(message);
-        return;
-      }
-
       renderPage('/assigned-member?view=none');
     }
 
@@ -71,27 +65,6 @@
         return `(${formatDate})`;
       }
       return date;
-    }
-
-    let isNotClanAssigned = false;
-    async function displayClanAssignedDate() {
-      const latestClanAssignedSeasonDate = await latestClanAssignedDate();
-
-      const clanAssignedDateDisplay = document.querySelector('.clan-assigned-date');
-      let displayText = formatDate(latestClanAssignedSeasonDate);
-      if (isNotClanAssignedMonth(latestClanAssignedSeasonDate)) {
-        isNotClanAssigned = true;
-        displayText = `(${formatYYYYMM(dayjs())} 배정 예정)`;
-      }
-
-      clanAssignedDateDisplay.innerHTML = displayText;
-
-      function isNotClanAssignedMonth(latestClanAssignedSeasonDate) {
-        const latestSeasonMonth = dayjs(String(latestClanAssignedSeasonDate)).month();
-        const currentMonth = dayjs().month();
-
-        return latestSeasonMonth !== currentMonth;
-      }
     }
 
     let isNotLeagueAssigned = false;
@@ -144,7 +117,7 @@
     }
 
     async function initAssignedDate() {
-      await displayClanAssignedDate();
+      // await displayClanAssignedDate();
       await displayLeagueAssignedDate();
     }
 
@@ -308,49 +281,9 @@
           <i class="fa-solid fa-medal"></i>
         </div>
       </div>
-      <div class="card-group align-items-center flex-row justify-content-center">
-        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderPage('https://www.youtube.com/@nomicoc'); return false;">
-          <i class="fa-brands fa-youtube fa-lg" style="color: gold;"></i>
-          <p class="tip">뱃튜브</p>
-        </div>
-        <div class="card bg-black-2 with-icon color-gold w90" onclick="renderTeamEventPage(); return false;">
-          <i class="fa-solid fa-star" style="color: gold;"></i>
-          <p class="tip">이벤트</p>
-          <i class="fa-solid fa-star" style="color: gold;"></i>
-        </div>
-      </div>
 
-      <div class="card-group menu-rule">
-        <div class="title">아카데미 규칙</div>
-        <div class="cards">
-          <div class="card bg-black-2 w100p btn-notice display-none" onclick="renderPage('/notice'); return false;">
-            <p class="tip">공지사항</p>
-          </div>
-        </div>
-        <div class="sub-title color-red">소통방에서 "/ (슬러쉬)" 입력 시 바로 확인 가능</div>
-        <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1S7QI9UvUpgxv9ytxV_hiAH3yapDD8oPSnrONvkNyuAc/edit#gid=0'); return false;">
-            <p class="tip">클랜전 규칙</p>
-            <p class="second-text"></p>
-          </div>
-          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1FQ6Og-Q5Wybhk919dYaQsjpWjfgsUwwowHvhIBkJNi0/edit#gid=0'); return false;">
-            <p class="tip">리그전 규칙</p>
-            <p class="second-text"></p>
-          </div>
-        </div>
-        <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1Z5Ce9zDDIoUgian1aYOyV-STmme1-jLQLPKfA5-UvFc/edit#gid=0'); return false;">
-            <p class="tip">습격전 규칙</p>
-            <p class="second-text"></p>
-          </div>
-          <div class="card bg-black-2" onclick="renderPage('https://docs.google.com/spreadsheets/d/1cFbo-26Y6MDf2ioVjurMW4G3nvwYUZtgYGIjcoB1qgw/edit?usp=sharing'); return false;">
-            <p class="tip">클랜 링크</p>
-            <p class="second-text"></p>
-          </div>
-        </div>
-      </div>
       <div class="card-group menu-information">
-        <div class="title">아카데미 정보</div>
+        <div class="title">기본 정보</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/lab/links'); return false;">
             <p class="tip">연구소</p>
@@ -363,8 +296,7 @@
         </div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderClanAssignedPage(); return false;">
-            <p class="tip">클랜 배정표</p>
-            <p class="second-text"><span class="clan-assigned-date">(조회중)</span></p>
+            <p class="tip">클랜 배정 현황</p>
           </div>
           <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">
             <p class="tip">리그 배정표</p>
@@ -372,7 +304,7 @@
           </div>
         </div>
 
-        <div class="title">아카데미 클랜원</div>
+        <div class="title">클랜원 정보</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/member'); return false;">
             <p class="tip">전체 클랜원</p>
@@ -398,7 +330,7 @@
       </div>
 
       <div class="card-group menu-contents">
-        <div class="title">아카데미 컨텐츠</div>
+        <div class="title">컨텐츠 정보</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/war?type=none'); return false;">
             <p class="tip">클랜전 현황</p>

@@ -11,7 +11,7 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI openAPI() {
-        Info info = new Info().title("아카데미 편의 기능 APIs")
+        Info info = new Info().title("편의 기능 APIs")
                               .version("1.0")
                               .description("편의/운영 기능 구현을 위한 API 연동 규격서")
                               .contact(new Contact().name("monayo")

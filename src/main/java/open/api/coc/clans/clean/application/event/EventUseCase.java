@@ -1,10 +1,12 @@
 package open.api.coc.clans.clean.application.event;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.application.event.mapper.EventUseCaseMapper;
+import open.api.coc.clans.clean.domain.event.exception.EventTeamLegendNotExistsException;
 import open.api.coc.clans.clean.domain.event.model.EventTeam;
 import open.api.coc.clans.clean.domain.event.model.EventTeamLegend;
 import open.api.coc.clans.clean.domain.event.model.EventTeamMember;
@@ -29,8 +31,13 @@ public class EventUseCase {
 
     @Transactional(readOnly = true)
     public EventTeamLegendResponse getLatestTeamLegend() {
+        LocalDateTime startDate = eventTeamLegendService.findLatestStartDate();
+        if (startDate == null) {
+            throw new EventTeamLegendNotExistsException();
+        }
+
         // 최신 팀 전설내기 이벤트 정보를 조회한다.
-        EventTeamLegend teamLegend = eventTeamLegendService.findLatestTeamLegend();
+        EventTeamLegend teamLegend = eventTeamLegendService.findLatestTeamLegend(startDate);
 
         // 응답한다.
         return useCaseMapper.toEventTeamLegendResponse(teamLegend);
@@ -38,8 +45,13 @@ public class EventUseCase {
 
     @Transactional
     public void processForTeamLegendRecord() {
+        LocalDateTime startDate = eventTeamLegendService.findLatestStartDate();
+        if (startDate == null) {
+            return;
+        }
+
         // 최신 팀 전설내기 이벤트 정보를 조회한다.
-        EventTeamLegend teamLegend = eventTeamLegendService.findLatestTeamLegend();
+        EventTeamLegend teamLegend = eventTeamLegendService.findLatestTeamLegend(startDate);
 
         // 이미 종료된 이벤트인 경우 종료
         if (teamLegend.isFinish()) return;

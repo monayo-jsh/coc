@@ -20,12 +20,12 @@ public class EventTeamLegendService {
     private final EventTeamLegendMemberRepository teamLegendMemberRepository;
 
     @Transactional(readOnly = true)
-    public EventTeamLegend findLatestTeamLegend() {
-        LocalDateTime startDate = teamLegendRepository.findLatestStartDate();
-        if (startDate == null) {
-            throw new EventTeamLegendNotExistsException();
-        }
+    public LocalDateTime findLatestStartDate() {
+        return teamLegendRepository.findLatestStartDate();
+    }
 
+    @Transactional(readOnly = true)
+    public EventTeamLegend findLatestTeamLegend(LocalDateTime startDate) {
         return teamLegendRepository.findByStartDate(startDate)
                                    .orElseThrow(() -> new EventTeamLegendNotExistsException(startDate));
     }
@@ -37,7 +37,10 @@ public class EventTeamLegendService {
 
     @Transactional
     public void saveCurrentTeamLegendRecord() {
-        EventTeamLegend eventTeamLegend = findLatestTeamLegend();
+        LocalDateTime latestStartDate = findLatestStartDate();
+        if (latestStartDate == null) { return; }
+
+        EventTeamLegend eventTeamLegend = findLatestTeamLegend(latestStartDate);
 
         if (eventTeamLegend.isNotStarted()) return; // 시작하지 않은 경우
         if (eventTeamLegend.isFinish()) return; // 종료된 경우
@@ -62,4 +65,5 @@ public class EventTeamLegendService {
     public List<EventTeamRankResponse> findAllTeamLegendDailyRankingsByIds(List<Long> teamIds) {
         return teamLegendMemberRepository.findAllTeamLegendDailyRankingsByIds(teamIds);
     }
+
 }

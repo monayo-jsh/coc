@@ -566,10 +566,10 @@
       const leagueIconImg = memberHtml.querySelector('.cell.league-icon');
       if (league) {
         const { iconUrls } = league;
-        leagueIconImg.src = iconUrls.tiny;
+        leagueIconImg.src = iconUrls.small;
       } else {
         const { iconUrls } = leagueMap['Unranked'];
-        leagueIconImg.src = iconUrls.tiny;
+        leagueIconImg.src = iconUrls.small;
       }
 
       renderHeroes(memberHtml, player);

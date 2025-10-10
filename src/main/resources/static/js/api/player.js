@@ -18,6 +18,7 @@ const URI_PLAYERS_LEGEND_RECORD_ORDER = `${PREFIX_PLAYER_API}/{playerTag}/legend
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = `${PREFIX_PLAYER_API}/ranking/hero/equipments`; //영웅 장비 랭킹
 
 const URI_PLAYERS_RANKING_CURRENT_TROPHIES = `${PREFIX_PLAYER_API}/ranking/trophies` //현재 트로피 순위
+const URI_PLAYERS_RANKING_CURRENT_TIER_TROPHIES = `${PREFIX_PLAYER_API}/ranking/trophies/tier` //현재 티어 트로피 순위
 const URI_PLAYERS_RANKING_ATTACK_WINS = `${PREFIX_PLAYER_API}/ranking/attack/wins` //현재 공성 순위
 
 const URI_PLAYERS_RANKING_DONATIONS = `${PREFIX_PLAYER_API}/ranking/donations` //현재 지원 순위
@@ -221,6 +222,18 @@ async function fetchRankingHeroEquipments(clanTag) {
 
 async function fetchRankingPlayerTrophies() {
   return await axios.get(URI_PLAYERS_RANKING_CURRENT_TROPHIES)
+                    .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchRankingTierPlayerTrophies() {
+  return await axios.get(URI_PLAYERS_RANKING_CURRENT_TIER_TROPHIES)
                     .then((response) => {
                       const { data } = response
                       return data;

@@ -40,7 +40,7 @@ public abstract class PlayerClientMapper {
     private PlayerTroopsEntityMapper troopsEntityMapper;
 
     // from COC API
-    @Mapping(target = "leagueId", source = "league.id")
+    @Mapping(target = "leagueId", source = "leagueTier.id")
     @Mapping(target = "clanTag", source = "clan.tag")
     @Mapping(target = "heroes", source = "heroes", qualifiedByName = "mapHeroes")
     @Mapping(target = "heroEquipments", source = "heroEquipment", qualifiedByName = "mapHeroEquipments")

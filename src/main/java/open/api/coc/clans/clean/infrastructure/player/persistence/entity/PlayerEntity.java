@@ -42,7 +42,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 @Table(
     name = "tb_player",
-    indexes = @Index(name = "idx_player_name", columnList = "name")
+    indexes = {
+        @Index(name = "idx_player_name", columnList = "name"),
+        @Index(name = "idx_player_trophies", columnList = "trophies"),
+        @Index(name = "idx_player_league_trophies", columnList = "league_id, trophies")
+    }
 )
 @Comment("플레이어 테이블")
 public class PlayerEntity extends BaseEntity implements Persistable<String> {

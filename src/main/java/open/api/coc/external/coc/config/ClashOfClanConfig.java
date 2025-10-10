@@ -21,6 +21,7 @@ public class ClashOfClanConfig {
         private final Clans clans;
         private final Players players;
         private final Leagues leagues;
+        private final LeagueTier leagueTier;
         private final ClanWarLeagues clanWarLeagues;
 
         @RequiredArgsConstructor
@@ -66,6 +67,16 @@ public class ClashOfClanConfig {
         }
 
         @RequiredArgsConstructor
+        private static class LeagueTier {
+            private final String prefix;
+            private final String leagueTier;
+
+            public String getLeagueTier() {
+                return prefix + leagueTier;
+            }
+        }
+
+        @RequiredArgsConstructor
         private static class ClanWarLeagues {
             private final String prefix;
             private final String roundTag;
@@ -95,6 +106,9 @@ public class ClashOfClanConfig {
 
     public String getLeaguesUri() {
         return getEndPoint().getLeagues().getLeagues();
+    }
+    public String getLeagueTiersUri() {
+        return getEndPoint().getLeagueTier().getLeagueTier();
     }
 
     public String getClanWarLeagueUri() { return getEndPoint().getClanWarLeagues().getClanWarLeagues();}

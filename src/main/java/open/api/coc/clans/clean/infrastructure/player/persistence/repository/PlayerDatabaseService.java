@@ -131,6 +131,14 @@ public class PlayerDatabaseService implements PlayerRepository {
     }
 
     @Override
+    public List<Player> findTrophiesTierRanking(Integer pageSize) {
+        return jpaPlayerCustomRepository.findTierTrophiesRanking(pageSize)
+                                        .stream()
+                                        .map(playerEntityMapper::toPlayerOnly)
+                                        .toList();
+    }
+
+    @Override
     public List<Player> findAttackWinsRanking(Integer pageSize) {
         return jpaPlayerCustomRepository.findAttackWinsRanking(pageSize)
                                         .stream()

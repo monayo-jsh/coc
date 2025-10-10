@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.presentation.common.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import open.api.coc.clans.clean.presentation.league.dto.LeagueResponse;
 
 @Getter
 @AllArgsConstructor
@@ -19,5 +20,8 @@ public class RankingHallOfFameResponse {
 
     @Schema(description = "타운홀 레벨")
     private final Integer townHallLevel;
+
+    @Schema(description = "현재 리그")
+    private final Integer leagueId;
 
 }

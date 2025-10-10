@@ -53,6 +53,10 @@ public class PlayerService {
         return playerRepository.findTrophiesRanking(pageSize);
     }
 
+    public List<Player> findTrophiesTierRanking(Integer pageSize) {
+        return playerRepository.findTrophiesTierRanking(pageSize);
+    }
+
     @Transactional(readOnly = true)
     public List<Player> findAttackWinsRanking(Integer pageSize) {
         return playerRepository.findAttackWinsRanking(pageSize);
@@ -108,4 +112,5 @@ public class PlayerService {
         Player latestPlayer = playerClient.findByTag(playerTag);
         return create(latestPlayer);
     }
+
 }

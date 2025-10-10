@@ -10,16 +10,12 @@ import open.api.coc.external.coc.clan.domain.leagues.LabelList;
 import open.api.coc.external.coc.clan.domain.player.Player;
 import org.springframework.stereotype.Component;
 
-@Component
 public interface ClanApiService {
 
     Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag);
 
     Optional<Player> findPlayerBy(String playerTag);
 
-    Optional<LabelList> findLeagues();
-
-    List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException;
     Optional<ClanWar> findLeagueWarByRoundTag(String roundTag);
 
     Optional<ClanCurrentWarLeagueGroup> findClanCurrentWarLeagueGroupBy(String clanTag);

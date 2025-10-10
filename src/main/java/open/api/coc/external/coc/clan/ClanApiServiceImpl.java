@@ -23,7 +23,6 @@ public class ClanApiServiceImpl implements ClanApiService {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final RestClient restClient;
-    private final ObjectMapper objectMapper;
 
     @Override
     public Optional<ClanWar> findClanCurrentWarByClanTag(String clanTag) {
@@ -42,30 +41,12 @@ public class ClanApiServiceImpl implements ClanApiService {
     }
 
     @Override
-    public List<LinkedHashMap<String,List<String>>> findClanWarLeagueRoundTags(String clanTag) throws JsonProcessingException {
-        JsonNode rootNode = objectMapper.readTree(
-                restClient.get().uri(clashOfClanConfig.getClansClanTagCurrentLeagueGroupUri(), clanTag)
-                .retrieve().body(String.class));
-        return objectMapper.convertValue(rootNode.get("rounds"), List.class);
-    }
-
-    @Override
     public Optional<ClanWar> findLeagueWarByRoundTag(String roundTag) {
         return Optional.ofNullable(restClient.get()
                 .uri(clashOfClanConfig.getClanWarLeagueUri(), roundTag)
                 .retrieve()
                 .body(ClanWar.class));
     }
-
-    @Override
-    public Optional<LabelList> findLeagues() {
-        return Optional.ofNullable(restClient.get()
-                                             .uri(clashOfClanConfig.getLeaguesUri())
-                                             .retrieve()
-                                             .body(LabelList.class));
-    }
-
-
 
     @Override
     public Optional<ClanCurrentWarLeagueGroup> findClanCurrentWarLeagueGroupBy(String clanTag) {

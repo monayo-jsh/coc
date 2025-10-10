@@ -279,6 +279,15 @@ public class PlayerUseCase {
     }
 
     @Transactional(readOnly = true)
+    public List<RankingHallOfFameResponse> getTierRankingTrophies() {
+        List<Player> players = playerService.findTrophiesTierRanking(hallOfFameConfig.getRanking());
+
+        return players.stream()
+                      .map(playerUseCaseMapper::toRankingTrophiesResponse)
+                      .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<RankingHallOfFameResponse> getRankingAttackWins() {
         List<Player> players = playerService.findAttackWinsRanking(hallOfFameConfig.getRanking());
 

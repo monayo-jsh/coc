@@ -7,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.clean.infrastructure.league.persistence.mapper.LeagueEntityMapper;
 import open.api.coc.clans.clean.infrastructure.league.persistence.repository.JpaLeagueRepository;
-import open.api.coc.external.coc.clan.ClanApiService;
 import open.api.coc.external.coc.clan.domain.leagues.LabelList;
+import open.api.coc.external.coc.league.LeagueApi;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,29 +17,52 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MetaRunner implements CommandLineRunner {
 
-    private final ClanApiService clanApiService;
+    private final LeagueApi leagueApi;
 
     private final JpaLeagueRepository jpaLeagueRepository;
     private final LeagueEntityMapper leagueEntityMapper;
 
     @Override
     public void run(String... args) {
-        Optional<LabelList> findLeagues = clanApiService.findLeagues();
+        collectLeagues();
+        collectLeagueTiers();
+    }
+
+    private void collectLeagues() {
+        Optional<LabelList> findLeagues = leagueApi.findLeagues();
         if (findLeagues.isEmpty()) {
             log.info("leagues is empty ...");
             return;
         }
 
-        LabelList leagues = findLeagues.get();
+        save(findLeagues);
+    }
 
-        List<LeagueEntity> leagueEntities = leagues.getItems()
-                                                   .stream()
-                                                   .map(league -> {
-                                                       LeagueEntity leagueEntity = leagueEntityMapper.toLeagueEntity(league);
-                                                       leagueEntity.markedNotNew();
-                                                       return leagueEntity;
-                                                   })
-                                                   .toList();
+    private void collectLeagueTiers() {
+        Optional<LabelList> findLeagueTiers = leagueApi.findLeagueTiers();
+        if (findLeagueTiers.isEmpty()) {
+            log.info("leagueTiers is empty ...");
+            return;
+        }
+
+        save(findLeagueTiers);
+    }
+
+    private void save(Optional<LabelList> labels) {
+        if (labels.isEmpty()) {
+            log.info("labels is empty ...");
+            return;
+        }
+        LabelList leagueTiers = labels.get();
+
+        List<LeagueEntity> leagueEntities = leagueTiers.getItems()
+                                                       .stream()
+                                                       .map(league -> {
+                                                           LeagueEntity leagueEntity = leagueEntityMapper.toLeagueEntity(league);
+                                                           leagueEntity.markedNotNew();
+                                                           return leagueEntity;
+                                                       })
+                                                       .toList();
 
         jpaLeagueRepository.saveAll(leagueEntities);
     }

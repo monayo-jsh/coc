@@ -21,6 +21,7 @@ public interface PlayerRepository {
     void deleteById(String playerTag);
 
     List<Player> findTrophiesRanking(Integer pageSize);
+    List<Player> findTrophiesTierRanking(Integer pageSize);
 
     List<Player> findAttackWinsRanking(Integer pageSize);
 

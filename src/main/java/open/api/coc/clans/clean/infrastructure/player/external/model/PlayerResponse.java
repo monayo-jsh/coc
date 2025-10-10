@@ -33,6 +33,7 @@ public class PlayerResponse {
     private Integer warStars; // 전쟁 획득 별
 
     private PlayerLeagueResponse league; // 현재 리그 정보
+    private PlayerLeagueResponse leagueTier; // 현재 리그 정보
 
     private String role; // 가입 클랜 직위 - leader: 대표, coLeader: 공동대표, admin: 장로, member: 일반
     private String warPreference; // 가입 클랜 전쟁 선호도 - in: 참가, out: 불참

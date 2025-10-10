@@ -65,6 +65,10 @@ body {
   }
 }
 
+.league-icon {
+  width: 35px;
+}
+
 .section-wrapper {
   margin-top: 10px;
   display: flex;

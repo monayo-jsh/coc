@@ -59,6 +59,19 @@ public class JpaPlayerCustomRepository {
                            .fetch();
     }
 
+    public List<PlayerEntity> findTierTrophiesRanking(Integer pageSize) {
+        final int UNRANKED_LEAGUE_ID = 105000000;
+        final int LEGEND_LEAGUE_ID = 105000034;
+        return queryFactory.select(playerEntity)
+                           .from(playerEntity)
+                           .where(playerEntity.league.id.notIn(UNRANKED_LEAGUE_ID, LEGEND_LEAGUE_ID)) // 언랭크, 전설 리그
+                           .orderBy(playerEntity.trophies.desc())
+                           .offset(0)
+                           .limit(pageSize)
+                           .fetch();
+    }
+
+
     public List<PlayerEntity> findAttackWinsRanking(Integer pageSize) {
         return queryFactory.select(playerEntity)
                            .from(playerEntity)

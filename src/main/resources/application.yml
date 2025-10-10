@@ -63,6 +63,9 @@ external:
       leagues:
         prefix: /v1
         leagues: /leagues
+      leaguetier:
+        prefix: /v1
+        league-tier: /leaguetiers
       clanwarleagues:
         prefix: /v1/clanwarleagues/wars
         round-tag: /{roundTag}
@@ -82,7 +85,7 @@ scheduling:
 
 # 명예의전당 랭킹 표기 설정값
 hall-of-fame:
-  ranking: 11
+  ranking: 21
   average: 3
 
 file:

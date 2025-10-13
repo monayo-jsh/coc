@@ -24,27 +24,36 @@ public class PlayerClientService implements PlayerClient {
 
     private final PlayerClientMapper playerClientMapper;
 
+    public String makeRequestPlayerTag(String playerTag) {
+        if (playerTag.startsWith("#")) {
+            return playerTag;
+        }
+
+        return "#" + playerTag;
+    }
+    
     @Override
     public Player findByTag(String playerTag) {
+        String requestPlayerTag = makeRequestPlayerTag(playerTag);
         try {
             PlayerResponse playerResponse = Decorators.ofSupplier(() -> restClient.get()
-                                                                                  .uri(clashOfClanConfig.getPlayerUri(), playerTag)
+                                                                                  .uri(clashOfClanConfig.getPlayerUri(), requestPlayerTag)
                                                                                   .retrieve()
                                                                                   .body(PlayerResponse.class))
                                                       .withCircuitBreaker(circuitBreaker)
                                                       .get();
 
             if (Objects.isNull(playerResponse)) {
-                throw new PlayerClientException(playerTag);
+                throw new PlayerClientException(requestPlayerTag);
             }
 
             return playerClientMapper.toPlayer(playerResponse);
         } catch (CallNotPermittedException ex) {
-            PlayerClientException playerClientException = new PlayerClientException(playerTag);
+            PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
             playerClientException.addExtraMessage(ex.getMessage());
             throw playerClientException;
         } catch (Exception e) {
-            PlayerClientException playerClientException = new PlayerClientException(playerTag);
+            PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
             playerClientException.addExtraMessage(e.getMessage());
             throw playerClientException;
         }

@@ -25,30 +25,42 @@ public class ClanClientImpl implements ClanClient {
 
     private final ClanClientResponseMapper clanResponseMapper;
 
+    public String makeRequestClanTag(String clanTag) {
+        if (clanTag.startsWith("#")) {
+            return clanTag;
+        }
+
+        return "#" + clanTag;
+    }
+
     @Override
     public Clan findByTag(String clanTag) {
+        String requestClanTag = makeRequestClanTag(clanTag);
+
         try {
             ClanResponse clanResponse = restClient.get()
-                                                  .uri(clashOfClanConfig.getClansClanTagUri(), clanTag)
+                                                  .uri(clashOfClanConfig.getClansClanTagUri(), requestClanTag)
                                                   .retrieve()
                                                   .body(ClanResponse.class);
 
             return clanResponseMapper.toClan(clanResponse);
         } catch (Exception e) {
-            throw ClanClientException.ofClan(clanTag);
+            throw ClanClientException.ofClan(requestClanTag);
         }
     }
 
     @Override
     public List<ClanMember> findMembersByTag(String clanTag) {
+        String requestClanTag = makeRequestClanTag(clanTag);
+
         try {
             ClanMemberListResponse clanResponse = restClient.get()
-                                                            .uri(clashOfClanConfig.getClansClanMembersUri(), clanTag)
+                                                            .uri(clashOfClanConfig.getClansClanMembersUri(), requestClanTag)
                                                             .retrieve()
                                                             .body(ClanMemberListResponse.class);
 
             if (clanResponse == null) {
-                throw ClanClientException.ofClanMember(clanTag);
+                throw ClanClientException.ofClanMember(requestClanTag);
             }
 
             return clanResponse.getItems()
@@ -56,7 +68,7 @@ public class ClanClientImpl implements ClanClient {
                                .map(clanResponseMapper::toClanMember)
                                .collect(Collectors.toList());
         } catch (Exception e) {
-            throw ClanClientException.ofClanMember(clanTag);
+            throw ClanClientException.ofClanMember(requestClanTag);
         }
     }
 

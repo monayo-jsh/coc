@@ -43,8 +43,8 @@ public class SecurityConfig {
                 .formLogin(login -> login.loginPage("/clan/cms/login").permitAll())
                 .rememberMe(remember -> remember
                         .key("AcademyCMS")
-                        .rememberMeParameter("academy-cms-remember-me")
-                        .rememberMeCookieName("academy-cms-remember-me")
+                        .rememberMeParameter("cms-remember-me")
+                        .rememberMeCookieName("cms-remember-me")
                         .tokenRepository(tokenRepository())
                         .userDetailsService(users()))
                 .csrf(AbstractHttpConfigurer::disable)

@@ -59,7 +59,7 @@
           </div>
           <div class="input-group support">
             <label for="remember-me" class="label" >로그인 유지</label>
-            <input type="checkbox" id="remember-me" name="academy-cms-remember-me">
+            <input type="checkbox" id="remember-me" name="cms-remember-me">
           </div>
           <button type="submit">로그인</button>
         </form>
@@ -74,7 +74,9 @@
     <div class="col align-items-center flex-col">
       <div class="text sign-in">
         <h2>
-          Academy CMS
+          Content<br>
+          Management<br>
+          System
         </h2>
 
       </div>
@@ -120,14 +122,14 @@
       // 폼 데이터 가져오기
       const username = $('input[name="username"]').val();
       const password = $('input[name="password"]').val();
-      const academyCmsRememberMe = $('input[name="academy-cms-remember-me"]').is(":checked");
+      const academyCmsRememberMe = $('input[name="cms-remember-me"]').is(":checked");
 
 
       // 폼 데이터를 객체로 만들기
       const userInfo = {
         username: username,
         password: password,
-        "academy-cms-remember-me": academyCmsRememberMe
+        "cms-remember-me": academyCmsRememberMe
       };
         console.log(userInfo)
       // AJAX 요청 보내기

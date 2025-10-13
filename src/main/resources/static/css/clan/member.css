@@ -408,7 +408,7 @@
 
     .contents {
       margin-top: 2px;
-      display: flex;
+      display: ruby;
       flex-wrap: wrap;
 
       .img-icon {

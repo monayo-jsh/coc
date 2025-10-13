@@ -40,27 +40,29 @@ public class SecurityConfig {
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.httpBasic(AbstractHttpConfigurer::disable)
-                .headers(header -> header.frameOptions(FrameOptionsConfig::sameOrigin))
-                .formLogin(login -> login.loginPage("/clan/cms/login").permitAll())
-                .rememberMe(remember -> remember
-                        .key("ContentManagementSystem")
-                        .rememberMeParameter("cms-remember-me")
-                        .rememberMeCookieName("cms-remember-me")
-                        .tokenRepository(tokenRepository())
-                        .userDetailsService(users()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize ->
-                                           authorize.requestMatchers(PathRequest.toH2Console()).permitAll()
-                                                    .requestMatchers(WebMvcConfig.resourcePaths.toArray(new String[0])).permitAll()
-                                                    .requestMatchers(BLACK_LIST).authenticated()
-                                                    .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                                                    .requestMatchers(HttpMethod.POST, "/api/players/{playerTag}/legend/record").permitAll()
-                                                    .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/legend/record/{order}").permitAll()
-                                                    .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/nickname").permitAll()
+                   .csrf(AbstractHttpConfigurer::disable)
+                   .headers(header -> header.frameOptions(FrameOptionsConfig::sameOrigin))
+                   .formLogin(login -> login.loginPage("/clan/cms/login").permitAll())
+                   .rememberMe(remember ->
+                                   remember.key("ContentManagementSystem")
+                                           .rememberMeParameter("cms-remember-me")
+                                           .rememberMeCookieName("cms-remember-me")
+                                           .tokenRepository(tokenRepository())
+                                           .userDetailsService(users()))
+                   .authorizeHttpRequests(authorize ->
+                                              authorize.requestMatchers(WebMvcConfig.resourcePaths.toArray(new String[0])).permitAll()
+                                                       .requestMatchers("/").permitAll()
+                                                       .requestMatchers(PathRequest.toH2Console()).permitAll()
+                                                       .requestMatchers(BLACK_LIST).authenticated()
+                                                       .requestMatchers(HttpMethod.GET, "/**").permitAll()
+                                                       .requestMatchers(HttpMethod.POST, "/api/players/{playerTag}/legend/record").permitAll()
+                                                       .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/legend/record/{order}").permitAll()
+                                                       .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/nickname").permitAll()
 //                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
-                                                    .anyRequest().authenticated()).build();
+                                                       .anyRequest().authenticated())
+                   .build();
 
     }
 

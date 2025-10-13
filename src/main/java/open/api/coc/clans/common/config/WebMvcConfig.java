@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final List<String> resourcePaths = List.of("/favicon.ico", "/js/**", "/css/**", "/images/**", "/lib/**");
+    public static final List<String> resourcePaths = List.of("/favicon.ico", "/js/**", "/css/**", "/images/**", "/lib/**");
     private final String swaggerDocPath = "/clan/cms/docs/**";
 
     @Override

@@ -25,7 +25,7 @@ public class ClanWarScheduler {
     /**
      * 30분마다 진행중인 클랜전 기록을 수집한다.
      */
-    @Scheduled(cron = "0 */20 * * * *")
+    @Scheduled(cron = "0 */15 * * * *")
     public void collectCurrentClanWar() {
         clanWarService.collectCurrentClanWar();
     }}

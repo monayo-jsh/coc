@@ -408,8 +408,10 @@
 
     .contents {
       margin-top: 2px;
-      display: ruby;
+      display: flex;
+      flex-direction: row;
       flex-wrap: wrap;
+      gap: unset;
 
       .img-icon {
         width: 35px;

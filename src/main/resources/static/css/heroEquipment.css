@@ -161,3 +161,7 @@
   background-image: url("/images/hero/equipment/Dark_Crown.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.meteor_staff {
+  background-image: url("/images/hero/equipment/Meteor_Staff.png");
+  color: rgba(0, 0, 0, 0);
+}

@@ -118,7 +118,7 @@
 
     async function initAssignedDate() {
       // await displayClanAssignedDate();
-      await displayLeagueAssignedDate();
+      // await displayLeagueAssignedDate();
     }
 
     async function drawNotice() {
@@ -126,9 +126,9 @@
       if (notices && !!notices.length) {
         // 공지사항 있는 경우 버튼 노출
         let btnNotice = document.querySelector('.card.btn-notice');
-        if (btnNotice)
+        if (btnNotice) {
           toggleDisplay(btnNotice); // show
-        return;
+        }
       }
 
       renderNotices(notices);
@@ -285,8 +285,13 @@
       <div class="card-group menu-information">
         <div class="title">기본 정보</div>
         <div class="cards">
+          <div class="card bg-black-2 w100p btn-notice display-none" onclick="renderPage('/notice'); return false;">
+            <p class="tip">공지사항</p>
+          </div>
+        </div>
+        <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/lab/links'); return false;">
-            <p class="tip">연구소</p>
+            <p class="tip">톡방 안내</p>
             <p class="second-text"></p>
           </div>
           <div class="card bg-black-2" onclick="renderPage('/clan'); return false;">
@@ -298,13 +303,13 @@
           <div class="card bg-black-2" onclick="renderClanAssignedPage(); return false;">
             <p class="tip">클랜 배정 현황</p>
           </div>
-          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">
-            <p class="tip">리그 배정표</p>
-            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
-          </div>
+<!--          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">-->
+<!--            <p class="tip">리그 배정표</p>-->
+<!--            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>-->
+<!--          </div>-->
         </div>
 
-        <div class="title">클랜원 정보</div>
+        <div class="title">클랜원</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/member'); return false;">
             <p class="tip">전체 클랜원</p>
@@ -322,15 +327,15 @@
             <p class="tip">전설 기록 검색</p>
           </div>
         </div>
-        <div class="cards">
-          <div class="card bg-black-2" onclick="renderPage('/clan/member?view=support'); return false;">
-            <p class="tip">지원계정 목록</p>
-          </div>
-        </div>
+<!--        <div class="cards">-->
+<!--          <div class="card bg-black-2" onclick="renderPage('/clan/member?view=support'); return false;">-->
+<!--            <p class="tip">지원계정 목록</p>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
 
       <div class="card-group menu-contents">
-        <div class="title">컨텐츠 정보</div>
+        <div class="title">컨텐츠</div>
         <div class="cards">
           <div class="card bg-black-2" onclick="renderPage('/clan/war?type=none'); return false;">
             <p class="tip">클랜전 현황</p>
@@ -346,17 +351,21 @@
             <p class="tip">리그전 현황</p>
             <p class="second-text">(매월 초 진행)</p>
           </div>
-          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=parallel'); return false;">
-            <p class="tip">병행클랜전 현황</p>
-            <p class="second-text">(매월 리그전 진행 시 공지)</p>
-          </div>
-        </div>
-        <div class="cards">
+<!--          <div class="card bg-black-2" onclick="renderPage('/clan/war?type=parallel'); return false;">-->
+<!--            <p class="tip">병행클랜전 현황</p>-->
+<!--            <p class="second-text">(매월 리그전 진행 시 공지)</p>-->
+<!--          </div>-->
           <div class="card bg-black-2" onclick="renderPage('/clan-game'); return false;">
             <p class="tip">클랜게임 현황</p>
             <p class="second-text">(매월 22일 ~ 28일 진행)</p>
           </div>
         </div>
+<!--        <div class="cards">-->
+<!--          <div class="card bg-black-2" onclick="renderPage('/clan-game'); return false;">-->
+<!--            <p class="tip">클랜게임 현황</p>-->
+<!--            <p class="second-text">(매월 22일 ~ 28일 진행)</p>-->
+<!--          </div>-->
+<!--        </div>-->
       </div>
 
     </div>

@@ -60,6 +60,7 @@ public enum HeroEquipmentConfig {
     NOBLE_IRON(MINION_PRINCE, 503, "normal", "Noble Iron", "노블 아이언"),
 
     DARK_CROWN(MINION_PRINCE, 520, "epic", "Dark Crown", "다크 크라운"),
+    METEOR_STAFF(MINION_PRINCE, 521, "epic", "Meteor Staff", "유성우 스태프"),
 
     UNKNOWN(HeroConfig.UNKNOWN, Integer.MAX_VALUE, "unknown", "unknown", "unknown");
 

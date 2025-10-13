@@ -11,6 +11,7 @@
   <link rel="stylesheet" type="text/css" href="/css/links.css" />
 
   <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
   <script src="/js/api/lab.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
@@ -20,6 +21,9 @@
         const { code } = meta;
         const target = document.querySelector('.enter-code');
         target.innerHTML = code;
+
+        let enterAreaTag = target.closest('.enter-area');
+        toggleDisplay(enterAreaTag);
       }
     }
     async function getLabLinks() {
@@ -70,8 +74,11 @@
 
     <div class="description">
       새로운 연구소 개설 희망시 운영진DM 주세요
-      <br><br>
-      <span class="small-text">입장코드: <span class="enter-code"></span></span>
+      <div class="enter-area display-none">
+        <br>
+        <span class="small-text">입장코드: <span class="enter-code"></span></span>
+      </div>
+
     </div>
 
     <div class="contents">

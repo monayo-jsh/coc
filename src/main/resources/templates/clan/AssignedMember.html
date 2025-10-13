@@ -125,14 +125,19 @@
     }
 
     function renderAssignedDate(viewType, assignedDate) {
+      let isLeagueView = viewType === 'league';
+
       const assignedLabel = document.querySelector('.assigned-label:not(.loading)');
 
-      const target = assignedLabel.querySelector('.assigned-date');
-      if (assignedDate) {
-        target.innerHTML = formatYYYYMM(dayjs(assignedDate));
+      if (isLeagueView) {
+        const target = assignedLabel.querySelector('.assigned-date');
+        if (assignedDate) {
+          target.innerHTML = formatYYYYMM(dayjs(assignedDate));
+        }
       }
+
       const viewTypeTarget = assignedLabel.querySelector('.view-type');
-      viewTypeTarget.innerHTML = viewType === 'league' ? "리그전" : "클랜전"
+      viewTypeTarget.innerHTML = isLeagueView ? "리그전" : "클랜전"
 
       toggleDisplay(assignedLabel);
 

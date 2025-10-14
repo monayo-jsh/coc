@@ -35,6 +35,7 @@ public class PlayerResponse {
     private String role;
     private String warPreference;
     private PlayerClanResponse clan;
+    private PlayerClanResponse joinedClan;
 
     private Integer donations;
     private Integer donationsReceived;

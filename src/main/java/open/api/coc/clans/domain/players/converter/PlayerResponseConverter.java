@@ -302,6 +302,7 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
                              .trophies(source.getTrophies())
                              .league(makeLeague(source.getLeague()))
                              .clan(makePlayerClanResponse(source.getClan()))
+                             .joinedClan(makePlayerClanResponse(source.getJoinedClan())) // 가입중인 클랜 - 원래는 clan에 내려가지만 해당 응답을 재사용하기위한 변수...
                              .build();
     }
 }

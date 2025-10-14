@@ -38,12 +38,18 @@
     }
 
     function drawMember(member) {
-      const { tag, name, trophies, league } = member;
+      const { tag, name, trophies, league, joinedClan } = member;
       const rowTemplate = copyTemplateById('assigned-table-row-template');
       const row = rowTemplate.querySelector('.row');
 
+      let clanName = "알 수 없음";
+      if (joinedClan) {
+        clanName = joinedClan.name
+      }
+
       row.innerHTML = row.innerHTML
                          .replace(/{PLAYER_NAME}/, name)
+                         .replace(/{CLAN_NAME}/, clanName)
                          .replace(/{SCORE}/, trophies);
 
       const leagueTier = row.querySelector('.league-tier');
@@ -189,7 +195,10 @@
         const joinMember = currentJoinedMemberMap.get(member.tag);
         if (!joinMember) {
           const row = assignedTable.querySelector(`.player-${removeHashTag(member.tag)}`);
-          row.classList.add('bg-crimson', 'font-white');
+          // row.classList.add('bg-crimson', 'font-white');
+          // 가입중인 클랜 표기
+          let clanLabel = row.querySelector('.clan-info');
+          toggleDisplay(clanLabel);
         }
       }
     }
@@ -251,7 +260,7 @@
   <div class="assigned-label loading">배정표 불러오는중 ...</div>
   <div class="assigned-label display-none"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
   <div class="assigned-legend">
-    배정된 클랜에 가입되지 않은 계정은 <div class="highlight">계정명</div> 표기
+    배정된 클랜에 가입되지 않은 계정은 <div class="clan-info chip">가입중인 클랜</div> 표기
   </div>
   <div class="assigned-table-wrapper"></div>
 </div>
@@ -297,12 +306,15 @@
   <tr class="table-tr row">
     <td class="table-td">
       <div class="member-info">
-        <div class="league-tier">
-          <img class="icon" src="" alt="">
-          <div class="score">{SCORE}</div>
-        </div>
-        <div class="name">
-          {PLAYER_NAME}
+        <div class="user-info">
+          <div class="league-tier">
+            <img class="icon" src="" alt="">
+            <div class="score">{SCORE}</div>
+          </div>
+          <div class="player">
+            <div class="name">{PLAYER_NAME}</div>
+            <div class="clan-info chip display-none">{CLAN_NAME}</div>
+          </div>
         </div>
       </div>
     </td>

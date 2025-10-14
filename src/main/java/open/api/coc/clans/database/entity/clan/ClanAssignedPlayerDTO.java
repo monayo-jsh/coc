@@ -19,5 +19,6 @@ public class ClanAssignedPlayerDTO {
     private LeagueEntity league;
 
     private ClanEntity clan;
+    private ClanEntity joinedClan;
 
 }

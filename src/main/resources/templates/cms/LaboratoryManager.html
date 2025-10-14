@@ -17,7 +17,7 @@
   <script src="/js/api/lab.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  <title>연구소 관리</title>
+  <title>톡방 안내 관리</title>
   <script>
     async function setupEnterCode() {
         const input = document.querySelector('.input.code');
@@ -47,7 +47,7 @@
       const laboratory = element.closest('.laboratory');
       const { id, name } = laboratory.dataset;
 
-      if (!confirm(`"${name}" 연구소를 삭제하시겠습니까?`)) {
+      if (!confirm(`"${name}" 톡방을 삭제하시겠습니까?`)) {
         return;
       }
 
@@ -125,18 +125,18 @@
 <body>
 
 <div class="title">
-  <span class="label">연구소 관리</span>
+  <span class="label">톡방 안내 관리</span>
 </div>
 <div class="support-area">
   <form class="enter-code-form">
     <div class="row">
       <div class="cell">
-        <span class="description">* 연구소 입장코드 문구 설정</span>
+        <span class="description">* 공통 입장코드 문구 설정</span>
       </div>
     </div>
     <div class="row">
       <div class="cell">
-        <span class="description">현재 입장코드 : <span class="enter-code"></span></span>
+        <span class="description">공통 입장코드 : <span class="enter-code"></span></span>
       </div>
     </div>
     <div class="row">
@@ -151,12 +151,12 @@
 </div>
 <div class="support-area">
   <div class="buttons">
-    <div class="button-chip" onclick="displayRegisterForm();">연구소 등록</div>
+    <div class="button-chip" onclick="displayRegisterForm();">톡방 안내 등록</div>
   </div>
   <div class="registration-wrapper display-none">
     <form class="registration-form">
       <table class="table mt-5">
-        <caption class="table-caption">연구소 등록</caption>
+        <caption class="table-caption">톡방 안내 등록</caption>
         <colgroup>
           <col width="20%">
           <col width="*">

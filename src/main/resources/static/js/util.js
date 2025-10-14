@@ -215,6 +215,8 @@ function calcHeroLevelSum(heroes) {
 function sortByTrophies(members) {
   // 트로피 순 > 이름 순
   return members.map(member => {
+                  // 정렬을 위한 기본티어 설정 (Unranked)
+                  member.sortTier = 105000000;
                   // 정렬을 위한 트로피 설정
                   member.sortTrophies = member.trophies
                   const { league } = member;
@@ -222,15 +224,18 @@ function sortByTrophies(members) {
                   if (!league) {
                     // 리그 정보 없는 경우
                     member.sortTrophies = -1;
-                  }
-                  if (league.name === 'Unranked') {
-                    // 언랭크
-                    member.sortTrophies = -1;
+                  } else {
+                    member.sortTier = league.id;
+
+                    if (league.name === 'Unranked') {
+                      // 언랭크
+                      member.sortTrophies = -1;
+                    }
                   }
 
                   return member;
                 })
-                .sort((a, b) => b.sortTrophies - a.sortTrophies || b.name.localeCompare(a.name));
+                .sort((a, b) => b.sortTier - a.sortTier || b.sortTrophies - a.sortTrophies || b.name.localeCompare(a.name));
 }
 
 function sortByHeroTotalLevel(players) {

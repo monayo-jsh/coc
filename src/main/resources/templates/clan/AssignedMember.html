@@ -38,12 +38,23 @@
     }
 
     function drawMember(member) {
-      const { tag, name } = member;
+      const { tag, name, trophies, league } = member;
       const rowTemplate = copyTemplateById('assigned-table-row-template');
       const row = rowTemplate.querySelector('.row');
 
       row.innerHTML = row.innerHTML
-                         .replace(/{PLAYER_NAME}/, name);
+                         .replace(/{PLAYER_NAME}/, name)
+                         .replace(/{SCORE}/, trophies);
+
+      const leagueTier = row.querySelector('.league-tier');
+      let leagueIconImg = leagueTier.querySelector('.icon');
+      if (league) {
+        const { iconUrls } = league;
+        leagueIconImg.src = iconUrls.small;
+      } else {
+        const { iconUrls } = leagueMap['Unranked'];
+        leagueIconImg.src = iconUrls.small;
+      }
 
       row.classList.add(`player-${removeHashTag(tag)}`)
 
@@ -52,7 +63,7 @@
 
     function appendMember(table, clanAssignedMembers) {
       const tableTbody = table.querySelector('.table-tbody');
-      const sortedMembers = clanAssignedMembers.sort((a, b) => a.name.localeCompare(b.name));
+      const sortedMembers = sortByTrophies(clanAssignedMembers);
       for (const member of sortedMembers) {
         const memberRow = drawMember(member);
         tableTbody.appendChild(memberRow);
@@ -175,8 +186,8 @@
       const currentJoinedMemberMap = convertArrayToMapByKey(currentJoinedMembers)
 
       for (const member of assignedMembers) {
-        const isJoined = currentJoinedMemberMap.get(member.tag);
-        if (!isJoined) {
+        const joinMember = currentJoinedMemberMap.get(member.tag);
+        if (!joinMember) {
           const row = assignedTable.querySelector(`.player-${removeHashTag(member.tag)}`);
           row.classList.add('bg-crimson', 'font-white');
         }
@@ -284,7 +295,17 @@
 </template>
 <template id="assigned-table-row-template">
   <tr class="table-tr row">
-    <td class="table-td name">{PLAYER_NAME}</td>
+    <td class="table-td">
+      <div class="member-info">
+        <div class="league-tier">
+          <img class="icon" src="" alt="">
+          <div class="score">{SCORE}</div>
+        </div>
+        <div class="name">
+          {PLAYER_NAME}
+        </div>
+      </div>
+    </td>
   </tr>
 </template>
 </html>

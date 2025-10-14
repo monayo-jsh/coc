@@ -6,12 +6,16 @@ import open.api.coc.clans.clean.domain.common.model.Label;
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanMemberResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanResponse;
 import open.api.coc.clans.clean.infrastructure.common.external.dto.LabelResponse;
+import open.api.coc.clans.clean.infrastructure.league.persistence.mapper.ClanMemberLeagueMapper;
 import open.api.coc.clans.common.config.MapStructConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(
-    config = MapStructConfig.class
+    config = MapStructConfig.class,
+    uses = {
+        ClanMemberLeagueMapper.class
+    }
 )
 public interface ClanClientResponseMapper {
 
@@ -23,6 +27,7 @@ public interface ClanClientResponseMapper {
     @Mapping(target = "iconUrl", source = "iconUrls")
     Label map(LabelResponse labelResponse);
 
+    @Mapping(target = "league", source = "leagueTier")
     ClanMember toClanMember(ClanMemberResponse clanMemberResponse);
 
 }

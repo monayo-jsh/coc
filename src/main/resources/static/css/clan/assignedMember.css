@@ -72,3 +72,21 @@
     gap: 3px;
   }
 }
+
+.member-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  
+  .league-tier {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      height: 35px;
+    }
+    .score {
+      margin-left: 5px;
+    }
+  }
+}

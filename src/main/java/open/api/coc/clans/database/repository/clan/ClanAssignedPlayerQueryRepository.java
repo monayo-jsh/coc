@@ -38,6 +38,8 @@ public class ClanAssignedPlayerQueryRepository {
                                                                                                      clanAssignedPlayerEntity.id.seasonDate.as("seasonDate"),
                                                                                                      clanAssignedPlayerEntity.id.playerTag.as("playerTag"),
                                                                                                      playerEntity.name.as("playerName"),
+                                                                                                     playerEntity.trophies.as("trophies"),
+                                                                                                     playerEntity.league.as("league"),
                                                                                                      clanAssignedPlayerEntity.clan.as("clan"));
         return queryFactory.select(clanAssignedPlayerDTO)
                            .from(clanAssignedPlayerEntity)

@@ -18,6 +18,7 @@ public class ClanMemberResponse {
     private Integer expLevel; // EXP 레벨
 
     private LeagueResponse league; // 리그 정보
+    private LeagueResponse leagueTier; // 리그 티어 정보
 
     private Integer trophies; // 현재 트로피
 

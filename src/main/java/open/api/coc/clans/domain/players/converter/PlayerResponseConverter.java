@@ -299,6 +299,8 @@ public class PlayerResponseConverter implements Converter<Player, PlayerResponse
         return PlayerResponse.builder()
                              .tag(source.getPlayerTag())
                              .name(source.getPlayerName())
+                             .trophies(source.getTrophies())
+                             .league(makeLeague(source.getLeague()))
                              .clan(makePlayerClanResponse(source.getClan()))
                              .build();
     }

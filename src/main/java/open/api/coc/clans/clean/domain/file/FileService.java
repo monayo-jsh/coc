@@ -15,9 +15,9 @@ public class FileService {
     private final FileRepository fileRepository;
 
     public FileUploadResponse upload(FileUploadCommand command) throws CustomRuntimeException {
-        String uploadPath = fileRepository.upload(command.uploadType(), command.uploadFile());
+        String uploadedPath = fileRepository.upload(command.uploadType().getPath(), command.uploadType().getFileName(), command.uploadFile());
 
-        return FileUploadResponse.of(command.uploadType(), uploadPath);
+        return FileUploadResponse.of(command.uploadType().getPath(), uploadedPath);
     }
 
     public Resource download(String downloadType, String fileName) {

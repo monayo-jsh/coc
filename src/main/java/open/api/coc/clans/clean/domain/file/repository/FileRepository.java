@@ -5,7 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface FileRepository {
 
-    String upload(String uploadType, MultipartFile file);
+    String upload(String uploadPath, String uploadFileName, MultipartFile file);
 
     Resource download(String downloadType, String fileName);
 

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -28,16 +29,15 @@ public class FileUploadLocalSystemService implements FileRepository {
     private final FileConfig fileConfig;
 
     @Override
-    public String upload(String uploadType, MultipartFile file) {
-        String uploadFileName = generateFileName(uploadType, file);
-        Path uploadPath = generateFilePath(uploadType, uploadFileName);
+    public String upload(String uploadPath, String uploadFileName, MultipartFile file) {
+        Path uploadFilePath = generateFilePath(uploadPath, uploadFileName);
 
         try {
             // 파일 업로드 진행
-            Files.createDirectories(uploadPath.getParent());
+            Files.createDirectories(uploadFilePath.getParent());
 
             try (InputStream inputStream = file.getInputStream()) {
-                Files.copy(inputStream, uploadPath);
+                Files.copy(inputStream, uploadFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
             CustomRuntimeException ex = new CustomRuntimeException(ExceptionCode.INTERNAL_ERROR);
@@ -45,7 +45,7 @@ public class FileUploadLocalSystemService implements FileRepository {
             throw ex;
         }
 
-        return uploadPath.toFile().getPath();
+        return uploadFilePath.toFile().getPath();
     }
 
     @Override
@@ -66,21 +66,10 @@ public class FileUploadLocalSystemService implements FileRepository {
         }
     }
 
-    private String generateFileName(String uploadType, MultipartFile file) {
-        String fileExtension = StringUtils.getFilenameExtension(file.getOriginalFilename());
-
-        String fileName = UUID.randomUUID().toString();
-        if ("CLAN-GAME".equals(uploadType.toUpperCase(Locale.ROOT))) {
-            fileName = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
-
-        return fileName + ".png";
-    }
-
-    private Path generateFilePath(String uploadType, String fileName) {
-        // #{upload-path}/#{uploadType}/file.ext
+    private Path generateFilePath(String uploadPath, String fileName) {
+        // #{upload-path}/#{uploadType}/{fileName}.ext
         return Path.of(fileConfig.getUploadPath(),
-                       uploadType.toLowerCase())
+                       uploadPath.toLowerCase())
                    .resolve(fileName);
     }
 }

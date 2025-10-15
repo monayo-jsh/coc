@@ -8,9 +8,11 @@
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" type="text/css" href="/css/common.css" />
   <link rel="stylesheet" type="text/css" href="/css/home.css" />
+  <link rel="stylesheet" type="text/css" href="/css/admin.css" />
 
   <script src="/js/common.js"></script>
   <script src="/js/util.js"></script>
+  <script src="/js/api/file.js"></script>
   <script src="/js/api/clan.js"></script>
   <script src="/js/api/player.js"></script>
 
@@ -34,6 +36,34 @@
       let clanAllPlayers = await fetchAllClanPlayers();
       exportExcel(clanAllPlayers);
     }
+
+    function clickUploadRulebook(element) {
+      if (!element) return;
+      let file = element.querySelector('#upload-rulebook');
+      if (file) {
+        file.click();
+      }
+    }
+
+    function changeFile(element) {
+      const { files } = element;
+      if (!files.length) {
+        return;
+      }
+
+      const [file] = files;
+
+      if (!confirm(`"${file.name}" 규정을 업로드하시겠습니까?`)) {
+        return;
+      }
+
+      const fileInfo = {
+        "uploadType": "RULE_BOOK"
+      }
+
+      uploadFile(fileInfo, file);
+    }
+
   </script>
 
   <title>클랜 운영기능</title>
@@ -51,10 +81,16 @@
         <div class="card-inner-group">
 
           <div class="cards">
-            <div class="card bg-black-2" onclick="renderPage('/clan/cms/season/manager'); return false;">
-              <p class="tip">시즌 관리</p>
-              <p class="second-text">(시즌종료일 설정)</p>
+            <div class="card bg-black-2 form-upload-rulebook" onclick="clickUploadRulebook(this);">
+              <p class="tip label">규정 업로드</p>
+              <p class="second-text">(규정 현행화)</p>
+              <input type="file" id="upload-rulebook" class="upload-rulebook" accept=".xlsx" onchange="changeFile(this); return false;">
             </div>
+
+<!--            <div class="card bg-black-2" onclick="renderPage('/clan/cms/season/manager'); return false;">-->
+<!--              <p class="tip">시즌 관리</p>-->
+<!--              <p class="second-text">(시즌종료일 설정)</p>-->
+<!--            </div>-->
 
             <div class="card bg-black-2" onclick="renderPage('/clan/cms/laboratory/manager'); return false;">
               <p class="tip">톡방 관리</p>

@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 public record FileUploadCommand(
 
     // 업로드 유형
-    String uploadType,
+    FileUploadType uploadType,
 
     // 업로드 파일
     MultipartFile uploadFile
@@ -18,13 +18,21 @@ public record FileUploadCommand(
 ) {
 
     public static FileUploadCommand create(FileUploadRequest fileInfo, MultipartFile file) throws BadRequestException {
-        FileUploadCommand instance = new FileUploadCommand(fileInfo.getUploadType(), file);
+        FileUploadType uploadType = FileUploadType.valueOf(fileInfo.getUploadType());
+        FileUploadCommand instance = new FileUploadCommand(uploadType, file);
         instance.validate();
         return instance;
     }
 
     private void validate() throws BadRequestException {
+        validateUploadType();
         validateFile();
+    }
+
+    private void validateUploadType() {
+        if (uploadType == null) {
+            throw new BadRequestException("업로드 유형을 확인해주세요.");
+        }
     }
 
     private void validateFile() throws BadRequestException {
@@ -39,12 +47,20 @@ public record FileUploadCommand(
     }
 
     private void validateFileExtension() throws BadRequestException {
-        List<String> allowedExtensions = List.of("JPG", "JPEG", "PNG");
+        List<String> allowedExtensions = getAllowedExtensions();
 
         String fileExtension = StringUtils.getFilenameExtension(this.uploadFile.getOriginalFilename());
         assert fileExtension != null;
         if (!allowedExtensions.contains(fileExtension.toUpperCase(Locale.ROOT))) {
             throw new BadRequestException("파일 확장자를 확인해주세요");
         }
+    }
+
+    private List<String> getAllowedExtensions() {
+        return switch (this.uploadType) {
+            case RULE_BOOK -> List.of("XLSX");
+            case CLAN_GAME -> List.of("JPG", "JPEG", "PNG");
+        };
+
     }
 }

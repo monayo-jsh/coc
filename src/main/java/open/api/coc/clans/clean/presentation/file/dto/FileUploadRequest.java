@@ -15,7 +15,7 @@ public class FileUploadRequest {
 
     @NotNull @NotEmpty
     @Schema(description = "업로드 유형")
-    @JsonProperty(value = "uploadType", defaultValue = "clan-game", required = true)
+    @JsonProperty(value = "uploadType", defaultValue = "CLAN_GAME", required = true)
     private final String uploadType;
 
 }

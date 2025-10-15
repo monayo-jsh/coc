@@ -10,10 +10,12 @@ import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerHeroEquipment;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.LeagueDistributionResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerSupportUpdateBulkRequest;
@@ -91,4 +93,6 @@ public interface PlayerUseCaseMapper {
     }
 
     PlayerLegendRecordResponse toPlayerLegendRecordResponse(PlayerRecordHistory playerLegendRecord);
+
+    LeagueDistributionResponse toLeagueDistribution(LeagueDistributionDTO leagueDistributionDTO);
 }

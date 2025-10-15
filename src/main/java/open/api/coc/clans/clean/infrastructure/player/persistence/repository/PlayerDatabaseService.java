@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
 import open.api.coc.clans.clean.infrastructure.clan.persistence.repository.JpaClanRepository;
@@ -144,6 +145,11 @@ public class PlayerDatabaseService implements PlayerRepository {
                                         .stream()
                                         .map(playerEntityMapper::toPlayerOnly)
                                         .toList();
+    }
+
+    @Override
+    public List<LeagueDistributionDTO> findLeagueDistribution() {
+        return jpaPlayerCustomRepository.findLeagueDistribution();
     }
 
 }

@@ -22,6 +22,7 @@ import open.api.coc.clans.clean.domain.league.service.LeagueService;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.domain.player.model.PlayerRecordHistory;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerDonationReceiveDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
@@ -33,6 +34,7 @@ import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.LeagueDistributionResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
 import open.api.coc.clans.clean.presentation.player.dto.RankingHallOfFameDonationResponse;
@@ -330,6 +332,15 @@ public class PlayerUseCase {
         return mapToPlayerResponse(latestPlayer);
     }
 
+    @Transactional(readOnly = true)
+    public List<LeagueDistributionResponse> getLeagueDistribution() {
+        List<LeagueDistributionDTO> leagueDistributionDTOS = playerService.findLeagueDistribution();
+        return leagueDistributionDTOS.stream()
+                                     .map(playerUseCaseMapper::toLeagueDistribution)
+                                     .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<RankingHeroEquipmentResponse> getRankingHeroEquipments(String clanTag) {
         // 최근 배정일을 가져온다.
         String latestAssignedDate = clanAssignService.findLatestAssignedMonth();
@@ -392,4 +403,5 @@ public class PlayerUseCase {
         // 닉네임을 저장한다.
         playerService.save(player);
     }
+
 }

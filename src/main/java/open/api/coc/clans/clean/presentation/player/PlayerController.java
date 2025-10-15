@@ -19,6 +19,7 @@ import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateBulk
 import open.api.coc.clans.clean.application.player.model.PlayerSupportUpdateCommand;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
+import open.api.coc.clans.clean.presentation.player.dto.LeagueDistributionResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerNicknameUpdateRequest;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerResponse;
@@ -235,6 +236,21 @@ public class PlayerController {
     public ResponseEntity<List<PlayerLegendRecordResponse>> getLegendRecord(@PathVariable String playerTag) {
         return ResponseEntity.status(HttpStatus.OK)
                              .body(playerUseCase.getLegendRecord(playerTag));
+    }
+
+    @Operation(
+        summary = "플레이어 리그 티어 현황 정보를 제공합니다. version: 1.00, Last Update: 25.10.15",
+        description = "이 API는 플레이어 티어 현황 정보를 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = RankingHeroEquipmentResponse.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/distribution/league-tier")
+    public ResponseEntity<List<LeagueDistributionResponse>> getLeagueDistribution() {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.getLeagueDistribution());
     }
 
     @Operation(

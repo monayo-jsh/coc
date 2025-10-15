@@ -8,6 +8,7 @@ import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsExcep
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.repository.PlayerRepository;
 import org.springframework.stereotype.Service;
@@ -113,4 +114,8 @@ public class PlayerService {
         return create(latestPlayer);
     }
 
+    @Transactional(readOnly = true)
+    public List<LeagueDistributionDTO> findLeagueDistribution() {
+        return playerRepository.findLeagueDistribution();
+    }
 }

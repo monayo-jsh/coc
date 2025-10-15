@@ -3,6 +3,7 @@ package open.api.coc.clans.clean.domain.player.repository;
 import java.util.List;
 import java.util.Optional;
 import open.api.coc.clans.clean.domain.player.model.Player;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 
 public interface PlayerRepository {
@@ -24,5 +25,7 @@ public interface PlayerRepository {
     List<Player> findTrophiesTierRanking(Integer pageSize);
 
     List<Player> findAttackWinsRanking(Integer pageSize);
+
+    List<LeagueDistributionDTO> findLeagueDistribution();
 
 }

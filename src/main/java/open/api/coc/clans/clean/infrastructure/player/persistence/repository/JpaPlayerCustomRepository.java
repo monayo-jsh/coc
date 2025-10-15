@@ -4,9 +4,12 @@ import static open.api.coc.clans.clean.infrastructure.player.persistence.entity.
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
+import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import org.springframework.stereotype.Repository;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class JpaPlayerCustomRepository {
 
+    private final EntityManager entityManager;
     private final JPAQueryFactory queryFactory;
 
     public List<String> findAllTag(PlayerSearchQuery query) {
@@ -95,4 +99,17 @@ public class JpaPlayerCustomRepository {
                            .execute();
     }
 
+    public List<LeagueDistributionDTO> findLeagueDistribution() {
+        String query = "select p.league_id, count(p.league_id) "
+                    + "from tb_player p "
+                    + "where p.league_id is not null "
+                    + "group by p.league_id";
+
+        List<Object[]> results = entityManager.createNativeQuery(query)
+                                              .getResultList();
+
+        return results.stream()
+                      .map(LeagueDistributionDTO::create)
+                      .toList();
+    }
 }

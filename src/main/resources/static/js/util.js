@@ -681,3 +681,30 @@ function isCapitalHighTier(clan) {
 
   return tier === 1
 }
+
+function downloadExcelFile(resource, downloadFileName) {
+  const mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  downloadFile(resource, downloadFileName, mimeType);
+}
+function downloadFile(resource, downloadFileName, mimeType) {
+  if (!resource) return;
+
+  // blob 데이터를 대상 파일로 변환
+  const blob = new Blob([resource], {
+    type: mimeType,
+  });
+
+  // Blob URL 생성
+  const url = window.URL.createObjectURL(blob);
+
+  // 임시 <a> 태그 생성해서 다운로드 트리거
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = downloadFileName; // 파일 이름 지정
+  document.body.appendChild(a);
+  a.click();
+
+  // 정리
+  a.remove();
+  window.URL.revokeObjectURL(url);
+}

@@ -16,6 +16,7 @@ const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/recor
 const URI_PLAYERS_LEGEND_RECORD_ORDER = `${PREFIX_PLAYER_API}/{playerTag}/legend/record/{order}`; //전설 기록 수집 등록 계정 조회 순서 설정
 
 const URI_PLAYERS_RANKING_HERO_EQUIPMENTS = `${PREFIX_PLAYER_API}/ranking/hero/equipments`; //영웅 장비 랭킹
+const URI_PLAYERS_DISTRIBUTION_LEAGUE_TIER = `${PREFIX_PLAYER_API}/distribution/league-tier`; //리그 티어 현황
 
 const URI_PLAYERS_RANKING_CURRENT_TROPHIES = `${PREFIX_PLAYER_API}/ranking/trophies` //현재 트로피 순위
 const URI_PLAYERS_RANKING_CURRENT_TIER_TROPHIES = `${PREFIX_PLAYER_API}/ranking/trophies/tier` //현재 티어 트로피 순위
@@ -210,6 +211,18 @@ async function insertSupportPlayerBulk(playerTags) {
 async function fetchRankingHeroEquipments(clanTag) {
   const uri = URI_PLAYERS_RANKING_HERO_EQUIPMENTS + `?clanTag=${encodeURIComponent(clanTag)}`;
   return await axios.get(uri)
+                    .then(response => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchDistributionLeagueTier() {
+  return await axios.get(URI_PLAYERS_DISTRIBUTION_LEAGUE_TIER)
                     .then(response => {
                       const { data } = response
                       return data;

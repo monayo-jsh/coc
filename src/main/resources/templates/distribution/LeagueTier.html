@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" CONTENT="no-cache">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
+
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" type="text/css" href="/css/common.css" />
+  <link rel="stylesheet" type="text/css" href="/css/button.css" />
+  <link rel="stylesheet" type="text/css" href="/css/distribution/leagueTier.css" />
+
+  <script src="/js/common.js"></script>
+  <script src="/js/util.js"></script>
+  <script src="/js/api/league.js"></script>
+  <script src="/js/api/player.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <script>
+
+    let leagueMap = {}
+    async function loadLeagues() {
+      // 리그 목록 조회
+      const leagues = await fetchLeagues();
+      leagues.map(league => {
+        leagueMap[league.id] = league;
+      });
+    }
+
+    function makeTierGroup(tierGroup) {
+        const { group, items } = tierGroup
+
+        const template = copyTemplateById('row-league-tier-template');
+        const groupRow = template.querySelector('.row');
+
+        groupRow.innerHTML = groupRow.innerHTML.replace(/{TIER_NAME}/, group);
+
+        const target = groupRow.querySelector('.items');
+        for (const tierInfo of items) {
+          const tierRow = makeLeagueTier(tierInfo);
+          target.appendChild(tierRow);
+        }
+
+        return groupRow;
+    }
+
+    function makeLeagueTier(leagueTier) {
+        const { leagueId, count } = leagueTier;
+
+        let leagueInfo = leagueMap[leagueId];
+        // 리그 정보 매핑 실패 시
+        if (!leagueInfo) {
+          leagueInfo = leagueMap[105000000]; // unranked
+        }
+
+        const { iconUrls } = leagueInfo;
+
+        let template = copyTemplateById('row-league-tier-item-template');
+        let row = template.querySelector('.item');
+
+        row.innerHTML = row.innerHTML.replace(/{COUNT}/, count);
+
+        let iconElement = row.querySelector('.league .icon');
+        iconElement.src = iconUrls.small;
+
+        return row;
+    }
+
+    function convertGroupByTier(tiers) {
+      const groupingTiers = tiers.reduce((acc, league) => {
+        let name = "Unranked";
+        const leagueInfo = leagueMap[league.leagueId];
+        if (leagueInfo) {
+          name = leagueInfo.name
+        }
+
+        // name에서 숫자 제거
+        const groupName = name.replace(/\s*\d+$/, '');
+
+        // 그룹 초기화
+        if (!acc[groupName]) {
+          acc[groupName] = [];
+        }
+
+        // 해당 그룹에 추가
+        acc[groupName].push(league);
+
+        return acc;
+      }, {});
+
+      return Object.entries(groupingTiers)
+                   .map(([group, items]) => ({
+                     group,
+                     items
+                   }))
+
+    }
+
+    async function drawDistributionLeagueTier() {
+        const leagueTiers = await fetchDistributionLeagueTier();
+        if (!leagueTiers) return;
+
+        const sortedTiers = leagueTiers.sort((a, b) => b.leagueId - a.leagueId);
+        const groupedTiers = convertGroupByTier(sortedTiers);
+        const target = document.querySelector('.contents');
+        for (const group of groupedTiers) {
+          const row = makeTierGroup(group);
+          target.appendChild(row);
+        }
+    }
+
+    window.onload = async () => {
+      // 리그 정보 셋업
+      await loadLeagues();
+      await drawDistributionLeagueTier();
+    }
+  </script>
+
+  <title>리그 티어 현황</title>
+</head>
+<body>
+  <div class="content-wrapper">
+    <div class="title">리그 티어 분포 현황</div>
+
+    <div class="contents"></div>
+  </div>
+</body>
+<template id="row-league-tier-template">
+  <div class="row">
+    <div class="tier">
+      <div>{TIER_NAME}</div>
+    </div>
+    <div class="items"></div>
+  </div>
+</template>
+<template id="row-league-tier-item-template">
+  <div class="item">
+    <div class="league">
+      <img class="icon" src="" alt="">
+    </div>
+    <div class="count">
+      <div>{COUNT}</div>
+    </div>
+  </div>
+</template>
+</html>

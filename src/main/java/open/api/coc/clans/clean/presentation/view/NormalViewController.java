@@ -74,6 +74,12 @@ public class NormalViewController {
         return "ranking/HeroEquipments";
     }
 
+    /** 티어 현황 */
+    @GetMapping("/distribution/league-tier")
+    public String distributionLeagueTier() {
+        return "distribution/LeagueTier";
+    }
+
     /** 습격전 현황 */
     @GetMapping("/capital/raid")
     public String capitalRaid() {

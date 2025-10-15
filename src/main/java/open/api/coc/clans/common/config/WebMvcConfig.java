@@ -2,6 +2,8 @@ package open.api.coc.clans.common.config;
 
 import java.time.Duration;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import open.api.coc.clans.controller.interceptors.KakaoRedirectInterceptor;
 import open.api.coc.clans.controller.interceptors.LoggerInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
@@ -10,6 +12,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
     public static final List<String> resourcePaths = List.of("/favicon.ico", "/js/**", "/css/**", "/images/**", "/lib/**");

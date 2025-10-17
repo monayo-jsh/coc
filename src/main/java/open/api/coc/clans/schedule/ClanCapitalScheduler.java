@@ -13,7 +13,7 @@ public class ClanCapitalScheduler {
     private final RaidUseCase raidUseCase;
 
     // 매주 월요일 오후 4시 0분부터 5분 간격으로 클랜 캐피탈 종료 데이터 수집
-    @Scheduled(cron = "0 0/5 16 ? * MON")
+    @Scheduled(cron = "${scheduling.collect.capital.ended}")
     public void raidScheduling() {
         raidUseCase.collectCapitalCurrentSeason();
     }

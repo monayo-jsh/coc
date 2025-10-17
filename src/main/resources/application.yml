@@ -82,6 +82,26 @@ cms:
 # 스케쥴링 활성화 여부
 scheduling:
   enabled: false
+  collect:
+    clan-war:
+      ended-sec: 60 # 클랜전 종료 수집
+      current: "0 */15 * * * *" # 클랜전 수집
+    capital:
+      ended: "0 0/5 16 ? * MON" # 캐피탈 종료
+    event:
+      team-legend:
+        enabled: false
+        min-record-milli-sec: 60000 # 팀 전설내기 분 단위 기록, 1분 (60 * 1000)
+        daily-record: "0 59 13 ? * *" # 팀 전설내기 일별 기록
+    player:
+      sync:
+        delay: 5000 # 서버 구동 후 실행 대기 (초)
+        milli-sec: 300000 # 동기화 시간 5분 (5 * 60 * 1000)
+      legend:
+        enabled: false
+        record-milli-sec: 10000 # 플레이어 기록, 10초 (10 * 1000) -> 전설 등록 사용자 수집
+  reset:
+    season: "0 1 14 ? * MON" # 시즌 초기화
 
 # 명예의전당 랭킹 표기 설정값
 hall-of-fame:

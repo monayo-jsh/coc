@@ -119,7 +119,7 @@
 
     async function initAssignedDate() {
       // await displayClanAssignedDate();
-      // await displayLeagueAssignedDate();
+      await displayLeagueAssignedDate();
     }
 
     async function drawNotice() {
@@ -319,10 +319,10 @@
           <div class="card bg-black-2" onclick="renderClanAssignedPage(); return false;">
             <p class="tip">클랜 배정 현황</p>
           </div>
-<!--          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">-->
-<!--            <p class="tip">리그 배정표</p>-->
-<!--            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>-->
-<!--          </div>-->
+          <div class="card bg-black-2" onclick="renderLeagueAssignedPage(); return false;">
+            <p class="tip">리그전 배정표</p>
+            <p class="second-text"><span class="league-assigned-date">(조회중)</span></p>
+          </div>
         </div>
 
         <div class="title">클랜원</div>

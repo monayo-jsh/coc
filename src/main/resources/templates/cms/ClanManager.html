@@ -34,6 +34,10 @@
   <script src="https://jsuites.net/v4/jsuites.js"></script>
   <link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css" type="text/css" />
 
+  <!-- toast-ui -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.11.10/dayjs.min.js" integrity="sha512-FwNWaxyfy2XlEINoSnZh1JQ5TRRtGow0D6XcmAWmYCRgvqOUTnzCxPc9uF35u5ZEpirk1uhlPVA19tflhvnW1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <script>
   dayjs.locale('ko')
@@ -722,7 +726,9 @@
                                          .replace(/{JOINED}/, convertJoinedLabel(isClanPlayer, isSupportPlayer));
 
         const infoAdditionalElement = playerInfo.querySelector('.info.additional');
-        renderAdditionalLabel(infoAdditionalElement, tag);
+        const playerTag = renderAdditionalLabel(infoAdditionalElement, tag);
+        playerTag.classList.add("cursor-pointer")
+        playerTag.onclick = () => copyClipboard(tag, "플레이어 태그");
 
         const roleLabel = renderAdditionalLabel(infoAdditionalElement, convRoleName(role));
         roleLabel.classList.add(role);

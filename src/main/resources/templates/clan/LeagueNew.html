@@ -1092,6 +1092,10 @@
 
     function drawClanRank(clanTag) {
       const clan = clanLeagueInfoMap.get(clanTag);
+      if (!clan) {
+        console.debug("drawClanRank failed.", clanTag, "is not found.");
+        return;
+      }
 
       const { tag, badgeUrls, warLeague, rank, leagueClanCount, totalStars, totalDestructionPercentage, count } = clan;
 
@@ -1287,6 +1291,10 @@
 
     async function drawLeagueRoundState(clanTag) {
       const clan = clanLeagueInfoMap.get(clanTag);
+      if (!clan) {
+        console.debug("drawLeagueRoundState failed.", clanTag, "is not found.");
+        return;
+      }
 
       const { tag, roundSize, rounds, badgeUrls } = clan;
 
@@ -1554,7 +1562,7 @@
             <div class="name">{CLAN_NAME}</div>
 
             <div class="hall">
-              <div class="town-hall th16"></div>
+              <div class="town-hall th17"></div>
               <span class="count">{CLAN_REMAIN_HALL}/{CLAN_TOTAL_HALL}</span>
             </div>
 
@@ -1609,7 +1617,7 @@
 
             <div class="hall">
               <span class="count">{OPPONENT_REMAIN_HALL}/{OPPONENT_TOTAL_HALL}</span>
-              <div class="town-hall th16"></div>
+              <div class="town-hall th17"></div>
             </div>
 
             <div class="stars">

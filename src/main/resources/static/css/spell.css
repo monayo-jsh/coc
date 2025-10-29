@@ -37,6 +37,9 @@
 .img-icon.overgrowth_spell {
   background-image: url(/images/spell/Overgrowth_Spell.png);
 }
+.img-icon.ice_block_spell {
+  background-image: url(/images/spell/Ice_Block_Spell.png);
+}
 .img-icon.poison_spell {
   background-image: url(/images/spell/Poison_Spell.png);
 }

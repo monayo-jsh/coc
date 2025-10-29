@@ -23,6 +23,7 @@ public enum SpellConfig {
     SKELETON_SPELL(SpellType.DARK_ELIXIR, 4, "Skeleton Spell", "해골 마법"),
     BAT_SPELL(SpellType.DARK_ELIXIR, 5, "Bat Spell", "박쥐 마법"),
     OVERGROWTH_SPELL(SpellType.DARK_ELIXIR, 6, "Overgrowth Spell", "과성장 마법"),
+    ICE_BLOCK_SPELL(SpellType.DARK_ELIXIR, 7, "Ice Block Spell", "얼음 블록 마법"),
 
     UNKNOWN(SpellType.UNKNOWN, 1, "unknown", "알 수 없음");
 

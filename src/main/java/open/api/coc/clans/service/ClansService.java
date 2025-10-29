@@ -29,6 +29,7 @@ import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanContentRepository;
+import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerQueryRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueAssignedPlayerRepository;
 import open.api.coc.clans.database.repository.clan.ClanLeagueWarRepository;
 import open.api.coc.clans.database.repository.clan.ClanRepository;
@@ -65,6 +66,7 @@ public class ClansService {
     private final ClanAssignedPlayerRepository clanAssignedPlayerRepository;
     private final ClanAssignedPlayerQueryRepository clanAssignedPlayerQueryRepository;
     private final ClanLeagueAssignedPlayerRepository clanLeagueAssignedPlayerRepository;
+    private final ClanLeagueAssignedPlayerQueryRepository clanLeagueAssignedPlayerQueryRepository;
 
     private final ClanLeagueWarRepository clanLeagueWarRepository;
 
@@ -252,12 +254,9 @@ public class ClansService {
 
     public ClanAssignedMemberListResponse getLatestLeagueAssignedMembers() {
 
-        String latestSeasonDate = clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
-        if (ObjectUtils.isEmpty(latestSeasonDate)) {
-            latestSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
+        String latestSeasonDate = clanLeagueAssignedPlayerQueryRepository.findLatestSeasonDate();
 
-        List<ClanAssignedPlayerDTO> clanAssignedPlayers = clanLeagueAssignedPlayerRepository.findBySeasonDate(latestSeasonDate);
+        List<ClanAssignedPlayerDTO> clanAssignedPlayers = clanLeagueAssignedPlayerQueryRepository.findAllBySeasonDate(latestSeasonDate);
 
         List<PlayerResponse> players = clanAssignedPlayers.stream()
                                                           .map(playerResponseConverter::convert)
@@ -267,10 +266,7 @@ public class ClansService {
     }
 
     public ClanAssignedMemberListResponse findClanLeagueAssignedMembers(String clanTag) {
-        String latestLeagueSeasonDate = clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
-        if (ObjectUtils.isEmpty(latestLeagueSeasonDate)) {
-            latestLeagueSeasonDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
-        }
+        String latestLeagueSeasonDate = clanLeagueAssignedPlayerQueryRepository.findLatestSeasonDate();
 
         List<ClanLeagueAssignedPlayerEntity> clanLeagueAssignedPlayers = clanLeagueAssignedPlayerRepository.findClanLeagueAssignedPlayersByClanTagAndSeasonDate(clanTag, latestLeagueSeasonDate);
 
@@ -455,6 +451,6 @@ public class ClansService {
     }
 
     public String getLatestLeagueAssignedDate() {
-        return clanLeagueAssignedPlayerRepository.findLatestLeagueSeasonDate();
+        return clanLeagueAssignedPlayerQueryRepository.findLatestSeasonDate();
     }
 }

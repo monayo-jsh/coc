@@ -325,12 +325,12 @@
       }
     }
 
-    let leagueMap = {}
+    let leagueMap = new Map();
     async function loadLeagues() {
       // 리그 목록 조회
       const leagues = await fetchLeagues();
       leagues.map(league => {
-        leagueMap[league.name] = league;
+        leagueMap.set(league.name, league);
       });
     }
 
@@ -362,7 +362,7 @@
       if (warLeagueIconClassName !== 'Unranked') {
         warLeagueElement.classList.add(warLeagueIconClassName);
       } else {
-        const leagueLabel = leagueMap[name];
+        const leagueLabel = leagueMap.get(name);
         if (leagueLabel) {
           const {iconUrls} = leagueLabel;
           const {small} = iconUrls;
@@ -380,7 +380,7 @@
       if (!capitalLeague) return;
 
       const { name } = capitalLeague;
-      const leagueLabel = leagueMap[name];
+      const leagueLabel = leagueMap.get(name);
       if (leagueLabel) {
         const { iconUrls } = leagueLabel;
         const { small } = iconUrls;

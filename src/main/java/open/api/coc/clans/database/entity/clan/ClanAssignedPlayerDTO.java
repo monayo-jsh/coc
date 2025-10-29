@@ -21,10 +21,11 @@ public class ClanAssignedPlayerDTO {
     private ClanEntity clan;
     private ClanEntity joinedClan;
 
-    public ClanAssignedPlayerDTO(String seasonDate, String playerTag, String playerName, ClanEntity clan) {
+    public ClanAssignedPlayerDTO(String seasonDate, String playerTag, String playerName, Integer trophies, ClanEntity clan) {
         this.seasonDate = seasonDate;
         this.playerTag = playerTag;
         this.playerName = playerName;
+        this.trophies = trophies;
         this.clan = clan;
     }
 

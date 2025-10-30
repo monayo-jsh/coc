@@ -62,7 +62,10 @@
         leagueIconImg.src = iconUrls.small;
       }
 
-      row.classList.add(`player-${removeHashTag(tag)}`)
+      row.classList.add('player-item', `player-${removeHashTag(tag)}`)
+
+      // set dataset
+      row.dataset.name = name;
 
       return row;
     }
@@ -230,10 +233,36 @@
       hideWifiLoading(".section");
     }
 
+    function initSearchPlayerName() {
+      // search event 등록
+      const searchKeyword = document.querySelector('#player-search-input');
+
+      searchKeyword.addEventListener('input', filterPlayer);
+    }
+
+    function filterPlayer(event) {
+      const keyword = event.target.value.trim();
+      const players = document.querySelectorAll('.player-item');
+
+      players.forEach(player => {
+        const name = player.dataset.name;
+
+        if (keyword && name.includes(keyword)) {
+          player.classList.remove('display-none');
+          player.querySelector('.name').classList.add('highlight')
+        } else {
+          player.classList.add('display-none');
+          player.querySelector('.name').classList.remove('highlight')
+        }
+      });
+    }
+
     window.onload = async () => {
       await loadLeagues();
 
       await drawAssignedMember();
+
+      initSearchPlayerName();
     }
   </script>
 
@@ -261,6 +290,9 @@
   <div class="assigned-label display-none"><div class="assigned-date"></div><div class="view-type"></div><div>배정표</div></div>
   <div class="assigned-legend">
     배정된 클랜에 가입되지 않은 계정은 <div class="clan-info chip">가입중인 클랜</div> 표기
+  </div>
+  <div class="assigned-legend">
+    계정 검색 <input id="player-search-input" class="ml-5 input player-search-input" type="text">
   </div>
   <div class="assigned-table-wrapper"></div>
 </div>

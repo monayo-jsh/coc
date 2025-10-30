@@ -813,3 +813,8 @@ select {
   padding: 5px;
   border-radius: 5px;
 }
+
+.highlight {
+  background-color: yellow;
+  font-weight: bold;
+}

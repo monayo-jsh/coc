@@ -49,6 +49,7 @@
 
       row.innerHTML = row.innerHTML
                          .replace(/{PLAYER_NAME}/, name)
+                         .replace(/{PLAYER_TAG}/, tag)
                          .replace(/{CLAN_NAME}/, clanName)
                          .replace(/{SCORE}/, trophies);
 
@@ -247,10 +248,16 @@
       players.forEach(player => {
         const name = player.dataset.name;
 
-        if (keyword && name.includes(keyword)) {
+        if (!keyword) {
+          // 입력값 없음
+          player.classList.remove('display-none');
+          player.querySelector('.name').classList.remove('highlight')
+        } else if (name.includes(keyword)) {
+          // 포함된 계정
           player.classList.remove('display-none');
           player.querySelector('.name').classList.add('highlight')
         } else {
+          // 미포함 계정
           player.classList.add('display-none');
           player.querySelector('.name').classList.remove('highlight')
         }
@@ -343,8 +350,9 @@
             <img class="icon" src="" alt="">
             <div class="score">{SCORE}</div>
           </div>
-          <div class="player">
+          <div class="player flex-gap">
             <div class="name">{PLAYER_NAME}</div>
+            <div class="chip">{PLAYER_TAG}</div>
             <div class="clan-info chip display-none">{CLAN_NAME}</div>
           </div>
         </div>

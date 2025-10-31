@@ -124,13 +124,13 @@
 
     async function drawNotice() {
       const notices = await fetchPostingNotices();
-      if (notices && !!notices.length) {
-        // 공지사항 있는 경우 버튼 노출
-        let btnNotice = document.querySelector('.card.btn-notice');
-        if (btnNotice) {
-          toggleDisplay(btnNotice); // show
-        }
-      }
+      // if (notices && !!notices.length) {
+      //   // 공지사항 있는 경우 버튼 노출
+      //   let btnNotice = document.querySelector('.card.btn-notice');
+      //   if (btnNotice) {
+      //     toggleDisplay(btnNotice); // show
+      //   }
+      // }
 
       renderNotices(notices);
       initSwipeEvent();

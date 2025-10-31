@@ -7,6 +7,11 @@
   background-size: contain;
 }
 
+
+.img-icon.Unranked {
+  background-image: url(/images/warleague/Unranked.png);
+}
+
 .img-icon.BronzeLeagueIII {
   background-image: url(/images/warleague/BronzeLeagueIII.png);
 }

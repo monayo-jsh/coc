@@ -708,3 +708,8 @@ function downloadFile(resource, downloadFileName, mimeType) {
   a.remove();
   window.URL.revokeObjectURL(url);
 }
+
+function isClanWarLeagueId(id) {
+  const clanWarLeagueIdPrefix = "29";
+  return String(id).startsWith(clanWarLeagueIdPrefix);
+}

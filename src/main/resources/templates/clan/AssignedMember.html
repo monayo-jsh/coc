@@ -187,8 +187,8 @@
           const aWarLeague = leagueMap.get(a.warLeague.name);
           const bWarLeague = leagueMap.get(b.warLeague.name);
 
-          // 리그순 > 선점순 > 내부 정렬순
-          return bWarLeague.id - aWarLeague.id || b.isLeagueOccupy - a.isLeagueOccupy || a.order - b.order;
+          // 선점순 > 리그순 > 내부 정렬순
+          return b.isLeagueOccupy - a.isLeagueOccupy || bWarLeague.id - aWarLeague.id || a.order - b.order;
         });
       }
 

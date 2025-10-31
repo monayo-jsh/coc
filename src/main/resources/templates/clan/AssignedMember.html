@@ -182,18 +182,37 @@
       const clans = await fetchWarClans(viewType);
 
       if (viewType === 'league') {
-        // 리그 & 클랜 정렬
-        return clans.sort((a, b) => {
-          const aWarLeague = leagueMap.get(a.warLeague.name);
-          const bWarLeague = leagueMap.get(b.warLeague.name);
-
-          // 선점순 > 리그순 > 내부 정렬순
-          return b.isLeagueOccupy - a.isLeagueOccupy || bWarLeague.id - aWarLeague.id || a.order - b.order;
+        // 선점제 그룹
+        const occupyClans = clans
+        .filter(c => c.isLeagueOccupy)
+        .sort((a, b) => {
+          const aId = getLeagueId(a.warLeague.name);
+          const bId = getLeagueId(b.warLeague.name);
+          if (aId !== bId) return bId - aId; // 리그 id 내림차순
+          return a.order - b.order; // order 오름차순
         });
+
+        // 동점제 그룹
+        const normalClans = clans
+        .filter(c => !c.isLeagueOccupy)
+        .sort((a, b) => {
+          const aId = getLeagueId(a.warLeague.name);
+          const bId = getLeagueId(b.warLeague.name);
+          if (aId !== bId) return bId - aId; // 리그 id 내림차순
+          return a.order - b.order;
+        });
+
+        // 병합
+        return [...occupyClans, ...normalClans];
       }
 
       // 클랜 정렬
-      return clans.sort((a, b) => a.order - b.order);
+      return [...clans].sort((a, b) => a.order - b.order);
+    }
+
+    function getLeagueId(warLeagueName) {
+        const league = leagueMap.get(warLeagueName)
+        return league ? league.id : 0;
     }
 
     async function renderJoinedFlag(clan, assignedTable, assignedMembers) {

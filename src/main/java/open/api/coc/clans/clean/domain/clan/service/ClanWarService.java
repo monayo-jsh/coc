@@ -22,6 +22,12 @@ public class ClanWarService {
     public ClanWarEntity findByIdOrThrow(Long warId) {
         return clanWarRepository.findById(warId).orElseThrow(() -> new ClanWarNotExistsException(warId));
     }
+
+    @Transactional(readOnly = true)
+    public ClanWarEntity findByClanTagAndPreparationStartTimeOrThrow(String clanTag, LocalDateTime preparationStartTime) {
+        return clanWarRepository.findByClanTagAndPreparationStartTime(clanTag, preparationStartTime).orElseThrow(() -> new ClanWarNotExistsException(clanTag, preparationStartTime));
+    }
+
     @Transactional(readOnly = true)
     public List<ClanWarDTO> findAllDTO(LocalDate startDate, LocalDate endDate) {
         LocalDateTime from = TimeUtils.withMinTime(startDate);

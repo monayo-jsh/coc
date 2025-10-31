@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberLeagueRecordQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberNecessaryAttackCommand;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
@@ -83,6 +84,18 @@ public class ClanWarUseCase {
 
         // 클랜 참여자의 필수 참석 여부를 전환한다.
         clanWar.changeMemberNecessaryAttack(playerTag);
+
+        // 클랜 참여자 정보를 저장한다.
+        clanWarService.save(clanWar);
+    }
+
+    @Transactional
+    public void changeClanWarMemberNecessaryAttack(ClanWarMemberNecessaryAttackCommand command) {
+        // 클랜 도메인 조회
+        ClanWarEntity clanWar = clanWarService.findByClanTagAndPreparationStartTimeOrThrow(command.clanTag(), command.preparationStartTime());
+
+        // 클랜 참여자의 필수 참석 여부를 전환한다.
+        clanWar.changeMemberNecessaryAttack(command.playerTag());
 
         // 클랜 참여자 정보를 저장한다.
         clanWarService.save(clanWar);
@@ -172,4 +185,6 @@ public class ClanWarUseCase {
                                    .map(clanWarUseCaseMapper::toClanWarParticipationStatusRecordResponse)
                                    .toList();
     }
+
+
 }

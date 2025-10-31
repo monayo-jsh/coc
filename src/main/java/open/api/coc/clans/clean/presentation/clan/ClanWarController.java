@@ -9,12 +9,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.application.clan.ClanWarUseCase;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberLeagueRecordQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberNecessaryAttackCommand;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberNecessaryAttackRequest;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackQuery;
@@ -34,6 +37,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -99,6 +103,25 @@ public class ClanWarController {
         ClanWarMemberQuery query = clanWarUseCaseMapper.toClanWarMemberQuery(clanTag, preparationStartTime, necessaryAttackYn);
         return ResponseEntity.status(HttpStatus.OK)
                              .body(clanWarUseCase.getClanWarParticipants(query));
+    }
+
+    @Operation(
+        summary = "클랜 전쟁 참여자의 필수 참여 여부를 수정한다. version: 1.00, Last Update: 25.10.31",
+        description = "이 API는 클랜 전쟁 참여자의 필수 참여 여부를 수정합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(schema = @Schema(implementation = Void.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @PutMapping("/{playerTag}/necessary")
+    public ResponseEntity<Void> putClanWarNecessaryAttack(@PathVariable String playerTag,
+                                                          @Valid @RequestBody ClanWarMemberNecessaryAttackRequest request) {
+
+        ClanWarMemberNecessaryAttackCommand command = clanWarUseCaseMapper.toClanWarNecessaryAttackCommand(request, playerTag);
+        clanWarUseCase.changeClanWarMemberNecessaryAttack(command);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                             .build();
     }
 
     @Operation(

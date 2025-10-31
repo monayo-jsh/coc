@@ -7,6 +7,7 @@ const URI_CLAN_WAR_PARTICIPANTS = `${PREFIX_CLAN_WAR_API}/participants` //클랜
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS = `${PREFIX_CLAN_WAR_API}/missing/attack` // 클랜전 미공 기록 조회
 const URI_CLAN_WAR_MISSING_ATTACK_PLAYERS_PERIOD = `${PREFIX_CLAN_WAR_API}/missing/attack/period` //클랜전 미공 기록 조회 - 기간
 
+const URI_CLAN_WAR_NECESSARY_ATTACK = `${PREFIX_CLAN_WAR_API}/{playerTag}/necessary` // 클랜전 참여 계정 강제 참여 여부 설정 - 클랜 태그, 준비 시간으로 설정
 const URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK = `${PREFIX_CLAN_WAR_API}/{warId}/{playerTag}/necessary` // 클랜전 참여 계정 강제 참여 여부 설정
 
 const URI_CLAN_WAR_PARTICIPATION_RECORD = `${PREFIX_CLAN_WAR_API}/participation/record` //클랜전 참여 기록 조회
@@ -126,6 +127,39 @@ async function fetchRankingClanLeagueWarStars(searchMonth, clanTag, searchType, 
 async function putClanWarNecessaryAttack(warId, playerTag) {
   const URI = URI_CLAN_WAR_MEMBER_NECESSARY_ATTACK.replace(/{warId}/, warId).replace(/{playerTag}/, encodeURIComponent(playerTag));
   return await axios.put(URI)
+                    .then((response) => {
+                      alert('처리 되었습니다.');
+                      return true;
+                    })
+                    .catch((error) => {
+                      let message = error.message;
+                      const { response } = error;
+                      if (response && response.data) {
+                        message = response.data;
+                      }
+
+                      alert(message);
+
+                      console.error(error);
+                      return false;
+                    })
+}
+
+async function putClanWarNecessaryAttackBy(clanTag, preparationStartTime, playerTag) {
+  const URI = URI_CLAN_WAR_NECESSARY_ATTACK.replace(/{playerTag}/, encodeURIComponent(playerTag));
+
+  const requestBody = {
+    clanTag, preparationStartTime
+  }
+
+  const jsonData = JSON.stringify(requestBody);
+  const options = {
+    headers: {
+      "Content-type": "application/json"
+    }
+  }
+
+  return await axios.put(URI, jsonData, options)
                     .then((response) => {
                       alert('처리 되었습니다.');
                       return true;

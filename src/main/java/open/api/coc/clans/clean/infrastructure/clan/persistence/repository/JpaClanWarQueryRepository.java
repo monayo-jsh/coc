@@ -34,6 +34,19 @@ public class JpaClanWarQueryRepository {
         return Optional.ofNullable(findClanWar);
     }
 
+    public Optional<ClanWarEntity> findByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime) {
+        BooleanBuilder condition = new BooleanBuilder();
+        condition.and(clanWarEntity.clanTag.eq(clanTag))
+                 .and(clanWarEntity.preparationStartTime.eq(preparationStartTime));
+
+        ClanWarEntity findClanWar = queryFactory.select(clanWarEntity)
+                                                .from(clanWarEntity)
+                                                .where(condition)
+                                                .fetchOne();
+
+        return Optional.ofNullable(findClanWar);
+    }
+
     public Optional<ClanWarDTO> findDTOById(Long warId) {
         BooleanBuilder condition = new BooleanBuilder();
         condition.and(clanWarEntity.warId.eq(warId));

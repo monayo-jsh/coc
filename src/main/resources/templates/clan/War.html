@@ -27,6 +27,7 @@
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/tippy.js@6"></script>
 
+  <script src="/js/api/auth.js"></script>
   <script src="/js/api/clan.js"></script>
   <script src="/js/api/clanWar.js"></script>
   <script src="/js/util.js"></script>
@@ -276,6 +277,25 @@
                                                                .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
     }
 
+    function changeForce(element) {
+        const playerRow = element.closest('.row');
+        const playerTag = playerRow.dataset.tag;
+
+        const tableTbody = playerRow.closest('.table-tbody');
+        const clanTag = tableTbody.dataset.tag;
+        const preparationStartTime = tableTbody.dataset.preparationStartTime;
+
+        putClanWarNecessaryAttackBy(clanTag, preparationStartTime, playerTag)
+        .then((result) => {
+          if (result) {
+            const chips = element.closest('.chips');
+            const forcedParticipateLabel = chips.querySelector('.chip.forced-participate');
+            toggleDisplay(forcedParticipateLabel)
+            element.remove();
+          }
+        });
+    }
+
     async function drawReportClanWarMissingAttack(clanWar) {
 
       const drawState = new Set(Array.from(['inWar', 'warEnded']));
@@ -300,6 +320,7 @@
       const tableTbody = tableTbodyTemplate.querySelector('.table-tbody');
 
       tableTbody.dataset.tag = clanData.tag;
+      tableTbody.dataset.preparationStartTime = preparationStartTime;
       tableTbody.dataset.name = clanData.name;
       tableTbody.dataset.order = clanData.order;
 
@@ -317,7 +338,14 @@
           });
 
           if (!isForcedParticipatePlayer) {
-            row.querySelector('.chip.forced-participate').remove();
+            let forcedParticipateLabel = row.querySelector('.chip.forced-participate');
+            toggleDisplay(forcedParticipateLabel);
+          }
+          let btnChangeForce = row.querySelector('.chip.change-force');
+          if ("admin" !== sessionStorage.getItem("mode") || isForcedParticipatePlayer) {
+            btnChangeForce.remove();
+          } else {
+            btnChangeForce.onclick = () => changeForce(btnChangeForce);
           }
           tableTbody.appendChild(row);
         }
@@ -368,6 +396,9 @@
                                                        .replace(/{TAG}/, player_tag)
                                                        .replace(/{CLAN_NAME}/, clan_name)
                                                        .replace(/{REMAIN_TIME}/, remain_time);
+
+      // set dataset
+      memberNotAttackRow.dataset.tag = player_tag;
 
       return memberNotAttackRow;
     }
@@ -559,13 +590,45 @@
 
           // 모든 클랜 그리기가 종료되었으면 정렬
           sortedMissingAttackTableTbody();
+
+          // 세션스토리지 초기화
+          sessionStorage.clear();
         }
       }, 1000);
+    }
+
+    function requiredActivate() {
+      const code = prompt("활성화 코드를 입력해주세요.");
+      if (!code) return;
+
+      verifySecretCode(code)
+      .then((result) => {
+        if (!result) return;
+
+        window.location.reload();
+      });
+    }
+
+    function initAdminActivate() {
+      const target = document.querySelector('.card-title');
+      let clickCount = 0;
+      let clickTimer;
+      target.addEventListener('click', () => {
+        clickCount++;
+        if (clickTimer) clearTimeout(clickTimer);
+        clickTimer = setTimeout(() => clickCount = 0, 2000); // 2초 이내
+        if (clickCount >= 5) {
+          requiredActivate();
+          clickCount = 0;
+        }
+      })
     }
 
     window.onload = async () => {
       await getClans();
       setIntervalSortMissingAttack();
+
+      initAdminActivate();
     }
   </script>
   <title>클랜전 현황</title>
@@ -839,6 +902,7 @@
       <div class="chips mt-5">
         <span class="chip border-none">{TAG}</span>
         <span class="forced-participate chip border-none bg-orange">강참</span>
+        <span class="change-force cursor-pointer chip border-none bg-orange">강참 설정</span>
       </div>
     </td>
     <td class="table-td"><span class="chip bg-green border-none">{CLAN_NAME}</span></td>

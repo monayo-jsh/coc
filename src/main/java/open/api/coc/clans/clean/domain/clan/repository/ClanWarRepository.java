@@ -10,6 +10,8 @@ import open.api.coc.clans.database.entity.clan.ClanWarEntity;
 public interface ClanWarRepository {
 
     Optional<ClanWarEntity> findById(Long warId);
+    Optional<ClanWarEntity> findByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime);
+
     List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to);
 
     Optional<ClanWarDTO> findDTOWithAllById(Long warId);

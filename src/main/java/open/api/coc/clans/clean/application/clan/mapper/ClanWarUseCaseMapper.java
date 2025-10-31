@@ -3,6 +3,8 @@ package open.api.coc.clans.clean.application.clan.mapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberLeagueRecordQuery;
+import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberNecessaryAttackCommand;
+import open.api.coc.clans.clean.presentation.clan.dto.war.ClanWarMemberNecessaryAttackRequest;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMemberRecordQuery;
 import open.api.coc.clans.clean.application.clan.dto.war.ClanWarMissingAttackPlayerQuery;
@@ -42,6 +44,10 @@ public abstract class ClanWarUseCaseMapper {
 
     public ClanWarMemberQuery toClanWarMemberQuery(String clanTag, Long preparationStartTime, String necessaryAttackYn) {
         return ClanWarMemberQuery.create(clanTag, mapToLocalDateTime(preparationStartTime), mapToYnType(necessaryAttackYn));
+    }
+
+    public ClanWarMemberNecessaryAttackCommand toClanWarNecessaryAttackCommand(ClanWarMemberNecessaryAttackRequest request, String playerTag) {
+        return ClanWarMemberNecessaryAttackCommand.create(request.clanTag(), mapToLocalDateTime(request.preparationStartTime()), playerTag);
     }
 
     public abstract ClanWarResponse toClanWarResponse(ClanWarDTO clanWar);
@@ -90,4 +96,5 @@ public abstract class ClanWarUseCaseMapper {
     protected long map(LocalDateTime time) {
         return timeConverter.toEpochMilliSecond(time);
     }
+
 }

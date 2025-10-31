@@ -28,6 +28,11 @@ public class ClanWarDatabaseService implements ClanWarRepository {
     }
 
     @Override
+    public Optional<ClanWarEntity> findByClanTagAndPreparationStartTime(String clanTag, LocalDateTime preparationStartTime) {
+        return queryRepository.findByClanTagAndPreparationStartTime(clanTag, preparationStartTime);
+    }
+
+    @Override
     public List<ClanWarDTO> findAllDTOByStartTime(LocalDateTime from, LocalDateTime to) {
         return queryRepository.findAllDTOByStartTime(from, to);
     }

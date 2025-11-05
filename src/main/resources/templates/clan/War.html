@@ -615,7 +615,20 @@
 
     const token = getToken();
 
+    function initTitle() {
+      const warType = getUriForClanWarViewType();
+      const warName = convWarTypeName(warType);
+      const warTitle = document.querySelector('.war-title');
+      warTitle.textContent = warName;
+
+      const warBgColor = getBgColorByWarType(warType);
+      let cardTitle = document.querySelector('.card-title');
+      cardTitle.classList.add(warBgColor);
+    }
+
     window.onload = async () => {
+      initTitle();
+
       await getClans();
       setIntervalSortMissingAttack();
 
@@ -647,7 +660,7 @@
   </div>
 
   <div class="card-container">
-    <div class="card-title">클랜전 현황</div>
+    <div class="card-title"><span class="war-title">클랜전</span> 현황</div>
     <div class="support-area">
       <div class="radio-inputs">
         <label class="radio item">

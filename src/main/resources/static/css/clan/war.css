@@ -12,7 +12,7 @@ body {
 
 .card-container {
   .card-title {
-    background-color: #515151;
+    border: none !important;
   }
 }
 

@@ -277,7 +277,7 @@
                                                                .replace(/{OPPONENT_AVERAGE_DURATION}/, calcAverageDuration(null));
     }
 
-    function changeForce(element) {
+    async function changeForce(element) {
         const playerRow = element.closest('.row');
         const playerTag = playerRow.dataset.tag;
 
@@ -285,15 +285,42 @@
         const clanTag = tableTbody.dataset.tag;
         const preparationStartTime = tableTbody.dataset.preparationStartTime;
 
-        putClanWarNecessaryAttackBy(clanTag, preparationStartTime, playerTag)
+        return await putClanWarNecessaryAttackBy(clanTag, preparationStartTime, playerTag)
         .then((result) => {
-          if (result) {
-            const chips = element.closest('.chips');
-            const forcedParticipateLabel = chips.querySelector('.chip.forced-participate');
-            toggleDisplay(forcedParticipateLabel)
-            element.remove();
-          }
+          return result;
         });
+    }
+
+    function displayForcedParticipation(isForcedParticipatePlayer, row) {
+      const forcedParticipateLabel = row.querySelector('.chip.forced-participate'); // 강참 라벨
+      const normalParticipateLabel = row.querySelector('.chip.normal-participate'); // 일반 라벨
+
+      if (token.isAdmin()) {
+        // 관리자 활성화 상태 클릭 이벤트 설정
+        forcedParticipateLabel.onclick = async () => {
+          let result = await changeForce(forcedParticipateLabel);
+          if (result) {
+            toggleDisplay(forcedParticipateLabel);
+            toggleDisplay(normalParticipateLabel);
+          }
+        };
+        normalParticipateLabel.onclick = async () => {
+          let result = await changeForce(normalParticipateLabel);
+          if (result) {
+            toggleDisplay(forcedParticipateLabel);
+            toggleDisplay(normalParticipateLabel);
+          }
+        };
+      }
+
+      if (isForcedParticipatePlayer) {
+        // 일반 라벨 비노출
+        toggleDisplay(normalParticipateLabel);
+      } else {
+        // 강참 라벨 비노출
+        toggleDisplay(forcedParticipateLabel);
+      }
+
     }
 
     async function drawReportClanWarMissingAttack(clanWar) {
@@ -337,16 +364,8 @@
             town_hall_level: townHallLevel,
           });
 
-          if (!isForcedParticipatePlayer) {
-            let forcedParticipateLabel = row.querySelector('.chip.forced-participate');
-            toggleDisplay(forcedParticipateLabel);
-          }
-          let btnChangeForce = row.querySelector('.chip.change-force');
-          if (!token.isAdmin() || isForcedParticipatePlayer) {
-            btnChangeForce.remove();
-          } else {
-            btnChangeForce.onclick = () => changeForce(btnChangeForce);
-          }
+          displayForcedParticipation(isForcedParticipatePlayer, row);
+
           tableTbody.appendChild(row);
         }
       }
@@ -874,7 +893,7 @@
       <div class="chips mt-5">
         <span class="chip border-none">{TAG}</span>
         <span class="forced-participate chip border-none bg-orange">강참</span>
-        <span class="change-force cursor-pointer chip border-none bg-orange">강참 설정</span>
+        <span class="normal-participate chip border-none bg-gray">일반</span>
       </div>
     </td>
     <td class="table-td"><span class="chip bg-green border-none">{CLAN_NAME}</span></td>

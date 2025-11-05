@@ -465,7 +465,7 @@ function convWarTypeName(type) {
   switch (type.toLowerCase()) {
     case 'none': return '클랜전';
     case 'league': return '리그전';
-    case 'parallel': return '병행클랜전';
+    case 'parallel': return '리그클랜전';
   }
   return type;
 }

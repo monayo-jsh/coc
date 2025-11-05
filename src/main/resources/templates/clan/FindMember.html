@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, email=no, address=no, date=no">
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
   <link rel="icon" href="/favicon.ico" />
   <link rel="stylesheet" href="/css/home.css" />
   <link rel="stylesheet" href="/css/common.css" />
@@ -21,6 +23,7 @@
 
   <script src="/js/common.js"></script>
   <script src="/js/util.js"></script>
+  <script src="/js/api/auth.js"></script>
   <script src="/js/api/league.js"></script>
   <script src="/js/api/clan.js"></script>
   <script src="/js/api/player.js"></script>
@@ -552,6 +555,11 @@
       renderSiegeMachines(memberHtml, player);
       renderSpells(memberHtml, player);
 
+      if (token.isAdmin()) {
+        let btnRemove = memberHtml.querySelector('.btn-member');
+        toggleDisplay(btnRemove)
+      }
+
       return memberHtml;
     }
 
@@ -675,6 +683,24 @@
       });
     }
 
+    function removeMember(element) {
+      const memberCard = element.closest('.member.row');
+      const { tag, name } = memberCard.dataset;
+
+      if (!confirm(`${name}(${tag}) 클랜원을 삭제하시겠습니까 ?`)) {
+        return;
+      }
+
+      deleteMember(tag)
+      .then((response) => {
+        const memberIndex = members.findIndex(member => member.tag === tag);
+        members.splice(memberIndex, 1);
+        drawMember(members);
+      });
+    }
+
+    const token = getToken();
+
     let latestClanAssignedPlayerObj = {}
     let latestLeagueAssignedPlayerObj = {}
     window.onload = async () => {
@@ -683,6 +709,8 @@
       latestLeagueAssignedPlayerObj = await latestLeagueAssignedMembers();
       initSearchKeyword();
       initSwitchCard();
+
+      initAdminActivate('title');
     }
 
     function copySearchedPlayerTags() {
@@ -789,6 +817,7 @@
           <div class="user">
             <div class="name chip">{NAME}</div>
             <div class="nickname chip cursor-pointer" onclick="changeNickname(this);">{NICKNAME}</div>
+            <i class="fa-regular fa-square-minus color-red btn-member cursor-pointer display-none" onclick="removeMember(this); return false;"></i>
           </div>
           <div class="player-labels">
           </div>

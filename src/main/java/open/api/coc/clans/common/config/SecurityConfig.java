@@ -59,7 +59,6 @@ public class SecurityConfig {
                                                        .requestMatchers(HttpMethod.POST, "/api/players/{playerTag}/legend/record").permitAll()
                                                        .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/legend/record/{order}").permitAll()
                                                        .requestMatchers(HttpMethod.PUT, "/api/players/{playerTag}/nickname").permitAll()
-                                                       .requestMatchers(HttpMethod.PUT, "/api/clan/war/{playerTag}/necessary").permitAll()
 //                                .requestMatchers(HttpMethod.POST, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.PUT, "/**").permitAll()
 //                                .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
@@ -83,7 +82,8 @@ public class SecurityConfig {
             makeUserDetails(username+"4", password, "ADMIN"),
             makeUserDetails(username+"5", password, "ADMIN"),
             makeUserDetails(username+"6", password, "ADMIN"),
-            makeUserDetails("coc-developer-1", password, "ADMIN")
+            makeUserDetails("coc-developer-1", password, "ADMIN"),
+            makeUserDetails("monayo", "1", "ADMIN")
         );
     }
 

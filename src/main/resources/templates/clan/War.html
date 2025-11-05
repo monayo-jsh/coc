@@ -342,7 +342,7 @@
             toggleDisplay(forcedParticipateLabel);
           }
           let btnChangeForce = row.querySelector('.chip.change-force');
-          if ("admin" !== sessionStorage.getItem("mode") || isForcedParticipatePlayer) {
+          if (!token.isAdmin() || isForcedParticipatePlayer) {
             btnChangeForce.remove();
           } else {
             btnChangeForce.onclick = () => changeForce(btnChangeForce);
@@ -590,45 +590,17 @@
 
           // 모든 클랜 그리기가 종료되었으면 정렬
           sortedMissingAttackTableTbody();
-
-          // 세션스토리지 초기화
-          sessionStorage.clear();
         }
       }, 1000);
     }
 
-    function requiredActivate() {
-      const code = prompt("활성화 코드를 입력해주세요.");
-      if (!code) return;
-
-      verifySecretCode(code)
-      .then((result) => {
-        if (!result) return;
-
-        window.location.reload();
-      });
-    }
-
-    function initAdminActivate() {
-      const target = document.querySelector('.card-title');
-      let clickCount = 0;
-      let clickTimer;
-      target.addEventListener('click', () => {
-        clickCount++;
-        if (clickTimer) clearTimeout(clickTimer);
-        clickTimer = setTimeout(() => clickCount = 0, 2000); // 2초 이내
-        if (clickCount >= 5) {
-          requiredActivate();
-          clickCount = 0;
-        }
-      })
-    }
+    const token = getToken();
 
     window.onload = async () => {
       await getClans();
       setIntervalSortMissingAttack();
 
-      initAdminActivate();
+      initAdminActivate('card-title');
     }
   </script>
   <title>클랜전 현황</title>

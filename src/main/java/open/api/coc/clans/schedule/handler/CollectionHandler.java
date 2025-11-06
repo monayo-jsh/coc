@@ -27,7 +27,7 @@ public class CollectionHandler {
         // 종료일이 설정된 경우: 종료일까지는 이전 달 시즌 유지
         if (!now.isAfter(customSeasonEndDate)) {
             LocalDate previousMonth = now.minusMonths(1);
-            return now.format(yyyyMM);
+            return previousMonth.format(yyyyMM);
         }
 
         // 종료일 이후부터는 현재 달 시즌

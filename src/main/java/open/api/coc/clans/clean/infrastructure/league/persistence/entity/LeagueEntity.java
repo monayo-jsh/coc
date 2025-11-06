@@ -49,6 +49,18 @@ public class LeagueEntity implements Persistable<Integer> {
         this.isNew = isNew;
     }
 
+    private static final int UNRANKED_TIER_ID = 105000000;
+    private static final int LEGEND_TIER_ID = 105000034;
+    public static boolean isLegend(int leagueId) {
+        return LEGEND_TIER_ID == leagueId;
+    }
+    public static int getUnrankedTierId() {
+        return UNRANKED_TIER_ID;
+    }
+    public static int getLegendTierId() {
+        return LEGEND_TIER_ID;
+    }
+
     // 기본값 설정을 위한 빌더 객체
     public static class LeagueEntityBuilder {
 

@@ -26,7 +26,7 @@ public class PlayerLegendScheduler {
             return;
         }
 
-        List<String> playerTags = playersService.findAllPlayersToRecord();
+        List<String> playerTags = playersService.findAllLegendTier();
         if (playerTags.isEmpty()) return;
         for(String playerTag : playerTags) {
             playerUseCase.synchronizePlayerFromSchedule("processForPlayerRecordKeeping", playerTag);

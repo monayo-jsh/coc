@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.player.model.dto.LeagueDistributionDTO;
 import open.api.coc.clans.clean.domain.player.model.dto.PlayerSearchQuery;
 import open.api.coc.clans.clean.domain.player.model.dto.RankingHeroEquipmentDTO;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import org.springframework.stereotype.Repository;
@@ -64,11 +65,9 @@ public class JpaPlayerCustomRepository {
     }
 
     public List<PlayerEntity> findTierTrophiesRanking(Integer pageSize) {
-        final int UNRANKED_LEAGUE_ID = 105000000;
-        final int LEGEND_LEAGUE_ID = 105000034;
         return queryFactory.select(playerEntity)
                            .from(playerEntity)
-                           .where(playerEntity.league.id.notIn(UNRANKED_LEAGUE_ID, LEGEND_LEAGUE_ID)) // 언랭크, 전설 리그
+                           .where(playerEntity.league.id.notIn(LeagueEntity.getUnrankedTierId(), LeagueEntity.getLegendTierId())) // 언랭크, 전설 리그
                            .orderBy(playerEntity.trophies.desc())
                            .offset(0)
                            .limit(pageSize)

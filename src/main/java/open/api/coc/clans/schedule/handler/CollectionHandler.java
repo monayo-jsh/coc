@@ -3,6 +3,7 @@ package open.api.coc.clans.schedule.handler;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.infrastructure.season.repository.JpaSeasonEndManagementQueryRepository;
@@ -13,6 +14,25 @@ import org.springframework.stereotype.Component;
 public class CollectionHandler {
 
     private final JpaSeasonEndManagementQueryRepository jpaSeasonEndManagementCustomRepository;
+
+    public static String getSeason(LocalDate customSeasonEndDate) {
+        final DateTimeFormatter yyyyMM = DateTimeFormatter.ofPattern("yyyyMM");
+
+        LocalDate now = LocalDate.now();
+        // 종료일이 없으면 오늘 날짜 기준 시즌 반환
+        if (customSeasonEndDate == null) {
+            return now.format(yyyyMM);
+        }
+
+        // 종료일이 설정된 경우: 종료일까지는 이전 달 시즌 유지
+        if (!now.isAfter(customSeasonEndDate)) {
+            LocalDate previousMonth = now.minusMonths(1);
+            return now.format(yyyyMM);
+        }
+
+        // 종료일 이후부터는 현재 달 시즌
+        return now.format(yyyyMM);
+    }
 
     public boolean isNotCollectionTime() {
         // 시즌 초기화는 매달 4번째주 월요일 초기화를 기준으로 함.

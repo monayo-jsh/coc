@@ -86,8 +86,8 @@ public class PlayerQueryRepository {
     public List<PlayerEntity> findAllWithoutRecordTarget() {
         return queryFactory.select(playerEntity)
                            .from(playerEntity)
-                           .leftJoin(playerRecordEntity).on(playerRecordEntity.tag.eq(playerEntity.playerTag))
-                           .where(playerRecordEntity.tag.isNull())
+                           .leftJoin(playerRecordEntity).on(playerRecordEntity.id.tag.eq(playerEntity.playerTag))
+                           .where(playerRecordEntity.id.tag.isNull())
                            .fetch();
     }
 }

@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import open.api.coc.clans.clean.common.event.Events;
 import open.api.coc.clans.clean.domain.player.event.SupportPlayerChangedEvent;
+import open.api.coc.clans.clean.infrastructure.league.persistence.entity.LeagueEntity;
 import open.api.coc.clans.database.entity.common.YnType;
 import open.api.coc.external.coc.config.HeroConfig;
 import org.springframework.util.StringUtils;
@@ -261,6 +262,10 @@ public class Player {
 
     public void changeNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public boolean isNotInLegend() {
+        return !LeagueEntity.isLegend(this.leagueId);
     }
 
     // 기본값 설정을 위한 빌더 객체

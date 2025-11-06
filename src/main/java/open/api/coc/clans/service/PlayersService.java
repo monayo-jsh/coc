@@ -250,11 +250,8 @@ public class PlayersService {
 
 
     @Transactional(readOnly = true)
-    public List<String> findAllPlayersToRecord() {
-        return playerRecordRepository.findAll()
-                                     .stream()
-                                     .map(PlayerRecordEntity::getTag)
-                                     .toList();
+    public List<String> findAllLegendTier() {
+        return playerRepository.findAllByLeagueTier(LeagueEntity.getLegendTierId());
     }
 
 }

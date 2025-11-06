@@ -378,13 +378,13 @@ public class PlayerUseCase {
         // 서버에 등록된 계정 조회 & 검증
         Player player = playerService.findByIdOrThrow(playerTag);
 
-        // 전설 기록 수집 계정 조회
-        PlayerRecordEntity playerRecord = legendRecordService.findByTagOrThrow(player.getTag());
-
-        // 조회 순서 업데이트
-        playerRecord.changeOrder(order);
-
-        legendRecordService.save(playerRecord);
+//        // 전설 기록 수집 계정 조회
+//        PlayerRecordEntity playerRecord = legendRecordService.findByTagOrThrow(player.getTag());
+//
+//        // 조회 순서 업데이트
+//        playerRecord.changeOrder(order);
+//
+//        legendRecordService.save(playerRecord);
     }
 
     @Transactional(readOnly = true)

@@ -88,7 +88,7 @@
                     '이름': name,
                     '태그': tag,
                     '클랜': clanName,
-                    '완파율': Number(completeStarRatio).toFixed(1),
+                    '완파율': completeStarRatio,
                     '총 공격수': Number(totalAttackCount).toLocaleString(),
                     '평균 파괴율': Number(totalDestructionPercentage).toLocaleString(),
                     '평균 완파시간': formatMinuteSecond(Number(avgDuration)),
@@ -139,14 +139,6 @@
             }
         }
 
-        function calcCompleteStarRatio(score, attackCount) {
-            let completeStarRatio = 0;
-            if (score > 0 && attackCount > 0) {
-                completeStarRatio = score / (attackCount * 3) * 100;
-            }
-            return completeStarRatio;
-        }
-
         function makeRankClanWarRow(player) {
             const rankingRowTemplate = document.querySelector('#clan-war-row-template');
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
@@ -162,7 +154,7 @@
                                .replace(/{CLAN_TAG_COLOR}/, isPageTypeClanWar() ? 'bg-green' : 'bg-crimson')
                                .replace(/{CLAN_NAME}/, clanName)
                                .replace(/{ATTACK_COUNT}/, totalAttackCount)
-                               .replace(/{RATIO}/g, Number(completeStarRatio).toFixed(2))
+                               .replace(/{RATIO}/g, completeStarRatio)
                                .replace(/{STARS}/g, Number(totalStars).toLocaleString())
                                .replace(/{THREE_STARS}/, Number(threeStars).toLocaleString())
                                .replace(/{TWO_STARS}/, Number(twoStars).toLocaleString())

@@ -14,6 +14,7 @@
   <script src="/js/util.js"></script>
   <script src="/js/api/file.js"></script>
   <script src="/js/api/clan.js"></script>
+  <script src="/js/api/clanWar.js"></script>
   <script src="/js/api/player.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -28,6 +29,30 @@
   </script>
 
   <script>
+    async function downloadAllMemberRecord() {
+      const season = prompt("조회할 날짜를 입력해주시겠습니까?\nex) 2025-01 or 2025-10");
+      if (!season) return;
+      if (!isValidYearMonth(season)) {
+        alert("날짜 입력 형식(YYYY-MM)을 확인해주세요.");
+        return;
+      }
+
+      const clanWarTargetSeason = dayjs(season).subtract(1, 'month').valueOf();
+      const leagueWarTargetSeason = dayjs(season).valueOf();
+
+      // 시즌 전설 기록 조회
+      const legendRecords = await fetchAllLegendRecordBySeason(season.replace("-", ""));
+      // 시즌 클랜전 기록 조회
+      const clanWarRecords = await fetchRankingClanWarStars(clanWarTargetSeason, "", "ALL");
+      // 시즌 리그전 기록 조회
+      const leagueWarRecords = await fetchRankingClanLeagueWarStars(leagueWarTargetSeason, "", "ALL")
+
+      exportMemberRecord({
+        legendRecords: legendRecords,
+        clanWarRecords: clanWarRecords,
+        leagueWarRecords: leagueWarRecords
+      })
+    }
     async function downloadAllClanMembers() {
       if (!confirm("전체 클랜원 정보를 다운받으시겠습니까?")) {
         return;
@@ -135,6 +160,11 @@
           <div class="cards">
             <div class="card bg-black-2" onclick="downloadAllClanMembers(); return false;">
               <p class="tip">전체 클랜원</p>
+              <p class="second-text">(엑셀 다운)</p>
+            </div>
+
+            <div class="card bg-black-2" onclick="downloadAllMemberRecord(); return false;">
+              <p class="tip">클랜원 성적</p>
               <p class="second-text">(엑셀 다운)</p>
             </div>
           </div>

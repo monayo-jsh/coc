@@ -11,6 +11,7 @@ const URI_PLAYERS_NICKNAME = `${PREFIX_PLAYER_API}/{playerTag}/nickname`; // 플
 const URI_PLAYERS_SUPPORT = `${PREFIX_PLAYER_API}/{playerTag}/support`; //지원 등록/해제
 const URI_PLAYERS_SUPPORT_BULK = `${PREFIX_PLAYER_API}/support/bulk`; //지원계정 일괄 등록
 
+const URI_PLAYERS_LEGEND_RECORD_SEASON = `${PREFIX_PLAYER_API}/legend/record/{season}`; //전설 기록 수집 시즌 조회
 const URI_PLAYERS_LEGEND_RECORD_TARGET = `${PREFIX_PLAYER_API}/legend/record/target`; //전설 기록 수집 등록 계정 태그 조회
 const URI_PLAYERS_LEGEND_RECORD = `${PREFIX_PLAYER_API}/{playerTag}/legend/record`; //전설 기록 수집 등록/조회
 const URI_PLAYERS_LEGEND_RECORD_ORDER = `${PREFIX_PLAYER_API}/{playerTag}/legend/record/{order}`; //전설 기록 수집 등록 계정 조회 순서 설정
@@ -284,6 +285,19 @@ async function fetchRankingPlayerDonations() {
 async function fetchRankingPlayerDonationsReceived() {
   return await axios.get(URI_PLAYERS_RANKING_DONATIONS_RECEIVED)
                     .then((response) => {
+                      const { data } = response
+                      return data;
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      return [];
+                    });
+}
+
+async function fetchAllLegendRecordBySeason(season) {
+  const uri = URI_PLAYERS_LEGEND_RECORD_SEASON.replace("{season}", season);
+  return await axios.get(uri)
+                    .then(response => {
                       const { data } = response
                       return data;
                     })

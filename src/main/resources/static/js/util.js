@@ -85,6 +85,141 @@ function formattedPlayers(players) {
   })
 }
 
+function formatPlayers(players = new Map()) {
+  return [...players].map(([key, value]) => {
+    return {
+      '이름': value.name,
+      '태그': value.tag,
+      '타운홀': value.townHallLevel,
+      '전설 트로피': value.trophies,
+      '총 완파율': calcCompleteStarRatio(value.totalStars, value.totalAttackCount),
+      '총 공격수': value.totalAttackCount,
+      '총 획득별': value.totalStars,
+      '총 3별수': value.totalThreeStars,
+      '총 2별수': value.totalTwoStars,
+      '총 1별수': value.totalOneStars,
+      '총 0별수': value.totalZeroStars,
+      '클랜전 완파율': calcCompleteStarRatio(value.clanTotalStars, value.clanTotalAttackCount),
+      '클랜전 총 공격수': value.clanTotalAttackCount,
+      '클랜전 총 획득별': value.clanTotalStars,
+      '클랜전 총 3별수': value.clanTotalThreeStars,
+      '클랜전 총 2별수': value.clanTotalTwoStars,
+      '클랜전 총 1별수': value.clanTotalOneStars,
+      '클랜전 총 0별수': value.clanTotalZeroStars,
+      '리그전 완파율': calcCompleteStarRatio(value.leagueTotalStars, value.leagueTotalAttackCount),
+      '리그전 공격수': value.leagueTotalAttackCount,
+      '리그전 획득별': value.leagueTotalStars,
+      '리그전 3별수': value.leagueTotalThreeStars,
+      '리그전 2별수': value.leagueTotalTwoStars,
+      '리그전 1별수': value.leagueTotalOneStars,
+      '리그전 0별수': value.leagueTotalZeroStars,
+    };
+  })
+}
+
+// 클랜원 기록 다운로드 함수
+function exportMemberRecord(record) {
+  const { legendRecords, clanWarRecords, leagueWarRecords } = record;
+
+  const result = new Map();
+
+  appendLegendRecord(legendRecords, result);
+  appendWarRecord('clan', clanWarRecords, result);
+  appendWarRecord('league', leagueWarRecords, result);
+
+  const players = formatPlayers(result);
+  const fileName = `클랜원_성적_${dayjs().format('YYYYMMDDHHmmss')}.xlsx`;
+  writeExcelFile(fileName, players)
+
+  function appendWarRecord(type, warRecords, result) {
+    for (const war of warRecords) {
+      const { tag, name, townHallLevel, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars } = war
+
+      let player = result.get(tag);
+      if (!player) {
+        player = {
+          tag: tag,
+          name: name,
+          trophies: 0,
+          totalAttackCount: 0,
+          totalDestructionPercentage: 0,
+          totalStars: 0,
+          totalThreeStars: 0,
+          totalTwoStars: 0,
+          totalOneStars: 0,
+          totalZeroStars: 0,
+          clanTotalAttackCount: 0,
+          clanTotalStars: 0,
+          clanTotalThreeStars: 0,
+          clanTotalTwoStars: 0,
+          clanTotalOneStars: 0,
+          clanTotalZeroStars: 0,
+          leagueTotalAttackCount: 0,
+          leagueTotalStars: 0,
+          leagueTotalThreeStars: 0,
+          leagueTotalTwoStars: 0,
+          leagueTotalOneStars: 0,
+          leagueTotalZeroStars: 0
+        }
+      }
+
+      player.townHallLevel = townHallLevel;
+      // 합산
+      player.totalAttackCount += totalAttackCount;
+      player.totalStars += totalStars;
+      player.totalThreeStars += threeStars;
+      player.totalTwoStars += twoStars;
+      player.totalOneStars += oneStars;
+      player.totalZeroStars += zeroStars;
+      // 전쟁별
+      player[`${type}TotalAttackCount`] = totalAttackCount;
+      player[`${type}TotalStars`] = totalStars;
+      player[`${type}TotalThreeStars`] = threeStars;
+      player[`${type}TotalTwoStars`] = twoStars;
+      player[`${type}TotalOneStars`] = oneStars;
+      player[`${type}TotalZeroStars`] = zeroStars;
+
+      result.set(tag, player);
+    }
+  }
+  function appendLegendRecord(legendRecords, result) {
+    for (const legend of legendRecords) {
+      const {tag, name, trophies} = legend;
+
+      let player = result.get(tag);
+      if (!player) {
+        player = {
+          totalAttackCount: 0,
+          totalDestructionPercentage: 0,
+          totalStars: 0,
+          totalThreeStars: 0,
+          totalTwoStars: 0,
+          totalOneStars: 0,
+          totalZeroStars: 0,
+          clanTotalAttackCount: 0,
+          clanTotalStars: 0,
+          clanTotalThreeStars: 0,
+          clanTotalTwoStars: 0,
+          clanTotalOneStars: 0,
+          clanTotalZeroStars: 0,
+          leagueTotalAttackCount: 0,
+          leagueTotalStars: 0,
+          leagueTotalThreeStars: 0,
+          leagueTotalTwoStars: 0,
+          leagueTotalOneStars: 0,
+          leagueTotalZeroStars: 0
+        }
+      }
+
+      player.tag = tag;
+      player.name = name;
+      player.trophies = trophies;
+
+      result.set(tag, player);
+    }
+  }
+}
+
 /**
  * 엑셀 다운로드 기능
  * @param members
@@ -215,26 +350,26 @@ function calcHeroLevelSum(heroes) {
 function sortByTrophies(members) {
   // 트로피 순 > 이름 순
   return members.map(member => {
-                  // 정렬을 위한 기본티어 설정 (Unranked)
-                  member.sortTier = 105000000;
-                  // 정렬을 위한 트로피 설정
-                  member.sortTrophies = member.trophies
-                  const { league } = member;
+    // 정렬을 위한 기본티어 설정 (Unranked)
+    member.sortTier = 105000000;
+    // 정렬을 위한 트로피 설정
+    member.sortTrophies = member.trophies
+    const { league } = member;
 
-                  if (!league) {
-                    // 리그 정보 없는 경우
-                    member.sortTrophies = -1;
-                  } else {
-                    member.sortTier = league.id;
+    if (!league) {
+      // 리그 정보 없는 경우
+      member.sortTrophies = -1;
+    } else {
+      member.sortTier = league.id;
 
-                    if (league.name === 'Unranked') {
-                      // 언랭크
-                      member.sortTrophies = -1;
-                    }
-                  }
+      if (league.name === 'Unranked') {
+        // 언랭크
+        member.sortTrophies = -1;
+      }
+    }
 
-                  return member;
-                })
+    return member;
+  })
                 .sort((a, b) => b.sortTier - a.sortTier || b.sortTrophies - a.sortTrophies || b.name.localeCompare(a.name));
 }
 
@@ -302,7 +437,7 @@ function formatYYMMDDHHMM(date) {
 function getMinutesDifferenceFromNow(dateStr) {
   const givenDate = dayjs(dateStr); // 주어진 날짜를 dayjs 객체로 변환
   const now = dayjs(); // 현재 시간
-   // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
+  // 현재 시간과 주어진 시간의 차이를 분 단위로 계산
   return Number(now.diff(givenDate, 'minute'));
 }
 
@@ -646,7 +781,7 @@ function convertMarkdownImageToTag(text) {
   const markdownImagePattern = /^!\[image]\(([^)]+)\)/g
 
   return targetWord.replace(markdownImagePattern, (match, url) => {
-      return `<img class="clan-game-reward" src="${url}" alt="">`;
+    return `<img class="clan-game-reward" src="${url}" alt="">`;
   });
 }
 
@@ -712,4 +847,17 @@ function downloadFile(resource, downloadFileName, mimeType) {
 function isClanWarLeagueId(id) {
   const clanWarLeagueIdPrefix = "29";
   return String(id).startsWith(clanWarLeagueIdPrefix);
+}
+
+function isValidYearMonth(value) {
+  const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
+  return regex.test(value);
+}
+
+function calcCompleteStarRatio(score, attackCount) {
+  let completeStarRatio = 0;
+  if (score > 0 && attackCount > 0) {
+    completeStarRatio = score / (attackCount * 3) * 100;
+  }
+  return Number(completeStarRatio).toFixed(2);
 }

@@ -347,6 +347,21 @@ public class PlayerController {
     }
 
     @Operation(
+        summary = "전설 기록 수집된 플레이어 정보를 제공합니다. version: 1.00, Last Update: 25.11.07",
+        description = "이 API는 전설 기록 수집된 플레이어 정보를 제공합니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "성공 응답 Body", content = @Content(array = @ArraySchema(arraySchema = @Schema(implementation = PlayerLegendRecordTargetDTO.class)))),
+        @ApiResponse(responseCode = "404", description = "플레이어 정보 없음", content = @Content(schema = @Schema(implementation = String.class))),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Object.class)))
+    })
+    @GetMapping("/legend/record/{season}")
+    public ResponseEntity<List<PlayerLegendRecordTargetDTO>> getPlayerLegendRecords(@PathVariable String season) {
+        return ResponseEntity.status(HttpStatus.OK)
+                             .body(playerUseCase.findAllLegendRecords(season));
+    }
+
+    @Operation(
         summary = "전설 기록 수집 등록된 플레이어 태그 목록을 제공합니다. version: 1.00, Last Update: 24.10.31",
         description = "이 API는 전설 기록 수집 등록된 플레이어 태그 목록을 제공합니다."
     )

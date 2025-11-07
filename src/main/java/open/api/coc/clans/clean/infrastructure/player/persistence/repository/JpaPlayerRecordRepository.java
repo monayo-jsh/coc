@@ -15,6 +15,14 @@ public interface JpaPlayerRecordRepository extends JpaRepository<PlayerRecordEnt
         value = "select new open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO(pr.id.tag, pr.order, p.name, p.expLevel, p.trophies) "
             + "from PlayerRecordEntity pr "
             + "join PlayerEntity p on p.playerTag = pr.id.tag "
+            + "where pr.id.season = :season "
+            + "order by pr.id.tag ")
+    List<PlayerLegendRecordTargetDTO> findAllBySeason(String season);
+
+    @Query(
+        value = "select new open.api.coc.clans.clean.domain.player.model.dto.PlayerLegendRecordTargetDTO(pr.id.tag, pr.order, p.name, p.expLevel, p.trophies) "
+            + "from PlayerRecordEntity pr "
+            + "join PlayerEntity p on p.playerTag = pr.id.tag "
             + "where p.name like concat(:name, '%') "
             + "or p.nickname like concat(:name, '%') "
             + "order by pr.id.tag ")

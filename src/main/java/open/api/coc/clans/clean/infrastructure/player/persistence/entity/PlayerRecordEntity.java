@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PostLoad;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -22,7 +23,10 @@ import org.springframework.data.domain.Persistable;
 @AllArgsConstructor
 @Entity
 @Table(
-    name = "tb_player_record"
+    name = "tb_player_record",
+    indexes = {
+        @Index(name = "IDX_PLAYER_RECORD_SEASON", columnList = "season")
+    }
 )
 @Comment("플레이어 기록 설정 테이블")
 public class PlayerRecordEntity implements Persistable<PlayerRecordPK> {

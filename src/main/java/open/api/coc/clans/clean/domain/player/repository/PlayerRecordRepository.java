@@ -9,6 +9,8 @@ import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerR
 public interface PlayerRecordRepository {
 
     List<PlayerLegendRecordTargetDTO> findAllByNameOrNickname(String playerName);
+    List<PlayerLegendRecordTargetDTO> findAllBySeason(String season);
+
     boolean existsByTag(PlayerRecordPK id);
 
     Optional<PlayerRecordEntity> findById(PlayerRecordPK id);

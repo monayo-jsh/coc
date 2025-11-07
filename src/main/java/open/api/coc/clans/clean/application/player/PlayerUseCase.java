@@ -32,7 +32,6 @@ import open.api.coc.clans.clean.domain.player.service.PlayerLegendRecordService;
 import open.api.coc.clans.clean.domain.player.service.PlayerRankingService;
 import open.api.coc.clans.clean.domain.player.service.PlayerService;
 import open.api.coc.clans.clean.domain.player.service.PlayerSupportService;
-import open.api.coc.clans.clean.infrastructure.player.persistence.entity.PlayerRecordEntity;
 import open.api.coc.clans.clean.presentation.common.dto.RankingHallOfFameResponse;
 import open.api.coc.clans.clean.presentation.player.dto.LeagueDistributionResponse;
 import open.api.coc.clans.clean.presentation.player.dto.PlayerLegendRecordResponse;
@@ -404,4 +403,8 @@ public class PlayerUseCase {
         playerService.save(player);
     }
 
+    @Transactional(readOnly = true)
+    public List<PlayerLegendRecordTargetDTO> findAllLegendRecords(String season) {
+        return legendRecordService.findAllBySeason(season);
+    }
 }

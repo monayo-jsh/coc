@@ -1,19 +1,14 @@
 package open.api.coc.clans.clean.domain.player.service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import open.api.coc.clans.clean.domain.league.model.League;
 import open.api.coc.clans.clean.domain.league.repository.LeagueRepository;
-import open.api.coc.clans.clean.domain.player.exception.PlayerAlreadyExistsException;
-import open.api.coc.clans.clean.domain.player.exception.PlayerNotFoundException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotLeagueException;
 import open.api.coc.clans.clean.domain.player.exception.PlayerNotLegendLeagueException;
 import open.api.coc.clans.clean.domain.player.model.Player;
@@ -136,6 +131,10 @@ public class PlayerLegendRecordService {
 //        recordRepository.deleteById(playerTag);
     }
 
+    public List<PlayerLegendRecordTargetDTO> findAllBySeason(String season) {
+        return recordRepository.findAllBySeason(season);
+    }
+
     public List<PlayerLegendRecordTargetDTO> findAllTagByName(String name) {
         if (!StringUtils.hasText(name)) return Collections.emptyList();
 
@@ -150,4 +149,5 @@ public class PlayerLegendRecordService {
     public void save(PlayerRecordEntity playerRecord) {
         recordRepository.save(playerRecord);
     }
+
 }

@@ -22,6 +22,11 @@ public class PlayerRecordDatabaseService implements PlayerRecordRepository {
     }
 
     @Override
+    public List<PlayerLegendRecordTargetDTO> findAllBySeason(String season) {
+        return jpaPlayerRecordRepository.findAllBySeason(season);
+    }
+
+    @Override
     public boolean existsByTag(PlayerRecordPK id) {
         return jpaPlayerRecordRepository.existsById(id);
     }

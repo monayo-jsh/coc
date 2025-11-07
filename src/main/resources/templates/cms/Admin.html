@@ -37,11 +37,12 @@
         return;
       }
 
+      const legendSeason = dayjs(season).subtract(1, 'month').format('YYYYMM');
       const clanWarTargetSeason = dayjs(season).subtract(1, 'month').valueOf();
       const leagueWarTargetSeason = dayjs(season).valueOf();
 
       // 시즌 전설 기록 조회
-      const legendRecords = await fetchAllLegendRecordBySeason(season.replace("-", ""));
+      const legendRecords = await fetchAllLegendRecordBySeason(legendSeason);
       // 시즌 클랜전 기록 조회
       const clanWarRecords = await fetchRankingClanWarStars(clanWarTargetSeason, "", "ALL");
       // 시즌 리그전 기록 조회

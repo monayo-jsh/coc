@@ -51,25 +51,40 @@ public class PlayerLegendRecordService {
 
     @Transactional
     public void createHistoryIfNotLegendLeagueExcept(Player originPlayer, Player latestPlayer) {
-        if (isNotRecording(originPlayer, latestPlayer)) return;
-        if (latestPlayer.isNotInLeague()) return;  // 리그 배정 안된 상태면 기록하지 않음 (시즌 초기화 등..)
-        if (latestPlayer.isNotInLegend()) return;  // 전설 리그 아닌 경우 기록하지 않음
 
-        recordSeasonTrophies(latestPlayer);
+        String baseSeason = getBaseSeason();
+
+        PlayerRecordPK playerRecordId = PlayerRecordPK.create(originPlayer.getTag(), baseSeason);
+
+        if (isNotRecording(originPlayer, latestPlayer)) return;
+        if (latestPlayer.isNotInLeague()) {
+            // 리그 배정 안된 상태면 기록하지 않음 (시즌 초기화 등..)
+            recordRepository.deleteById(playerRecordId);
+            return;
+        }
+        if (latestPlayer.isNotInLegend()) {
+            // 전설 리그 아닌 경우 기록하지 않음
+            recordRepository.deleteById(playerRecordId);
+            return;
+        }
+
+        recordSeasonTrophies(playerRecordId, latestPlayer);
         createRecordHistory(originPlayer, latestPlayer);
     }
 
-    private void recordSeasonTrophies(Player latestPlayer) {
+    private String getBaseSeason() {
         LocalDate latestSeasonEndDate = null;
         List<LocalDate> latestSeasonEndDates = seasonRepository.findLatestSeasonEndDate(1);
         if (!latestSeasonEndDates.isEmpty()) {
             latestSeasonEndDate = latestSeasonEndDates.get(0);
         }
 
-        String baseSeason = CollectionHandler.getSeason(latestSeasonEndDate);
+        return CollectionHandler.getSeason(latestSeasonEndDate);
+    }
 
-        PlayerRecordPK playerRecordPK = PlayerRecordPK.create(latestPlayer.getTag(), baseSeason);
-        Optional<PlayerRecordEntity> findPlayerSeasonRecord = recordRepository.findById(playerRecordPK);
+    private void recordSeasonTrophies(PlayerRecordPK playerRecordId, Player latestPlayer) {
+
+        Optional<PlayerRecordEntity> findPlayerSeasonRecord = recordRepository.findById(playerRecordId);
 
         if (findPlayerSeasonRecord.isPresent()) {
             PlayerRecordEntity updatePlayerRecord = findPlayerSeasonRecord.get();
@@ -78,7 +93,7 @@ public class PlayerLegendRecordService {
             return;
         }
 
-        PlayerRecordEntity newPlayerRecord = PlayerRecordEntity.create(playerRecordPK, latestPlayer.getTrophies());
+        PlayerRecordEntity newPlayerRecord = PlayerRecordEntity.create(playerRecordId, latestPlayer.getTrophies());
         recordRepository.save(newPlayerRecord);
     }
 

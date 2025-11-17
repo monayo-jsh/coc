@@ -16,6 +16,7 @@ public enum SpellConfig {
     INVISIBILITY_SPELL(SpellType.ELIXIR, 7, "Invisibility Spell", "투명 마법"),
     RECALL_SPELL(SpellType.ELIXIR, 8, "Recall Spell", "복귀 마법"),
     REVIVE_SPELL(SpellType.ELIXIR, 8, "Revive Spell", "소생 마법"),
+    TOTEM_SPELL(SpellType.ELIXIR, 9, "Totem Spell", "토템 마법"),
 
     POISON_SPELL(SpellType.DARK_ELIXIR, 1, "Poison Spell", "독 마법"),
     EARTHQUAKE_SPELL(SpellType.DARK_ELIXIR, 2, "Earthquake Spell", "지진 마법"),

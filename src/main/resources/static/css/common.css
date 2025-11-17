@@ -93,6 +93,7 @@ body::before {
       url("/images/pets/Spirit_Fox.png");
       url("/images/pets/Angry_Jelly.png");
 
+      url("/images/townhall/18.png");
       url("/images/townhall/17.png");
       url("/images/townhall/16.png");
       url("/images/townhall/15.png");
@@ -134,6 +135,7 @@ body::before {
       url("/images/spell/Rage_Spell.png");
       url("/images/spell/Recall_Spell.png");
       url("/images/spell/Skeleton_Spell.png");
+      url("/images/spell/Totem_Spell.png");
       url("/images/spell/Revive_Spell.png");
 }
 

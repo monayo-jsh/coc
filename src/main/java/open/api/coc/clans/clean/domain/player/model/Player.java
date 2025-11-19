@@ -244,10 +244,11 @@ public class Player {
         // 트로피 점수 다른 경우 기록
         if (!Objects.equals(this.trophies, originPlayer.getTrophies())) {
 
-            if (this.trophies - originPlayer.getTrophies() > 80) {
-                // 플레이어 트로피 값이 초기화되지 않은 상태로 넘어온 경우 기록하지 않도록 예외 처리 기준 설정
-                return false;
-            }
+            // 랭킹전은 매주 초기화되어 주석
+//            if (this.trophies - originPlayer.getTrophies() > 80) {
+//                // 플레이어 트로피 값이 초기화되지 않은 상태로 넘어온 경우 기록하지 않도록 예외 처리 기준 설정
+//                return false;
+//            }
 
             return true;
         }

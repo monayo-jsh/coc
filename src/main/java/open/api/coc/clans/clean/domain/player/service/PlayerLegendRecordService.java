@@ -63,7 +63,7 @@ public class PlayerLegendRecordService {
             return;
         }
         if (latestPlayer.isNotInLegend()) {
-            // 전설 리그 아닌 경우 기록하지 않음
+            // 전설 리그 아닌 경우 갱신 주기 변경
             recordRepository.deleteById(playerRecordId);
             return;
         }

@@ -139,6 +139,10 @@
   background-image: url("/images/hero/equipment/Electro_Boots.png");
   color: rgba(0, 0, 0, 0);
 }
+.img-icon.frost_flake {
+  background-image: url("/images/hero/equipment/Frost_Flake.png");
+  color: rgba(0, 0, 0, 0);
+}
 
 
 .img-icon.henchmen_puppet {

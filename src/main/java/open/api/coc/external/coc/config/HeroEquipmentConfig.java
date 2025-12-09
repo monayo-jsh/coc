@@ -52,6 +52,7 @@ public enum HeroEquipmentConfig {
 
     ROCKET_SPEAR(ROYAL_CHAMPION, 420, "epic", "Rocket Spear", "로켓창"),
     ELECTRO_BOOTS(ROYAL_CHAMPION, 421, "epic", "Electro Boots", "일렉트로 부츠"),
+    FROST_FLAKE(ROYAL_CHAMPION, 422, "epic", "Frost Flake", "서리 조각"),
 
     // 미니언 프린스
     HENCHMEN_PUPPET(MINION_PRINCE, 500, "normal", "Henchmen Puppet", "보디가드 인형"),

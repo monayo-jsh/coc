@@ -10,6 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/css/common.css" />
     <link rel="stylesheet" type="text/css" href="/css/loader.css" />
     <link rel="stylesheet" type="text/css" href="/css/button.css" />
+    <link rel="stylesheet" type="text/css" href="/css/townhall.css" />
     <link rel="stylesheet" type="text/css" href="/css/cms/ClanWarStatisticsPlayer.css" />
 
     <script src="/js/common.js"></script>
@@ -81,12 +82,13 @@
                                     || b.avgDuration - a.avgDuration
                           })
                           .map((player) => {
-                const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+                const { name, tag, townHallLevel, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
                 const completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
                 return {
                     '이름': name,
                     '태그': tag,
+                    '타운홀': townHallLevel,
                     '클랜': clanName,
                     '완파율': completeStarRatio,
                     '총 공격수': Number(totalAttackCount).toLocaleString(),
@@ -144,13 +146,14 @@
             const rankingRow = document.importNode(rankingRowTemplate.content, true);
             const row = rankingRow.querySelector('.table-tr');
 
-            const { name, tag, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
+            const { name, tag, townHallLevel, clanName, totalAttackCount, totalStars, threeStars, twoStars, oneStars, zeroStars, totalDestructionPercentage, avgDuration } = player;
 
             let completeStarRatio = calcCompleteStarRatio(totalStars, totalAttackCount);
 
             row.innerHTML = row.innerHTML
                                .replace(/{NAME}/, name)
                                .replace(/{TAG}/, tag)
+                               .replace(/{TOWN_HALL_LEVEL}/, townHallLevel)
                                .replace(/{CLAN_TAG_COLOR}/, isPageTypeClanWar() ? 'bg-green' : 'bg-crimson')
                                .replace(/{CLAN_NAME}/, clanName)
                                .replace(/{ATTACK_COUNT}/, totalAttackCount)
@@ -310,6 +313,7 @@
                     <thead class="table-thead">
                     <tr class="table-tr">
                         <th class="table-th no-sort">이름</th>
+                        <th class="table-th no-sort">타운홀</th>
                         <th class="table-th">총 공격수<br/>(완파율)</th>
                         <th class="table-th">총 획득별</th>
                         <th class="table-th">총 파괴율</th>
@@ -318,7 +322,7 @@
                     </thead>
                     <tbody class="table-tbody">
                     <tr class="table-tr">
-                        <td class="table-td" colspan="5">데이터 없음</td>
+                        <td class="table-td" colspan="6">데이터 없음</td>
                     </tr>
                     </tbody>
                 </table>
@@ -354,6 +358,11 @@
                 <div class="player-name">{NAME}</div>
                 <div class="chip">{TAG}</div>
                 <div class="chip {CLAN_TAG_COLOR}">{CLAN_NAME}</div>
+            </div>
+        </td>
+        <td class="table-td town-hall">
+            <div class="td-wrap">
+                <div class="town-hall th{TOWN_HALL_LEVEL}"></div>
             </div>
         </td>
         <td class="table-td" data-sort="{RATIO}">
@@ -393,7 +402,7 @@
 </template>
 <template id="clan-war-empty-row-template">
     <tr class="table-tr">
-        <td class="table-td empty" colspan="5">데이터 없음</td>
+        <td class="table-td empty" colspan="6">데이터 없음</td>
     </tr>
 </template>
 <template id="radio-item-template-default">

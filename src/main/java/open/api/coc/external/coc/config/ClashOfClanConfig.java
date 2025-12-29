@@ -1,6 +1,7 @@
 package open.api.coc.external.coc.config;
 
 
+import java.time.Duration;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -12,7 +13,17 @@ public class ClashOfClanConfig {
     private final String apiKey;
     private final String domain;
 
+    private final Timeout timeout;
+
     private final EndPoint endPoint;
+
+    @RequiredArgsConstructor
+    private static class Timeout {
+        private final Duration connect;
+        private final Duration response;
+        private final Duration read;
+        private final Duration write;
+    }
 
     @Getter
     @RequiredArgsConstructor
@@ -113,4 +124,16 @@ public class ClashOfClanConfig {
 
     public String getClanWarLeagueUri() { return getEndPoint().getClanWarLeagues().getClanWarLeagues();}
 
+    public Duration getConnectTimeout() {
+        return timeout.connect;
+    }
+    public Duration getReadTimeout() {
+        return timeout.read;
+    }
+    public Duration getWriteTimeout() {
+        return timeout.write;
+    }
+    public Duration getResponseTimeout() {
+        return timeout.response;
+    }
 }

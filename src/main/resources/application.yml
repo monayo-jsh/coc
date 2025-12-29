@@ -49,6 +49,11 @@ external:
   coc:
     api-key: ${COC_API_KEY}
     domain: https://api.clashofclans.com
+    timeout:
+      connect: 3s
+      response: 10s
+      read: 10s
+      write: 10s
     end-point:
       clans:
         prefix: /v1/clans

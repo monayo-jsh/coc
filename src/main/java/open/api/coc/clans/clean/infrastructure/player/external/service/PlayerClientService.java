@@ -1,26 +1,30 @@
 package open.api.coc.clans.clean.infrastructure.player.external.service;
 
-import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
-import io.github.resilience4j.circuitbreaker.CircuitBreaker;
-import io.github.resilience4j.decorators.Decorators;
-import java.util.Objects;
+import java.net.URI;
+import java.time.Duration;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
 import open.api.coc.clans.clean.infrastructure.player.external.exception.PlayerClientException;
 import open.api.coc.clans.clean.infrastructure.player.external.mapper.PlayerClientMapper;
 import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerResponse;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class PlayerClientService implements PlayerClient {
 
     private final ClashOfClanConfig clashOfClanConfig;
-    private final RestClient restClient;
-    private final CircuitBreaker circuitBreaker;
+    private final WebClient webClient;
 
     private final PlayerClientMapper playerClientMapper;
 
@@ -35,28 +39,37 @@ public class PlayerClientService implements PlayerClient {
     @Override
     public Player findByTag(String playerTag) {
         String requestPlayerTag = makeRequestPlayerTag(playerTag);
-        try {
-            PlayerResponse playerResponse = Decorators.ofSupplier(() -> restClient.get()
-                                                                                  .uri(clashOfClanConfig.getPlayerUri(), requestPlayerTag)
-                                                                                  .retrieve()
-                                                                                  .body(PlayerResponse.class))
-                                                      .withCircuitBreaker(circuitBreaker)
-                                                      .get();
 
-            if (Objects.isNull(playerResponse)) {
+        URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getPlayerUri()).build(requestPlayerTag);
+
+        try {
+            Optional<PlayerResponse> result = webClient.get()
+                                                       .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
+                                                       .retrieve()
+                                                       .onStatus(HttpStatusCode::isError,
+                                                                 response ->
+                                                                     response.bodyToMono(String.class)
+                                                                             .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                             .flatMap(body -> Mono.error(new RuntimeException(body))))
+                                                       .bodyToMono(PlayerResponse.class)
+                                                       .map(Optional::of)
+                                                       .defaultIfEmpty(Optional.empty())
+                                                       .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
+
+            if (result.isEmpty()) {
                 throw new PlayerClientException(requestPlayerTag);
             }
 
-            return playerClientMapper.toPlayer(playerResponse);
-        } catch (CallNotPermittedException ex) {
-            PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
-            playerClientException.addExtraMessage(ex.getMessage());
-            throw playerClientException;
+            return playerClientMapper.toPlayer(result.get());
         } catch (Exception e) {
+            log.warn("{} Request Call Failed. ", uri, e);
             PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
             playerClientException.addExtraMessage(e.getMessage());
             throw playerClientException;
         }
     }
 
+    private void writeLog(String uri, ClientResponse response, String body) {
+        log.warn("{} Request Failed. status={}, body={}", uri, response.statusCode(), body);
+    }
 }

@@ -76,7 +76,7 @@ public class ClanClientImpl implements ClanClient {
     public List<ClanMember> findMembersByTag(String clanTag) {
         String requestClanTag = makeRequestClanTag(clanTag);
 
-        URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getClansClanTagUri()).build(requestClanTag);
+        URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getClansClanMembersUri()).build(requestClanTag);
 
         try {
             Optional<ClanMemberListResponse> result = webClient.get()

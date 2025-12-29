@@ -1,5 +1,11 @@
 server:
   port: 8080
+  # 1core server
+  tomcat:
+    threads:
+      max: 20
+      min-spare: 5
+    accept-count: 30
 
 # jpa query log
 decorator:

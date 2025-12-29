@@ -1,5 +1,10 @@
 package open.api.coc.clans.clean.infrastructure.player.external.service;
 
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
+import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
+import jakarta.annotation.PostConstruct;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Optional;
@@ -20,13 +25,23 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class PlayerClientService implements PlayerClient {
 
     private final ClashOfClanConfig clashOfClanConfig;
     private final WebClient webClient;
 
+    private final CircuitBreaker circuitBreaker;
+
     private final PlayerClientMapper playerClientMapper;
+
+    public PlayerClientService(ClashOfClanConfig clashOfClanConfig, WebClient webClient,
+                               CircuitBreakerRegistry circuitBreakerRegistry,
+                               PlayerClientMapper playerClientMapper) {
+        this.clashOfClanConfig = clashOfClanConfig;
+        this.webClient = webClient;
+        this.circuitBreaker = circuitBreakerRegistry.circuitBreaker("clashOfClanApi");
+        this.playerClientMapper = playerClientMapper;
+    }
 
     public String makeRequestPlayerTag(String playerTag) {
         if (playerTag.startsWith("#")) {
@@ -52,6 +67,7 @@ public class PlayerClientService implements PlayerClient {
                                                                              .doOnNext(body -> writeLog(uri.toString(), response, body))
                                                                              .flatMap(body -> Mono.error(new RuntimeException(body))))
                                                        .bodyToMono(PlayerResponse.class)
+                                                       .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                                                        .map(Optional::of)
                                                        .defaultIfEmpty(Optional.empty())
                                                        .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
@@ -61,6 +77,11 @@ public class PlayerClientService implements PlayerClient {
             }
 
             return playerClientMapper.toPlayer(result.get());
+        } catch (CallNotPermittedException e) {
+            // Circuit OPEN
+            PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
+            playerClientException.addExtraMessage("Circuit breaker OPEN");
+            throw playerClientException;
         } catch (Exception e) {
             log.warn("{} Request Call Failed. ", uri, e);
             PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);

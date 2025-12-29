@@ -50,10 +50,10 @@ external:
     api-key: ${COC_API_KEY}
     domain: https://api.clashofclans.com
     timeout:
-      connect: 3s
-      response: 10s
-      read: 10s
-      write: 10s
+      connect: 1s
+      response: 1s
+      read: 2s
+      write: 2s
     end-point:
       clans:
         prefix: /v1/clans
@@ -77,7 +77,16 @@ external:
         war-tag: /{warTag}
 
 # circuit-breaker 설정
-
+resilience4j:
+  circuitbreaker:
+    instances:
+      clashOfClanApi:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 20
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 10
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 3
 
 # CMS 어드민 계정 설정
 cms:

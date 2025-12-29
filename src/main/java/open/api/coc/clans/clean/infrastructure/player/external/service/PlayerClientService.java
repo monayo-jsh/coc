@@ -58,32 +58,26 @@ public class PlayerClientService implements PlayerClient {
         URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getPlayerUri()).build(requestPlayerTag);
 
         try {
-            Optional<PlayerResponse> result = webClient.get()
-                                                       .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
-                                                       .retrieve()
-                                                       .onStatus(HttpStatusCode::isError,
-                                                                 response ->
-                                                                     response.bodyToMono(String.class)
-                                                                             .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                             .flatMap(body -> Mono.error(new RuntimeException(body))))
-                                                       .bodyToMono(PlayerResponse.class)
-                                                       .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-                                                       .map(Optional::of)
-                                                       .defaultIfEmpty(Optional.empty())
-                                                       .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
+            PlayerResponse searchPlayer = webClient.get()
+                                                   .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
+                                                   .retrieve()
+                                                   .onStatus(HttpStatusCode::isError,
+                                                             response ->
+                                                                 response.bodyToMono(String.class)
+                                                                         .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                         .flatMap(body -> Mono.error(new RuntimeException(body))))
+                                                   .bodyToMono(PlayerResponse.class)
+                                                   .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+                                                   .switchIfEmpty(Mono.error(new PlayerClientException(requestPlayerTag)))
+                                                   .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
 
-            if (result.isEmpty()) {
-                throw new PlayerClientException(requestPlayerTag);
-            }
-
-            return playerClientMapper.toPlayer(result.get());
+            return playerClientMapper.toPlayer(searchPlayer);
         } catch (CallNotPermittedException e) {
             // Circuit OPEN
             PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
             playerClientException.addExtraMessage("Circuit breaker OPEN");
             throw playerClientException;
         } catch (Exception e) {
-            log.warn("{} Request Call Failed. ", uri, e);
             PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);
             playerClientException.addExtraMessage(e.getMessage());
             throw playerClientException;

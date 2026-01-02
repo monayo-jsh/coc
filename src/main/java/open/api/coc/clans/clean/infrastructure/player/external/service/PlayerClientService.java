@@ -16,6 +16,7 @@ import open.api.coc.clans.clean.infrastructure.player.external.exception.PlayerC
 import open.api.coc.clans.clean.infrastructure.player.external.mapper.PlayerClientMapper;
 import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerResponse;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -60,15 +61,24 @@ public class PlayerClientService implements PlayerClient {
         try {
             PlayerResponse searchPlayer = webClient.get()
                                                    .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
-                                                   .retrieve()
-                                                   .onStatus(HttpStatusCode::isError,
-                                                             response ->
-                                                                 response.bodyToMono(String.class)
-                                                                         .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                         .flatMap(body -> Mono.error(new RuntimeException(body))))
-                                                   .bodyToMono(PlayerResponse.class)
+                                                   .exchangeToMono(
+                                                       response -> {
+                                                           if (response.statusCode() == HttpStatus.NOT_FOUND) {
+                                                               return response.bodyToMono(String.class)
+                                                                              .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                              .then(Mono.empty());
+                                                           }
+                                                           if (response.statusCode().isError()) {
+                                                               return response.bodyToMono(String.class)
+                                                                              .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                              .flatMap(body -> Mono.error(new RuntimeException(body)));
+                                                           }
+
+                                                           return response.bodyToMono(PlayerResponse.class);
+                                                       }
+                                                   )
                                                    .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-                                                   .switchIfEmpty(Mono.error(new PlayerClientException(requestPlayerTag)))
+                                                   .switchIfEmpty(Mono.error(new RuntimeException(requestPlayerTag)))
                                                    .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
 
             return playerClientMapper.toPlayer(searchPlayer);

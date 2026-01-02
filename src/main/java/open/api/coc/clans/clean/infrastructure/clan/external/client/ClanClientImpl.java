@@ -14,7 +14,9 @@ import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanMemberListR
 import open.api.coc.clans.clean.infrastructure.clan.external.dto.ClanResponse;
 import open.api.coc.clans.clean.infrastructure.clan.external.exception.ClanClientException;
 import open.api.coc.clans.clean.infrastructure.clan.external.mapper.ClanClientResponseMapper;
+import open.api.coc.clans.clean.infrastructure.player.external.model.PlayerResponse;
 import open.api.coc.external.coc.config.ClashOfClanConfig;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientResponse;
@@ -48,26 +50,29 @@ public class ClanClientImpl implements ClanClient {
         URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getClansClanTagUri()).build(requestClanTag);
 
         try {
-            Optional<ClanResponse> result = webClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
-                                                     .retrieve()
-                                                     .onStatus(HttpStatusCode::isError,
-                                                               response ->
-                                                                   response.bodyToMono(String.class)
-                                                                           .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                           .then(Mono.empty()))
-                                                     .bodyToMono(ClanResponse.class)
-                                                     .map(Optional::of)
-                                                     .defaultIfEmpty(Optional.empty())
-                                                     .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
+            ClanResponse result = webClient.get()
+                                           .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
+                                           .exchangeToMono(
+                                               response -> {
+                                                   if (response.statusCode() == HttpStatus.NOT_FOUND) {
+                                                       return response.bodyToMono(String.class)
+                                                                      .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                      .then(Mono.empty());
+                                                   }
+                                                   if (response.statusCode().isError()) {
+                                                       return response.bodyToMono(String.class)
+                                                                      .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                      .flatMap(body -> Mono.error(new RuntimeException(body)));
+                                                   }
 
-            if (result.isEmpty()) {
-                throw ClanClientException.ofClan(requestClanTag);
-            }
+                                                   return response.bodyToMono(ClanResponse.class);
+                                               }
+                                           )
+                                           .switchIfEmpty(Mono.error(new RuntimeException(clanTag)))
+                                           .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
 
-            return clanResponseMapper.toClan(result.get());
+            return clanResponseMapper.toClan(result);
         } catch (Exception e) {
-            log.warn("{} Request Call Failed. ", uri, e);
             throw ClanClientException.ofClan(requestClanTag);
         }
     }
@@ -79,30 +84,36 @@ public class ClanClientImpl implements ClanClient {
         URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getClansClanMembersUri()).build(requestClanTag);
 
         try {
-            Optional<ClanMemberListResponse> result = webClient.get()
+            ClanMemberListResponse result = webClient.get()
                                                      .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
-                                                     .retrieve()
-                                                     .onStatus(HttpStatusCode::isError,
-                                                               response ->
-                                                                   response.bodyToMono(String.class)
-                                                                           .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                           .then(Mono.empty()))
-                                                     .bodyToMono(ClanMemberListResponse.class)
-                                                     .map(Optional::of)
-                                                     .defaultIfEmpty(Optional.empty())
+                                                     .exchangeToMono(
+                                                         response -> {
+                                                             if (response.statusCode() == HttpStatus.NOT_FOUND) {
+                                                                 return response.bodyToMono(String.class)
+                                                                                .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                                .then(Mono.empty());
+                                                             }
+                                                             if (response.statusCode().isError()) {
+                                                                 return response.bodyToMono(String.class)
+                                                                                .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                                .flatMap(body -> Mono.error(new RuntimeException(body)));
+                                                             }
+
+                                                             return response.bodyToMono(ClanMemberListResponse.class);
+                                                         }
+                                                     )
+                                                     .switchIfEmpty(Mono.error(new RuntimeException(clanTag)))
                                                      .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
 
-            if (result.isEmpty()) {
-                throw ClanClientException.ofClan(requestClanTag);
+            if (result == null) {
+                throw new RuntimeException(clanTag);
             }
 
-            return result.get()
-                         .getItems()
+            return result.getItems()
                          .stream()
                          .map(clanResponseMapper::toClanMember)
                          .collect(Collectors.toList());
         } catch (Exception e) {
-            log.warn("{} Request Call Failed. ", uri, e);
             throw ClanClientException.ofClan(requestClanTag);
         }
     }

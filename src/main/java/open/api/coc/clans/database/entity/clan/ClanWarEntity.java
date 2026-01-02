@@ -33,9 +33,9 @@ import open.api.coc.clans.clean.domain.clan.exception.ClanWarMemberNotExistsExce
 @Table(
     name = "tb_clan_war",
     indexes = {
-        @Index(name = "TCW_IDX_01", columnList = "start_time, clan_tag"),
-        @Index(name = "TCW_IDX_02", columnList = "clan_tag"),
-        @Index(name = "TCW_IDX_03", columnList = "state")
+        @Index(name = "TCW_IDX_01", columnList = "clan_tag, start_time"),
+        @Index(name = "TCW_IDX_02", columnList = "state"),
+        @Index(name = "TCW_IDX_03", columnList = "start_time, type, state"),
     }
 )
 public class ClanWarEntity {

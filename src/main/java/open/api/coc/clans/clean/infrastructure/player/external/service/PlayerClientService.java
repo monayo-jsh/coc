@@ -6,6 +6,7 @@ import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import io.github.resilience4j.reactor.circuitbreaker.operator.CircuitBreakerOperator;
 import java.net.URI;
 import java.time.Duration;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import open.api.coc.clans.clean.domain.player.external.client.PlayerClient;
 import open.api.coc.clans.clean.domain.player.model.Player;
@@ -55,29 +56,34 @@ public class PlayerClientService implements PlayerClient {
         URI uri = UriComponentsBuilder.fromPath(clashOfClanConfig.getPlayerUri()).build(requestPlayerTag);
 
         try {
-            PlayerResponse searchPlayer = webClient.get()
-                                                   .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
-                                                   .exchangeToMono(
-                                                       response -> {
-                                                           if (response.statusCode() == HttpStatus.NOT_FOUND) {
-                                                               return response.bodyToMono(String.class)
-                                                                              .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                              .then(Mono.empty());
-                                                           }
-                                                           if (response.statusCode().isError()) {
-                                                               return response.bodyToMono(String.class)
-                                                                              .doOnNext(body -> writeLog(uri.toString(), response, body))
-                                                                              .flatMap(body -> Mono.error(new RuntimeException(body)));
-                                                           }
+            Optional<PlayerResponse> searchPlayer = webClient.get()
+                                                             .uri(uriBuilder -> uriBuilder.path(uri.getPath()).build())
+                                                             .exchangeToMono(
+                                                                 response -> {
+                                                                     if (response.statusCode() == HttpStatus.NOT_FOUND) {
+                                                                         return response.bodyToMono(String.class)
+                                                                                        .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                                        .then(Mono.empty());
+                                                                     }
+                                                                     if (response.statusCode().isError()) {
+                                                                         return response.bodyToMono(String.class)
+                                                                                        .doOnNext(body -> writeLog(uri.toString(), response, body))
+                                                                                        .flatMap(body -> Mono.error(new RuntimeException(body)));
+                                                                     }
 
-                                                           return response.bodyToMono(PlayerResponse.class);
-                                                       }
-                                                   )
-                                                   .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
-                                                   .switchIfEmpty(Mono.error(new RuntimeException(requestPlayerTag)))
-                                                   .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
+                                                                     return response.bodyToMono(PlayerResponse.class);
+                                                                 }
+                                                             )
+                                                             .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
+                                                             .map(Optional::of)
+                                                             .defaultIfEmpty(Optional.empty())
+                                                             .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
 
-            return playerClientMapper.toPlayer(searchPlayer);
+            if (searchPlayer.isEmpty()) {
+                throw new RuntimeException("Player not found: %s".formatted(playerTag));
+            }
+
+            return playerClientMapper.toPlayer(searchPlayer.get());
         } catch (CallNotPermittedException e) {
             // Circuit OPEN
             PlayerClientException playerClientException = new PlayerClientException(requestPlayerTag);

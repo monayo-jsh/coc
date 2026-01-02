@@ -84,7 +84,7 @@ public class ClanApiServiceImpl implements ClanApiService {
                             )
                             .transformDeferred(CircuitBreakerOperator.of(circuitBreaker))
                             .map(Optional::of)
-                            .switchIfEmpty(Mono.error(new RuntimeException(playTag)))
+                            .defaultIfEmpty(Optional.empty())
                             .block(Duration.ofSeconds(clashOfClanConfig.getReadTimeout().getSeconds()));
         } catch (Exception e) {
             throw new PlayerClientException(playTag);

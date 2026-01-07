@@ -112,7 +112,7 @@ scheduling:
         delay: 5000 # 서버 구동 후 실행 대기 (초)
         milli-sec: 300000 # 동기화 시간 5분 (5 * 60 * 1000)
       legend:
-        enabled: true
+        enabled: false
         record-milli-sec: 60000 # 플레이어 기록, 10초 (10 * 1000) -> 전설 계정 수집
   reset:
     season: "0 1 14 ? * MON" # 시즌 초기화

@@ -76,14 +76,14 @@ public class PlayerScheduler {
     private void processSyncPlayers() {
 
         // 플레이어 기록 설정되지 않은 플레이어를 대상으로 갱신
-        List<PlayerEntity> players = playersService.findAllWithoutRecordTarget();
+        List<String> players = playersService.findAllPlayerTags();
 
         final int offset = 50;
         for (int fromIndex = 0; fromIndex < players.size(); fromIndex += offset) {
-            List<PlayerEntity> syncPlayers = players.subList(fromIndex, Math.min(fromIndex + offset, players.size()));
+            List<String> syncPlayers = players.subList(fromIndex, Math.min(fromIndex + offset, players.size()));
             syncPlayers.stream()
                        .parallel()
-                       .forEach(player -> playerUseCase.synchronizePlayerFromSchedule("processSyncPlayers", player.getPlayerTag()));
+                       .forEach(player -> playerUseCase.synchronizePlayerFromSchedule("processSyncPlayers", player));
         }
 
     }

@@ -3,7 +3,7 @@ server:
   # 1core server
   tomcat:
     threads:
-      max: 50
+      max: 150
       min-spare: 5
     accept-count: 30
 
